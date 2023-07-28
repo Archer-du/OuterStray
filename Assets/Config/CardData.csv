@@ -1,0 +1,16 @@
+human_00,human,human_00,Artillery,0,1,1,1,test,-1,-1,none
+human_02,human,"黄蜂",Artillery,8,4,5,3,护甲（1），部署：随机消灭一个敌人。,-1,-1,none
+human_14,human,human_14,Motorized,5,2,5,3,test,-1,-1,<self:AfterDeploy+MushTokenGain-2-1-1>/<self:BeforeTerminate>
+human_17,human,human_17,LightArmor,4,3,6,4,部署：获得格挡。,-1,-1,<self:AfterDeploy+Armor-1-2>/<none>|<global:ally:EndOfTurn+SummonMushTokenInline-1-1>/<none>
+human_18,human,human_18,LightArmor,3,2,4,2,部署：为一个友方单位恢复3点生命值。,-1,-1,<global:ally:UnitDeployed+UnitGain-2-1-1>/<none>
+human_19,human,human_19,LightArmor,4,3,6,3,该单位进入前线时，抽一张卡。,-1,-1,<global:ally:EndOfTurn+AllyRecoverByATK-0>/<none>
+human_20,human,human_20,LightArmor,2,2,2,2,,-1,-1,none
+human_31,human,human_31,LightArmor,4,3,2,3,顺劈。,-1,-1,<self:AfterDeploy+AttackCounterDecrease-1-2>/<none>|<self:Meticulous+ReturnToHandicap-0>/<none>
+mush_00,plant,亮顶孢子,LightArmor,0,1,1,1,,-1,-1,none
+mush_01,plant,菇蕾,LightArmor,2,1,2,1,,-1,-1,none
+mush_02,plant,菇母,LightArmor,3,2,3,2,,-1,-1,none
+mush_03,plant,巨型马勃,Guardian,5,5,3,4,,-1,-1,<self:BeforeTerminate+DamageAdjacent-1-5>/<none>
+mush_04,plant,亮顶蘑菇,Motorized,5,2,5,3,,-1,-1,<self:AfterDeploy+MushTokenGain-2-1-1>/<self:BeforeTerminate>
+mush_06,plant,丛生者,Guardian,3,1,4,3,,-1,-1,<global:ally:UnitDeployed+UnitGain-2-1-1>/<none>
+mush_08,plant,喷射孢子丛,Artillery,1,2,1,2,,-1,-1,none
+mush_10,plant,臭臭菇,Artillery,4,3,4,3,,-1,-1,<self:AfterDeploy+RandomDamageFront-1-4>/<none>

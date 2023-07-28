@@ -1,0 +1,26 @@
+fileFormatVersion: 2
+guid: a86b7879b23a4c84e9e72ec88b0fca88
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - Forza
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 923a1483cb21706478e4cde25396f322, type: 3}
+  - {fileID: 12800000, guid: a4b6b1f756789a84dbfe8221060ab95b, type: 3}
+  - {fileID: 12800000, guid: 6455c544179391b43a02cc7e7bc71374, type: 3}
+  - {fileID: 12800000, guid: 279bb79a09fb3a94893fb651862382c0, type: 3}
+  - {fileID: 12800000, guid: 703e76d1b7ac21d4b9d8177d24c49cf2, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

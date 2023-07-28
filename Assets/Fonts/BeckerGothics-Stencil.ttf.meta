@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: 1459ada4546bc014c9684a1ab13cb962
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - Becker Gothics
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: e3def973cc2a1144f9aac188742bd18d, type: 3}
+  - {fileID: 12800000, guid: 92538f17564195f43a683561e5cbae4a, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

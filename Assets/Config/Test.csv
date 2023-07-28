@@ -1,0 +1,11 @@
+mush_00,ally,亮顶孢子,LightArmor,0,1,1,1,,-1,-1,none
+mush_01,ally,菇蕾,LightArmor,2,1,2,1,,-1,-1,none
+mush_02,ally,菇母,LightArmor,3,2,3,2,,-1,-1,none
+mush_03,ally,巨型马勃,Guardian,5,5,3,4,,-1,-1,<self:BeforeTerminate+DamageAdjacent-1-5>/<none>
+mush_04,ally,亮顶蘑菇,Motorized,5,2,5,3,,-1,-1,<self:AfterDeploy+MushTokenGain-2-1-1>/<self:BeforeTerminate>
+mush_05,ally,菌丝岩盘,Motorized,7,1,6,NA,,-1,-1,<self:AfterDeploy+Armor-1-2>/<none>|<global:ally:EndOfTurn+SummonMushTokenInline-1-1>/<none>
+mush_06,ally,丛生者,Guardian,3,0,4,NA,,-1,-1,<global:ally:UnitDeployed+UnitGain-2-1-1>/<none>
+mush_07,ally,治疗菌毯,Construction,3,2,4,NA,,-1,-1,<global:ally:EndOfTurn+AllyRecoverByATK-0>/<none>
+mush_08,ally,喷射孢子丛,Artillery,1,2,1,2,,-1,-1,none
+mush_09,ally,摇曳菇,Artillery,4,3,2,3,,-1,-1,<self:AfterDeploy+AttackCounterDecrease-1-2>/<none>|<self:Meticulous+ReturnToHandicap-0>/<none>
+mush_10,ally,臭臭菇,Artillery,4,3,4,3,,-1,-1,<self:AfterDeploy+RandomDamageFront-1-4>/<none>

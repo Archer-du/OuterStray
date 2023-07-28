@@ -1,0 +1,115 @@
+//Author@Archer
+using System.Collections;
+using System.Collections.Generic;
+using BattleDisplayEvent;
+using DataCore.Cards;
+using InputHandler;
+
+namespace DisplayInterface
+{
+	public interface IGameManagement
+	{
+
+	}
+	public interface IPoolDisplay
+	{
+
+	}
+	public interface IBuildingDisplay
+	{
+
+	}
+	public interface ICardDisplay
+	{
+		//public void TextDisplay(string __name, CardCategories __categories, int __attackPoint, int __cost, int __maxHealthPoint);
+	}
+	public interface ICommodityDisplay
+	{
+
+	}
+
+
+
+
+
+
+
+
+
+
+	public interface IBattleSceneController
+	{
+		/// <summary>
+		/// 战斗系统渲染层初始化
+		/// </summary>
+		/// <param name="handler"></param>
+		public void ControllerInitialize(IBattleSystemInput handler);
+
+		public IBattleLineController InstantiateBattleLine(int idx, int capacity);
+		public IHandicapController InstantiateHandicap(int turn);
+		public ICardStackController InstantiateCardStack(int turn);
+
+		public void UpdateTurnWithSettlement();
+		/// <summary>
+		/// 更新回合
+		/// </summary>
+		/// <param name="TURN"></param>
+		public void UpdateTurn(int TURN);
+		public void UpdateEnergy(int energy);
+		public void UpdateEnergy(int turn, int energy);
+		public void UpdateEnergySupply(int supply);
+		public void UpdateEnergySupply(int turn, int supply);
+
+
+		public void PushElementIntoHandicap(IUnitElementController element);
+		public void PushElementIntoHandicap(int turn, IUnitElementController element);
+
+	}
+	public interface IBattleLineController
+	{
+		public void Init(int capacity, int ownership);
+
+		public void Receive(IUnitElementController element, int dstPos);
+		public void InfoUpdate(int curlength, int ownership);
+	}
+
+	public interface ICardStackController
+	{
+		public IUnitElementController InstantiateUnitElement();
+		public IUnitElementController InstantiateUnitElement(int turn);
+		public ICommandElementController InstantiateCommandElement();
+	}
+
+
+
+	public interface IHandicapController
+	{
+		public void Push(IUnitElementController element);
+
+		public IUnitElementController Pop(int handicapIdx);
+	}
+	public interface IUnitElementController
+	{
+		public void Init(string ID, int ownership, IUnitInput input);
+
+		public void UpdateInfo(string name, string categories, int cost, int attackPoint, int healthPoint, int maxHealthPoint, int attackCounter, int operateCounter);
+
+		public void UpdateTarget(IUnitElementController t1, IUnitElementController t2, IUnitElementController t3, IUnitElementController target, int targetIdx);
+
+		public void Attack(IUnitElementController target);
+
+		public void RandomAttack(IUnitElementController target);
+
+		public void Terminate();
+		public void Damaged();
+
+	}
+
+
+
+
+	public interface ICommandElementController
+	{
+
+	}
+}
