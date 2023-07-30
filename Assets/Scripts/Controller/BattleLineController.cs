@@ -6,44 +6,43 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using System;
-using System.Xml.Linq;
 
 public class BattleLineController : MonoBehaviour,
     IBattleLineController
 {
-	//如果控件可以轻易获取到所需信息，就没必要使用数据层进行驱动
-
+	/// <summary>
+	/// 战线容量
+	/// </summary>
 	public int capacity;
-	//之后合并 现在可能出现不一致
-	public int count { get => elementList.Count; }
 
 	public List<UnitElementController> elementList;
+	public int count { get => elementList.Count; }
+
 
 	public GameObject background;
 	public Image image;
 
-	public float width;
-	public float interval = 20f;
-
-
-
-
-	public int LineIdx;
+	public int lineIdx;
 
 	public int ownerShip;
 
 
+	public float width;
+	public float interval = 20f;
 
+	public float updateTime = 0.2f;
+
+
+
+	public int cardWidth = 360;
+
+	public int childNum;
 
 
 	internal UnitElementController this[int index]
 	{
 		get => elementList[index];
 		set => elementList[index] = value;
-	}
-
-	public void Start()
-	{
 	}
 
 	/// <summary>
@@ -66,7 +65,11 @@ public class BattleLineController : MonoBehaviour,
 
 		image = background.GetComponent<Image>();
 		image.color = ownership == 0 ? Color.blue : Color.red;
+
+		childNum = transform.childCount;
 	}
+
+
 	/// <summary>
 	/// 接受Unit到战线
 	/// </summary>
@@ -77,18 +80,11 @@ public class BattleLineController : MonoBehaviour,
 		UnitElementController element = controller as UnitElementController;
 
 		element.transform.SetParent(transform);
-		element.transform.SetSiblingIndex(dstPos + 4);//TODO config child num
-		elementList.Insert(dstPos, element);
-		//update
-		for (int i = 0; i < elementList.Count; i++)
-		{
-			elementList[i].resIdx = i;
-			elementList[i].state = UnitState.inBattleLine;
-			elementList[i].line = this;
-			elementList[i].transform.SetSiblingIndex(i + 4);
-		}
 
-		UpdateDeployPosition();
+		elementList.Insert(dstPos, element);
+
+		UpdateElements();
+		UpdateElementPosition();
 	}
 
 
@@ -98,7 +94,7 @@ public class BattleLineController : MonoBehaviour,
 	/// </summary>
 	/// <param name="curlength"></param>
 	/// <param name="ownerShip"></param>
-	public void InfoUpdate(int curlength, int ownerShip)
+	public void UpdateInfo(int curlength, int ownerShip)
 	{
 		if(curlength != count) { throw new System.Exception("inaccurate"); }
 		this.ownerShip = ownerShip;
@@ -131,7 +127,8 @@ public class BattleLineController : MonoBehaviour,
 		{
 			int start = count / 2;
 			//一半卡牌 + 一半间隔
-			int offset = vtcPos > 0 ? (int)((vtcPos + 160) / 320) : (int)((vtcPos - 160) / 320);
+			int offset = vtcPos > 0 ? (int)((vtcPos + (cardWidth + interval) / 2) / (cardWidth + interval)) 
+				: (int)((vtcPos - (cardWidth + interval) / 2) / (cardWidth + interval));
 			pos = start + offset;
 			if (start + offset < 0)
 			{
@@ -144,7 +141,7 @@ public class BattleLineController : MonoBehaviour,
 		}
 		else
 		{
-			int offset = (int)(vtcPos / 320);
+			int offset = (int)(vtcPos / (cardWidth + interval));
 			int start = vtcPos > 0 ? (count / 2 + 1) : (count / 2);
 			pos = start + offset;
 			if(start + offset < 0)
@@ -159,48 +156,15 @@ public class BattleLineController : MonoBehaviour,
 
 		return pos;
 	}
+
+
 	//TODO
 	public int GetVerticalMovePos(float position)
 	{
-		if (count >= capacity)
-		{
-			return -1;
-		}
-		float vtcPos = position - 1980f;
-		int pos;
-		//CRITICAL ALGORITHM
-		if (count % 2 == 0)
-		{
-			int start = count / 2;
-			//一半卡牌 + 一半间隔
-			int offset = vtcPos > 0 ? (int)((vtcPos + 160) / 320) : (int)((vtcPos - 160) / 320);
-			pos = start + offset;
-			if (start + offset < 0)
-			{
-				pos = 0;
-			}
-			else if (start + offset > count)
-			{
-				pos = count;
-			}
-		}
-		else
-		{
-			int offset = (int)(vtcPos / 320);
-			int start = vtcPos > 0 ? (count / 2 + 1) : (count / 2);
-			pos = start + offset;
-			if (start + offset < 0)
-			{
-				pos = 0;
-			}
-			else if (start + offset > count)
-			{
-				pos = count;
-			}
-		}
-
-		return pos;
+		throw new NotImplementedException();
 	}
+
+
 
 
 
@@ -213,101 +177,113 @@ public class BattleLineController : MonoBehaviour,
 	{
 		IUnitElementController controller = elementList[idx];
 		elementList.RemoveAt(idx);
-		//update
-		for (int i = 0; i < elementList.Count; i++)
-		{
-			elementList[i].resIdx = i;
-			elementList[i].state = UnitState.inBattleLine;
-			elementList[i].line = this;
-			elementList[i].transform.SetSiblingIndex(i + 4);
-		}
 
-		UpdateDeployPosition();
+		UpdateElements();
+		UpdateElementPosition();
 
 		return controller;
 	}
-	public float updateTime = 0.2f;
 
 
 
-	public int cardWidth = 360;
-	public void UpdateDeployPosition()
+	public void UpdateElementPosition()
 	{
-		for (int i = 0; i < elementList.Count; i++)
+		UpdateElements();
+
+		for(int i = 0; i < elementList.Count; i++)
 		{
-			elementList[i].resIdx = i;
-			elementList[i].state = UnitState.inBattleLine;
-			elementList[i].line = this;
-			elementList[i].transform.SetSiblingIndex(i + 4);
-		}
-		if (elementList.Count % 2 == 0)
-		{
-			for (int i = 0; i < elementList.Count; i++)
+			Vector3 oriPos = elementList[i].transform.position;
+			Vector3 dstPos = GetInsertionPosition(i);
+
+			if (elementList[i].preprocessed == 1)
 			{
-				Vector3 oriPos = elementList[i].transform.position;
+				elementList[i].preprocessed = 0;
+				Vector3 moveBy = dstPos - oriPos;
+				Vector3 rotateBy = new Vector3(0, 0, 180);
 
-				Vector3 dstPos = transform.position + new Vector3((i - count / 2) * cardWidth + cardWidth / 2, 0, 0);
-				//TODO config
-
-				if (elementList[i].preprocessed == 1)
-				{
-					elementList[i].preprocessed = 0;
-					Vector3 moveBy = dstPos - oriPos;
-					Vector3 rotateBy = new Vector3(0, 0, 180);
-
-					Sequence seq = DOTween.Sequence();
-					seq.Append(elementList[i].transform.DOBlendableMoveBy(moveBy, updateTime));
-					seq.Join(elementList[i].transform.DOBlendableRotateBy(rotateBy, updateTime));
-					seq.Play();
-				}
-				else
-				{
-					elementList[i].transform.DOMove(dstPos, updateTime);
-				}
-
+				Sequence seq = DOTween.Sequence();
+				seq.Append(elementList[i].transform.DOBlendableMoveBy(moveBy, updateTime));
+				seq.Join(elementList[i].transform.DOBlendableRotateBy(rotateBy, updateTime));
+				seq.Play();
+			}
+			else
+			{
+				elementList[i].transform.DOMove(dstPos, updateTime);
 			}
 		}
-		else
-		{
-			for (int i = 0; i < elementList.Count; i++)
-			{
-				Vector3 oriPos = elementList[i].transform.position;
 
-				Vector3 dstPos = transform.position + new Vector3((i - count / 2) * cardWidth, 0, 0);
+		//if (elementList.Count % 2 == 0)
+		//{
+		//	for (int i = 0; i < elementList.Count; i++)
+		//	{
+		//		Vector3 oriPos = elementList[i].transform.position;
 
-				if (elementList[i].preprocessed == 1)
-				{
-					elementList[i].preprocessed = 0;
-					Vector3 moveBy = dstPos - oriPos;
-					Vector3 rotateBy = new Vector3(0, 0, 180);
+		//		Vector3 dstPos = transform.position + new Vector3((i - count / 2) * cardWidth + cardWidth / 2, 0, 0);
+		//		//TODO config
 
-					Sequence seq = DOTween.Sequence();
-					seq.Append(elementList[i].transform.DOBlendableMoveBy(moveBy, updateTime));
-					seq.Join(elementList[i].transform.DOBlendableRotateBy(rotateBy, updateTime));
-					seq.Play();
-				}
-				else
-				{
-					elementList[i].transform.DOMove(dstPos, updateTime);
-				}
-			}
-		}
+		//		if (elementList[i].preprocessed == 1)
+		//		{
+		//			elementList[i].preprocessed = 0;
+		//			Vector3 moveBy = dstPos - oriPos;
+		//			Vector3 rotateBy = new Vector3(0, 0, 180);
+
+		//			Sequence seq = DOTween.Sequence();
+		//			seq.Append(elementList[i].transform.DOBlendableMoveBy(moveBy, updateTime));
+		//			seq.Join(elementList[i].transform.DOBlendableRotateBy(rotateBy, updateTime));
+		//			seq.Play();
+		//		}
+		//		else
+		//		{
+		//			elementList[i].transform.DOMove(dstPos, updateTime);
+		//		}
+
+		//	}
+		//}
+		//else
+		//{
+		//	for (int i = 0; i < elementList.Count; i++)
+		//	{
+		//		Vector3 oriPos = elementList[i].transform.position;
+
+		//		Vector3 dstPos = transform.position + new Vector3((i - count / 2) * cardWidth, 0, 0);
+
+		//		if (elementList[i].preprocessed == 1)
+		//		{
+		//			elementList[i].preprocessed = 0;
+		//			Vector3 moveBy = dstPos - oriPos;
+		//			Vector3 rotateBy = new Vector3(0, 0, 180);
+
+		//			Sequence seq = DOTween.Sequence();
+		//			seq.Append(elementList[i].transform.DOBlendableMoveBy(moveBy, updateTime));
+		//			seq.Join(elementList[i].transform.DOBlendableRotateBy(rotateBy, updateTime));
+		//			seq.Play();
+		//		}
+		//		else
+		//		{
+		//			elementList[i].transform.DOMove(dstPos, updateTime);
+		//		}
+		//	}
+		//}
 	}
 
 
 	public void ElementDestroyed(int idx)
 	{
 		elementList.RemoveAt(idx);
+
+		UpdateElements();
+		UpdateElementPosition();
+	}
+	private void UpdateElements()
+	{
 		for (int i = 0; i < elementList.Count; i++)
 		{
 			elementList[i].resIdx = i;
 			elementList[i].state = UnitState.inBattleLine;
 			elementList[i].line = this;
-			elementList[i].transform.SetSiblingIndex(i + 4);
+			elementList[i].transform.SetSiblingIndex(i + childNum);
 		}
-		UpdateDeployPosition();
 	}
-
 
 
 	public float returnTime = 0.2f;
@@ -320,9 +296,8 @@ public class BattleLineController : MonoBehaviour,
 	private void ResetHierachy()
 	{
 		draggingElement.transform.SetParent(transform);
-		draggingElement.transform.SetSiblingIndex(draggingElement.resIdx + 4);//TODO 4
+		draggingElement.transform.SetSiblingIndex(draggingElement.resIdx + childNum);
 	}
-	//可以和UpdateDeploy组出复用块
 	private Vector3 GetInsertionPosition(int index)
 	{
 		return transform.position + new Vector3((index - count / 2) * cardWidth + cardWidth / 2 * ((count + 1) % 2), 0, 0);

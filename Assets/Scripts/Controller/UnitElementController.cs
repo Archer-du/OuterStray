@@ -68,12 +68,8 @@ public class UnitElementController : MonoBehaviour,
 		state = UnitState.inHandicap;
 
 	}
-	//激活后才会调用
-	void Start()
-	{
 
 
-	}
 	/// <summary>
 	/// 从牌堆加入手牌或战场时初始化
 	/// </summary>
@@ -224,26 +220,6 @@ public class UnitElementController : MonoBehaviour,
 			costTag.gameObject.SetActive(false);
 			costText.gameObject.SetActive(false);
 		}
-	}
-
-
-
-	private void Display()
-	{
-		nameText.text = nameContent;
-		attackText.text = attackPoint.ToString();
-		healthText.text = healthPoint.ToString();
-		attackCounterText.text = attackCounter.ToString();
-		costText.text = cost.ToString();
-
-		if (operateCounter == 0)
-		{
-			mask.DOColor(new Color(0, 0, 0, 0.5f), duration); // 使用DOTween来平滑地改变颜色
-		}
-		else
-		{
-			mask.DOColor(new Color(0, 0, 0, 0), duration); // 使用DOTween来平滑地改变颜色
-		}
 		//DOTween.To(
 		//	() => "", // getter返回空字符串
 		//	value => nameText.text = value, // setter设置costText的内容
@@ -281,6 +257,10 @@ public class UnitElementController : MonoBehaviour,
 		//	0.2f
 		//).SetEase(Ease.Linear); // 设置动画为线性变化
 	}
+
+
+
+
 	public Vector3 arrowScale;
 	public Vector3 enlargeArrowScale;
 
@@ -295,12 +275,12 @@ public class UnitElementController : MonoBehaviour,
 		this.t2 = t2 as UnitElementController;
 		this.t3 = t3 as UnitElementController;
 		this.target = target as UnitElementController;
-		Debug.Log("line: " + line.LineIdx + "res: " + resIdx);
+		Debug.Log("line: " + line.lineIdx + "res: " + resIdx);
 
-		Debug.Log(this.t1?.resIdx);
-		Debug.Log(this.t2?.resIdx);
-		Debug.Log(this.t3?.resIdx);
-		Debug.Log(targetIdx);
+		//Debug.Log(this.t1?.resIdx);
+		//Debug.Log(this.t2?.resIdx);
+		//Debug.Log(this.t3?.resIdx);
+		//Debug.Log(targetIdx);
 		switch (targetIdx)
 		{
 			case 0:
@@ -337,7 +317,8 @@ public class UnitElementController : MonoBehaviour,
 		Vector3 oriPosition = transform.position;
 
 		Debug.Log(resIdx + " attacked " + controller.resIdx);
-		battleSceneManager.attackSequence.Append(
+
+		battleSceneManager.rotateSequence.Append(
 			transform.DOMove(controller.transform.position, 0.2f).OnComplete(() =>
 			{
 				if (controller.gameObject.activeSelf && controller.gameObject != null)
@@ -347,10 +328,10 @@ public class UnitElementController : MonoBehaviour,
 				input.UpdateManual();
 			})
 		);
-		battleSceneManager.attackSequence.Append(
-			transform.DOMove(oriPosition, 0.2f)
+		battleSceneManager.rotateSequence.Append(
+			transform.DOMove(oriPosition, 0.2f)//.OnComplete(() => line.UpdateElementPosition())
 		);
-		battleSceneManager.attackSequence.AppendInterval(0.4f);
+		battleSceneManager.rotateSequence.AppendInterval(0.4f);
 		battleSceneManager.sequenceNum++;
 		
 	}
@@ -363,7 +344,7 @@ public class UnitElementController : MonoBehaviour,
 		Vector3 oriPosition = transform.position;
 
 		Debug.Log(resIdx + " random attacked " + controller.resIdx);
-		battleSceneManager.attackSequence.Append(
+		battleSceneManager.rotateSequence.Append(
 			transform.DOMove(transform.position + 100f * Vector3.up, 0.2f).OnComplete(() =>
 			{
 				if (controller.gameObject.activeSelf && controller.gameObject != null)
@@ -373,10 +354,10 @@ public class UnitElementController : MonoBehaviour,
 				input.UpdateManual();
 			})
 		);
-		battleSceneManager.attackSequence.Append(
+		battleSceneManager.rotateSequence.Append(
 			transform.DOMove(oriPosition, 0.2f)
 		);
-		battleSceneManager.attackSequence.AppendInterval(0.4f);
+		battleSceneManager.rotateSequence.AppendInterval(0.4f);
 		battleSceneManager.sequenceNum++;
 	}
 	public void Terminate()
@@ -424,8 +405,6 @@ public class UnitElementController : MonoBehaviour,
 
 
 	private Transform buffer;
-
-
 
 	public float scaleTime = 0.3f;
 	public void OnDrag(PointerEventData eventData)
@@ -486,11 +465,11 @@ public class UnitElementController : MonoBehaviour,
 		//移动条件判定
 		if (state == UnitState.inBattleLine)
 		{
-			//好逆天的回调。。
-			//if (operateCounter == 0)
-			//{
-			//	return;
-			//}
+			//好逆天的回调。。TODO
+			if (operateCounter == 0)
+			{
+				return;
+			}
 			HandicapController.isDragging = false;
 			if (battleSceneManager.PlayerMove(eventData.position, this.line, this) >= 0)
 			{

@@ -5,10 +5,15 @@ using UnityEngine.EventSystems;
 using DG.Tweening;
 using DisplayInterface;
 using System;
+using System.Xml.Linq;
+using UnityEngine.UIElements;
 
 public class HandicapController : MonoBehaviour,
 	IHandicapController
 {
+	public Transform parent;
+
+
 	private int ownership;
 
 	private float length;
@@ -20,7 +25,7 @@ public class HandicapController : MonoBehaviour,
 	/// 手牌数，有上限
 	/// </summary>
 	/// //TODO
-	private int count { get => handiCards.Count; }
+	public int count { get => handiCards.Count; }
 
 	public static bool isDragging;
 
@@ -64,16 +69,59 @@ public class HandicapController : MonoBehaviour,
 		// 初始化目标位置为原始位置
 		targetPosition = originalPosition + hoverDistance * Vector3.up;
 		awaked = true;
+
+		//parent = GameObject.Find("RedemptionZone" GetComponent<Transform>();
+	}
+
+
+
+
+
+
+	private float popTime = 0.3f;
+
+	public void Fill(List<IUnitElementController> list)
+	{
+		Sequence seq = DOTween.Sequence();
+		pushing = true;
+		for (int i = 0; i < list.Count; i++)
+		{
+			UnitElementController element = list[i] as UnitElementController;
+
+			element.gameObject.SetActive(true);
+			element.transform.SetParent(transform);
+
+			Vector3 moveBy = GetInsertionPosition(i) - element.transform.position;
+			Vector3 rotateBy = new Vector3(0, 0, (1 - (ownership * 2)) * 90);
+
+			int temp = i;
+			seq.Append(element.transform.DOBlendableMoveBy(moveBy, popTime));
+			seq.Join(element.transform.DOBlendableRotateBy(rotateBy, popTime)
+				.OnComplete(() =>
+				{
+					handiCards.Add(element);
+					UpdateElements();
+					UpdateHandicapPosition();
+				}));
+
+			
+		}
+		UpdateElements();
+
+		seq.OnComplete(() =>
+		{
+			pushing = false;
+			UpdateHandicapPosition();
+		});
+		seq.Play();
 	}
 	/// <summary>
-	/// 播放动画，将element控件加入到手牌列表中
+	/// 播放动画，将element控件加入到手牌列表中(动画结束后才能加入到手牌中)
 	/// </summary>
 	/// <param name="element"></param>
-	public float popTime = 0.6f;
 	public static bool pushing = false;
 	public void Push(IUnitElementController controller)
 	{
-		if(!awaked) Init();
 		if(count >= capacity)
 		{
 			return;
@@ -82,35 +130,33 @@ public class HandicapController : MonoBehaviour,
 		UnitElementController element = controller as UnitElementController;
 
 		element.gameObject.SetActive(true);
-
 		element.transform.SetParent(transform);
 
-		Vector3 moveBy = GetTargetPosition() - element.transform.position;
 
+		Vector3 moveBy = GetInsertionPosition(count) - element.transform.position;
 		Vector3 rotateBy = new Vector3(0, 0, (1 - (ownership * 2)) * 90);
 
 		Sequence seq = DOTween.Sequence();
 		seq.Append(element.transform.DOBlendableMoveBy(moveBy, popTime));
-		seq.Join(element.transform.DOBlendableRotateBy(rotateBy, popTime));
-		pushing = true;
+		seq.Join(element.transform.DOBlendableRotateBy(rotateBy, popTime)
+			.OnComplete(() =>
+			{
+				handiCards.Add(element);
+				UpdateElements();
+				UpdateHandicapPosition();
+				pushing = false;
+			}));
 		seq.Play();
-		seq.OnComplete(() => pushing = false);
+	}
 
-		handiCards.Add(element);
-		for(int i = 0; i < handiCards.Count; i++)
+	private void UpdateElements()
+	{
+		for (int i = 0; i < handiCards.Count; i++)
 		{
 			handiCards[i].handicapIdx = i;
+			handiCards[i].state = UnitState.inHandicap;
 		}
 	}
-	/// <summary>
-	/// 获取手牌区下一个空位的位置
-	/// </summary>
-	/// <returns></returns>
-	private Vector3 GetTargetPosition()
-	{
-		return originalPosition + (1 - (ownership * 2)) * (- new Vector3(length / 2, 0, 0) + count * new Vector3(gridWidth, 0, 0));
-	}
-
 
 
 
@@ -124,10 +170,7 @@ public class HandicapController : MonoBehaviour,
 	{
 		IUnitElementController controller = handiCards[handicapIdx];
 		handiCards.RemoveAt(handicapIdx);
-		for (int i = 0; i < handiCards.Count; i++)
-		{
-			handiCards[i].handicapIdx = i;
-		}
+		UpdateElements();
 
 		HandicapController.isDragging = true;
 
@@ -141,8 +184,7 @@ public class HandicapController : MonoBehaviour,
 		for (int i = 0; i < handiCards.Count; i++)
 		{
 			Vector3 oriPos = handiCards[i].transform.position;
-
-			Vector3 dstPos = originalPosition + (1 - ownership * 2) * new Vector3(i * gridWidth - length / 2, 0, 0);
+			Vector3 dstPos = GetInsertionPosition(i);
 			//TODO config
 
 			handiCards[i].transform.DOMove(dstPos, updateTime).OnComplete(() => HandicapController.isDragging = false);
@@ -172,14 +214,26 @@ public class HandicapController : MonoBehaviour,
 		draggingElement.transform.SetSiblingIndex(draggingElement.handicapIdx + 2);
 
 	}
+	/// <summary>
+	/// 根据索引获取对应手牌区位置坐标
+	/// </summary>
+	/// <param name="index"></param>
+	/// <returns></returns>
+	//public Vector3 GetInsertionPosition(int index)
+	//{
+	//	return originalPosition + (1 - (ownership * 2)) * (index * new Vector3(gridWidth - length / 2, 0, 0));
+	//}
 	public Vector3 GetInsertionPosition(int index)
 	{
-		return originalPosition + (1 - (ownership * 2)) * (-new Vector3(length / 2, 0, 0) + index * new Vector3(gridWidth, 0, 0));
+		Vector3 offset = new Vector3((index - count / 2) * gridWidth + gridWidth / 2 * ((count + 1) % 2), 0, 0);
+		return transform.position + offset;
 	}
-
-
-
-
+	public Vector3 GetInsertionPosition(int index, int count)
+	{
+		Debug.Log("index " + index + "count " + count);
+		Vector3 offset = new Vector3((index - count / 2) * gridWidth + gridWidth / 2 * ((count + 1) % 2), 0, 0);
+		return transform.position + offset;
+	}
 
 	//public void OnPointerEnter(PointerEventData eventData)
 	//{

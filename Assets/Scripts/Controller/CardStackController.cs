@@ -25,7 +25,7 @@ public class CardStackController : MonoBehaviour,
 	/// </summary>
 	/// <param name="turn"></param>
 	/// <returns></returns>
-	public IUnitElementController InstantiateUnitElement(int turn)
+	public IUnitElementController InstantiateUnitElementInBattle(int turn)
 	{
 		if (awaked == false) Init();
 

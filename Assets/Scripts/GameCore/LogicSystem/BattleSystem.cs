@@ -10,6 +10,7 @@ using SystemEventHandler;
 using System;
 using DataCore.CultivateItems;
 using System.Xml.Linq;
+using PlasticGui;
 
 namespace LogicCore
 {
@@ -88,7 +89,7 @@ namespace LogicCore
 		/// <summary>
 		/// 敌我部署栈
 		/// </summary>
-		internal Stack[] deployStack;
+		internal List<UnitElement> deployQueue;
 
 
 
@@ -105,7 +106,7 @@ namespace LogicCore
 			//系统层渲染接口
 			controller = bsdspl;
 			//返回输入句柄
-			controller.ControllerInitialize(this);
+			controller.FieldInitialize(this);
 
 
 			//test segment TODO------
@@ -117,7 +118,7 @@ namespace LogicCore
 			plantDeck.LoadDeckFromPool(pool, "enemy");
 			//-----------------------
 
-
+			//TODO 之后由战术层参数化
 			eventTable = new EventTable[2] { new EventTable(), new EventTable() };
 
 			//初始回合为玩家
@@ -125,26 +126,23 @@ namespace LogicCore
 			controller.UpdateTurn(TURN);
 
 			//数据层初始化
+			linesCapacity = 4;
 			battleLines = new List<BattleLine>(linesCapacity);
 
 			supportLines = new int[2] { 0, linesCapacity - 1 };
-			stacks = new RandomCardStack[2] { new RandomCardStack(), new RandomCardStack() };
-			handicaps = new RedemptionZone[2] { new RedemptionZone(), new RedemptionZone() };
+			stacks = new RandomCardStack[2];
+			handicaps = new RedemptionZone[2];
 
 			frontLines = new int[2] { 0, 1 };
 
 			energy = new int[2] { 10, 10 };
 			energySupply = new int[2] { 1, 1 };
 
+			deployQueue = new List<UnitElement>();
+
 
 
 			//渲染控件初始化
-			stacks[0].controller = controller.InstantiateCardStack(0);
-			stacks[1].controller = controller.InstantiateCardStack(1);
-
-			handicaps[0].controller = controller.InstantiateHandicap(0);
-			handicaps[1].controller = controller.InstantiateHandicap(1);
-
 			controller.UpdateEnergy(0, energy[0]);
 			controller.UpdateEnergy(1, energy[1]);
 
@@ -152,8 +150,10 @@ namespace LogicCore
 			controller.UpdateEnergySupply(1, energySupply[1]);
 
 			//TODO remove
-			BuildBattleFIeld(null, null, 4);
+			BuildBattleField(null, null, 4);
 		}
+
+
 
 
 
@@ -163,7 +163,7 @@ namespace LogicCore
 		/// </summary>
 		/// <param name="deck"></param>
 		/// <param name="enemyDeck"></param>
-		internal void BuildBattleFIeld(Deck deck, Deck enemyDeck, int lineCapacity)
+		internal void BuildBattleField(Deck deck, Deck enemyDeck, int lineCapacity)
 		{
 			BuildBattleLine(lineCapacity);
 
@@ -171,6 +171,10 @@ namespace LogicCore
 			BuildPlantStack(enemyDeck);
 
 			InitializeHandicaps();
+		}
+		internal void UnloadBattleField()
+		{
+
 		}
 
 		/// <summary>
@@ -186,8 +190,9 @@ namespace LogicCore
 				if (i == supportLines[TURN])
 				{
 					battleLines.Add(new BattleLine(5));//TODO config
-					battleLines[i].controller = controller.InstantiateBattleLine(i, 5);
 					battleLines[i].ownerShip = 0;
+
+					battleLines[i].controller = controller.InstantiateBattleLine(i, 5);
 				}
 				else if (i == supportLines[(TURN + 1)%2])
 				{
@@ -200,6 +205,7 @@ namespace LogicCore
 					battleLines.Add(new BattleLine(len));
 					battleLines[i].controller = controller.InstantiateBattleLine(i,	len);
 				}
+				battleLines[i].index = i;
 
 				battleLines[i].Init();
 			}
@@ -214,6 +220,9 @@ namespace LogicCore
 
 		private void BuildHumanStack(Deck deck)
 		{
+			stacks[0] = new RandomCardStack();
+			stacks[0].controller = controller.InstantiateCardStack(0);
+
 			stacks[0].Fill(humanDeck);
 		}
 		private void UnloadHumanStack()
@@ -223,9 +232,12 @@ namespace LogicCore
 
 
 		//REVIEW
-		//TODO 导入方式与人类不同
+		//TODO 导入方式与human不同
 		private void BuildPlantStack(Deck deck)
 		{
+			stacks[1] = new RandomCardStack();
+			stacks[1].controller = controller.InstantiateCardStack(1);
+
 			stacks[1].Fill(plantDeck);
 		}
 		private void UnloadPlantStack()
@@ -237,13 +249,25 @@ namespace LogicCore
 
 		private void InitializeHandicaps()
 		{
+			handicaps[0] = new RedemptionZone();
+			handicaps[1] = new RedemptionZone();
+			handicaps[0].controller = controller.InstantiateHandicap(0);
+			handicaps[0].controller.Init();
+			handicaps[1].controller = controller.InstantiateHandicap(1);
+			handicaps[1].controller.Init();
+
+			List<BattleElement>[] list;
+			list = new List<BattleElement>[2];
+			list[0] = new List<BattleElement>();
+			list[1] = new List<BattleElement>();
 			//初始化手牌
 			for (int i = 0; i < SystemConfig.handicapInit; i++)
 			{
-				handicaps[0].Push(stacks[0].RandomPop());
-
-				handicaps[1].Push(stacks[1].RandomPop());
+				list[0].Add(stacks[0].RandomPop());
+				list[1].Add(stacks[1].RandomPop());
 			}
+			handicaps[0].Fill(list[0]);
+			handicaps[1].Fill(list[1]);
 		}
 		private void UnloadHandicaps()
 		{
@@ -295,15 +319,16 @@ namespace LogicCore
 			controller.UpdateEnergy(energy[TURN]);
 
 
-			element.Deploy(battleLines[dstLineIdx]);
 
 			battleLines[dstLineIdx].Receive(element, dstPos);
 
 			//更新前线指针
 			UpdateFrontLine();
 			//更新目标
-			UpdateTarget();
+			UpdateAttackRange();
 
+			deployQueue.Add(element);
+			element.Deploy(this);
 
 
 			if (dstLineIdx == frontLines[TURN])
@@ -354,12 +379,11 @@ namespace LogicCore
 
 			battleLines[dstLineIdx].Receive(battleLines[resLineIdx].Send(resIdx), dstPos);
 
-			element.Move(battleLines[dstLineIdx]);
-
 			//先更新前线再更新目标
 			UpdateFrontLine();
-			UpdateTarget();
+			UpdateAttackRange();
 
+			element.Move(battleLines[dstLineIdx]);
 
 
 			if (dstLineIdx == frontLines[TURN])
@@ -379,16 +403,20 @@ namespace LogicCore
 				throw new InvalidOperationException("battleLine out of range");
 			}
 
+			eventTable[TURN].RaiseEvent("MoveUnit", null, this);
+
+
 			UnitElement element = battleLines[resLineIdx][resIdx];
-
-
 			battleLines[resLineIdx].Receive(battleLines[resLineIdx].Send(resIdx), dstPos);
 
 			//先更新前线再更新目标
 			UpdateFrontLine();
-			UpdateTarget();
+			UpdateAttackRange();
 
 			element.Move(battleLines[resLineIdx]);
+
+
+			eventTable[TURN].RaiseEvent("UnitMoved", null, this);
 		}
 
 
@@ -396,7 +424,7 @@ namespace LogicCore
 
 		public void Retreat(int resLineIdx, int resIdx)
 		{
-			UnitElement element = battleLines[resLineIdx].Send(resIdx);
+			UnitElement element = battleLines[resLineIdx][resIdx];
 
 			//单位剩余可操作次数为0
 			if (element.operateCounter <= 0)
@@ -405,12 +433,12 @@ namespace LogicCore
 				throw new InvalidOperationException();
 			}
 
+
+			handicaps[TURN].Push(battleLines[resLineIdx][resIdx]);
 			element.Retreat();
 
-			handicaps[TURN].Push(element);
-
 			UpdateFrontLine();
-			UpdateTarget();
+			UpdateAttackRange();
 		}
 
 
@@ -420,29 +448,31 @@ namespace LogicCore
 		{
 			eventTable[TURN].RaiseEvent("EndOfTurn", null, this);
 
-			//TODO 有上限
+			//TODO 可能有上限
 			energy[TURN] += energySupply[TURN];
 			controller.UpdateEnergy(energy[TURN]);
 
-			//TODO 有上限
 			energySupply[TURN] = energySupply[TURN] + 1 > 5 ? 5 : energySupply[TURN] + 1;
 			controller.UpdateEnergySupply(energySupply[TURN]);
 
-			if (handicaps[TURN].count < handicaps[TURN].capacity)//TODO simplify
+			//发牌
+			if (handicaps[TURN].count < handicaps[TURN].capacity)
 			{
 				BattleElement element = stacks[TURN].RandomPop();
-				if(element != null)
-				{
-					handicaps[TURN].Push(element);
-				}
+				handicaps[TURN].Push(element);
 			}
 
 			//UpdateFrontLine();
 			//UpdateTarget();
-
-
-			RotateUpdate();
-			UpdateTarget();
+			//RotateSettlement();
+			for(int i = 0; i < deployQueue.Count; i++)
+			{
+				if (deployQueue[i].ownership == TURN && deployQueue[i].state == UnitState.inbattleLine)
+				{
+					deployQueue[i].RotateSettlement();
+					UpdateAttackRange();
+				}
+			}
 
 
 			TURN = (TURN + 1) % 2;
@@ -454,6 +484,9 @@ namespace LogicCore
 		{
 			throw new System.NotImplementedException();
 		}
+
+
+
 
 
 
@@ -471,9 +504,8 @@ namespace LogicCore
 			return false;
 		}
 		/// <summary>
-		/// return true if aligned with the opposite front line
+		/// 
 		/// </summary>
-		/// <param name="__other"></param>
 		/// <returns></returns>
 		private bool FrontLineAlign()
 		{
@@ -502,7 +534,7 @@ namespace LogicCore
 		/// <summary>
 		/// 更新全场所有单位的目标
 		/// </summary>
-		internal void UpdateTarget()
+		internal void UpdateAttackRange()
 		{
 			for (int i = 0; i < linesCapacity; i++)
 			{
@@ -563,27 +595,43 @@ namespace LogicCore
 			}
 		}
 
-		private void RotateUpdate()
-		{
-			for (int i = 0; i < linesCapacity; i++)
-			{
-				for (int j = 0; j < battleLines[i].count; j++)
-				{
-					battleLines[i][j].battleSystem = this;
-				}
-			}
-			for (int i = 0; i < linesCapacity; i++)
-			{
-				if (battleLines[i].ownerShip == TURN)
-				{
-					for (int j = 0; j < battleLines[i].count; j++)
-					{
-						battleLines[i][j].RotateUpdate();
-					}
-				}
-			}
-		}
 
+
+		//private void RotateSettlement()
+		//{
+		//	for (int i = 0; i < linesCapacity; i++)
+		//	{
+		//		for (int j = 0; j < battleLines[i].count; j++)
+		//		{
+		//			battleLines[i][j].battleSystem = this;
+		//		}
+		//	}
+		//	for (int i = 0; i < linesCapacity; i++)
+		//	{
+		//		if (battleLines[i].ownerShip == TURN)
+		//		{
+		//			for (int j = 0; j < battleLines[i].count; j++)
+		//			{
+		//				battleLines[i][j].RotateUpdate();
+		//			}
+		//		}
+		//	}
+		//}
+
+
+
+
+
+
+
+
+
+		//一些战场查询方法
+
+		/// <summary>
+		/// 查询敌方随机目标 TODO
+		/// </summary>
+		/// <returns></returns>
 		internal UnitElement RandomTarget()
 		{
 
@@ -624,13 +672,4 @@ namespace LogicCore
 			//commandElement.Invoke
 		}
 	}
-}
-
-namespace BattleDisplayEvent
-{
-	public delegate void InstantiateHandler();
-
-	public delegate void DestroyHandler();
-
-	public delegate void UpdateHandler();
 }

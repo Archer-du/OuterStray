@@ -9,6 +9,7 @@ using DataCore.BattleElements;
 using DataCore.TacticalItems;
 
 using DisplayInterface;
+using System.Xml.Linq;
 
 
 namespace DataCore.BattleItems
@@ -40,6 +41,10 @@ namespace DataCore.BattleItems
 		/// 归属权 0为敌方
 		/// </summary>
 		internal int ownerShip;
+		/// <summary>
+		/// 战线编号
+		/// </summary>
+		internal int index;
 
 
 
@@ -63,22 +68,14 @@ namespace DataCore.BattleItems
 		/// </summary>
 		/// <param name="element"></param>
 		/// <param name="pos"></param>
-		/// <exception cref="InvalidOperationException"></exception>
 		internal void Receive(UnitElement element, int pos)
 		{
-			// TODO throw event
-			elementList.Insert(pos, element);
 			this.ownerShip = element.ownership;
-			//TODO check
-			for(int i = 0; i < count; i++)
-			{
-				elementList[i].inlineIdx = i;
-				elementList[i].battleLine = this;
-			}
 
-			//display
-			//controller.Receive(element.controller, pos);
-			InfoUpdate();
+			elementList.Insert(pos, element);
+
+			UpdateElements();
+			UpdateInfo();
 		}
 
 		internal UnitElement Send(int Idx)
@@ -86,38 +83,42 @@ namespace DataCore.BattleItems
 			UnitElement element = elementList[Idx];
 
 			elementList.RemoveAt(Idx);
-			for (int i = 0; i < count; i++)
-			{
-				elementList[i].inlineIdx = i;
-				elementList[i].battleLine = this;
-			}
 
-			InfoUpdate();
+			UpdateElements();
+			UpdateInfo();
 
 			return element;
 		}
 
-		internal void ElementDestroy(int idx)
+		internal void UpdateElements()
 		{
-			elementList.RemoveAt(idx);
 			for (int i = 0; i < count; i++)
 			{
+				elementList[i].state = UnitState.inbattleLine;
 				elementList[i].inlineIdx = i;
 				elementList[i].battleLine = this;
 			}
+		}
+		internal void ElementRemove(int idx)
+		{
+			elementList.RemoveAt(idx);
+			UpdateElements();
 		}
 
 		internal void Init()
 		{
 			controller.Init(capacity, ownerShip);
 		}
-		internal void InfoUpdate()
+		internal void UpdateInfo()
 		{
 			//display
-			controller.InfoUpdate(count, ownerShip);
+			controller.UpdateInfo(count, ownerShip);
 		}
 
 	}
+
+
+
 
 
 	internal class RandomCardStack
@@ -150,11 +151,17 @@ namespace DataCore.BattleItems
 			{
 				stack.Add(deck[i]);
 
+
 				if (deck[i] is UnitElement)
 				{
 					UnitElement element = deck[i] as UnitElement;
-					element.controller = controller.InstantiateUnitElement(element.ownership);
-					
+					element.state = UnitState.inStack;
+
+					element.controller = controller.InstantiateUnitElementInBattle(element.ownership);
+				}
+				else
+				{
+					//TODO
 				}
 			}
 
@@ -162,6 +169,16 @@ namespace DataCore.BattleItems
 		internal void Push(BattleElement element)
 		{
 			stack.Add(element);
+
+			if (element is UnitElement)
+			{
+				UnitElement unit = element as UnitElement;
+				unit.state = UnitState.inStack;
+			}
+			else
+			{
+				//TODO
+			}
 		}
 		internal BattleElement RandomPop()
 		{
@@ -173,6 +190,7 @@ namespace DataCore.BattleItems
 			int index = random.Next(0, stack.Count);
 			BattleElement element = stack[index];
 			stack.RemoveAt(index);
+
 			return element;
 		}
 		internal void Clear()
@@ -182,21 +200,46 @@ namespace DataCore.BattleItems
 	}
 
 
+
+
+
 	internal class RedemptionZone
 	{
 		public IHandicapController controller;
 
 		private List<BattleElement> handicap;
+
+
 		internal int capacity = 8;//TODO config
 		internal int count { get => handicap.Count; }
 		internal RedemptionZone()
 		{
-			handicap = new List<BattleElement>();//TODO config
+			handicap = new List<BattleElement>();
 		}
 		internal BattleElement this[int index]
 		{
 			get => handicap[index];
 			set => handicap[index] = value;
+		}
+		internal void Fill(List<BattleElement> list)
+		{
+			List<IUnitElementController> controllerList = new List<IUnitElementController>();
+
+			for(int i = 0; i < list.Count; i++)
+			{
+				handicap.Add(list[i]);
+				
+				if (list[i] is UnitElement)
+				{
+					//display
+					UnitElement unit = list[i] as UnitElement;
+					controllerList.Add(unit.controller);
+					unit.Init();
+				}
+				else throw new InvalidOperationException();
+			}
+			if(controllerList.Count <= 0) { throw new Exception("list"); }
+			controller.Fill(controllerList);
 		}
 		/// <summary>
 		/// 添加元素到手牌
@@ -204,8 +247,7 @@ namespace DataCore.BattleItems
 		/// <param name="element"></param>
 		internal void Push(BattleElement element)
 		{
-			//TODO if()
-			
+			if (element == null) { return; }
 			handicap.Add(element);
 
 
@@ -216,7 +258,7 @@ namespace DataCore.BattleItems
 				controller.Push(unit.controller);
 				unit.Init();
 			}
-			else throw new InvalidOperationException();//TODO display
+			else throw new InvalidOperationException();
 		}
 		/// <summary>
 		/// 根据索引从手牌中移除一个元素(弃牌，被弃牌)

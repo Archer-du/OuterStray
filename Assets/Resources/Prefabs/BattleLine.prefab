@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1997180304254011892}
   - component: {fileID: 1350973223314816649}
   - component: {fileID: 3399883432698030461}
+  - component: {fileID: 635020648109737336}
   m_Layer: 5
   m_Name: BattleLine
   m_TagString: Untagged
@@ -55,13 +56,12 @@ MonoBehaviour:
   elementList: []
   background: {fileID: 2529723076203885583}
   image: {fileID: 0}
+  lineIdx: 0
+  ownerShip: 0
   width: 0
   interval: 20
-  maxText: {fileID: 0}
-  curText: {fileID: 0}
-  LineIdx: 0
-  ownerShip: 0
   updateTime: 0.2
+  cardWidth: 360
   returnTime: 0.2
   draggingElement: {fileID: 0}
 --- !u!222 &3399883432698030461
@@ -72,6 +72,29 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2340474308455216108}
   m_CullTransparentMesh: 1
+--- !u!223 &635020648109737336
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2340474308455216108}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 632713841
+  m_SortingOrder: 0
+  m_TargetDisplay: 0
 --- !u!1 &2529723076203885583
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,7 +1,6 @@
 //Author@Archer
 using System.Collections;
 using System.Collections.Generic;
-using BattleDisplayEvent;
 using DataCore.Cards;
 using InputHandler;
 
@@ -43,7 +42,7 @@ namespace DisplayInterface
 		/// 战斗系统渲染层初始化
 		/// </summary>
 		/// <param name="handler"></param>
-		public void ControllerInitialize(IBattleSystemInput handler);
+		public void FieldInitialize(IBattleSystemInput handler);
 
 		public IBattleLineController InstantiateBattleLine(int idx, int capacity);
 		public IHandicapController InstantiateHandicap(int turn);
@@ -70,13 +69,13 @@ namespace DisplayInterface
 		public void Init(int capacity, int ownership);
 
 		public void Receive(IUnitElementController element, int dstPos);
-		public void InfoUpdate(int curlength, int ownership);
+		public void UpdateInfo(int curlength, int ownership);
 	}
 
 	public interface ICardStackController
 	{
 		public IUnitElementController InstantiateUnitElement();
-		public IUnitElementController InstantiateUnitElement(int turn);
+		public IUnitElementController InstantiateUnitElementInBattle(int turn);
 		public ICommandElementController InstantiateCommandElement();
 	}
 
@@ -84,8 +83,9 @@ namespace DisplayInterface
 
 	public interface IHandicapController
 	{
+		public void Init();
+		public void Fill(List<IUnitElementController> list);
 		public void Push(IUnitElementController element);
-
 		public IUnitElementController Pop(int handicapIdx);
 	}
 	public interface IUnitElementController
