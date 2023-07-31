@@ -340,7 +340,7 @@ public class UnitElementController : MonoBehaviour,
 			})
 		);
 		battleSceneManager.rotateSequence.Append(
-			transform.DOMove(oriPosition, 0.2f)//.OnComplete(() => line.UpdateElementPosition())
+			transform.DOMove(oriPosition, 0.2f).OnComplete(() => line.UpdateElementPosition())
 		);
 		battleSceneManager.rotateSequence.AppendInterval(0.4f);
 		battleSceneManager.sequenceNum++;

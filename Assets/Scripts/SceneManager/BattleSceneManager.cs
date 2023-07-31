@@ -114,6 +114,14 @@ public class BattleSceneManager : MonoBehaviour,
 		});
 		rotateSequence.Play();
 	}
+	public void Settlement()
+	{
+		rotateSequence.InsertCallback(sequenceNum * 0.8f, () =>
+		{
+			sequenceNum = 0;
+		});
+		rotateSequence.Play();
+	}
 	public void UpdateTurn(int TURN)
 	{
 		Turn = TURN;
@@ -419,6 +427,10 @@ public class BattleSceneManager : MonoBehaviour,
 
 		UnitElementController controller = handicapController[1].Pop(handicapIdx) as UnitElementController;
 
+
+
+		rotateSequence.Kill();
+		rotateSequence = DOTween.Sequence();
 		battleLineControllers[idx].Receive(controller, pos);
 
 
@@ -455,6 +467,10 @@ public class BattleSceneManager : MonoBehaviour,
 			return -1;
 		}
 
+
+
+		rotateSequence.Kill();
+		rotateSequence = DOTween.Sequence();
 		battleLineControllers[dstLineIdx].Receive(battleLineControllers[resLineIdx].Send(resIdx), dstPos);
 
 		battleSystem.Move(resLineIdx, resIdx, dstLineIdx, dstPos);

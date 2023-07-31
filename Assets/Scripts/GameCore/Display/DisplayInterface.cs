@@ -50,6 +50,7 @@ namespace DisplayInterface
 		public ICardStackController InstantiateCardStack(int turn);
 
 		public void UpdateTurnWithSettlement();
+		public void Settlement();
 		/// <summary>
 		/// 更新回合
 		/// </summary>

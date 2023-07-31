@@ -589,9 +589,9 @@ namespace DataCore.BattleElements
 
 			if (target == null) return -1;
 
+			controller.AttackAnimation(target.inlineIdx, target.battleLine.count);
 			this.target.Attacked(this);
 
-			controller.AttackAnimation(target.inlineIdx, target.battleLine.count);
 
 			eventTable.RaiseEvent("AfterAttack", this, battleSystem);
 
@@ -604,9 +604,9 @@ namespace DataCore.BattleElements
 
 			if (tmpTarget == null) return -1;
 
+			controller.RandomAttackAnimation(tmpTarget.controller);
 			tmpTarget.Attacked(this);
 
-			controller.RandomAttackAnimation(tmpTarget.controller);
 
 			eventTable.RaiseEvent("AfterAttack", this, battleSystem);
 
