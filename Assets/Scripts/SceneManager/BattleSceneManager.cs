@@ -8,6 +8,7 @@ using TMPro;
 using UnityEngine.UI;
 using System;
 using System.Xml.Linq;
+using System.Data;
 
 public class BattleSceneManager : MonoBehaviour,
 	IBattleSceneController
@@ -108,7 +109,6 @@ public class BattleSceneManager : MonoBehaviour,
 		//结算攻击动画
 		rotateSequence.InsertCallback(sequenceNum * 0.8f, () =>
 		{
-			Debug.Log("sequenceNum " + sequenceNum);
 			sequenceNum = 0;
 			UpdateTurn();
 		});
@@ -163,6 +163,8 @@ public class BattleSceneManager : MonoBehaviour,
 
 		battleSystem.Skip();
 	}
+
+
 
 
 	public void UpdateEnergy(int energy)
@@ -298,7 +300,8 @@ public class BattleSceneManager : MonoBehaviour,
 		//---解析输入---
 
 
-
+		rotateSequence.Kill();
+		rotateSequence = DOTween.Sequence();
 		UnitElementController controller = handicapController[0].Pop(handicapIdx) as UnitElementController;
 
 		battleLineControllers[idx].Receive(controller, pos);
@@ -319,11 +322,6 @@ public class BattleSceneManager : MonoBehaviour,
 	/// <returns></returns>
 	public int PlayerMove(Vector2 position, BattleLineController resLine, UnitElementController element)
 	{
-
-		rotateSequence.Kill();
-		rotateSequence = DOTween.Sequence();
-
-
 		if (Turn != 0)
 		{
 			return -1;
@@ -334,13 +332,13 @@ public class BattleSceneManager : MonoBehaviour,
 		int dstPos = battleLineControllers[dstLineIdx].GetDeployPos(position.x);
 		if(dstPos < 0) return -1;
 
-		//if (dstLineIdx == resLineIdx)
-		//{
-		//	int verPos = battleLineControllers[dstLineIdx].GetVerticalMovePos(position.x);
-		//	if(verPos < 0) return -1;
-		//	battleSystem.VerticalMove(resLineIdx, resIdx, verPos - 1);
-		//	return 1;
-		//}
+		if (dstLineIdx == resLineIdx)
+		{
+			//int verPos = battleLineControllers[dstLineIdx].GetVerticalMovePos(position.x);
+			//if (verPos < 0) return -1;
+			//battleSystem.VerticalMove(resLineIdx, resIdx, verPos - 1);
+			return -1;
+		}
 		if (element.operateCounter == 0)
 		{
 			return -1;
@@ -354,6 +352,10 @@ public class BattleSceneManager : MonoBehaviour,
 			return -1;
 		}
 		//解析成功
+
+
+		rotateSequence.Kill();
+		rotateSequence = DOTween.Sequence();
 
 		battleLineControllers[dstLineIdx].Receive(battleLineControllers[resLineIdx].Send(resIdx), dstPos);
 

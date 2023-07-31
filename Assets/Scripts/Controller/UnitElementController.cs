@@ -10,12 +10,9 @@ using Unity.VisualScripting;
 using UnityEngine.UI;
 using UnityEngine.Rendering;
 using InputHandler;
+using DataCore.BattleElements;
 
-public enum UnitState
-{
-	inHandicap,
-	inBattleLine
-}
+
 public class UnitElementController : MonoBehaviour,
 	IUnitElementController, 
 	IPointerEnterHandler, IPointerExitHandler,
@@ -33,6 +30,9 @@ public class UnitElementController : MonoBehaviour,
 	public int handicapIdx;
 	public int resIdx;
 
+	public Vector3 dstPosition;
+	public Vector3 logiPosition;
+
 	public int ownership;
 	public int preprocessed;//TODO 敌方特有，之后会改
 
@@ -47,7 +47,10 @@ public class UnitElementController : MonoBehaviour,
 	public int attackCounter;
 	public int operateCounter;
 
+	public int cardWidth = 360;
+
 	//public SortingGroup sortingGroup; // SortingGroup 组件的引用
+	public Canvas canvas;
 
 	public UnitState state;
 
@@ -55,6 +58,7 @@ public class UnitElementController : MonoBehaviour,
 	public void OnEnable()
 	{
 		//sortingGroup = transform.GetComponent<SortingGroup>();
+		canvas = GetComponent<Canvas>();
 		battleSceneManager = GameObject.Find("BattleSceneManager").GetComponent<BattleSceneManager>();//TODO
 
 		//????
@@ -63,9 +67,6 @@ public class UnitElementController : MonoBehaviour,
 		//TODO
 
 		buffer = GameObject.Find("Buffer").transform;
-
-		//TODO
-		state = UnitState.inHandicap;
 
 	}
 
@@ -190,7 +191,9 @@ public class UnitElementController : MonoBehaviour,
 	public GameObject midArrow;
 
 
-	public void UpdateInfo(string name, string categories, int cost, int attackPoint, int healthPoint, int maxHealthPoint, int attackCounter, int operateCounter)
+	public void UpdateInfo(string name, string categories, 
+		int cost, int attackPoint, int healthPoint, int maxHealthPoint, int attackCounter, int operateCounter, 
+		UnitState state)
 	{
 		this.nameContent = name;
 		this.category = categories;
@@ -200,6 +203,7 @@ public class UnitElementController : MonoBehaviour,
 		this.maxHealthPoint = maxHealthPoint;
 		this.attackCounter = attackCounter;
 		this.operateCounter = operateCounter;
+		this.state = state;
 
 		nameText.text = name;
 		attackText.text = attackPoint.ToString();
@@ -275,7 +279,7 @@ public class UnitElementController : MonoBehaviour,
 		this.t2 = t2 as UnitElementController;
 		this.t3 = t3 as UnitElementController;
 		this.target = target as UnitElementController;
-		Debug.Log("line: " + line.lineIdx + "res: " + resIdx);
+		//Debug.Log("line: " + line.lineIdx + "res: " + resIdx);
 
 		//Debug.Log(this.t1?.resIdx);
 		//Debug.Log(this.t2?.resIdx);
@@ -309,22 +313,29 @@ public class UnitElementController : MonoBehaviour,
 		midArrow.SetActive(t2 != null);
 		rightArrow.SetActive(t3 != null);
 	}
-	public void Attack(IUnitElementController target)
+	/// <summary>
+	/// 攻击动画加入结算队列
+	/// </summary>
+	/// <param name="target"></param>
+	public void AttackAnimation(int resIdx, int count)
 	{
 		if (target == null) return;
-		UnitElementController controller = target as UnitElementController;
-
 		Vector3 oriPosition = transform.position;
+		Vector3 dstPosition = target.GetLogicPosition(resIdx, count);
 
-		Debug.Log(resIdx + " attacked " + controller.resIdx);
+		Debug.Log("line: " + line.lineIdx + "res: " + resIdx + " attacked " + "line: " + target.line.lineIdx + "res: " + target.resIdx);
+
+
+
+		//目标暂存
+		UnitElementController tmpTarget = target;
 
 		battleSceneManager.rotateSequence.Append(
-			transform.DOMove(controller.transform.position, 0.2f).OnComplete(() =>
+			transform.DOMove(dstPosition, 0.2f).OnComplete(() =>
 			{
-				if (controller.gameObject.activeSelf && controller.gameObject != null)
-				{
-					controller.Damaged();
-				}
+				Debug.Log(tmpTarget.state);
+				//重点错误
+				tmpTarget.DamageAnimation();
 				input.UpdateManual();
 			})
 		);
@@ -335,22 +346,22 @@ public class UnitElementController : MonoBehaviour,
 		battleSceneManager.sequenceNum++;
 		
 	}
-	public void RandomAttack(IUnitElementController target)
+	public void RandomAttackAnimation(IUnitElementController target)
 	{
-		Debug.Log("random attack");
 		if (target == null) return;
 		UnitElementController controller = target as UnitElementController;
-
 		Vector3 oriPosition = transform.position;
 
-		Debug.Log(resIdx + " random attacked " + controller.resIdx);
+
+		Debug.Log("line: " + line.lineIdx + "res: " + resIdx + " random attacked " + "line: " + controller.line.lineIdx + "res: " + controller.resIdx);
+
+
+
 		battleSceneManager.rotateSequence.Append(
-			transform.DOMove(transform.position + 100f * Vector3.up, 0.2f).OnComplete(() =>
+			transform.DOMove(transform.position + 100f * Vector3.up * (2 * ownership - 1), 0.2f).OnComplete(() =>
 			{
-				if (controller.gameObject.activeSelf && controller.gameObject != null)
-				{
-					controller.Damaged();
-				}
+				Debug.Log(controller.state);
+				controller.DamageAnimation();
 				input.UpdateManual();
 			})
 		);
@@ -360,17 +371,21 @@ public class UnitElementController : MonoBehaviour,
 		battleSceneManager.rotateSequence.AppendInterval(0.4f);
 		battleSceneManager.sequenceNum++;
 	}
-	public void Terminate()
+	public void LogicElementDestroy(int inlineIdx, int count)
 	{
-		Debug.Log(this + " destroyed!");
-		line.ElementDestroyed(resIdx);
+		logiPosition = GetLogicPosition(inlineIdx, count);
+	}
+	public void TerminateAnimation()
+	{
+		Debug.Log("line: " + line.lineIdx + "res: " + resIdx + " destroyed!");
 
-		gameObject.SetActive(false);//test TODO
-		//Destroy(gameObject);
+		line.ElementRemove(resIdx);
+		line.UpdateElementPosition();
+		gameObject.SetActive(false);
 	}
 	public Vector3 originTextScale;
 	public Vector3 targetTextScale;
-	public void Damaged()
+	public void DamageAnimation()
 	{
 		healthText.transform.DOScale(targetTextScale, 0.1f)
 			.OnComplete(() =>
@@ -390,13 +405,16 @@ public class UnitElementController : MonoBehaviour,
 				input.UpdateManual();
 				if (healthPoint <= 0)
 				{
-					Terminate();
+					TerminateAnimation();
 				}
 			});
 	}
 
 
-
+	public Vector3 GetLogicPosition(int index, int count)
+	{
+		return line.transform.position + new Vector3((index - count / 2) * cardWidth + cardWidth / 2 * ((count + 1) % 2), 0, 0);
+	}
 
 
 
@@ -457,6 +475,10 @@ public class UnitElementController : MonoBehaviour,
 
 	public void OnEndDrag(PointerEventData eventData)
 	{
+		if (ownership != 0)
+		{
+			return;
+		}
 		//锁住玩家操作
 		if (BattleSceneManager.Turn != 0)
 		{
@@ -530,6 +552,14 @@ public class UnitElementController : MonoBehaviour,
 
 	public void OnPointerExit(PointerEventData eventData)
 	{
+		if (HandicapController.isDragging)
+		{
+			return;
+		}
+		if (HandicapController.pushing)
+		{
+			return;
+		}
 		if (ownership != 0)
 		{
 			return;

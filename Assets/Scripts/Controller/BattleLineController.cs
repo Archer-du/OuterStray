@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using System;
+using DataCore.BattleElements;
 
 public class BattleLineController : MonoBehaviour,
     IBattleLineController
@@ -178,7 +179,6 @@ public class BattleLineController : MonoBehaviour,
 		IUnitElementController controller = elementList[idx];
 		elementList.RemoveAt(idx);
 
-		UpdateElements();
 		UpdateElementPosition();
 
 		return controller;
@@ -193,7 +193,7 @@ public class BattleLineController : MonoBehaviour,
 		for(int i = 0; i < elementList.Count; i++)
 		{
 			Vector3 oriPos = elementList[i].transform.position;
-			Vector3 dstPos = GetInsertionPosition(i);
+			Vector3 dstPos = elementList[i].dstPosition;
 
 			if (elementList[i].preprocessed == 1)
 			{
@@ -267,21 +267,20 @@ public class BattleLineController : MonoBehaviour,
 	}
 
 
-	public void ElementDestroyed(int idx)
+	public void ElementRemove(int idx)
 	{
 		elementList.RemoveAt(idx);
 
 		UpdateElements();
-		UpdateElementPosition();
 	}
 	private void UpdateElements()
 	{
 		for (int i = 0; i < elementList.Count; i++)
 		{
 			elementList[i].resIdx = i;
-			elementList[i].state = UnitState.inBattleLine;
 			elementList[i].line = this;
 			elementList[i].transform.SetSiblingIndex(i + childNum);
+			elementList[i].dstPosition = GetInsertionPosition(i);
 		}
 	}
 
@@ -299,6 +298,10 @@ public class BattleLineController : MonoBehaviour,
 		draggingElement.transform.SetSiblingIndex(draggingElement.resIdx + childNum);
 	}
 	private Vector3 GetInsertionPosition(int index)
+	{
+		return transform.position + new Vector3((index - count / 2) * cardWidth + cardWidth / 2 * ((count + 1) % 2), 0, 0);
+	}
+	public Vector3 GetInsertionPosition(int index, int count)
 	{
 		return transform.position + new Vector3((index - count / 2) * cardWidth + cardWidth / 2 * ((count + 1) % 2), 0, 0);
 	}

@@ -111,5 +111,6 @@ namespace InputHandler
 	public interface IUnitInput
 	{
 		public void UpdateManual();
+		public void UpdateTargetManual();
 	}
 }

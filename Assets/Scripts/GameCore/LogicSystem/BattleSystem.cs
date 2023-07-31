@@ -321,14 +321,16 @@ namespace LogicCore
 
 
 			battleLines[dstLineIdx].Receive(element, dstPos);
+			element.Deploy(this);
+			deployQueue.Add(element);
 
 			//更新前线指针
 			UpdateFrontLine();
-			//更新目标
 			UpdateAttackRange();
+			//更新目标
+			Settlement();
 
-			deployQueue.Add(element);
-			element.Deploy(this);
+
 
 
 			if (dstLineIdx == frontLines[TURN])
@@ -378,12 +380,15 @@ namespace LogicCore
 
 
 			battleLines[dstLineIdx].Receive(battleLines[resLineIdx].Send(resIdx), dstPos);
+			element.Move();
 
 			//先更新前线再更新目标
 			UpdateFrontLine();
 			UpdateAttackRange();
+			Settlement();
 
-			element.Move(battleLines[dstLineIdx]);
+
+
 
 
 			if (dstLineIdx == frontLines[TURN])
@@ -413,7 +418,7 @@ namespace LogicCore
 			UpdateFrontLine();
 			UpdateAttackRange();
 
-			element.Move(battleLines[resLineIdx]);
+			element.Move();
 
 
 			eventTable[TURN].RaiseEvent("UnitMoved", null, this);
@@ -462,17 +467,8 @@ namespace LogicCore
 				handicaps[TURN].Push(element);
 			}
 
-			//UpdateFrontLine();
-			//UpdateTarget();
-			//RotateSettlement();
-			for(int i = 0; i < deployQueue.Count; i++)
-			{
-				if (deployQueue[i].ownership == TURN && deployQueue[i].state == UnitState.inbattleLine)
-				{
-					deployQueue[i].RotateSettlement();
-					UpdateAttackRange();
-				}
-			}
+			RotateSettlement();
+
 
 
 			TURN = (TURN + 1) % 2;
@@ -597,27 +593,28 @@ namespace LogicCore
 
 
 
-		//private void RotateSettlement()
-		//{
-		//	for (int i = 0; i < linesCapacity; i++)
-		//	{
-		//		for (int j = 0; j < battleLines[i].count; j++)
-		//		{
-		//			battleLines[i][j].battleSystem = this;
-		//		}
-		//	}
-		//	for (int i = 0; i < linesCapacity; i++)
-		//	{
-		//		if (battleLines[i].ownerShip == TURN)
-		//		{
-		//			for (int j = 0; j < battleLines[i].count; j++)
-		//			{
-		//				battleLines[i][j].RotateUpdate();
-		//			}
-		//		}
-		//	}
-		//}
-
+		private void RotateSettlement()
+		{
+			for (int i = 0; i < deployQueue.Count; i++)
+			{
+				if (deployQueue[i].ownership == TURN && deployQueue[i].state == UnitState.inBattleLine)
+				{
+					deployQueue[i].RotateSettlement();
+					UpdateAttackRange();
+				}
+			}
+		}
+		private void Settlement()
+		{
+			for (int i = 0; i < deployQueue.Count; i++)
+			{
+				if (deployQueue[i].state == UnitState.inBattleLine)
+				{
+					deployQueue[i].Settlement();
+					UpdateAttackRange();
+				}
+			}
+		}
 
 
 

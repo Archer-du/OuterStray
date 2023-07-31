@@ -94,7 +94,7 @@ namespace DataCore.BattleItems
 		{
 			for (int i = 0; i < count; i++)
 			{
-				elementList[i].state = UnitState.inbattleLine;
+				elementList[i].state = UnitState.inBattleLine;
 				elementList[i].inlineIdx = i;
 				elementList[i].battleLine = this;
 			}

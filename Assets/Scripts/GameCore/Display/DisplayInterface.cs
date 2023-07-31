@@ -1,6 +1,7 @@
 //Author@Archer
 using System.Collections;
 using System.Collections.Generic;
+using DataCore.BattleElements;
 using DataCore.Cards;
 using InputHandler;
 
@@ -92,16 +93,18 @@ namespace DisplayInterface
 	{
 		public void Init(string ID, int ownership, IUnitInput input);
 
-		public void UpdateInfo(string name, string categories, int cost, int attackPoint, int healthPoint, int maxHealthPoint, int attackCounter, int operateCounter);
+		public void UpdateInfo(string name, string categories, int cost, int attackPoint, int healthPoint, int maxHealthPoint, int attackCounter, int operateCounter, UnitState state);
 
 		public void UpdateTarget(IUnitElementController t1, IUnitElementController t2, IUnitElementController t3, IUnitElementController target, int targetIdx);
 
-		public void Attack(IUnitElementController target);
+		public void AttackAnimation(int resIdx, int count);
 
-		public void RandomAttack(IUnitElementController target);
+		public void RandomAttackAnimation(IUnitElementController target);
 
-		public void Terminate();
-		public void Damaged();
+		public void TerminateAnimation();
+
+		public void LogicElementDestroy(int resIdx, int count);
+		public void DamageAnimation();
 
 	}
 

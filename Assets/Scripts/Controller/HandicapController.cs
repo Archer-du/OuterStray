@@ -5,8 +5,7 @@ using UnityEngine.EventSystems;
 using DG.Tweening;
 using DisplayInterface;
 using System;
-using System.Xml.Linq;
-using UnityEngine.UIElements;
+using DataCore.BattleElements;
 
 public class HandicapController : MonoBehaviour,
 	IHandicapController
@@ -128,7 +127,7 @@ public class HandicapController : MonoBehaviour,
 		}
 
 		UnitElementController element = controller as UnitElementController;
-
+		pushing = true;
 		element.gameObject.SetActive(true);
 		element.transform.SetParent(transform);
 
