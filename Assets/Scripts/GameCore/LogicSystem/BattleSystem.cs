@@ -94,7 +94,7 @@ namespace LogicCore
 
 
 		//data access (test)
-		Pool pool;
+		internal Pool pool;
 		internal Deck humanDeck;
 		internal Deck plantDeck;
 
@@ -320,8 +320,8 @@ namespace LogicCore
 
 
 
-			battleLines[dstLineIdx].Receive(element, dstPos);
-			element.Deploy(this);
+			//battleLines[dstLineIdx].Receive(element, dstPos);
+			element.Deploy(this, battleLines[dstLineIdx], dstPos);
 			deployQueue.Add(element);
 
 			//更新前线指针
@@ -338,6 +338,9 @@ namespace LogicCore
 				eventTable[TURN].RaiseEvent("EnterFrontLine", element, this);
 			}
 			eventTable[TURN].RaiseEvent("UnitDeployed", element, this);
+
+
+			controller.Settlement();
 		}
 
 
@@ -379,8 +382,8 @@ namespace LogicCore
 
 
 
-			battleLines[dstLineIdx].Receive(battleLines[resLineIdx].Send(resIdx), dstPos);
-			element.Move();
+			//battleLines[dstLineIdx].Receive(battleLines[resLineIdx].Send(resIdx), dstPos);
+			element.Move(battleLines[dstLineIdx], battleLines[resLineIdx], resIdx, dstPos);
 
 			//先更新前线再更新目标
 			UpdateFrontLine();
@@ -396,6 +399,8 @@ namespace LogicCore
 				eventTable[TURN].RaiseEvent("EnterFrontLine", null, this);
 			}
 			eventTable[TURN].RaiseEvent("UnitMoved", null, this);
+
+			controller.Settlement();
 		}
 
 
@@ -418,7 +423,7 @@ namespace LogicCore
 			UpdateFrontLine();
 			UpdateAttackRange();
 
-			element.Move();
+			//element.Move();
 
 
 			eventTable[TURN].RaiseEvent("UnitMoved", null, this);

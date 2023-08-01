@@ -317,7 +317,7 @@ public class UnitElementController : MonoBehaviour,
 	/// 攻击动画加入结算队列
 	/// </summary>
 	/// <param name="target"></param>
-	public void AttackAnimation(int resIdx, int count)
+	public void AttackAnimationEvent(int resIdx, int count)
 	{
 		if (target == null) return;
 		Vector3 oriPosition = transform.position;
@@ -333,20 +333,19 @@ public class UnitElementController : MonoBehaviour,
 		battleSceneManager.rotateSequence.Append(
 			transform.DOMove(dstPosition, 0.2f).OnComplete(() =>
 			{
-				Debug.Log(tmpTarget.state);
-				//重点错误
-				tmpTarget.DamageAnimation();
+				transform.DOMove(oriPosition, 0.2f).OnComplete(() => line.UpdateElementPosition());
 				input.UpdateManual();
 			})
 		);
-		battleSceneManager.rotateSequence.Append(
-			transform.DOMove(oriPosition, 0.2f).OnComplete(() => line.UpdateElementPosition())
-		);
-		battleSceneManager.rotateSequence.AppendInterval(0.4f);
-		battleSceneManager.sequenceNum++;
+		
+		battleSceneManager.sequenceTime += 0.4f;
 		
 	}
-	public void RandomAttackAnimation(IUnitElementController target)
+	/// <summary>
+	/// 随机攻击动画加入结算队列
+	/// </summary>
+	/// <param name="target"></param>
+	public void RandomAttackAnimationEvent(IUnitElementController target)
 	{
 		if (target == null) return;
 		UnitElementController controller = target as UnitElementController;
@@ -360,55 +359,72 @@ public class UnitElementController : MonoBehaviour,
 		battleSceneManager.rotateSequence.Append(
 			transform.DOMove(transform.position + 100f * Vector3.up * (2 * ownership - 1), 0.2f).OnComplete(() =>
 			{
-				Debug.Log(controller.state);
-				controller.DamageAnimation();
+				transform.DOMove(oriPosition, 0.2f);
 				input.UpdateManual();
 			})
 		);
-		battleSceneManager.rotateSequence.Append(
-			transform.DOMove(oriPosition, 0.2f)
-		);
-		battleSceneManager.rotateSequence.AppendInterval(0.4f);
-		battleSceneManager.sequenceNum++;
+
+		battleSceneManager.sequenceTime += 0.4f;
 	}
-	public void LogicElementDestroy(int inlineIdx, int count)
-	{
-		logiPosition = GetLogicPosition(inlineIdx, count);
-	}
-	public void TerminateAnimation()
+
+
+	//public void LogicElementDestroy(int inlineIdx, int count)
+	//{
+	//	logiPosition = GetLogicPosition(inlineIdx, count);
+	//}
+
+
+
+	public void TerminateAnimationEvent()
 	{
 		Debug.Log("line: " + line.lineIdx + "res: " + resIdx + " destroyed!");
 
-		line.ElementRemove(resIdx);
-		line.UpdateElementPosition();
-		gameObject.SetActive(false);
+		battleSceneManager.rotateSequence.InsertCallback(battleSceneManager.sequenceTime,
+				() =>
+				{
+					line.ElementRemove(resIdx);
+					line.UpdateElementPosition();
+					gameObject.SetActive(false);
+					input.UpdateManual();
+				}
+			);
+		battleSceneManager.rotateSequence.AppendInterval(0.4f);
+		battleSceneManager.sequenceTime += 0.4f;
 	}
+
+
+
+
 	public Vector3 originTextScale;
 	public Vector3 targetTextScale;
-	public void DamageAnimation()
+	public void DamageAnimationEvent(int health)
 	{
-		healthText.transform.DOScale(targetTextScale, 0.1f)
-			.OnComplete(() =>
-			{
-				input.UpdateManual();
-				healthText.transform.DOScale(originTextScale, 0.1f);
-			});
-		healthText.DOColor(Color.red, 0.1f)
-			.OnComplete(() =>
-			{
-				input.UpdateManual();
-				healthText.DOColor(Color.white, 0.1f);
-			});
-		transform.DOShakeRotation(0.2f, 20f)
-			.OnComplete(() =>
-			{
-				input.UpdateManual();
-				if (healthPoint <= 0)
+		battleSceneManager.rotateSequence.Append(
+			transform.DOShakeRotation(0.2f, 20f)
+			);
+		//放大
+		battleSceneManager.rotateSequence.Join(
+			healthText.transform.DOScale(targetTextScale, 0.1f)
+				.OnComplete(() =>
 				{
-					TerminateAnimation();
-				}
-			});
+					healthText.text = health.ToString();
+					healthText.transform.DOScale(originTextScale, 0.1f);
+				})
+			);
+		//变色
+		battleSceneManager.rotateSequence.Join(
+			healthText.DOColor(Color.red, 0.1f)
+				.OnComplete(() =>
+				{
+					healthText.DOColor(Color.white, 0.1f);
+				})
+			);
+
+		battleSceneManager.rotateSequence.AppendInterval(0.2f);
+		battleSceneManager.sequenceTime += 0.4f;
 	}
+
+
 
 
 	public Vector3 GetLogicPosition(int index, int count)

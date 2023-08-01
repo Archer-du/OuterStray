@@ -918,7 +918,7 @@ MonoBehaviour:
   - {fileID: 356271561}
   cardStackPrototype: {fileID: 1309693667242794316, guid: 283a9de3da7738f438bf43ae7ed7242e, type: 3}
   cardStackController: []
-  HandicapPrototype: {fileID: 108150961239437055, guid: 71a0c67643b2e344a83f699db9c92e74, type: 3}
+  handicapPrototype: {fileID: 108150961239437055, guid: 71a0c67643b2e344a83f699db9c92e74, type: 3}
   handicapController: []
   unitPrototype: {fileID: 5613162459952636112, guid: 5eee63721fbcaab49a5699057a2adbbd, type: 3}
   fieldCapacity: 0
@@ -926,7 +926,7 @@ MonoBehaviour:
   fieldHeight: 0
   skipButton: {fileID: 0}
   buttonImage: {fileID: 0}
-  sequenceNum: 0
+  sequenceTime: 0
   check: 0
 --- !u!1 &705507993
 GameObject:

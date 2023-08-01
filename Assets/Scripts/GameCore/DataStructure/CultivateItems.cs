@@ -18,6 +18,7 @@ namespace DataCore.CultivateItems
 		//之后换成hash
 		internal List<Card> cardPool { get; private set; }
 
+		internal Hashtable hashPool;
 		internal Hashtable humanCardPool;
 		internal Hashtable plantCardPool;
 
@@ -28,6 +29,7 @@ namespace DataCore.CultivateItems
 		internal Pool()
 		{
 			cardPool = new List<Card>(SystemConfig.poolCapacity);
+			hashPool = new Hashtable();
 
 			humanCardPool = new Hashtable();
 			plantCardPool = new Hashtable();
@@ -86,9 +88,11 @@ namespace DataCore.CultivateItems
 
 				string description = data[8];
 
+				//TODO
 				Card card = new UnitCard(id, ownership, name, category, cost, atk, hp, atkc, description, department, pack, effects);
 
 				cardPool.Add(card);
+				hashPool.Add(id, card);
 
 				if(ownership == 0)
 				{
@@ -110,6 +114,12 @@ namespace DataCore.CultivateItems
 			reader.Close();
 			return num;
 		}
+		internal Card GetCardByID(string ID)
+		{
+			return hashPool[ID] as Card;
+		}
+
+
 	}
 
 

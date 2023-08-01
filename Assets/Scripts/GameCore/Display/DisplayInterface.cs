@@ -98,14 +98,14 @@ namespace DisplayInterface
 
 		public void UpdateTarget(IUnitElementController t1, IUnitElementController t2, IUnitElementController t3, IUnitElementController target, int targetIdx);
 
-		public void AttackAnimation(int resIdx, int count);
+		public void AttackAnimationEvent(int resIdx, int count);
 
-		public void RandomAttackAnimation(IUnitElementController target);
+		public void RandomAttackAnimationEvent(IUnitElementController target);
+		public void DamageAnimationEvent(int health);
 
-		public void TerminateAnimation();
+		public void TerminateAnimationEvent();
 
-		public void LogicElementDestroy(int resIdx, int count);
-		public void DamageAnimation();
+		//public void LogicElementDestroy(int resIdx, int count);
 
 	}
 

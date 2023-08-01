@@ -97,7 +97,8 @@ public class BattleLineController : MonoBehaviour,
 	/// <param name="ownerShip"></param>
 	public void UpdateInfo(int curlength, int ownerShip)
 	{
-		if(curlength != count) { throw new System.Exception("inaccurate"); }
+		if(curlength != count) 
+		{ throw new System.Exception("inaccurate"); }
 		this.ownerShip = ownerShip;
 
 		if (ownerShip == 0)

@@ -9,7 +9,16 @@ using UnityEngine.UI;
 using System;
 using System.Xml.Linq;
 using System.Data;
+using static UnityEditor.PlayerSettings;
 
+
+public class AnimationQueue
+{
+	public Sequence sequence;
+	public int eventNum;
+	public float sequenceTime;
+
+}
 public class BattleSceneManager : MonoBehaviour,
 	IBattleSceneController
 {
@@ -46,7 +55,7 @@ public class BattleSceneManager : MonoBehaviour,
 	public CardStackController[] cardStackController;
 
 
-	public GameObject HandicapPrototype;
+	public GameObject handicapPrototype;
 	public HandicapController[] handicapController;
 
 
@@ -67,7 +76,7 @@ public class BattleSceneManager : MonoBehaviour,
 
 
 	public Sequence rotateSequence;
-	public int sequenceNum = 0;
+	public float sequenceTime = 0;
 	public Sequence moveSequence;
 	public Sequence immediateSequence;
 
@@ -95,6 +104,7 @@ public class BattleSceneManager : MonoBehaviour,
 		skipButton.onClick.AddListener(Skip);
 		buttonImage = skipButton.gameObject.GetComponent<Image>();
 
+		rotateSequence.Pause();
 
 		fieldWidth = GameObject.Find("BattleField").GetComponent<RectTransform>().rect.width;
 		fieldHeight = GameObject.Find("BattleField").GetComponent<RectTransform>().rect.height;
@@ -107,20 +117,18 @@ public class BattleSceneManager : MonoBehaviour,
 	public void UpdateTurnWithSettlement()
 	{
 		//结算攻击动画
-		rotateSequence.InsertCallback(sequenceNum * 0.8f, () =>
+		rotateSequence.InsertCallback(sequenceTime, () =>
 		{
-			sequenceNum = 0;
+			sequenceTime = 0;
 			UpdateTurn();
 		});
-		rotateSequence.Play();
 	}
 	public void Settlement()
 	{
-		rotateSequence.InsertCallback(sequenceNum * 0.8f, () =>
+		rotateSequence.InsertCallback(sequenceTime, () =>
 		{
-			sequenceNum = 0;
+			sequenceTime = 0;
 		});
-		rotateSequence.Play();
 	}
 	public void UpdateTurn(int TURN)
 	{
@@ -134,8 +142,7 @@ public class BattleSceneManager : MonoBehaviour,
 		{
 			buttonImage.color = Color.gray;
 
-			//行为树在这里写 //TODO
-			AIDeploy(0, 0);
+			StartCoroutine(AIBehavior());
 		}
 	}
 	private void UpdateTurn()
@@ -151,26 +158,10 @@ public class BattleSceneManager : MonoBehaviour,
 			buttonImage.color = Color.gray;
 
 			//行为树在这里写 TODO
-			Sequence seq = DOTween.Sequence();
-			seq.AppendInterval(2f);
-			seq.InsertCallback(1f, () =>
-			{
-				AIDeploy(0, 0);
-			});
-			rotateSequence.Play();
+			StartCoroutine(AIBehavior());
 		}
 	}
-	/// <summary>
-	/// 敌我双方公用的输入 结束回合
-	/// </summary>
-	public void Skip()
-	{
-		//分配动画队列
-		rotateSequence.Kill();
-		rotateSequence = DOTween.Sequence();
 
-		battleSystem.Skip();
-	}
 
 
 
@@ -217,7 +208,7 @@ public class BattleSceneManager : MonoBehaviour,
 	public IHandicapController InstantiateHandicap(int ownership)
 	{
 		//set position
-		GameObject handicap = Instantiate(HandicapPrototype, GetHandicapPosition(ownership), new Quaternion());
+		GameObject handicap = Instantiate(handicapPrototype, GetHandicapPosition(ownership), new Quaternion());
 		handicap.transform.SetParent(GameObject.Find("RedemptionZone").transform);
 		handicapController[ownership] = handicap.GetComponent<HandicapController>();
 		return handicapController[ownership];
@@ -274,6 +265,29 @@ public class BattleSceneManager : MonoBehaviour,
 		}
 		return -1;
 	}
+
+
+
+
+
+
+
+
+
+	/// <summary>
+	/// 敌我双方公用的输入 结束回合
+	/// </summary>
+	public void Skip()
+	{
+		//分配动画队列
+		rotateSequence.Kill();
+		rotateSequence = DOTween.Sequence();
+		//rotateSequence.OnPlay(() =>
+		//{
+		//	Debug.Log("start playing sequence");
+		//});
+		battleSystem.Skip();
+	}
 	/// <summary>
 	/// 仅限玩家的输入层部署
 	/// </summary>
@@ -310,6 +324,9 @@ public class BattleSceneManager : MonoBehaviour,
 
 		rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
+		rotateSequence.AppendInterval(0.4f);
+		sequenceTime += 0.4f;
+
 		UnitElementController controller = handicapController[0].Pop(handicapIdx) as UnitElementController;
 
 		battleLineControllers[idx].Receive(controller, pos);
@@ -364,6 +381,8 @@ public class BattleSceneManager : MonoBehaviour,
 
 		rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
+		rotateSequence.AppendInterval(0.4f);
+		sequenceTime += 0.4f;
 
 		battleLineControllers[dstLineIdx].Receive(battleLineControllers[resLineIdx].Send(resIdx), dstPos);
 
@@ -380,101 +399,130 @@ public class BattleSceneManager : MonoBehaviour,
 
 
 
+	HandicapController AIHandicap;
+	BattleLineController AISupportLine;
+	BattleLineController AIAdjacentLine;
+	IEnumerator AIBehavior()
+	{
+		AIHandicap = handicapController[1];
+		AISupportLine = battleLineControllers[3];
+		//TODO
+		AIAdjacentLine = battleLineControllers[2];
+		float waitTime = 1.0f;
+
+		yield return new WaitForSeconds(waitTime);
 
 
 
+		int deploytimes = 1;
+		int cost = GetMaxCost();
+		int idx = GetMaxCostPointer();
+		//有足够的能量
+		while (cost <= energy[1] && idx >= 0)
+		{
+			//支援战线没到上限
+			if (AISupportLine.count < 5)
+			{
+				yield return new WaitForSeconds(waitTime);
+				AIDeploy(idx);
+				cost = GetMaxCost();
+				idx = GetMaxCostPointer();
+				deploytimes++;
+			}
+		}
+		int movetimes = 1;
+		idx = GetOperatorPointer();
+		while (AIAdjacentLine.count < AIAdjacentLine.capacity && idx >= 0)
+		{
+			yield return new WaitForSeconds(waitTime);
+			AIMove(idx);
+			idx = GetOperatorPointer();
+			movetimes++;
+		}
 
-
-	public int AIDeploy(int pos, int handicapIdx)
+		yield return new WaitForSeconds(waitTime);
+		Skip();
+	}
+	private int GetMaxCost()
+	{
+		int maxCost = 0;
+		int maxPointer = -1;
+		for(int i = 0; i < AIHandicap.count; i++)
+		{
+			if (AIHandicap[i].cost > maxCost)
+			{
+				maxCost = AIHandicap[i].cost;
+				maxPointer = i;
+			}
+		}
+		return maxCost;
+	}
+	private int GetMaxCostPointer()
+	{
+		int maxCost = 0;
+		int maxPointer = -1;
+		for (int i = 0; i < AIHandicap.count; i++)
+		{
+			if (AIHandicap[i].cost >= maxCost)
+			{
+				maxCost = AIHandicap[i].cost;
+				maxPointer = i;
+			}
+		}
+		return maxPointer;
+	}
+	private int GetOperatorPointer()
+	{
+		for (int i = 0; i < AISupportLine.count; i++)
+		{
+			if (AISupportLine[i].operateCounter == 1)
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
+	public void AIDeploy(int handicapIdx)
 	{
 		int idx = 3;//TODO
-		if(handicapIdx >= handicapController[1].count)
-		{
-			AIMove();
-			Sequence seq1 = DOTween.Sequence();
-			seq1.AppendInterval(2f);
-			seq1.InsertCallback(1f, () =>
-			{
-				Skip();
-			});
-			rotateSequence.Play();
-			return -1;
-		}
-		if (energy[1] < handicapController[1][handicapIdx].cost)
-		{
-			AIMove();
-			Sequence seq1 = DOTween.Sequence();
-			seq1.AppendInterval(2f);
-			seq1.InsertCallback(1f, () =>
-			{
-				Skip();
-			});
-			rotateSequence.Play();
-			return -1;
-		}
-		if (battleLineControllers[idx].count >= battleLineControllers[idx].capacity)
-		{
-			AIMove();
-			Sequence seq2 = DOTween.Sequence();
-			seq2.AppendInterval(2f);
-			seq2.InsertCallback(1f, () =>
-			{
-				Skip();
-			});
-			rotateSequence.Play();
-			return -1;
-		}
-
-		UnitElementController controller = handicapController[1].Pop(handicapIdx) as UnitElementController;
-
+		UnitElementController controller = AIHandicap.Pop(handicapIdx) as UnitElementController;
 
 
 		rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
-		battleLineControllers[idx].Receive(controller, pos);
+		rotateSequence.AppendInterval(0.4f);
+		sequenceTime += 0.4f;
+
+
+		battleLineControllers[idx].Receive(controller, 0);
 
 
 		//data input 显示层检查完了再动数据层！！！
-		battleSystem.Deploy(handicapIdx, idx, pos);
-
-
-		Sequence seq = DOTween.Sequence();
-		seq.AppendInterval(2f);
-		seq.InsertCallback(1f, () =>
-		{
-			Skip();
-		});
-		rotateSequence.Play();
-
-
-		return 1;
+		battleSystem.Deploy(handicapIdx, idx, 0);
 	}
-	public int AIMove()
+
+
+	public void AIMove(int resIdx)
 	{
 		int resLineIdx = 3;
 		int dstLineIdx = 2;
-		int resIdx = battleLineControllers[resLineIdx].count - 1;
 		int dstPos = 0;
-		if (battleLineControllers[resLineIdx].count <= 0) return -1;
-
-		UnitElementController controller = battleLineControllers[resLineIdx][resIdx] as UnitElementController;
-		if (controller.operateCounter == 0)
-		{
-			return -1;
-		}
-		if (battleLineControllers[dstLineIdx].ownerShip != controller.ownership && battleLineControllers[dstLineIdx].count > 0)
-		{
-			return -1;
-		}
-
-
 
 		rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
+		rotateSequence.AppendInterval(0.4f);
+		sequenceTime += 0.4f;
+
+
 		battleLineControllers[dstLineIdx].Receive(battleLineControllers[resLineIdx].Send(resIdx), dstPos);
 
 		battleSystem.Move(resLineIdx, resIdx, dstLineIdx, dstPos);
-
-		return 1;
 	}
+
+
+	public void AISkip()
+	{
+		Skip();
+	}
+
 }
