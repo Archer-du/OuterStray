@@ -62,8 +62,8 @@ namespace DisplayInterface
 		public void UpdateEnergySupply(int turn, int supply);
 
 
-		public void PushElementIntoHandicap(IUnitElementController element);
-		public void PushElementIntoHandicap(int turn, IUnitElementController element);
+		//public void PushElementIntoHandicap(IUnitElementController element);
+		//public void PushElementIntoHandicap(int turn, IUnitElementController element);
 
 	}
 	public interface IBattleLineController

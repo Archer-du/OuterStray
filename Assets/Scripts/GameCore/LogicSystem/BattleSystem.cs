@@ -64,11 +64,11 @@ namespace LogicCore
 		/// <summary>
 		/// (TURN mapped)牌堆
 		/// </summary>
-		private RandomCardStack[] stacks;
+		internal RandomCardStack[] stacks;
 		/// <summary>
 		/// (TURN mapped)手牌
 		/// </summary>
-		private RedemptionZone[] handicaps;
+		internal RedemptionZone[] handicaps;
 		/// <summary>
 		/// (TURN mapped)支援战线指针<br/>
 		/// 战局内只读
@@ -310,10 +310,9 @@ namespace LogicCore
 			eventTable[TURN].RaiseEvent("DeployUnit", null, this);
 
 
-
-			//这里逻辑判断顺序有问题 之后修改
+			//手牌区弹出卡牌
 			UnitElement element = handicaps[TURN].Pop(handicapIdx) as UnitElement;
-
+			//消耗费用
 			energy[TURN] -= cost;
 			//显示层更新
 			controller.UpdateEnergy(energy[TURN]);
@@ -477,6 +476,7 @@ namespace LogicCore
 
 
 			TURN = (TURN + 1) % 2;
+			eventTable[TURN].RaiseEvent("StartOfTurn", null, this);
 			//动画结算后回调
 			controller.UpdateTurnWithSettlement();
 		}

@@ -13,6 +13,12 @@ using InputHandler;
 using DataCore.BattleElements;
 
 
+
+public enum ControllerState
+{
+	attacking,
+	moving
+}
 public class UnitElementController : MonoBehaviour,
 	IUnitElementController, 
 	IPointerEnterHandler, IPointerExitHandler,
@@ -49,10 +55,10 @@ public class UnitElementController : MonoBehaviour,
 
 	public int cardWidth = 360;
 
-	//public SortingGroup sortingGroup; // SortingGroup 组件的引用
 	public Canvas canvas;
 
-	public UnitState state;
+	public UnitState dataState;
+	public ControllerState controllerState;
 
 	public Vector2 offset;
 	public void OnEnable()
@@ -78,9 +84,31 @@ public class UnitElementController : MonoBehaviour,
 	public void Init(string ID, int ownership, IUnitInput input)
 	{
 		this.input = input;
+		this.ownership = ownership;
 
+		LoadCardResources();
+
+		preprocessed = ownership;
+
+		originScale = transform.localScale;
+		enlargeScale = 1.35f * originScale;
+
+		arrowScale = leftArrow.transform.localScale;
+		enlargeArrowScale = arrowScale * 1.5f;
+
+		originTextScale = healthText.transform.localScale;
+		targetTextScale = healthText.transform.localScale * 1.5f;
+
+		offset = new Vector2(1980, 1080);
+
+		leftArrow.SetActive(false);
+		rightArrow.SetActive(false);
+		midArrow.SetActive(false);
+	}
+	private void LoadCardResources()
+	{
 		CardImage.sprite = Resources.Load<Sprite>("CardImage/" + ID);
-		if(ownership == 1)
+		if (ownership == 1)
 		{
 			CardImage.rectTransform.sizeDelta = new Vector2(10, 13);
 		}
@@ -88,9 +116,9 @@ public class UnitElementController : MonoBehaviour,
 		{
 			case "Guardian":
 				Color color;
-				if (UnityEngine.ColorUtility.TryParseHtmlString("#97A5A4", out color)) // 尝试解析色号字符串，如果成功，返回 true 并赋值给 color 变量
+				if (UnityEngine.ColorUtility.TryParseHtmlString("#97A5A4", out color))
 				{
-					NameTag.color = color; // 赋值给 Image 组件的 color 属性
+					NameTag.color = color;
 					frame.color = color;
 					slot.color = color;
 					costTag.color = color;
@@ -99,9 +127,9 @@ public class UnitElementController : MonoBehaviour,
 				}
 				break;
 			case "Artillery":
-				if (UnityEngine.ColorUtility.TryParseHtmlString("#CE8849", out color)) // 尝试解析色号字符串，如果成功，返回 true 并赋值给 color 变量
+				if (UnityEngine.ColorUtility.TryParseHtmlString("#CE8849", out color))
 				{
-					NameTag.color = color; // 赋值给 Image 组件的 color 属性
+					NameTag.color = color;
 					frame.color = color;
 					slot.color = color;
 					costTag.color = color;
@@ -143,26 +171,7 @@ public class UnitElementController : MonoBehaviour,
 				}
 				break;
 		}
-
-		this.ownership = ownership;
-		preprocessed = ownership;
-
-		originScale = transform.localScale;
-		enlargeScale = 1.35f * originScale;
-
-		arrowScale = leftArrow.transform.localScale;
-		enlargeArrowScale = arrowScale * 1.5f;
-
-		originTextScale = healthText.transform.localScale;
-		targetTextScale = healthText.transform.localScale * 1.5f;
-
-		offset = new Vector2(1980, 1080);
-
-		leftArrow.SetActive(false);
-		rightArrow.SetActive(false);
-		midArrow.SetActive(false);
 	}
-
 
 	public TMP_Text nameText;
 	public TMP_Text attackText;
@@ -203,7 +212,7 @@ public class UnitElementController : MonoBehaviour,
 		this.maxHealthPoint = maxHealthPoint;
 		this.attackCounter = attackCounter;
 		this.operateCounter = operateCounter;
-		this.state = state;
+		this.dataState = state;
 
 		nameText.text = name;
 		attackText.text = attackPoint.ToString();
@@ -213,11 +222,11 @@ public class UnitElementController : MonoBehaviour,
 
 		if (operateCounter == 0)
 		{
-			mask.DOColor(new Color(0, 0, 0, 0.5f), duration); // 使用DOTween来平滑地改变颜色
+			mask.DOColor(new Color(0, 0, 0, 0.5f), duration);
 		}
 		else
 		{
-			mask.DOColor(new Color(0, 0, 0, 0), duration); // 使用DOTween来平滑地改变颜色
+			mask.DOColor(new Color(0, 0, 0, 0), duration);
 		}
 		if(state == UnitState.inBattleLine)
 		{
@@ -279,8 +288,8 @@ public class UnitElementController : MonoBehaviour,
 		this.t2 = t2 as UnitElementController;
 		this.t3 = t3 as UnitElementController;
 		this.target = target as UnitElementController;
-		//Debug.Log("line: " + line.lineIdx + "res: " + resIdx);
 
+		//Debug.Log("line: " + line.lineIdx + "res: " + resIdx);
 		//Debug.Log(this.t1?.resIdx);
 		//Debug.Log(this.t2?.resIdx);
 		//Debug.Log(this.t3?.resIdx);
@@ -303,7 +312,6 @@ public class UnitElementController : MonoBehaviour,
 				rightArrow.transform.DOScale(enlargeArrowScale, 0.2f);
 				break;
 			default:
-				//if (leftArrow == null) throw new System.Exception("arrow null: " + "line: " + line.LineIdx + "res: " + resIdx);
 				leftArrow.transform.DOScale(arrowScale, 0.2f);
 				midArrow.transform.DOScale(arrowScale, 0.2f);
 				rightArrow.transform.DOScale(arrowScale, 0.2f);
@@ -313,6 +321,14 @@ public class UnitElementController : MonoBehaviour,
 		midArrow.SetActive(t2 != null);
 		rightArrow.SetActive(t3 != null);
 	}
+
+
+
+
+
+
+
+
 	/// <summary>
 	/// 攻击动画加入结算队列
 	/// </summary>
@@ -320,16 +336,13 @@ public class UnitElementController : MonoBehaviour,
 	public void AttackAnimationEvent(int resIdx, int count)
 	{
 		if (target == null) return;
-		Vector3 oriPosition = transform.position;
+		Vector3 oriPosition = GetLogicPosition(this.resIdx, this.line.count);
 		Vector3 dstPosition = target.GetLogicPosition(resIdx, count);
 
 		Debug.Log("line: " + line.lineIdx + "res: " + resIdx + " attacked " + "line: " + target.line.lineIdx + "res: " + target.resIdx);
 
 
-
-		//目标暂存
-		UnitElementController tmpTarget = target;
-
+		//TODO time config
 		battleSceneManager.rotateSequence.Append(
 			transform.DOMove(dstPosition, 0.2f).OnComplete(() =>
 			{
@@ -337,9 +350,7 @@ public class UnitElementController : MonoBehaviour,
 				input.UpdateManual();
 			})
 		);
-		
 		battleSceneManager.sequenceTime += 0.4f;
-		
 	}
 	/// <summary>
 	/// 随机攻击动画加入结算队列
@@ -349,11 +360,9 @@ public class UnitElementController : MonoBehaviour,
 	{
 		if (target == null) return;
 		UnitElementController controller = target as UnitElementController;
-		Vector3 oriPosition = transform.position;
-
+		Vector3 oriPosition = GetLogicPosition(this.resIdx, this.line.count);
 
 		Debug.Log("line: " + line.lineIdx + "res: " + resIdx + " random attacked " + "line: " + controller.line.lineIdx + "res: " + controller.resIdx);
-
 
 
 		battleSceneManager.rotateSequence.Append(
@@ -363,18 +372,11 @@ public class UnitElementController : MonoBehaviour,
 				input.UpdateManual();
 			})
 		);
-
 		battleSceneManager.sequenceTime += 0.4f;
 	}
-
-
-	//public void LogicElementDestroy(int inlineIdx, int count)
-	//{
-	//	logiPosition = GetLogicPosition(inlineIdx, count);
-	//}
-
-
-
+	/// <summary>
+	/// 
+	/// </summary>
 	public void TerminateAnimationEvent()
 	{
 		Debug.Log("line: " + line.lineIdx + "res: " + resIdx + " destroyed!");
@@ -383,7 +385,6 @@ public class UnitElementController : MonoBehaviour,
 				() =>
 				{
 					line.ElementRemove(resIdx);
-					line.UpdateElementPosition();
 					gameObject.SetActive(false);
 					input.UpdateManual();
 				}
@@ -391,10 +392,6 @@ public class UnitElementController : MonoBehaviour,
 		battleSceneManager.rotateSequence.AppendInterval(0.4f);
 		battleSceneManager.sequenceTime += 0.4f;
 	}
-
-
-
-
 	public Vector3 originTextScale;
 	public Vector3 targetTextScale;
 	public void DamageAnimationEvent(int health)
@@ -473,7 +470,7 @@ public class UnitElementController : MonoBehaviour,
 			return;
 		}
 		//在战线：移动
-		if(state == UnitState.inBattleLine)
+		if(dataState == UnitState.inBattleLine)
 		{
 			//if(operateCounter == 0)
 			//{
@@ -483,7 +480,7 @@ public class UnitElementController : MonoBehaviour,
 			HandicapController.isDragging = true;
 		}
 		//在手牌区：部署或cast
-		if(state == UnitState.inHandicap)
+		if(dataState == UnitState.inHandicap)
 		{
 			HandicapController.isDragging = true; // 开始拖动
 		}
@@ -501,7 +498,7 @@ public class UnitElementController : MonoBehaviour,
 			return;
 		}
 		//移动条件判定
-		if (state == UnitState.inBattleLine)
+		if (dataState == UnitState.inBattleLine)
 		{
 			//好逆天的回调。。TODO
 			if (operateCounter == 0)
@@ -516,7 +513,7 @@ public class UnitElementController : MonoBehaviour,
 			line.Insert(this);
 		}
 		//部署条件判定
-		if(state == UnitState.inHandicap)
+		if(dataState == UnitState.inHandicap)
 		{
 			HandicapController.isDragging = false; // 结束拖动
 			if (battleSceneManager.PlayerDeploy(eventData.position, this.handicapIdx) >= 0)
@@ -551,7 +548,7 @@ public class UnitElementController : MonoBehaviour,
 		{
 			return;
 		}
-		if (state == UnitState.inHandicap)
+		if (dataState == UnitState.inHandicap)
 		{
 			//sortingGroup.sortingOrder = 100;
 			transform.DOScale(enlargeScale, moveTime);
@@ -559,7 +556,7 @@ public class UnitElementController : MonoBehaviour,
 			//transform.DOBlendableLocalMoveBy(targetPosition, moveTime);
 			//transform.DOBlendableScaleBy(enlargeScale, moveTime);
 		}
-		if (state == UnitState.inBattleLine)
+		if (dataState == UnitState.inBattleLine)
 		{
 			//TODO 检视
 			return;
@@ -580,7 +577,7 @@ public class UnitElementController : MonoBehaviour,
 		{
 			return;
 		}
-		if(state == UnitState.inHandicap)
+		if(dataState == UnitState.inHandicap)
 		{
 			//sortingGroup.sortingOrder = 0;
 			transform.DOScale(originScale, 0.2f);

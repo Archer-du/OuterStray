@@ -229,6 +229,7 @@ namespace DataCore.BattleElements
 		/// 反甲
 		/// </summary>
 		internal bool thorn;
+		internal bool cleave;
 
 
 
@@ -281,6 +282,7 @@ namespace DataCore.BattleElements
 			this.batter = 1;
 			this.moveRange = 1;
 
+			cleave = false;
 
 
 			//效果形式化解析
@@ -506,7 +508,7 @@ namespace DataCore.BattleElements
 		/// </summary>
 		internal void RotateSettlement()
 		{
-			eventTable.RaiseEvent("EndOfTurn", this, battleSystem);
+			eventTable.RaiseEvent("RotateSettlement", this, battleSystem);
 
 			this.dynAttackCounter = (this.dynAttackCounter - this.operateCounter) < 0 ? 0 : this.dynAttackCounter - this.operateCounter;
 			//操作计数回复
@@ -780,25 +782,6 @@ namespace DataCore.BattleElements
 			eventTable.RaiseEvent("AfterMove", this, battleSystem);
 		}
 	}
-	internal sealed class GuardianElement : UnitElement
-	{
-		internal GuardianElement(UnitCard __card) : base(__card) { }
-		internal override void SetAttackRange(UnitElement t1, UnitElement t2, UnitElement t3)
-		{
-			attackRange[0] = t1;
-			attackRange[1] = t2;
-			attackRange[2] = t3;
-			UpdateTarget();
-		}
-	}
-	internal sealed class ConstructionElement : UnitElement
-	{
-		internal ConstructionElement(UnitCard __card) : base(__card) { }
-		internal override void Move(BattleLine resLine, BattleLine dstLine, int resIdx, int dstPos)
-		{
-			return;
-		}
-	}
 	internal sealed class ArtilleryElement : UnitElement
 	{
 		internal UnitElement tmpTarget;
@@ -840,6 +823,26 @@ namespace DataCore.BattleElements
 
 		}
 	}
+	internal sealed class GuardianElement : UnitElement
+	{
+		internal GuardianElement(UnitCard __card) : base(__card) { }
+		internal override void SetAttackRange(UnitElement t1, UnitElement t2, UnitElement t3)
+		{
+			attackRange[0] = t1;
+			attackRange[1] = t2;
+			attackRange[2] = t3;
+			UpdateTarget();
+		}
+	}
+	internal sealed class ConstructionElement : UnitElement
+	{
+		internal ConstructionElement(UnitCard __card) : base(__card) { }
+		internal override void Move(BattleLine resLine, BattleLine dstLine, int resIdx, int dstPos)
+		{
+			return;
+		}
+	}
+
 
 
 

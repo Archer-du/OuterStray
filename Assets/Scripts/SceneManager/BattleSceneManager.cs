@@ -88,7 +88,6 @@ public class BattleSceneManager : MonoBehaviour,
 	public void FieldInitialize(IBattleSystemInput handler)
 	{
 		battleSystem = handler;
-		
 
 		fieldCapacity = 4;
 		battleLineControllers = new BattleLineController[fieldCapacity];
@@ -111,6 +110,8 @@ public class BattleSceneManager : MonoBehaviour,
 
 		check = true;
 	}
+
+
 	/// <summary>
 	/// 
 	/// </summary>
@@ -138,6 +139,7 @@ public class BattleSceneManager : MonoBehaviour,
 		{
 			buttonImage.color = Color.white;
 		}
+		//如果是地方回合，启动行为树
 		else
 		{
 			buttonImage.color = Color.gray;
@@ -153,6 +155,7 @@ public class BattleSceneManager : MonoBehaviour,
 		{
 			buttonImage.color = Color.white;
 		}
+		//如果是地方回合，启动行为树
 		else
 		{
 			buttonImage.color = Color.gray;
@@ -230,27 +233,6 @@ public class BattleSceneManager : MonoBehaviour,
 	}
 
 
-
-
-
-
-	/// <summary>
-	/// 将
-	/// </summary>
-	/// <param name="element"></param>
-	public void PushElementIntoHandicap(IUnitElementController element)
-	{
-		handicapController[Turn].Push(element as UnitElementController);
-	}
-	/// <summary>
-	/// 重载的方法，用于初始化
-	/// </summary>
-	/// <param name="turn"></param>
-	/// <param name="element"></param>
-	public void PushElementIntoHandicap(int turn, IUnitElementController element)
-	{
-		handicapController[turn].Push(element as UnitElementController);
-	}
 
 
 
@@ -399,6 +381,9 @@ public class BattleSceneManager : MonoBehaviour,
 
 
 
+
+
+	//行为树
 	HandicapController AIHandicap;
 	BattleLineController AISupportLine;
 	BattleLineController AIAdjacentLine;
@@ -518,8 +503,6 @@ public class BattleSceneManager : MonoBehaviour,
 
 		battleSystem.Move(resLineIdx, resIdx, dstLineIdx, dstPos);
 	}
-
-
 	public void AISkip()
 	{
 		Skip();

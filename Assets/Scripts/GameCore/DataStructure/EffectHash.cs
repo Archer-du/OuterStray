@@ -86,7 +86,15 @@ namespace EventEffectModels
 		{
 			element.operateCounter = 1;
 		}
-
+		//TODO
+		internal void SetMoveRange(UnitElement element, BattleSystem system)
+		{
+			element.moveRange = 9;
+		}
+		internal void Cleave(UnitElement element, BattleSystem system)
+		{
+			element.cleave = true;
+		}
 		internal void Parry(UnitElement element, BattleSystem system)
 		{
 			element.immunity = true;
@@ -115,7 +123,67 @@ namespace EventEffectModels
 
 		//args effects
 		/// <summary>
-		/// 根据参数在指定位置召唤指定类型的Token
+		/// 
+		/// </summary>
+		/// <param name="element"></param>
+		/// <param name="system"></param>
+		/// <exception cref="InvalidOperationException"></exception>
+		internal void RecruitByID(UnitElement element, BattleSystem system)
+		{
+			int argsNum = 3;
+			if (!argsTable.ContainsKey("RecruitByID"))
+			{
+				throw new InvalidOperationException("argsTable fault");
+			}
+			if (((List<int>)argsTable["RecruitByID"]).Count != argsNum)
+			{
+				throw new InvalidOperationException("argsTable list length invalid");
+			}
+
+			//第一个参数是招募对象ID数值域
+			string ID = ((List<int>)argsTable["RecruitByID"])[0] < 10 
+				? "0" + ((List<int>)argsTable["RecruitByID"])[0].ToString() : ((List<int>)argsTable["RecruitByID"])[0].ToString();
+			//TODO
+			ID = element.ownership == 0 ? "human_" + ID : "mush_" + ID;
+			//第二个参数是招募位置
+			int position = ((List<int>)argsTable["RecruitByID"])[1];
+			//第三个参数是招募数量
+			int num = ((List<int>)argsTable["RecruitByID"])[2];
+
+			for(int i = 0; i < num; i++)
+			{
+				UnitElement unit = system.stacks[element.ownership].FindElementByID(ID) as UnitElement;
+				if (unit == null) break;
+				switch (position)
+				{
+					case 0:
+						if(system.battleLines[system.supportLines[element.ownership]].Receive(unit, 0) > 0)
+						{
+							system.stacks[element.ownership].PopElementByID(ID);
+						}
+						break;
+					case 1:
+						break;
+				}
+			}
+		}
+		internal void RecruitByCategory(UnitElement element, BattleSystem system)
+		{
+			int argsNum = 3;
+			if (!argsTable.ContainsKey("RecruitByCategory"))
+			{
+				throw new InvalidOperationException("argsTable fault");
+			}
+			if (((List<int>)argsTable["RecruitByCategory"]).Count != argsNum)
+			{
+				throw new InvalidOperationException("argsTable list length invalid");
+			}
+			int category = ((List<int>)argsTable["RecruitByCategory"])[0];
+			int position = ((List<int>)argsTable["RecruitByCategory"])[1];
+			int num = ((List<int>)argsTable["RecruitByCategory"])[2];
+		}
+		/// <summary>
+		/// 根据参数在指定位置召唤指定类型的Token(事件必须有源)
 		/// </summary>
 		/// <param name="element"></param>
 		/// <param name="system"></param>
@@ -162,14 +230,16 @@ namespace EventEffectModels
 					case 0:
 						system.battleLines[system.supportLines[element.ownership]].Receive(unit, 0);
 						break;
+					//召唤至当前战线
 					case 1:
 						element.battleLine.Receive(unit, 0);
 						break;
 				}
 			}
 		}
-		internal void Damage(UnitElement element, BattleSystem system)
+		internal void AOEDamage(UnitElement element, BattleSystem system)
 		{
+			int argsNum = 2;
 
 		}
 		internal void SummonTokenInline(UnitElement element, BattleSystem system)
