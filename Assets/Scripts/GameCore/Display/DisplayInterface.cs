@@ -94,14 +94,19 @@ namespace DisplayInterface
 	{
 		public void Init(string ID, int ownership, IUnitInput input);
 
-		public void UpdateInfo(string name, string categories, int cost, int attackPoint, int healthPoint, int maxHealthPoint, int attackCounter, int operateCounter, UnitState state);
+		public void UpdateInfo(string name, string categories, int cost, int attackPoint, int healthPoint, int maxHealthPoint, int attackCounter, int operateCounter, UnitState state, int moveRange);
 
 		public void UpdateTarget(IUnitElementController t1, IUnitElementController t2, IUnitElementController t3, IUnitElementController target, int targetIdx);
 
 		public void AttackAnimationEvent(int resIdx, int count);
 
 		public void RandomAttackAnimationEvent(IUnitElementController target);
+
+		public void CleaveAttackAnimationEvent(int resIdx, int count);
+
 		public void DamageAnimationEvent(int health);
+
+		public void ImmediateDamageAnimationEvent(int health);
 
 		public void TerminateAnimationEvent();
 

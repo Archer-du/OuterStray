@@ -36,7 +36,7 @@ public class UnitElementController : MonoBehaviour,
 	public int handicapIdx;
 	public int resIdx;
 
-	public Vector3 dstPosition;
+	public Vector3 logicPosition;
 	public Vector3 logiPosition;
 
 	public int ownership;
@@ -52,6 +52,7 @@ public class UnitElementController : MonoBehaviour,
 	public int maxHealthPoint;
 	public int attackCounter;
 	public int operateCounter;
+	public int moveRange;
 
 	public int cardWidth = 360;
 
@@ -202,7 +203,7 @@ public class UnitElementController : MonoBehaviour,
 
 	public void UpdateInfo(string name, string categories, 
 		int cost, int attackPoint, int healthPoint, int maxHealthPoint, int attackCounter, int operateCounter, 
-		UnitState state)
+		UnitState state, int moveRange)
 	{
 		this.nameContent = name;
 		this.category = categories;
@@ -213,6 +214,7 @@ public class UnitElementController : MonoBehaviour,
 		this.attackCounter = attackCounter;
 		this.operateCounter = operateCounter;
 		this.dataState = state;
+		this.moveRange = moveRange;
 
 		nameText.text = name;
 		attackText.text = attackPoint.ToString();
@@ -336,8 +338,8 @@ public class UnitElementController : MonoBehaviour,
 	public void AttackAnimationEvent(int resIdx, int count)
 	{
 		if (target == null) return;
-		Vector3 oriPosition = GetLogicPosition(this.resIdx, this.line.count);
-		Vector3 dstPosition = target.GetLogicPosition(resIdx, count);
+		Vector3 oriPosition = logicPosition;
+		Vector3 dstPosition = target.logicPosition;
 
 		Debug.Log("line: " + line.lineIdx + "res: " + resIdx + " attacked " + "line: " + target.line.lineIdx + "res: " + target.resIdx);
 
@@ -360,7 +362,7 @@ public class UnitElementController : MonoBehaviour,
 	{
 		if (target == null) return;
 		UnitElementController controller = target as UnitElementController;
-		Vector3 oriPosition = GetLogicPosition(this.resIdx, this.line.count);
+		Vector3 oriPosition = logicPosition;
 
 		Debug.Log("line: " + line.lineIdx + "res: " + resIdx + " random attacked " + "line: " + controller.line.lineIdx + "res: " + controller.resIdx);
 
@@ -419,14 +421,6 @@ public class UnitElementController : MonoBehaviour,
 
 		battleSceneManager.rotateSequence.AppendInterval(0.2f);
 		battleSceneManager.sequenceTime += 0.4f;
-	}
-
-
-
-
-	public Vector3 GetLogicPosition(int index, int count)
-	{
-		return line.transform.position + new Vector3((index - count / 2) * cardWidth + cardWidth / 2 * ((count + 1) % 2), 0, 0);
 	}
 
 
@@ -587,4 +581,66 @@ public class UnitElementController : MonoBehaviour,
 		}
 	}
 
+
+
+
+
+
+
+
+
+
+
+	//TODO
+	public int GetBattleLineIdx(float y)
+	{
+		if (y > 220 && y < 1970)
+		{
+			return (int)((y - 180) / 466);
+		}
+		return -1;
+	}
+
+	//public int GetDeployPos(float position)
+	//{
+	//	if (count >= capacity)
+	//	{
+	//		return -1;
+	//	}
+	//	float vtcPos = position - 1980f;
+	//	int pos;
+	//	//CRITICAL ALGORITHM
+	//	if (count % 2 == 0)
+	//	{
+	//		int start = count / 2;
+	//		//一半卡牌 + 一半间隔
+	//		int offset = vtcPos > 0 ? (int)((vtcPos + (cardWidth + interval) / 2) / (cardWidth + interval))
+	//			: (int)((vtcPos - (cardWidth + interval) / 2) / (cardWidth + interval));
+	//		pos = start + offset;
+	//		if (start + offset < 0)
+	//		{
+	//			pos = 0;
+	//		}
+	//		else if (start + offset > count)
+	//		{
+	//			pos = count;
+	//		}
+	//	}
+	//	else
+	//	{
+	//		int offset = (int)(vtcPos / (cardWidth + interval));
+	//		int start = vtcPos > 0 ? (count / 2 + 1) : (count / 2);
+	//		pos = start + offset;
+	//		if (start + offset < 0)
+	//		{
+	//			pos = 0;
+	//		}
+	//		else if (start + offset > count)
+	//		{
+	//			pos = count;
+	//		}
+	//	}
+
+	//	return pos;
+	//}
 }
