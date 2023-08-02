@@ -86,10 +86,14 @@ namespace LogicCore
 		/// (TURN mapped)能量补给
 		/// </summary>
 		public int[] energySupply;
+
+
 		/// <summary>
-		/// 敌我部署栈
+		/// 部署队列
 		/// </summary>
 		internal List<UnitElement> deployQueue;
+
+		internal Dictionary<string, List<UnitElement>> UnitIDDic;
 
 
 
@@ -121,6 +125,8 @@ namespace LogicCore
 			//TODO 之后由战术层参数化
 			eventTable = new EventTable[2] { new EventTable(), new EventTable() };
 
+			bases = new UnitElement[2];
+
 			//初始回合为玩家
 			TURN = 0;
 			controller.UpdateTurn(TURN);
@@ -139,6 +145,7 @@ namespace LogicCore
 			energySupply = new int[2] { 1, 1 };
 
 			deployQueue = new List<UnitElement>();
+			UnitIDDic = new Dictionary<string, List<UnitElement>>();
 
 
 
@@ -321,7 +328,8 @@ namespace LogicCore
 
 			//battleLines[dstLineIdx].Receive(element, dstPos);
 			element.Deploy(this, battleLines[dstLineIdx], dstPos);
-			deployQueue.Add(element);
+
+
 
 			//更新前线指针
 			UpdateFrontLine();
@@ -337,6 +345,9 @@ namespace LogicCore
 				eventTable[TURN].RaiseEvent("EnterFrontLine", element, this);
 			}
 			eventTable[TURN].RaiseEvent("UnitDeployed", element, this);
+
+			eventTable[TURN].RaiseEvent("UpdateAura", null, this);
+			eventTable[(TURN + 1) % 2].RaiseEvent("UpdateAura", null, this);
 
 
 			controller.Settlement();
@@ -399,6 +410,9 @@ namespace LogicCore
 			}
 			eventTable[TURN].RaiseEvent("UnitMoved", null, this);
 
+			eventTable[TURN].RaiseEvent("UpdateAura", null, this);
+			eventTable[(TURN + 1) % 2].RaiseEvent("UpdateAura", null, this);
+
 			controller.Settlement();
 		}
 
@@ -426,6 +440,9 @@ namespace LogicCore
 
 
 			eventTable[TURN].RaiseEvent("UnitMoved", null, this);
+
+			eventTable[TURN].RaiseEvent("UpdateAura", null, this);
+			eventTable[(TURN + 1) % 2].RaiseEvent("UpdateAura", null, this);
 		}
 
 
@@ -448,6 +465,9 @@ namespace LogicCore
 
 			UpdateFrontLine();
 			UpdateAttackRange();
+
+			eventTable[TURN].RaiseEvent("UpdateAura", null, this);
+			eventTable[(TURN + 1) % 2].RaiseEvent("UpdateAura", null, this);
 		}
 
 
@@ -456,6 +476,7 @@ namespace LogicCore
 		public void Skip()
 		{
 			eventTable[TURN].RaiseEvent("EndOfTurn", null, this);
+			BroadCastEvent("EndOfTurn");
 
 			//TODO 可能有上限
 			energy[TURN] += energySupply[TURN];
@@ -477,6 +498,8 @@ namespace LogicCore
 
 			TURN = (TURN + 1) % 2;
 			eventTable[TURN].RaiseEvent("StartOfTurn", null, this);
+			BroadCastEvent("StartOfTurn");
+
 			//动画结算后回调
 			controller.UpdateTurnWithSettlement();
 		}
@@ -488,7 +511,16 @@ namespace LogicCore
 
 
 
-
+		internal void BroadCastEvent(string eventName)
+		{
+			for (int i = 0; i < deployQueue.Count; i++)
+			{
+				if (deployQueue[i].ownership == TURN && deployQueue[i].state == UnitState.inBattleLine)
+				{
+					deployQueue[i].eventTable.RaiseEvent(eventName, deployQueue[i], this);
+				}
+			}
+		}
 
 
 
@@ -627,28 +659,69 @@ namespace LogicCore
 
 
 
-
+		public int allyNum;
+		public int enemyNum;
 		//一些战场查询方法
-
+		internal void UpdateUnitNum()
+		{
+			allyNum = 0;
+			enemyNum = 0;
+			for (int i = 0; i < deployQueue.Count; i++)
+			{
+				if (deployQueue[i].state == UnitState.inBattleLine)
+				{
+					allyNum += deployQueue[i].ownership == TURN ? 1 : 0;
+					enemyNum += deployQueue[i].ownership == (TURN + 1) % 2 ? 1 : 0;
+				}
+			}
+		}
 		/// <summary>
 		/// 查询敌方随机目标 TODO
 		/// </summary>
 		/// <returns></returns>
-		internal UnitElement RandomTarget()
+		internal UnitElement RandomEnemy()
 		{
-
-			for(int i = 0; i < linesCapacity; i++)
+			UpdateUnitNum();
+			if (enemyNum == 0) return null;
+			
+			Random random = new Random();
+			int counter = random.Next(1, enemyNum + 1);
+			//从敌方战线开始
+			int line = linesCapacity - 1;
+			while (counter > 0)
 			{
-				if (battleLines[i].ownerShip != TURN && battleLines[i].count > 0)
+				counter -= battleLines[line].count;
+				if(counter <= 0)
 				{
-					Random random = new Random();
-					int idx = random.Next(0, battleLines[i].count);
-					return battleLines[i][idx];
+					return battleLines[line][battleLines[line].count - 1 + counter];
+				}
+				line--;
+			}
+			return null;
+		}
+		internal UnitElement RandomEnemyAtFrontLine()
+		{
+			Random random = new Random();
+			if (battleLines[frontLines[(TURN + 1) % 2]].count == 0) return null;
+
+			int counter = random.Next(0, battleLines[frontLines[(TURN + 1) % 2]].count);
+			return battleLines[frontLines[(TURN + 1) % 2]][counter];
+		}
+
+		internal UnitElement DamagedAlly()
+		{
+			for (int i = 0; i < deployQueue.Count; i++)
+			{
+				if (deployQueue[i].state == UnitState.inBattleLine)
+				{
+					if (deployQueue[i].maxHealth > deployQueue[i].dynHealth)
+					{
+						return deployQueue[i];
+					}
 				}
 			}
 			return null;
 		}
-
 
 
 

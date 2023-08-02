@@ -106,6 +106,9 @@ public class UnitElementController : MonoBehaviour,
 		rightArrow.SetActive(false);
 		midArrow.SetActive(false);
 	}
+	/// <summary>
+	/// 读取卡面图像音频等资源
+	/// </summary>
 	private void LoadCardResources()
 	{
 		CardImage.sprite = Resources.Load<Sprite>("CardImage/" + ID);
@@ -241,36 +244,6 @@ public class UnitElementController : MonoBehaviour,
 		//	nameTag, // endValue是原始内容
 		//	0.2f
 		//).SetEase(Ease.Linear); // 设置动画为线性变化
-		//DOTween.To(
-		//	() => "", // getter返回空字符串
-		//	value => categoriesText.text = value, // setter设置costText的内容
-		//	category, // endValue是原始内容
-		//	0.2f
-		//).SetEase(Ease.Linear); // 设置动画为线性变化
-		//DOTween.To(
-		//	() => "", // getter返回空字符串
-		//	value => attackText.text = value, // setter设置costText的内容
-		//	attackPoint.ToString(), // endValue是原始内容
-		//	0.2f
-		//).SetEase(Ease.Linear); // 设置动画为线性变化
-		//DOTween.To(
-		//	() => "", // getter返回空字符串
-		//	value => healthText.text = value, // setter设置costText的内容
-		//	healthPoint.ToString(), // endValue是原始内容
-		//	0.2f
-		//).SetEase(Ease.Linear); // 设置动画为线性变化
-		//DOTween.To(
-		//	() => "", // getter返回空字符串
-		//	value => attackCounterText.text = value, // setter设置costText的内容
-		//	attackCounter.ToString(), // endValue是原始内容
-		//	0.2f
-		//).SetEase(Ease.Linear); // 设置动画为线性变化
-		//DOTween.To(
-		//	() => "", // getter返回空字符串
-		//	value => costText.text = value, // setter设置costText的内容
-		//	cost.ToString(), // endValue是原始内容
-		//	0.2f
-		//).SetEase(Ease.Linear); // 设置动画为线性变化
 	}
 
 
@@ -278,6 +251,9 @@ public class UnitElementController : MonoBehaviour,
 
 	public Vector3 arrowScale;
 	public Vector3 enlargeArrowScale;
+
+	public Vector3 originTextScale;
+	public Vector3 targetTextScale;
 
 	//TODO remove
 	public UnitElementController t1;
@@ -379,23 +355,7 @@ public class UnitElementController : MonoBehaviour,
 	/// <summary>
 	/// 
 	/// </summary>
-	public void TerminateAnimationEvent()
-	{
-		Debug.Log("line: " + line.lineIdx + "res: " + resIdx + " destroyed!");
-
-		battleSceneManager.rotateSequence.InsertCallback(battleSceneManager.sequenceTime,
-				() =>
-				{
-					line.ElementRemove(resIdx);
-					gameObject.SetActive(false);
-					input.UpdateManual();
-				}
-			);
-		battleSceneManager.rotateSequence.AppendInterval(0.4f);
-		battleSceneManager.sequenceTime += 0.4f;
-	}
-	public Vector3 originTextScale;
-	public Vector3 targetTextScale;
+	/// <param name="health"></param>
 	public void DamageAnimationEvent(int health)
 	{
 		battleSceneManager.rotateSequence.Append(
@@ -422,6 +382,25 @@ public class UnitElementController : MonoBehaviour,
 		battleSceneManager.rotateSequence.AppendInterval(0.2f);
 		battleSceneManager.sequenceTime += 0.4f;
 	}
+	/// <summary>
+	/// 
+	/// </summary>
+	public void TerminateAnimationEvent()
+	{
+		Debug.Log("line: " + line.lineIdx + "res: " + resIdx + " destroyed!");
+
+		battleSceneManager.rotateSequence.InsertCallback(battleSceneManager.sequenceTime,
+				() =>
+				{
+					line.ElementRemove(resIdx);
+					gameObject.SetActive(false);
+					input.UpdateManual();
+				}
+			);
+		battleSceneManager.rotateSequence.AppendInterval(0.4f);
+		battleSceneManager.sequenceTime += 0.4f;
+	}
+
 
 
 
@@ -495,7 +474,7 @@ public class UnitElementController : MonoBehaviour,
 		if (dataState == UnitState.inBattleLine)
 		{
 			//好逆天的回调。。TODO
-			if (operateCounter == 0)
+			if (operateCounter <= 0)
 			{
 				return;
 			}

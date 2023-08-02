@@ -8,6 +8,10 @@ using DisplayInterface;
 using LogicCore;
 using EventEffectModels;
 using InputHandler;
+using Codice.CM.Common;
+using CodiceApp.EventTracking.Plastic;
+using System.Runtime.CompilerServices;
+using System.Xml.Linq;
 
 namespace DataCore.BattleElements
 {
@@ -42,6 +46,7 @@ namespace DataCore.BattleElements
 		/// 绝对归属权
 		/// </summary>
 		internal int ownership;
+		internal int stackIdx;
 
 
 		internal BattleElement(Card __card)
@@ -52,6 +57,8 @@ namespace DataCore.BattleElements
 			this.description = __card.description;
 			this.cost = __card.cost;
 			this.ownership = __card.ownership;
+			//TODO 维护
+			this.stackIdx = -1;
 		}
 	}
 
@@ -71,6 +78,10 @@ namespace DataCore.BattleElements
 		/// </summary>
 		internal BattleSystem battleSystem;
 		/// <summary>
+		/// 战场中不会变化的唯一标识编号
+		/// </summary>
+		internal int battleID;
+		/// <summary>
 		/// 当前所在战线
 		/// </summary>
 		internal BattleLine battleLine;
@@ -87,7 +98,7 @@ namespace DataCore.BattleElements
 		/// <summary>
 		/// 个体事件系统
 		/// </summary>
-		protected EventTable eventTable;
+		internal EventTable eventTable;
 		/// <summary>
 		/// 效果表(CRITICAL)
 		/// </summary>
@@ -95,53 +106,101 @@ namespace DataCore.BattleElements
 
 		internal UnitState state;
 
-		//static info
 		/// <summary>
 		/// 兵种
 		/// </summary>
 		internal string category { get; private set; }
+
+
+
+
 		/// <summary>
 		/// 原始攻击力
 		/// </summary>
 		internal int oriAttack { get; private set; }
 		/// <summary>
-		/// 原始最大生命值
+		/// 动态攻击力
 		/// </summary>
-		internal int oriHealth { get; private set; }
+		internal int DynAttack;
+		internal int dynAttack
+		{
+			get
+			{
+				int gainSum = 0;
+				foreach (KeyValuePair<int, int> entry in attackGain)
+				{
+					gainSum += entry.Value;
+				}
+				return DynAttack + gainSum;
+			}
+			set { DynAttack = value; }
+		}
+
+
 
 		/// <summary>
 		/// 原始攻击计数器最大值
 		/// </summary>
 		internal int oriAttackCounter { get; private set; }
-
-
-
-		//dynamic info
-		/// <summary>
-		/// 动态攻击力
-		/// </summary>
-		internal int dynAttack { get; set; }
-		/// <summary>
-		/// 动态生命值
-		/// </summary>
-		internal int dynHealth { get; set; }
-		/// <summary>
-		/// 动态最大生命值
-		/// </summary>
-		internal int maxHealth { get; set; }
 		/// <summary>
 		/// 动态攻击计数器
 		/// </summary>
-		internal int dynAttackCounter;
+		private int DynAttackCounter;
+		internal int dynAttackCounter
+		{
+			get { return DynAttackCounter; }
+			set
+			{
+				DynAttackCounter = value;
+				if(value < 0) DynAttackCounter = 0;
+				if (value > oriAttackCounter) DynAttackCounter = oriAttackCounter;
+			}
+		}
+
+
+
 
 		/// <summary>
-		/// 攻击增益(伤害附加)
+		/// 原始最大生命值
 		/// </summary>
-		internal int dynAttackGain;
+		internal int oriHealth { get; private set; }
 		/// <summary>
-		/// 最大生命值增益
+		/// 动态生命值
 		/// </summary>
-		internal int maxHealthGain;
+		private int DynHealth;
+		internal int dynHealth
+		{
+			get { return DynHealth; }
+			set
+			{
+				DynHealth = value;
+				if(value < 0) DynHealth = 0;
+				if(value > MaxHealth) DynHealth = MaxHealth;
+			}
+		}
+		/// <summary>
+		/// 动态最大生命值
+		/// </summary>
+		private int MaxHealth;
+		internal int maxHealth
+		{
+			get { return MaxHealth; }
+			set
+			{
+				DynHealth += value - MaxHealth;
+				MaxHealth = value;
+			}
+		}
+
+
+		/// <summary>
+		/// 记源攻击力增益
+		/// </summary>
+		internal Dictionary<int, int> attackGain;
+		/// <summary>
+		/// 记源最大生命值增益
+		/// </summary>
+		internal Dictionary<int, int> maxHealthGain;
 
 
 		/// <summary>
@@ -152,6 +211,13 @@ namespace DataCore.BattleElements
 		/// 伤害量寄存器
 		/// </summary>
 		internal int damage;
+
+
+
+		/// <summary>
+		/// 攻击范围，长度为3
+		/// </summary>
+		internal UnitElement[] attackRange;
 		/// <summary>
 		/// 目标寄存器
 		/// </summary>
@@ -164,22 +230,19 @@ namespace DataCore.BattleElements
 
 
 		/// <summary>
-		/// 攻击范围，长度为3
-		/// </summary>
-		internal UnitElement[] attackRange;
-
-		/// <summary>
-		/// (巨兽特有)身体组件
-		/// </summary>
-		internal UnitElement[] componentHash;
-
-
-		/// <summary>
 		/// 操作计数器，为1时表示未被操作
 		/// </summary>
-		internal int operateCounter;
+		internal int operateCounter
+		{
+			get { return operateCounter; }
+			set
+			{
+				operateCounter = value > 1 ? 1 : value;
+			}
+		}
 
 
+		//legacy
 		/// <summary>
 		/// 移动时减少的攻击计数 default: 0
 		/// </summary>
@@ -202,14 +265,6 @@ namespace DataCore.BattleElements
 		
 		//附加属性
 		/// <summary>
-		/// 护甲值 default: 0
-		/// </summary>
-		internal int armor;
-		/// <summary>
-		/// 连击值 default: 1
-		/// </summary>
-		internal int batter;
-		/// <summary>
 		/// 移动范围 default: 1
 		/// </summary>
 		internal int moveRange;
@@ -225,6 +280,9 @@ namespace DataCore.BattleElements
 		/// 顺劈状态
 		/// </summary>
 		internal bool cleave;
+		internal bool assault;
+		internal bool raid;
+		internal int armor;
 		/// <summary>
 		/// 可选
 		/// </summary>
@@ -233,6 +291,10 @@ namespace DataCore.BattleElements
 		/// 反甲
 		/// </summary>
 		internal bool thorn;
+
+
+
+		internal bool aura;
 
 
 
@@ -252,8 +314,11 @@ namespace DataCore.BattleElements
 			this.oriAttackCounter = __card.attackCounter;
 
 			//初始化动态数据
+			this.DynAttack = __card.attackPoint;
 			this.dynAttack = __card.attackPoint;
+			this.DynHealth = __card.healthPoint;
 			this.dynHealth = __card.healthPoint;
+			this.MaxHealth = __card.healthPoint;
 			this.maxHealth = __card.healthPoint;
 			this.dynAttackCounter = __card.attackCounter;
 			this.operateCounter = 1;
@@ -264,8 +329,9 @@ namespace DataCore.BattleElements
 			this.target = null;
 
 			//寄存器初始化
-			this.dynAttackGain = 0;
-			this.maxHealthGain = 0;
+			attackGain = new Dictionary<int, int>();
+			maxHealthGain = new Dictionary<int, int>();
+
 			this.recover = 0;
 			this.damage = 0;
 
@@ -275,29 +341,48 @@ namespace DataCore.BattleElements
 			this.randomAttack = __card.randomAttack;
 			this.moveable = __card.moveable;
 			this.mocking = __card.mocking;
-			//TODO
-			this.componentHash = new UnitElement[5];
 
 
 			//std attribute & status
 			//内嵌逻辑特性
-			this.armor = 0;
-			this.batter = 1;
 			this.moveRange = 1;
 
+			parry = false;
 			cleave = false;
+			this.armor = 0;
 
+			aura = false;
 
 			//效果形式化解析
-			string effects = __card.effects;
+			EffectsParse(__card.effects);
+
+
+			eventTable.RaiseEvent("Initialize", this, null);
+		}
+		protected void EffectsParse(string effects)
+		{
 			if (effects != "none")
 			{
 				//复数效果分离
 				string[] effect = effects.Split('|');
+
 				foreach (string s in effect)
 				{
+					string prefabs = s;
+					switch (prefabs)
+					{
+						case "Raid":
+							prefabs = "<self:Initialize+Raid-0>/<self:AfterDeploy+RaidOnEnable-0>";
+							break;
+						case "Assault":
+							prefabs = "<self:Initialize+Assault-0>/<self:AfterDeploy+AssaultOnEnable-0>";
+							break;
+						case "Cleave":
+							prefabs = "<self:Initialize+Cleave-0>/<self:BeforeAttack+CleaveOnEnable-0>";
+							break;
+					}
 					//将触发块与解除块分离
-					string[] trigger = s.Split('/');
+					string[] trigger = prefabs.Split('/');
 
 					//遍历触发块与解除块
 					foreach (string block in trigger)
@@ -305,7 +390,6 @@ namespace DataCore.BattleElements
 						//将事件与委托分离
 						string[] tuple = block.Trim('<', '>').Split('+');
 
-						//若无事件(通常只可能没有解除事件)
 						if (tuple[0] == "none") break;
 
 						//分离委托及其参数
@@ -316,12 +400,14 @@ namespace DataCore.BattleElements
 
 						//初始化委托参数列表
 						List<int> argList = new List<int>();
-						for(int i = 0; i < int.Parse(triggerDelegate[1]); i++)
+						for (int i = 0; i < int.Parse(triggerDelegate[1]); i++)
 						{
 							argList.Add(int.Parse(triggerDelegate[i + 2]));
 						}
 						//注册委托参数
 						effectsTable.RegisterArgs(triggerDelegate[0], argList);
+
+
 
 						//解析分离 事件
 						string[] triggerEvent = tuple[0].Split(':');
@@ -366,19 +452,11 @@ namespace DataCore.BattleElements
 			}
 		}
 
-		//TODO
-		///// <summary>
-		///// 顺劈状态
-		///// </summary>
-		//internal bool cleave;
+
 		///// <summary>
 		///// 嘲讽状态
 		///// </summary>
 		//internal bool mocking;
-		///// <summary>
-		///// 荆棘状态
-		///// </summary>
-		//internal bool thorn;
 		///// <summary>
 		///// 不屈状态
 		///// </summary>
@@ -522,9 +600,12 @@ namespace DataCore.BattleElements
 		{
 			eventTable.RaiseEvent("RotateSettlement", this, battleSystem);
 
-			this.dynAttackCounter = (this.dynAttackCounter - this.operateCounter) < 0 ? 0 : this.dynAttackCounter - this.operateCounter;
+			if(this.operateCounter > 0)
+			{
+				this.dynAttackCounter -= 1;
+			}
 			//操作计数回复
-			this.operateCounter = 1;
+			this.operateCounter++;
 
 			//自动更新
 			Settlement();
@@ -540,7 +621,7 @@ namespace DataCore.BattleElements
 			{
 				if (randomAttack)
 				{
-					UnitElement tmpTarget = battleSystem.RandomTarget();
+					UnitElement tmpTarget = battleSystem.RandomEnemy();
 					int result = -1;
 					result = Attack(tmpTarget);
 					if (result > 0)
@@ -560,6 +641,12 @@ namespace DataCore.BattleElements
 			}
 		}
 
+
+
+
+
+
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -568,13 +655,53 @@ namespace DataCore.BattleElements
 		{
 			eventTable.RaiseEvent("BeforeDeploy", this, battleSystem);
 
+			//加入部署队列
+			this.battleID = battleSystem.deployQueue.Count;
+			battleSystem.deployQueue.Add(this);
+			//加入ID字典
+			if (!battleSystem.UnitIDDic.ContainsKey(this.backendID))
+			{
+				battleSystem.UnitIDDic.Add(this.backendID, new List<UnitElement>());
+			}
+			battleSystem.UnitIDDic[this.backendID].Add(this);
+
+			//战线接收
 			dstLine.Receive(this, dstPos);
 			this.battleSystem = battleSystem;
-			this.operateCounter = 0;
+			this.operateCounter--;
 
 			eventTable.RaiseEvent("AfterDeploy", this, battleSystem);
 
 			UpdateInfo();
+		}
+		/// <summary>
+		/// 主动移动，消耗行动次数
+		/// </summary>
+		internal virtual void Move(BattleLine resLine, BattleLine dstLine, int resIdx, int dstPos)
+		{
+			//if (!moveable)
+			//{
+			//	return;//TODO
+			//}
+
+			eventTable.RaiseEvent("BeforeMove", this, battleSystem);
+
+
+			dstLine.Receive(resLine.Send(resIdx), dstPos);
+			this.dynAttackCounter -= counterDecrease;
+
+			this.operateCounter--;
+
+			UpdateInfo();
+
+			eventTable.RaiseEvent("AfterMove", this, battleSystem);
+		}
+		/// <summary>
+		/// 强制移动，不消耗移动次数
+		/// </summary>
+		internal void ForceMove(BattleLine dstLine)
+		{
+			throw new NotImplementedException();
 		}
 		/// <summary>
 		/// 攻击方法: 
@@ -620,9 +747,10 @@ namespace DataCore.BattleElements
 		/// <param name="source"></param>
 		internal void Attacked(UnitElement source)
 		{
+			this.damage = source.dynAttack;
+
 			eventTable.RaiseEvent("BeforeAttacked", this, battleSystem);
 
-			this.damage = source.dynAttack;
 			Damaged();
 
 			eventTable.RaiseEvent("AfterAttacked", this, battleSystem);
@@ -638,7 +766,7 @@ namespace DataCore.BattleElements
 				eventTable.RaiseEvent("Meticulous", this, battleSystem);
 			}
 
-			this.dynHealth = this.dynHealth - this.damage < 0 ? 0 : this.dynHealth - this.damage;
+			this.dynHealth -= this.damage;
 			controller.DamageAnimationEvent(this.dynHealth);
 
 			this.damage = 0;
@@ -665,7 +793,7 @@ namespace DataCore.BattleElements
 				eventTable.RaiseEvent("Meticulous", this, battleSystem);
 			}
 
-			this.dynHealth = this.dynHealth - this.damage < 0 ? 0 : this.dynHealth - this.damage;
+			this.dynHealth -= this.damage;
 			controller.ImmediateDamageAnimationEvent(this.dynHealth);
 
 			this.damage = 0;
@@ -677,34 +805,14 @@ namespace DataCore.BattleElements
 
 			eventTable.RaiseEvent("AfterDamaged", this, battleSystem);
 		}
-		/// <summary>
-		/// 主动移动，消耗行动次数
-		/// </summary>
-		internal virtual void Move(BattleLine resLine, BattleLine dstLine, int resIdx, int dstPos)
+		internal void Recover(int heal)
 		{
-			//if (!moveable)
-			//{
-			//	return;//TODO
-			//}
+			this.recover = heal;
+			eventTable.RaiseEvent("BeforeRecover", this, battleSystem);
+			battleSystem.eventTable[ownership].RaiseEvent("UnitHealed", this, battleSystem);
 
-			eventTable.RaiseEvent("BeforeMove", this, battleSystem);
-
-
-			dstLine.Receive(resLine.Send(resIdx), dstPos);
-			this.dynAttackCounter = this.dynAttackCounter - this.counterDecrease < 0 ? 0 : this.dynAttackCounter - this.counterDecrease;
-
-			this.operateCounter = 0;
-
-			UpdateInfo();
-
-			eventTable.RaiseEvent("AfterMove", this, battleSystem);
-		}
-		/// <summary>
-		/// 强制移动，不消耗移动次数
-		/// </summary>
-		internal void ForceMove(BattleLine dstLine)
-		{
-			throw new NotImplementedException();
+			this.dynHealth += recover;
+			this.recover = 0;
 		}
 		/// <summary>
 		/// 死亡
@@ -715,6 +823,8 @@ namespace DataCore.BattleElements
 
 			//由自己修改的状态
 			this.state = UnitState.destroyed;
+			UnloadEffects();
+
 
 			battleLine.ElementRemove(inlineIdx);
 			controller.TerminateAnimationEvent();
@@ -724,28 +834,56 @@ namespace DataCore.BattleElements
 			eventTable.RaiseEvent("AfterTerminate", this, battleSystem);
 		}
 		/// <summary>
-		/// 撤退回到手牌区回复状态
+		/// 撤退回到手牌区,回复状态
 		/// </summary>
 		internal void Retreat()
 		{
 			battleLine.ElementRemove(inlineIdx);
 
 			//TODO config
-			this.dynHealth = dynHealth + 2 > oriHealth ? oriHealth : dynHealth + 2;
+			this.dynHealth += 2;
 			this.operateCounter = 1;
+			UnloadEffects();
 		}
 
 
 
 
 
-
-
-
-		internal void Parry()
+		//死亡和战斗结束时调用
+		private void UnloadEffects()
 		{
+			//初始化攻击范围和攻击目标
+			attackRange[0] = null;
+			attackRange[1] = null;
+			attackRange[2] = null;
+			this.targetIdx = -1;
+			this.target = null;
+
+			//寄存器初始化
+			attackGain.Clear();
+			maxHealthGain.Clear();
+
+			this.recover = 0;
 			this.damage = 0;
+
+			this.armor = 0;
+			this.moveRange = 1;
+
 			parry = false;
+			cleave = false;
+
+			aura = false;
+		}
+
+
+
+		internal void AuraGain(UnitElement element, BattleSystem system)
+		{
+			if (aura)
+			{
+
+			}
 		}
 
 
@@ -839,7 +977,7 @@ namespace DataCore.BattleElements
 
 			if (this.dynAttackCounter <= 0)
 			{
-				tmpTarget = battleSystem.RandomTarget();
+				tmpTarget = battleSystem.RandomEnemy();
 				int result = -1;
 				result = Attack();
 				if (result > 0)
@@ -867,6 +1005,7 @@ namespace DataCore.BattleElements
 	internal sealed class GuardianElement : UnitElement
 	{
 		internal GuardianElement(UnitCard __card) : base(__card) { }
+		//TODO
 		internal override void SetAttackRange(UnitElement t1, UnitElement t2, UnitElement t3)
 		{
 			attackRange[0] = t1;
@@ -883,7 +1022,12 @@ namespace DataCore.BattleElements
 			return;
 		}
 	}
-
+	internal sealed class BehemothsElement : UnitElement
+	{
+		internal BehemothsElement(UnitCard __card) : base(__card)
+		{
+		}
+	}
 
 
 

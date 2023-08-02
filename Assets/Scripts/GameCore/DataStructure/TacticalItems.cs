@@ -41,7 +41,25 @@ namespace DataCore.TacticalItems
 				{
 					if(card.ownership == 0)
 					{
-						deck.Add(new UnitElement(card as UnitCard));
+						string category = (card as UnitCard).category;
+						switch (category)
+						{
+							case "LightArmor":
+								deck.Add(new LightArmorElement(card as UnitCard));
+								break;
+							case "Motorized":
+								deck.Add(new MotorizedElement(card as UnitCard));
+								break;
+							case "Artillery":
+								deck.Add(new ArtilleryElement(card as UnitCard));
+								break;
+							case "Guardian":
+								deck.Add(new GuardianElement(card as UnitCard));
+								break;
+							case "Construction":
+								deck.Add(new ConstructionElement(card as UnitCard));
+								break;
+						}
 					}
 				}
 			}
@@ -51,7 +69,25 @@ namespace DataCore.TacticalItems
 				{
 					if (card.ownership == 1)
 					{
-						deck.Add(new UnitElement(card as UnitCard));
+						string category = (card as UnitCard).category;
+						switch (category)
+						{
+							case "LightArmor":
+								deck.Add(new LightArmorElement(card as UnitCard));
+								break;
+							case "Motorized":
+								deck.Add(new MotorizedElement(card as UnitCard));
+								break;
+							case "Artillery":
+								deck.Add(new ArtilleryElement(card as UnitCard));
+								break;
+							case "Guardian":
+								deck.Add(new GuardianElement(card as UnitCard));
+								break;
+							case "Construction":
+								deck.Add(new ConstructionElement(card as UnitCard));
+								break;
+						}
 					}
 				}
 			}

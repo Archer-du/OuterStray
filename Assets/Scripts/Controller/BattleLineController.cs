@@ -11,10 +11,11 @@ using DataCore.BattleElements;
 public class BattleLineController : MonoBehaviour,
     IBattleLineController
 {
+
+	public BattleSceneManager battleSceneManager;
 	/// <summary>
 	/// 战线容量
 	/// </summary>
-
 	public int capacity;
 
 	public List<UnitElementController> elementList;
@@ -53,6 +54,7 @@ public class BattleLineController : MonoBehaviour,
 	/// <param name="ownership"></param>
 	public void Init(int capacity, int ownership)
 	{
+		battleSceneManager = GameObject.Find("BattleSceneManager").GetComponent<BattleSceneManager>();
 		elementList = new List<UnitElementController>();
 
 		this.capacity = capacity;
@@ -186,6 +188,10 @@ public class BattleLineController : MonoBehaviour,
 	}
 
 
+
+	/// <summary>
+	/// 动画效果
+	/// </summary>
 	public void UpdateElementPosition()
 	{
 		UpdateElements();
@@ -201,15 +207,16 @@ public class BattleLineController : MonoBehaviour,
 				Vector3 moveBy = dstPos - oriPos;
 				Vector3 rotateBy = new Vector3(0, 0, 180);
 
-				Sequence seq = DOTween.Sequence();
-				seq.Append(elementList[i].transform.DOBlendableMoveBy(moveBy, updateTime));
-				seq.Join(elementList[i].transform.DOBlendableRotateBy(rotateBy, updateTime));
-				seq.Play();
+
+				battleSceneManager.rotateSequence.Append(elementList[i].transform.DOBlendableMoveBy(moveBy, updateTime));
+				battleSceneManager.rotateSequence.Join(elementList[i].transform.DOBlendableRotateBy(rotateBy, updateTime));
 			}
 			else
 			{
-				elementList[i].transform.DOMove(dstPos, updateTime);
+				battleSceneManager.rotateSequence.Append(elementList[i].transform.DOMove(dstPos, updateTime));
 			}
+			battleSceneManager.rotateSequence.AppendInterval(0.2f);
+			battleSceneManager.sequenceTime += updateTime + 0.2f;
 		}
 	}
 	private void UpdateElements()

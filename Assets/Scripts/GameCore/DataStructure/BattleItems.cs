@@ -10,7 +10,7 @@ using DataCore.TacticalItems;
 
 using DisplayInterface;
 using System.Xml.Linq;
-
+using System.Data;
 
 namespace DataCore.BattleItems
 {
@@ -62,7 +62,14 @@ namespace DataCore.BattleItems
 		}
 
 
-
+		internal bool Receiveable()
+		{
+			return count < capacity;
+		}
+		internal bool Sendable()
+		{
+			return count > 0;
+		}
 		/// <summary>
 		/// 接收一个单位到该战线指定位置
 		/// </summary>
@@ -139,7 +146,13 @@ namespace DataCore.BattleItems
 		/// 
 		/// </summary>
 		internal List<BattleElement> stack;
-		internal Hashtable IDhash;
+		internal Dictionary<string, List<UnitElement>> UnitIDDic;
+
+		internal List<LightArmorElement> lightArmors;
+		internal List<MotorizedElement> motorizeds;
+		internal List<ArtilleryElement> artillerys;
+		internal List<GuardianElement> guardians;
+		internal List<ConstructionElement> constructions;
 		/// <summary>
 		/// 
 		/// </summary>
@@ -149,7 +162,8 @@ namespace DataCore.BattleItems
 		internal RandomCardStack()
 		{
 			stack = new List<BattleElement>(SystemConfig.stackCapacity);
-			IDhash = new Hashtable();
+			UnitIDDic = new Dictionary<string, List<UnitElement>>();
+
 		}
 
 		/// <summary>
@@ -162,14 +176,51 @@ namespace DataCore.BattleItems
 			for (int i = 0; i < num; i++)
 			{
 				stack.Add(deck[i]);
-				IDhash.Add(deck[i].backendID, deck[i]);
 
 				if (deck[i] is UnitElement)
 				{
-					UnitElement element = deck[i] as UnitElement;
-					element.state = UnitState.inStack;
+					if (!UnitIDDic.ContainsKey(deck[i].backendID))
+					{
+						UnitIDDic.Add(deck[i].backendID, new List<UnitElement>());
+					}
+					UnitIDDic[deck[i].backendID].Add(deck[i] as UnitElement);
 
-					element.controller = controller.InstantiateUnitElementInBattle(element.ownership);
+
+					if (deck[i] is LightArmorElement)
+					{
+						LightArmorElement element = deck[i] as LightArmorElement;
+						lightArmors.Add(element);
+						element.state = UnitState.inStack;
+						element.controller = controller.InstantiateUnitElementInBattle(element.ownership);
+					}
+					if (deck[i] is MotorizedElement)
+					{
+						MotorizedElement element = deck[i] as MotorizedElement;
+						motorizeds.Add(element);
+						element.state = UnitState.inStack;
+						element.controller = controller.InstantiateUnitElementInBattle(element.ownership);
+					}
+					if (deck[i] is ArtilleryElement)
+					{
+						ArtilleryElement element = deck[i] as ArtilleryElement;
+						artillerys.Add(element);
+						element.state = UnitState.inStack;
+						element.controller = controller.InstantiateUnitElementInBattle(element.ownership);
+					}
+					if (deck[i] is GuardianElement)
+					{
+						GuardianElement element = deck[i] as GuardianElement;
+						guardians.Add(element);
+						element.state = UnitState.inStack;
+						element.controller = controller.InstantiateUnitElementInBattle(element.ownership);
+					}
+					if (deck[i] is ConstructionElement)
+					{
+						ConstructionElement element = deck[i] as ConstructionElement;
+						constructions.Add(element);
+						element.state = UnitState.inStack;
+						element.controller = controller.InstantiateUnitElementInBattle(element.ownership);
+					}
 				}
 				else
 				{
@@ -177,6 +228,14 @@ namespace DataCore.BattleItems
 				}
 			}
 
+			UpdateStackIdx();
+		}
+		internal void UpdateStackIdx()
+		{
+			for (int i = 0; i < stack.Count; i++)
+			{
+				stack[i].stackIdx = i;
+			}
 		}
 		internal void Push(BattleElement element)
 		{
@@ -191,6 +250,8 @@ namespace DataCore.BattleItems
 			{
 				//TODO
 			}
+
+			UpdateStackIdx();
 		}
 		internal BattleElement RandomPop()
 		{
@@ -203,45 +264,82 @@ namespace DataCore.BattleItems
 			BattleElement element = stack[index];
 			stack.RemoveAt(index);
 
+			UpdateStackIdx();
+
+
 			return element;
 		}
 		internal void Clear()
 		{
 			stack.Clear();
+			UnitIDDic.Clear();
 		}
 
 
 
 
 
-		internal BattleElement PopElementByID(string id)
+		internal BattleElement PopElementByStackIdx(int stackIdx)
 		{
-			if (!IDhash.ContainsKey(id))
-			{
-				return null;
-			}
-			BattleElement element = IDhash[id] as BattleElement;
-			IDhash.Remove(id);
-			for(int i = 0; i < stack.Count; i ++)
-			{
-				if (stack[i].backendID == id)
-				{
-					stack.RemoveAt(i);
-				}
-			}
+			BattleElement element = stack[stackIdx];
+			stack[stackIdx].stackIdx = -1;
+			stack.RemoveAt(stackIdx);
 			return element;
 		}
-		internal BattleElement FindElementByID(string id)
+
+		internal void UpdateDics()
 		{
-			if (!IDhash.ContainsKey(id))
+			foreach(KeyValuePair<string, List<UnitElement>> pair in UnitIDDic)
+			{
+				int i = 0;
+				while(i < pair.Value.Count)
+				{
+					if (pair.Value[i].stackIdx == -1)
+					{
+						pair.Value.RemoveAt(i);
+					}
+					else { i++; }
+				}
+			}
+		}
+		internal UnitElement RandomFindUnitByID(string id)
+		{
+			UpdateDics();
+
+			if (!UnitIDDic.ContainsKey(id))
 			{
 				return null;
 			}
-			else return IDhash[id] as BattleElement;
+			Random random = new Random();
+			int idx = random.Next(0, UnitIDDic[id].Count);
+			UnitElement element = UnitIDDic[id][idx];
+			UnitIDDic.Remove(id);
+
+			return element;
 		}
 		internal UnitElement RandomFindUnitByCategory(string category)
 		{
-			throw new NotImplementedException();
+			Random random = new Random();
+			int idx = 0;
+			switch(category)
+			{
+				case "LightArmor":
+					idx = random.Next(0, lightArmors.Count);
+					return lightArmors[idx];
+				case "Motorized":
+					idx = random.Next(0, motorizeds.Count);
+					return motorizeds[idx];
+				case "Artillery":
+					idx = random.Next(0, artillerys.Count);
+					return artillerys[idx];
+				case "Guardian":
+					idx = random.Next(0, guardians.Count);
+					return guardians[idx];
+				case "Construction":
+					idx = random.Next(0, constructions.Count);
+					return constructions[idx];
+			}
+			return null;
 		}
 	}
 

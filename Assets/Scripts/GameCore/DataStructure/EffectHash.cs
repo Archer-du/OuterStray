@@ -25,7 +25,7 @@ namespace EventEffectModels
 			eventTable = new Hashtable();
 		}
 		/// <summary>
-		/// 注册触发事件
+		/// 将委托注册到事件
 		/// </summary>
 		/// <param name="eventName"></param>
 		/// <param name="handler"></param>
@@ -38,7 +38,7 @@ namespace EventEffectModels
 			eventTable[eventName] = Delegate.Combine((BattleEventHandler)eventTable[eventName], handler);
 		}
 		/// <summary>
-		/// 注册解除事件
+		/// 将委托从事件中解除
 		/// </summary>
 		/// <param name="eventName"></param>
 		/// <param name="handler"></param>
@@ -76,21 +76,43 @@ namespace EventEffectModels
 		}
 	}
 
+
+
+
+
+
+
+
+
+
 	internal class EffectsTable
 	{
 		internal Hashtable effectsTable;
 		internal Hashtable argsTable;
 		internal Hashtable buffer;
 
-		//non-args effects
-		internal void RecoverOperateCounter(UnitElement element, BattleSystem system)
+		//non-args effects---------------------------------------------
+		internal void Assault(UnitElement element, BattleSystem system)
 		{
-			element.operateCounter = 1;
+			element.assault = true;
 		}
-		//TODO
-		internal void SetMoveRange(UnitElement element, BattleSystem system)
+		internal void AssaultOnEnable(UnitElement element, BattleSystem system)
 		{
-			element.moveRange = 9;
+			if (element.assault)
+			{
+				element.moveRange = 9;
+			}
+		}
+		internal void Raid(UnitElement element, BattleSystem system)
+		{
+			element.raid = true;
+		}
+		internal void RaidOnEnable(UnitElement element, BattleSystem system)
+		{
+			if (element.raid)
+			{
+				element.operateCounter = 1;
+			}
 		}
 		internal void Cleave(UnitElement element, BattleSystem system)
 		{
@@ -112,6 +134,27 @@ namespace EventEffectModels
 				}
 			}
 		}
+		internal void Armor(UnitElement element, BattleSystem system)
+		{
+			int argsNum = 1;
+			if (!argsTable.ContainsKey("Armor"))
+			{
+				throw new InvalidOperationException("argsTable fault");
+			}
+			if (((List<int>)argsTable["Armor"]).Count != argsNum)
+			{
+				throw new InvalidOperationException("argsTable list length invalid");
+			}
+
+			element.armor = ((List<int>)argsTable["Armor"])[0];
+		}
+		internal void ArmorOnEnable(UnitElement element, BattleSystem system)
+		{
+			if(element.armor > 0)
+			{
+				element.damage = element.damage - element.armor < 0 ? 0 : element.damage - element.armor;
+			}
+		}
 		internal void Parry(UnitElement element, BattleSystem system)
 		{
 			element.parry = true;
@@ -122,14 +165,14 @@ namespace EventEffectModels
 			if (element.parry)
 			{
 				element.damage = 0;
-				element.parry = false;
 			}
 		}
-
-
-		internal void Lurk(UnitElement element, BattleSystem system)
+		internal void ParryUnload(UnitElement element, BattleSystem system)
 		{
-			element.selectable = true;
+			if (element.parry)
+			{
+				element.parry = false;
+			}
 		}
 
 
@@ -137,6 +180,139 @@ namespace EventEffectModels
 
 
 		//args effects------------------------------------------------------
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="element"></param>
+		/// <param name="system"></param>
+		/// <exception cref="InvalidOperationException"></exception>
+		internal void AttackCounterDecrease(UnitElement element, BattleSystem system)
+		{
+			int argsNum = 1;
+			if (!argsTable.ContainsKey("AttackCounterDecrease"))
+			{
+				throw new InvalidOperationException("argsTable fault");
+			}
+			if (((List<int>)argsTable["AttackCounterDecrease"]).Count != argsNum)
+			{
+				throw new InvalidOperationException("argsTable list length invalid");
+			}
+
+			int decrease = ((List<int>)argsTable["AttackCounterDecrease"])[0];
+
+			element.dynAttackCounter -= decrease;
+
+			element.UpdateInfo();
+		}
+		internal void DrawCardsRandom(UnitElement element, BattleSystem system)
+		{
+			int argsNum = 1;
+
+
+
+			int num = ((List<int>)argsTable["DrawCardsRandom"])[0];
+			for(int i = 0; i < num; i++)
+			{
+				if (system.handicaps[BattleSystem.TURN].count < system.handicaps[BattleSystem.TURN].capacity)
+				{
+					BattleElement unit = system.stacks[BattleSystem.TURN].RandomPop();
+					system.handicaps[BattleSystem.TURN].Push(unit);
+				}
+			}
+		}
+		internal void RandomDamage(UnitElement element, BattleSystem system)
+		{
+			int argsNum = 2;
+
+
+
+			int range = ((List<int>)argsTable["RandomDamage"])[0];
+			int damage = ((List<int>)argsTable["RandomDamage"])[1];
+
+			UnitElement target = null;
+			switch (range)
+			{
+				case 0:
+					target = system.RandomEnemy();
+					break;
+				case 1:
+					target = system.RandomEnemyAtFrontLine();
+					break;
+			}
+
+			target?.Damaged(damage);
+		}
+		internal void DoubleRecovery(UnitElement element, BattleSystem system)
+		{
+			element.recover *= 2;
+		}
+		internal void UnitGain(UnitElement element, BattleSystem system)
+		{
+			int argsNum = 2;
+
+
+			element.DynAttack += ((List<int>)argsTable["UnitGain"])[0];
+			element.maxHealth += ((List<int>)argsTable["UnitGain"])[1];
+		}
+
+		internal void RandomRecoverDamaged(UnitElement element, BattleSystem system)
+		{
+			int argsNum = 1;
+
+
+
+			int recover = ((List<int>)argsTable["RandomRecoverDamaged"])[0];
+
+			UnitElement unit = system.DamagedAlly();
+			unit?.Recover(recover);
+		}
+		internal void DamageAdjacent(UnitElement element, BattleSystem system)
+		{
+			int argsNum = 1;
+
+
+
+			int damage = ((List<int>)argsTable["DamageAdjacent"])[0];
+
+			for(int i = 0; i < system.battleLines[system.frontLines[element.ownership]].count; i++)
+			{
+				system.battleLines[system.frontLines[element.ownership]][i].Damaged(damage);
+			}
+		}
+
+
+
+
+		private void RecruitToPosition(UnitElement element, BattleSystem system, int position, UnitElement unit)
+		{
+			switch (position)
+			{
+				//0：支援战线
+				case 0:
+					if (system.battleLines[system.supportLines[element.ownership]].Receiveable())
+					{
+						unit.Deploy(system, system.battleLines[system.supportLines[element.ownership]], 0);
+						system.stacks[element.ownership].PopElementByStackIdx(unit.stackIdx);
+					}
+					break;
+				//1：当前战线
+				case 1:
+					if (element.battleLine.Receiveable())
+					{
+						unit.Deploy(system, element.battleLine, 0);
+						system.stacks[element.ownership].PopElementByStackIdx(unit.stackIdx);
+					}
+					break;
+				case 2:
+					if (system.battleLines[system.frontLines[element.ownership]].Receiveable())
+					{
+						unit.Deploy(system, system.battleLines[system.frontLines[element.ownership]], 0);
+						system.stacks[element.ownership].PopElementByStackIdx(unit.stackIdx);
+					}
+					break;
+			}
+		}
 		/// <summary>
 		/// 
 		/// </summary>
@@ -167,21 +343,18 @@ namespace EventEffectModels
 
 			for(int i = 0; i < num; i++)
 			{
-				UnitElement unit = system.stacks[element.ownership].FindElementByID(ID) as UnitElement;
+				UnitElement unit = system.stacks[element.ownership].RandomFindUnitByID(ID);
 				if (unit == null) break;
-				switch (position)
-				{
-					case 0:
-						if(system.battleLines[system.supportLines[element.ownership]].Receive(unit, 0) > 0)
-						{
-							system.stacks[element.ownership].PopElementByID(ID);
-						}
-						break;
-					case 1:
-						break;
-				}
+
+				RecruitToPosition(element, system, position, unit);
 			}
 		}
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="element"></param>
+		/// <param name="system"></param>
+		/// <exception cref="InvalidOperationException"></exception>
 		internal void RecruitByCategory(UnitElement element, BattleSystem system)
 		{
 			int argsNum = 3;
@@ -196,6 +369,62 @@ namespace EventEffectModels
 			int category = ((List<int>)argsTable["RecruitByCategory"])[0];
 			int position = ((List<int>)argsTable["RecruitByCategory"])[1];
 			int num = ((List<int>)argsTable["RecruitByCategory"])[2];
+
+			for(int i = 0; i < num; i++)
+			{
+				UnitElement unit = null;
+				switch (category)
+				{
+					case 0:
+						unit = system.stacks[element.ownership].RandomFindUnitByCategory("LightArmor");
+						break;
+					case 1:
+						unit = system.stacks[element.ownership].RandomFindUnitByCategory("Motorized");
+						break;
+					case 2:
+						unit = system.stacks[element.ownership].RandomFindUnitByCategory("Artillery");
+						break;
+					case 3:
+						unit = system.stacks[element.ownership].RandomFindUnitByCategory("Guardian");
+						break;
+					case 4:
+						unit = system.stacks[element.ownership].RandomFindUnitByCategory("Construction");
+						break;
+				}
+				if (unit == null) break;
+
+				RecruitToPosition(element, system, position, unit);
+			}
+		}
+
+
+
+
+		private void SummonToPosition(UnitElement element, BattleSystem system, int position, UnitElement unit)
+		{
+			switch (position)
+			{
+				//0：支援战线
+				case 0:
+					if (system.battleLines[system.supportLines[element.ownership]].Receiveable())
+					{
+						unit.Deploy(system, system.battleLines[system.supportLines[element.ownership]], 0);
+					}
+					break;
+				//1：当前战线
+				case 1:
+					if (element.battleLine.Receiveable())
+					{
+						unit.Deploy(system, element.battleLine, 0);
+					}
+					break;
+				case 2:
+					if (system.battleLines[system.frontLines[element.ownership]].Receiveable())
+					{
+						unit.Deploy(system, system.battleLines[system.frontLines[element.ownership]], 0);
+					}
+					break;
+			}
 		}
 		/// <summary>
 		/// 根据参数在指定位置召唤指定类型的Token(事件必须有源)
@@ -239,45 +468,82 @@ namespace EventEffectModels
 				}
 				UnitElement unit = new UnitElement(card);
 
-				switch (position)
+				SummonToPosition(element, system, position, unit);
+			}
+		}
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="element"></param>
+		/// <param name="system"></param>
+		internal void TokenGain(UnitElement element, BattleSystem system)
+		{
+			int argNum = 3;
+
+
+
+			int category = ((List<int>)argsTable["TokenGain"])[0];
+			int atkGain = ((List<int>)argsTable["TokenGain"])[1];
+			int maxhealthGain = ((List<int>)argsTable["TokenGain"])[2];
+
+			string ID = null;
+			switch (category)
+			{
+				case 0:
+					ID = "mush_00";
+					break;
+			}
+
+			if (!system.UnitIDDic.ContainsKey(ID)) return;
+			if (system.UnitIDDic[ID].Count == 0) return;
+
+			foreach(UnitElement unit in system.UnitIDDic[ID])
+			{
+				if(unit.state == UnitState.inBattleLine)
 				{
-					//召唤至支援战线
-					case 0:
-						system.battleLines[system.supportLines[element.ownership]].Receive(unit, 0);
-						break;
-					//召唤至当前战线
-					case 1:
-						element.battleLine.Receive(unit, 0);
-						break;
+					unit.DynAttack += atkGain;
+					unit.maxHealth += maxhealthGain;
 				}
 			}
 		}
+
+
 		internal void AOEDamage(UnitElement element, BattleSystem system)
 		{
 			int argsNum = 2;
 
 		}
-		internal void SummonTokenInline(UnitElement element, BattleSystem system)
-		{
 
-		}
-		internal void Armor(UnitElement element, BattleSystem system)
+
+
+
+
+		internal void Aura(UnitElement element, BattleSystem system)
 		{
-			if (!argsTable.ContainsKey("armor"))
+			int argsNum = 3;
+			if (!argsTable.ContainsKey("Aura"))
 			{
 				throw new InvalidOperationException("argsTable fault");
 			}
-			element.armor = ((List<int>)argsTable["armor"])[0];
+			if (((List<int>)argsTable["Aura"]).Count != argsNum)
+			{
+				throw new InvalidOperationException("argsTable list length invalid");
+			}
+
+			element.aura = true;
+			system.eventTable[0].RegisterHandler("UpdateAura", element.AuraGain);
+			system.eventTable[1].RegisterHandler("UpdateAura", element.AuraGain);
+
+
+			//作用范围
+			int range = ((List<int>)argsTable["Aura"])[0];
+			//作用效果
+			int type = ((List<int>)argsTable["Aura"])[1];
+			//作用数值
+			int value = ((List<int>)argsTable["Aura"])[2];
+
 		}
 
-		internal void Batter(UnitElement element, BattleSystem system)
-		{
-			if (!argsTable.ContainsKey("batter"))
-			{
-				throw new InvalidOperationException("argsTable fault");
-			}
-			element.batter = ((List<int>)argsTable["batter"])[0];
-		}
 
 
 
@@ -288,12 +554,10 @@ namespace EventEffectModels
 			effectsTable = new Hashtable()
 			{
 				//non args
-				{"RecoverOperateCounter", (BattleEventHandler)RecoverOperateCounter },
 
 				//args
 				{"SummonToken", (BattleEventHandler)SummonToken },
 				{"Parry", (BattleEventHandler)Parry },
-				{"Lurk", (BattleEventHandler)Lurk },
 				//{"CLeave", (BattleEventHandler)Cleave },
 				//{"Mock",(BattleEventHandler)Mock },
 				//{"Thorn", (BattleEventHandler)Thorn },
