@@ -1057,6 +1057,8 @@ MonoBehaviour:
   line: {fileID: 0}
   handicapIdx: 0
   resIdx: 0
+  dstPosition: {x: 0, y: 0, z: 0}
+  logiPosition: {x: 0, y: 0, z: 0}
   ownership: 0
   preprocessed: 0
   ID: 
@@ -1068,7 +1070,10 @@ MonoBehaviour:
   maxHealthPoint: 0
   attackCounter: 0
   operateCounter: 0
-  state: 0
+  cardWidth: 360
+  canvas: {fileID: 0}
+  dataState: 0
+  controllerState: 0
   offset: {x: 0, y: 0}
   nameText: {fileID: 2424463536136595778}
   attackText: {fileID: 332679753968886912}
@@ -1171,7 +1176,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_PresetInfoIsWorld: 0
 --- !u!1 &5840855469082734367
 GameObject:
   m_ObjectHideFlags: 0

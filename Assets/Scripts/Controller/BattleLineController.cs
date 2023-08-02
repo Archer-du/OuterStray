@@ -193,7 +193,7 @@ public class BattleLineController : MonoBehaviour,
 		for(int i = 0; i < elementList.Count; i++)
 		{
 			Vector3 oriPos = elementList[i].transform.position;
-			Vector3 dstPos = elementList[i].dstPosition;
+			Vector3 dstPos = elementList[i].logicPosition;
 
 			if (elementList[i].preprocessed == 1)
 			{
@@ -219,7 +219,7 @@ public class BattleLineController : MonoBehaviour,
 			elementList[i].resIdx = i;
 			elementList[i].line = this;
 			elementList[i].transform.SetSiblingIndex(i + childNum);
-			elementList[i].dstPosition = GetInsertionPosition(i);
+			elementList[i].logicPosition = GetLogicPosition(i);
 		}
 	}
 
@@ -232,14 +232,14 @@ public class BattleLineController : MonoBehaviour,
 	public void Insert(UnitElementController element)
 	{
 		draggingElement = element;
-		element.transform.DOMove(GetInsertionPosition(element.resIdx), returnTime).OnComplete(ResetHierachy);
+		element.transform.DOMove(GetLogicPosition(element.resIdx), returnTime).OnComplete(ResetHierachy);
 	}
 	private void ResetHierachy()
 	{
 		draggingElement.transform.SetParent(transform);
 		draggingElement.transform.SetSiblingIndex(draggingElement.resIdx + childNum);
 	}
-	private Vector3 GetInsertionPosition(int index)
+	private Vector3 GetLogicPosition(int index)
 	{
 		return transform.position + new Vector3((index - count / 2) * cardWidth + cardWidth / 2 * ((count + 1) % 2), 0, 0);
 	}

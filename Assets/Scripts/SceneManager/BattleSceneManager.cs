@@ -351,7 +351,7 @@ public class BattleSceneManager : MonoBehaviour,
 			return -1;
 		}
 
-		if(Math.Abs(dstLineIdx - resLineIdx) > 1) return -1;//TODO
+		if(Math.Abs(dstLineIdx - resLineIdx) > element.moveRange) return -1;
 
 
 		if (battleLineControllers[dstLineIdx].ownerShip != element.ownership && battleLineControllers[dstLineIdx].count > 0)

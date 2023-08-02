@@ -218,9 +218,13 @@ namespace DataCore.BattleElements
 
 		//std状态
 		/// <summary>
-		/// 无敌
+		/// 格挡状态
 		/// </summary>
-		internal bool immunity;
+		internal bool parry;
+		/// <summary>
+		/// 顺劈状态
+		/// </summary>
+		internal bool cleave;
 		/// <summary>
 		/// 可选
 		/// </summary>
@@ -229,7 +233,6 @@ namespace DataCore.BattleElements
 		/// 反甲
 		/// </summary>
 		internal bool thorn;
-		internal bool cleave;
 
 
 
@@ -297,13 +300,13 @@ namespace DataCore.BattleElements
 					string[] trigger = s.Split('/');
 
 					//遍历触发块与解除块
-					for(int j = 0; j < 2; j++)
+					foreach (string block in trigger)
 					{
 						//将事件与委托分离
-						string[] tuple = trigger[j].Trim('<', '>').Split('+');
+						string[] tuple = block.Trim('<', '>').Split('+');
 
 						//若无事件(通常只可能没有解除事件)
-						if (tuple[0] == "none") break;//TODO 由Unload 统一处理
+						if (tuple[0] == "none") break;
 
 						//分离委托及其参数
 						string[] triggerDelegate = tuple[1].Split('-');
@@ -415,38 +418,27 @@ namespace DataCore.BattleElements
 		/// <returns></returns>
 		protected void UpdateTarget()
 		{
-			if (attackRange[0] == null)
+			if (attackRange[1] != null)
 			{
-				if (attackRange[1] == null)
+				target = attackRange[1];
+				targetIdx = 1;
+			}
+			else
+			{
+				if (attackRange[0] == null)
 				{
 					if (attackRange[2] == null)
 					{
 						this.target = null;
 						this.targetIdx = -1;
 					}
-					else
-					{
+                    else
+                    {
 						this.target = attackRange[2];
 						this.targetIdx = 2;
 					}
-				}
+                }
 				else
-				{
-					if (attackRange[2] == null)
-					{
-						this.target = attackRange[1];
-						this.targetIdx = 1;
-					}
-					else
-					{
-						this.target = (attackRange[1].dynHealth < attackRange[2].dynHealth) ? attackRange[1] : attackRange[2];
-						this.targetIdx = (attackRange[1].dynHealth < attackRange[2].dynHealth) ? 1 : 2;
-					}
-				}
-			}
-			else
-			{
-				if (attackRange[1] == null)
 				{
 					if (attackRange[2] == null)
 					{
@@ -459,49 +451,69 @@ namespace DataCore.BattleElements
 						this.targetIdx = (attackRange[0].dynHealth < attackRange[2].dynHealth) ? 0 : 2;
 					}
 				}
-				else
-				{
-					if (attackRange[2] == null)
-					{
-						this.target = (attackRange[0].dynHealth < attackRange[1].dynHealth) ? attackRange[0] : attackRange[1];
-						this.targetIdx = (attackRange[0].dynHealth < attackRange[1].dynHealth) ? 0 : 1;
-					}
-					else
-					{
-						this.target = (attackRange[1].dynHealth < attackRange[2].dynHealth) ? attackRange[1] : attackRange[2];
-						this.targetIdx = (attackRange[1].dynHealth < attackRange[2].dynHealth) ? 1 : 2;
-						this.target = (attackRange[0].dynHealth < target.dynHealth) ? attackRange[0] : target;
-						this.targetIdx = (attackRange[0].dynHealth < target.dynHealth) ? 0 : targetIdx;
-					}
-				}
 			}
 			controller.UpdateTarget(attackRange[0]?.controller, attackRange[1]?.controller, attackRange[2]?.controller, target?.controller, targetIdx);
-			//if (attackRange[0] != null && attackRange[1] != null)
+			//if (attackRange[0] == null)
 			//{
-			//	this.targetIdx = (attackRange[0].dynHealth < attackRange[1].dynHealth) ? 0 : 1;
-			//	this.target = (attackRange[0].dynHealth < attackRange[1].dynHealth) ? attackRange[0] : attackRange[1];
+			//	if (attackRange[1] == null)
+			//	{
+			//		if (attackRange[2] == null)
+			//		{
+			//			this.target = null;
+			//			this.targetIdx = -1;
+			//		}
+			//		else
+			//		{
+			//			this.target = attackRange[2];
+			//			this.targetIdx = 2;
+			//		}
+			//	}
+			//	else
+			//	{
+			//		if (attackRange[2] == null)
+			//		{
+			//			this.target = attackRange[1];
+			//			this.targetIdx = 1;
+			//		}
+			//		else
+			//		{
+			//			this.target = (attackRange[1].dynHealth < attackRange[2].dynHealth) ? attackRange[1] : attackRange[2];
+			//			this.targetIdx = (attackRange[1].dynHealth < attackRange[2].dynHealth) ? 1 : 2;
+			//		}
+			//	}
 			//}
 			//else
 			//{
-			//	this.targetIdx = (attackRange[0] == null) ? 1 : 0;
-			//	this.target = (attackRange[0] == null) ? attackRange[1] : attackRange[0];
+			//	if (attackRange[1] == null)
+			//	{
+			//		if (attackRange[2] == null)
+			//		{
+			//			this.target = attackRange[0];
+			//			this.targetIdx = 0;
+			//		}
+			//		else
+			//		{
+			//			this.target = (attackRange[0].dynHealth < attackRange[2].dynHealth) ? attackRange[0] : attackRange[2];
+			//			this.targetIdx = (attackRange[0].dynHealth < attackRange[2].dynHealth) ? 0 : 2;
+			//		}
+			//	}
+			//	else
+			//	{
+			//		if (attackRange[2] == null)
+			//		{
+			//			this.target = (attackRange[0].dynHealth < attackRange[1].dynHealth) ? attackRange[0] : attackRange[1];
+			//			this.targetIdx = (attackRange[0].dynHealth < attackRange[1].dynHealth) ? 0 : 1;
+			//		}
+			//		else
+			//		{
+			//			this.target = (attackRange[1].dynHealth < attackRange[2].dynHealth) ? attackRange[1] : attackRange[2];
+			//			this.targetIdx = (attackRange[1].dynHealth < attackRange[2].dynHealth) ? 1 : 2;
+			//			this.target = (attackRange[0].dynHealth < target.dynHealth) ? attackRange[0] : target;
+			//			this.targetIdx = (attackRange[0].dynHealth < target.dynHealth) ? 0 : targetIdx;
+			//		}
+			//	}
 			//}
-
-			//if (target == null)
-			//{
-			//	this.targetIdx = 2;
-			//	this.target = attackRange[2];
-			//}
-			//else if (attackRange[2] != null)
-			//{
-			//	this.targetIdx = (target.dynHealth < attackRange[2].dynHealth) ? targetIdx : 2;
-			//	this.target = (target.dynHealth < attackRange[2].dynHealth) ? target : attackRange[2];
-			//}
-			//else 
-			//{
-			//	this.targetIdx = -1;
-			//	this.target = null;
-			//}
+			//controller.UpdateTarget(attackRange[0]?.controller, attackRange[1]?.controller, attackRange[2]?.controller, target?.controller, targetIdx);
 		}
 		/// <summary>
 		/// 回合结束结算攻击，回复操作数（系统更新）
@@ -569,9 +581,13 @@ namespace DataCore.BattleElements
 		/// </summary>
 		internal virtual int Attack()
 		{
+			if (target == null) return -1;
+
+
 			eventTable.RaiseEvent("BeforeAttack", this, battleSystem);
 
-			if (target == null) return -1;
+			//顺劈状态会锁死默认攻击方式
+			if (cleave) return 1;
 
 			controller.AttackAnimationEvent(target.inlineIdx, target.battleLine.count);
 			this.target.Attacked(this);
@@ -582,6 +598,7 @@ namespace DataCore.BattleElements
 			return 1;
 
 		}
+		//legacy
 		internal int Attack(UnitElement tmpTarget)
 		{
 			eventTable.RaiseEvent("BeforeAttack", this, battleSystem);
@@ -634,15 +651,24 @@ namespace DataCore.BattleElements
 
 			eventTable.RaiseEvent("AfterDamaged", this, battleSystem);
 		}
+		/// <summary>
+		/// 立即瞬时受伤
+		/// </summary>
+		/// <param name="damage"></param>
 		internal void Damaged(int damage)
 		{
+			this.damage = damage;
+
 			eventTable.RaiseEvent("BeforeDamaged", this, battleSystem);
 			if (this.dynHealth == this.maxHealth)
 			{
 				eventTable.RaiseEvent("Meticulous", this, battleSystem);
 			}
 
-			this.dynHealth = this.dynHealth - damage < 0 ? 0 : this.dynHealth - damage;
+			this.dynHealth = this.dynHealth - this.damage < 0 ? 0 : this.dynHealth - this.damage;
+			controller.ImmediateDamageAnimationEvent(this.dynHealth);
+
+			this.damage = 0;
 
 			if (this.dynHealth <= 0)
 			{
@@ -656,10 +682,10 @@ namespace DataCore.BattleElements
 		/// </summary>
 		internal virtual void Move(BattleLine resLine, BattleLine dstLine, int resIdx, int dstPos)
 		{
-			if (!moveable)
-			{
-				return;//TODO
-			}
+			//if (!moveable)
+			//{
+			//	return;//TODO
+			//}
 
 			eventTable.RaiseEvent("BeforeMove", this, battleSystem);
 
@@ -714,6 +740,21 @@ namespace DataCore.BattleElements
 
 
 
+
+
+		internal void Parry()
+		{
+			this.damage = 0;
+			parry = false;
+		}
+
+
+
+
+
+
+
+
 		//arg: chip TODO
 		internal void ChipImplant()
 		{
@@ -736,7 +777,7 @@ namespace DataCore.BattleElements
 		}
 		internal void UpdateInfo()
 		{
-			controller.UpdateInfo(name, category, cost, dynAttack, dynHealth, maxHealth, dynAttackCounter, operateCounter, state);
+			controller.UpdateInfo(name, category, cost, dynAttack, dynHealth, maxHealth, dynAttackCounter, operateCounter, state, moveRange);
 		}
 
 

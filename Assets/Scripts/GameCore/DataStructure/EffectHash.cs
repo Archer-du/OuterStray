@@ -1,6 +1,7 @@
 using DataCore.BattleElements;
 using DataCore.Cards;
 using LogicCore;
+using PlasticPipe.PlasticProtocol.Messages;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -95,33 +96,47 @@ namespace EventEffectModels
 		{
 			element.cleave = true;
 		}
+		//必须订阅自体攻击前事件
+		internal void CleaveOnEnable(UnitElement element, BattleSystem system)
+		{
+			if (element.cleave)
+			{
+				element.controller.CleaveAttackAnimationEvent(element.target.inlineIdx, element.target.battleLine.count);
+				element.target.Attacked(element);
+				for (int i = 0; i < 3; i++)
+				{
+					if (i != element.targetIdx)
+					{
+						element.attackRange[i]?.Damaged(element.dynAttack);
+					}
+				}
+			}
+		}
 		internal void Parry(UnitElement element, BattleSystem system)
 		{
-			element.immunity = true;
+			element.parry = true;
 		}
+		//必须订阅自体受击前事件
+		internal void ParryOnEnable(UnitElement element, BattleSystem system)
+		{
+			if (element.parry)
+			{
+				element.damage = 0;
+				element.parry = false;
+			}
+		}
+
+
 		internal void Lurk(UnitElement element, BattleSystem system)
 		{
 			element.selectable = true;
 		}
-		//internal void Cleave(UnitElement element, BattleSystem system)
-		//{
-		//	element.cleave = true;
-		//}
-		//internal void Mock(UnitElement element, BattleSystem system)
-		//{
-		//	element.mocking = true;
-		//}
-		//internal void Thorn(UnitElement element, BattleSystem system)
-		//{
-		//	element.thorn = true;
-		//}
-		//internal void Unyield(UnitElement element, BattleSystem system)
-		//{
-		//	element.unyielding = true;
-		//}
 
 
-		//args effects
+
+
+
+		//args effects------------------------------------------------------
 		/// <summary>
 		/// 
 		/// </summary>
