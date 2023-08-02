@@ -68,18 +68,28 @@ namespace DataCore.BattleItems
 		/// </summary>
 		/// <param name="element"></param>
 		/// <param name="pos"></param>
-		internal void Receive(UnitElement element, int pos)
+		internal int Receive(UnitElement element, int pos)
 		{
+			if(count >= capacity)
+			{
+				return -1;
+			}
 			this.ownerShip = element.ownership;
 
 			elementList.Insert(pos, element);
 
 			UpdateElements();
 			UpdateInfo();
+
+			return 1;
 		}
 
 		internal UnitElement Send(int Idx)
 		{
+			if(count <= 0)
+			{
+				return null;
+			}
 			UnitElement element = elementList[Idx];
 
 			elementList.RemoveAt(Idx);
@@ -94,7 +104,7 @@ namespace DataCore.BattleItems
 		{
 			for (int i = 0; i < count; i++)
 			{
-				elementList[i].state = UnitState.inbattleLine;
+				elementList[i].state = UnitState.inBattleLine;
 				elementList[i].inlineIdx = i;
 				elementList[i].battleLine = this;
 			}
@@ -129,6 +139,7 @@ namespace DataCore.BattleItems
 		/// 
 		/// </summary>
 		internal List<BattleElement> stack;
+		internal Hashtable IDhash;
 		/// <summary>
 		/// 
 		/// </summary>
@@ -138,6 +149,7 @@ namespace DataCore.BattleItems
 		internal RandomCardStack()
 		{
 			stack = new List<BattleElement>(SystemConfig.stackCapacity);
+			IDhash = new Hashtable();
 		}
 
 		/// <summary>
@@ -150,7 +162,7 @@ namespace DataCore.BattleItems
 			for (int i = 0; i < num; i++)
 			{
 				stack.Add(deck[i]);
-
+				IDhash.Add(deck[i].backendID, deck[i]);
 
 				if (deck[i] is UnitElement)
 				{
@@ -196,6 +208,40 @@ namespace DataCore.BattleItems
 		internal void Clear()
 		{
 			stack.Clear();
+		}
+
+
+
+
+
+		internal BattleElement PopElementByID(string id)
+		{
+			if (!IDhash.ContainsKey(id))
+			{
+				return null;
+			}
+			BattleElement element = IDhash[id] as BattleElement;
+			IDhash.Remove(id);
+			for(int i = 0; i < stack.Count; i ++)
+			{
+				if (stack[i].backendID == id)
+				{
+					stack.RemoveAt(i);
+				}
+			}
+			return element;
+		}
+		internal BattleElement FindElementByID(string id)
+		{
+			if (!IDhash.ContainsKey(id))
+			{
+				return null;
+			}
+			else return IDhash[id] as BattleElement;
+		}
+		internal UnitElement RandomFindUnitByCategory(string category)
+		{
+			throw new NotImplementedException();
 		}
 	}
 

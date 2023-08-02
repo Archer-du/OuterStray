@@ -59,7 +59,7 @@ namespace DataCore.BattleElements
 
 
 	//CRITICAL!!
-	internal sealed class UnitElement : BattleElement, IUnitInput
+	internal class UnitElement : BattleElement, IUnitInput
 	{
 		/// <summary>
 		/// 渲染层控件
@@ -87,11 +87,11 @@ namespace DataCore.BattleElements
 		/// <summary>
 		/// 个体事件系统
 		/// </summary>
-		EventTable eventTable;
+		protected EventTable eventTable;
 		/// <summary>
 		/// 效果表(CRITICAL)
 		/// </summary>
-		EffectsTable effectsTable;
+		protected EffectsTable effectsTable;
 
 		internal UnitState state;
 
@@ -229,6 +229,7 @@ namespace DataCore.BattleElements
 		/// 反甲
 		/// </summary>
 		internal bool thorn;
+		internal bool cleave;
 
 
 
@@ -281,6 +282,7 @@ namespace DataCore.BattleElements
 			this.batter = 1;
 			this.moveRange = 1;
 
+			cleave = false;
 
 
 			//效果形式化解析
@@ -391,7 +393,7 @@ namespace DataCore.BattleElements
 		/// <param name="t1"></param>
 		/// <param name="t2"></param>
 		/// <param name="t3"></param>
-		internal void SetAttackRange(UnitElement t1, UnitElement t2, UnitElement t3)
+		internal virtual void SetAttackRange(UnitElement t1, UnitElement t2, UnitElement t3)
 		{
 			//炮兵没有攻击范围
 			if (randomAttack)
@@ -411,7 +413,7 @@ namespace DataCore.BattleElements
 		/// 根据一定策略，更新即将攻击的目标（系统更新）
 		/// </summary>
 		/// <returns></returns>
-		private void UpdateTarget()
+		protected void UpdateTarget()
 		{
 			if (attackRange[0] == null)
 			{
@@ -506,23 +508,30 @@ namespace DataCore.BattleElements
 		/// </summary>
 		internal void RotateSettlement()
 		{
+			eventTable.RaiseEvent("RotateSettlement", this, battleSystem);
+
 			this.dynAttackCounter = (this.dynAttackCounter - this.operateCounter) < 0 ? 0 : this.dynAttackCounter - this.operateCounter;
 			//操作计数回复
 			this.operateCounter = 1;
 
 			//自动更新
+			Settlement();
+		}
+		/// <summary>
+		/// 操作中结算攻击，恢复操作数（系统更新）
+		/// </summary>
+		internal virtual void Settlement()
+		{
 			this.UpdateInfo();
 
 			if (this.dynAttackCounter <= 0)
 			{
 				if (randomAttack)
 				{
+					UnitElement tmpTarget = battleSystem.RandomTarget();
 					int result = -1;
-					for (int i = 0; i < batter; i++)
-					{
-						result = Attack();
-					}
-					if(result > 0)
+					result = Attack(tmpTarget);
+					if (result > 0)
 					{
 						this.dynAttackCounter = this.oriAttackCounter;
 					}
@@ -530,10 +539,7 @@ namespace DataCore.BattleElements
 				else
 				{
 					int result = -1;
-					for (int i = 0; i < batter; i++)
-					{
-						result = Attack();
-					}
+					result = Attack();
 					if (result > 0)
 					{
 						this.dynAttackCounter = this.oriAttackCounter;
@@ -546,43 +552,50 @@ namespace DataCore.BattleElements
 		/// 
 		/// </summary>
 		/// <param name="battleSystem"></param>
-		internal void Deploy(BattleSystem battleSystem)
+		internal void Deploy(BattleSystem battleSystem, BattleLine dstLine, int dstPos)
 		{
 			eventTable.RaiseEvent("BeforeDeploy", this, battleSystem);
-			//巨兽， 需要拓展
 
+			dstLine.Receive(this, dstPos);
 			this.battleSystem = battleSystem;
 			this.operateCounter = 0;
 
-			UpdateInfo();
-
 			eventTable.RaiseEvent("AfterDeploy", this, battleSystem);
+
+			UpdateInfo();
 		}
 		/// <summary>
 		/// 攻击方法: 
 		/// </summary>
-		internal int Attack()
+		internal virtual int Attack()
 		{
 			eventTable.RaiseEvent("BeforeAttack", this, battleSystem);
 
-			if (randomAttack)
-			{
-				UnitElement tmpTarget = battleSystem.RandomTarget();
-				tmpTarget?.Attacked(this);
+			if (target == null) return -1;
 
-				controller.RandomAttack(tmpTarget?.controller);
+			controller.AttackAnimationEvent(target.inlineIdx, target.battleLine.count);
+			this.target.Attacked(this);
 
-				return tmpTarget == null ? -1 : 1;
-			}
-			else
-			{
-				this.target?.Attacked(this);
-				controller.Attack(target?.controller);
-
-				return target == null ? -1 : 1;
-			}
 
 			eventTable.RaiseEvent("AfterAttack", this, battleSystem);
+
+			return 1;
+
+		}
+		internal int Attack(UnitElement tmpTarget)
+		{
+			eventTable.RaiseEvent("BeforeAttack", this, battleSystem);
+
+			if (tmpTarget == null) return -1;
+
+			controller.RandomAttackAnimationEvent(tmpTarget.controller);
+			tmpTarget.Attacked(this);
+
+
+			eventTable.RaiseEvent("AfterAttack", this, battleSystem);
+
+			return 1;
+
 		}
 		/// <summary>
 		/// 有来源受击方法: 根据伤害源atk修改damage寄存值
@@ -609,7 +622,10 @@ namespace DataCore.BattleElements
 			}
 
 			this.dynHealth = this.dynHealth - this.damage < 0 ? 0 : this.dynHealth - this.damage;
+			controller.DamageAnimationEvent(this.dynHealth);
+
 			this.damage = 0;
+
 
 			if (this.dynHealth <= 0)
 			{
@@ -638,7 +654,7 @@ namespace DataCore.BattleElements
 		/// <summary>
 		/// 主动移动，消耗行动次数
 		/// </summary>
-		internal void Move(BattleLine dstLine)
+		internal virtual void Move(BattleLine resLine, BattleLine dstLine, int resIdx, int dstPos)
 		{
 			if (!moveable)
 			{
@@ -647,18 +663,10 @@ namespace DataCore.BattleElements
 
 			eventTable.RaiseEvent("BeforeMove", this, battleSystem);
 
-			//骑兵特供 TODO 
-			this.dynAttackCounter = this.dynAttackCounter - this.counterDecrease < 0 ? 0 : this.dynAttackCounter - this.counterDecrease;
-			if (this.dynAttackCounter <= 0 && target != null)
-			{
-				this.dynAttackCounter = this.oriAttackCounter;
-				for (int i = 0; i < batter; i++)
-				{
-					Attack();
-				}
-			}
 
-			this.battleLine = dstLine;
+			dstLine.Receive(resLine.Send(resIdx), dstPos);
+			this.dynAttackCounter = this.dynAttackCounter - this.counterDecrease < 0 ? 0 : this.dynAttackCounter - this.counterDecrease;
+
 			this.operateCounter = 0;
 
 			UpdateInfo();
@@ -683,6 +691,8 @@ namespace DataCore.BattleElements
 			this.state = UnitState.destroyed;
 
 			battleLine.ElementRemove(inlineIdx);
+			controller.TerminateAnimationEvent();
+
 
 			//not likely
 			eventTable.RaiseEvent("AfterTerminate", this, battleSystem);
@@ -726,7 +736,7 @@ namespace DataCore.BattleElements
 		}
 		internal void UpdateInfo()
 		{
-			controller.UpdateInfo(name, category, cost, dynAttack, dynHealth, maxHealth, dynAttackCounter, operateCounter);
+			controller.UpdateInfo(name, category, cost, dynAttack, dynHealth, maxHealth, dynAttackCounter, operateCounter, state);
 		}
 
 
@@ -738,9 +748,100 @@ namespace DataCore.BattleElements
 		{
 			UpdateInfo();
 		}
+		public void UpdateTargetManual()
+		{
+			battleSystem.UpdateAttackRange();
+		}
 	}
 
 
+
+
+
+
+
+
+
+	internal sealed class LightArmorElement : UnitElement
+	{
+		internal LightArmorElement(UnitCard __card) : base(__card) { }
+	}
+	internal sealed class MotorizedElement : UnitElement
+	{
+		internal MotorizedElement(UnitCard __card) : base(__card) { }
+		internal override void Move(BattleLine resLine, BattleLine dstLine, int resIdx, int dstPos)
+		{
+			eventTable.RaiseEvent("BeforeMove", this, battleSystem);
+
+			this.dynAttackCounter = this.dynAttackCounter - 1 < 0 ? 0 : this.dynAttackCounter - 1;
+
+			this.operateCounter = 0;
+
+			UpdateInfo();
+
+			eventTable.RaiseEvent("AfterMove", this, battleSystem);
+		}
+	}
+	internal sealed class ArtilleryElement : UnitElement
+	{
+		internal UnitElement tmpTarget;
+		internal ArtilleryElement(UnitCard __card) : base(__card) { }
+		internal override void SetAttackRange(UnitElement t1, UnitElement t2, UnitElement t3)
+		{
+			attackRange[0] = null;
+			attackRange[1] = null;
+			attackRange[2] = null;
+		}
+		internal override void Settlement()
+		{
+			this.UpdateInfo();
+
+			if (this.dynAttackCounter <= 0)
+			{
+				tmpTarget = battleSystem.RandomTarget();
+				int result = -1;
+				result = Attack();
+				if (result > 0)
+				{
+					this.dynAttackCounter = this.oriAttackCounter;
+				}
+			}
+		}
+		internal override int Attack()
+		{
+			eventTable.RaiseEvent("BeforeAttack", this, battleSystem);
+
+			if (tmpTarget == null) return -1;
+
+			controller.RandomAttackAnimationEvent(tmpTarget.controller);
+			tmpTarget.Attacked(this);
+
+
+			eventTable.RaiseEvent("AfterAttack", this, battleSystem);
+
+			return 1;
+
+		}
+	}
+	internal sealed class GuardianElement : UnitElement
+	{
+		internal GuardianElement(UnitCard __card) : base(__card) { }
+		internal override void SetAttackRange(UnitElement t1, UnitElement t2, UnitElement t3)
+		{
+			attackRange[0] = t1;
+			attackRange[1] = t2;
+			attackRange[2] = t3;
+			UpdateTarget();
+		}
+	}
+	internal sealed class ConstructionElement : UnitElement
+	{
+		internal ConstructionElement(UnitCard __card) : base(__card) { }
+		internal override void Move(BattleLine resLine, BattleLine dstLine, int resIdx, int dstPos)
+		{
+			return;
+		}
+	}
 
 
 
@@ -783,12 +884,12 @@ namespace DataCore.BattleElements
 
 
 
-	internal enum UnitState
+	public enum UnitState
 	{
 		inDeck,
 		inStack,
 		inHandicap,
-		inbattleLine,
+		inBattleLine,
 		destroyed
 	}
 }

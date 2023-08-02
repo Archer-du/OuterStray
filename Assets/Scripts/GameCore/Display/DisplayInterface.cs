@@ -1,6 +1,7 @@
 //Author@Archer
 using System.Collections;
 using System.Collections.Generic;
+using DataCore.BattleElements;
 using DataCore.Cards;
 using InputHandler;
 
@@ -49,6 +50,7 @@ namespace DisplayInterface
 		public ICardStackController InstantiateCardStack(int turn);
 
 		public void UpdateTurnWithSettlement();
+		public void Settlement();
 		/// <summary>
 		/// 更新回合
 		/// </summary>
@@ -60,8 +62,8 @@ namespace DisplayInterface
 		public void UpdateEnergySupply(int turn, int supply);
 
 
-		public void PushElementIntoHandicap(IUnitElementController element);
-		public void PushElementIntoHandicap(int turn, IUnitElementController element);
+		//public void PushElementIntoHandicap(IUnitElementController element);
+		//public void PushElementIntoHandicap(int turn, IUnitElementController element);
 
 	}
 	public interface IBattleLineController
@@ -92,16 +94,18 @@ namespace DisplayInterface
 	{
 		public void Init(string ID, int ownership, IUnitInput input);
 
-		public void UpdateInfo(string name, string categories, int cost, int attackPoint, int healthPoint, int maxHealthPoint, int attackCounter, int operateCounter);
+		public void UpdateInfo(string name, string categories, int cost, int attackPoint, int healthPoint, int maxHealthPoint, int attackCounter, int operateCounter, UnitState state);
 
 		public void UpdateTarget(IUnitElementController t1, IUnitElementController t2, IUnitElementController t3, IUnitElementController target, int targetIdx);
 
-		public void Attack(IUnitElementController target);
+		public void AttackAnimationEvent(int resIdx, int count);
 
-		public void RandomAttack(IUnitElementController target);
+		public void RandomAttackAnimationEvent(IUnitElementController target);
+		public void DamageAnimationEvent(int health);
 
-		public void Terminate();
-		public void Damaged();
+		public void TerminateAnimationEvent();
+
+		//public void LogicElementDestroy(int resIdx, int count);
 
 	}
 

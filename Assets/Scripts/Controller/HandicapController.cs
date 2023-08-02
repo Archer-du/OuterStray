@@ -5,8 +5,7 @@ using UnityEngine.EventSystems;
 using DG.Tweening;
 using DisplayInterface;
 using System;
-using System.Xml.Linq;
-using UnityEngine.UIElements;
+using DataCore.BattleElements;
 
 public class HandicapController : MonoBehaviour,
 	IHandicapController
@@ -29,6 +28,7 @@ public class HandicapController : MonoBehaviour,
 
 	public static bool isDragging;
 
+	public bool awaked = false;
 
 	List<UnitElementController> handiCards;
 	internal UnitElementController this[int index]
@@ -37,17 +37,9 @@ public class HandicapController : MonoBehaviour,
 		set => handiCards[index] = value;
 	}
 
-	// 悬停时向上移动的距离
-	private float hoverDistance;
-	// 移动的速度
-	private float moveTime = 0.4f;
-	// 原始位置
-	private Vector3 originalPosition;
-	// 目标位置
-	private Vector3 targetPosition;
 
 
-	public bool awaked = false;
+
 	//note: start太晚，awake太早，晕了 TODO
 	public void Init()
 	{
@@ -63,14 +55,8 @@ public class HandicapController : MonoBehaviour,
 
 		handiCards = new List<UnitElementController>();
 
-		hoverDistance = 150f;
-		// 保存原始位置
-		originalPosition = transform.position;
-		// 初始化目标位置为原始位置
-		targetPosition = originalPosition + hoverDistance * Vector3.up;
-		awaked = true;
 
-		//parent = GameObject.Find("RedemptionZone" GetComponent<Transform>();
+		awaked = true;
 	}
 
 
@@ -78,8 +64,13 @@ public class HandicapController : MonoBehaviour,
 
 
 
-	private float popTime = 0.3f;
 
+
+	private float popTime = 0.3f;
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="list"></param>
 	public void Fill(List<IUnitElementController> list)
 	{
 		Sequence seq = DOTween.Sequence();
@@ -94,7 +85,6 @@ public class HandicapController : MonoBehaviour,
 			Vector3 moveBy = GetInsertionPosition(i) - element.transform.position;
 			Vector3 rotateBy = new Vector3(0, 0, (1 - (ownership * 2)) * 90);
 
-			int temp = i;
 			seq.Append(element.transform.DOBlendableMoveBy(moveBy, popTime));
 			seq.Join(element.transform.DOBlendableRotateBy(rotateBy, popTime)
 				.OnComplete(() =>
@@ -115,11 +105,15 @@ public class HandicapController : MonoBehaviour,
 		});
 		seq.Play();
 	}
+
+
+
+
+	public static bool pushing = false;
 	/// <summary>
-	/// 播放动画，将element控件加入到手牌列表中(动画结束后才能加入到手牌中)
+	/// 播放动画，将element控件加入到手牌列表中
 	/// </summary>
 	/// <param name="element"></param>
-	public static bool pushing = false;
 	public void Push(IUnitElementController controller)
 	{
 		if(count >= capacity)
@@ -128,11 +122,16 @@ public class HandicapController : MonoBehaviour,
 		}
 
 		UnitElementController element = controller as UnitElementController;
-
+		pushing = true;
 		element.gameObject.SetActive(true);
 		element.transform.SetParent(transform);
 
+		PushAnimation(element);
 
+	}
+
+	public void PushAnimation(UnitElementController element)
+	{
 		Vector3 moveBy = GetInsertionPosition(count) - element.transform.position;
 		Vector3 rotateBy = new Vector3(0, 0, (1 - (ownership * 2)) * 90);
 
@@ -148,15 +147,16 @@ public class HandicapController : MonoBehaviour,
 			}));
 		seq.Play();
 	}
-
 	private void UpdateElements()
 	{
 		for (int i = 0; i < handiCards.Count; i++)
 		{
 			handiCards[i].handicapIdx = i;
-			handiCards[i].state = UnitState.inHandicap;
+			handiCards[i].dataState = UnitState.inHandicap;
 		}
 	}
+
+
 
 
 
@@ -230,7 +230,6 @@ public class HandicapController : MonoBehaviour,
 	}
 	public Vector3 GetInsertionPosition(int index, int count)
 	{
-		Debug.Log("index " + index + "count " + count);
 		Vector3 offset = new Vector3((index - count / 2) * gridWidth + gridWidth / 2 * ((count + 1) % 2), 0, 0);
 		return transform.position + offset;
 	}

@@ -64,11 +64,11 @@ namespace LogicCore
 		/// <summary>
 		/// (TURN mapped)牌堆
 		/// </summary>
-		private RandomCardStack[] stacks;
+		internal RandomCardStack[] stacks;
 		/// <summary>
 		/// (TURN mapped)手牌
 		/// </summary>
-		private RedemptionZone[] handicaps;
+		internal RedemptionZone[] handicaps;
 		/// <summary>
 		/// (TURN mapped)支援战线指针<br/>
 		/// 战局内只读
@@ -94,7 +94,7 @@ namespace LogicCore
 
 
 		//data access (test)
-		Pool pool;
+		internal Pool pool;
 		internal Deck humanDeck;
 		internal Deck plantDeck;
 
@@ -310,25 +310,26 @@ namespace LogicCore
 			eventTable[TURN].RaiseEvent("DeployUnit", null, this);
 
 
-
-			//这里逻辑判断顺序有问题 之后修改
+			//手牌区弹出卡牌
 			UnitElement element = handicaps[TURN].Pop(handicapIdx) as UnitElement;
-
+			//消耗费用
 			energy[TURN] -= cost;
 			//显示层更新
 			controller.UpdateEnergy(energy[TURN]);
 
 
 
-			battleLines[dstLineIdx].Receive(element, dstPos);
+			//battleLines[dstLineIdx].Receive(element, dstPos);
+			element.Deploy(this, battleLines[dstLineIdx], dstPos);
+			deployQueue.Add(element);
 
 			//更新前线指针
 			UpdateFrontLine();
-			//更新目标
 			UpdateAttackRange();
+			//更新目标
+			Settlement();
 
-			deployQueue.Add(element);
-			element.Deploy(this);
+
 
 
 			if (dstLineIdx == frontLines[TURN])
@@ -336,6 +337,9 @@ namespace LogicCore
 				eventTable[TURN].RaiseEvent("EnterFrontLine", element, this);
 			}
 			eventTable[TURN].RaiseEvent("UnitDeployed", element, this);
+
+
+			controller.Settlement();
 		}
 
 
@@ -377,13 +381,16 @@ namespace LogicCore
 
 
 
-			battleLines[dstLineIdx].Receive(battleLines[resLineIdx].Send(resIdx), dstPos);
+			//battleLines[dstLineIdx].Receive(battleLines[resLineIdx].Send(resIdx), dstPos);
+			element.Move(battleLines[dstLineIdx], battleLines[resLineIdx], resIdx, dstPos);
 
 			//先更新前线再更新目标
 			UpdateFrontLine();
 			UpdateAttackRange();
+			Settlement();
 
-			element.Move(battleLines[dstLineIdx]);
+
+
 
 
 			if (dstLineIdx == frontLines[TURN])
@@ -391,6 +398,8 @@ namespace LogicCore
 				eventTable[TURN].RaiseEvent("EnterFrontLine", null, this);
 			}
 			eventTable[TURN].RaiseEvent("UnitMoved", null, this);
+
+			controller.Settlement();
 		}
 
 
@@ -413,7 +422,7 @@ namespace LogicCore
 			UpdateFrontLine();
 			UpdateAttackRange();
 
-			element.Move(battleLines[resLineIdx]);
+			//element.Move();
 
 
 			eventTable[TURN].RaiseEvent("UnitMoved", null, this);
@@ -462,20 +471,12 @@ namespace LogicCore
 				handicaps[TURN].Push(element);
 			}
 
-			//UpdateFrontLine();
-			//UpdateTarget();
-			//RotateSettlement();
-			for(int i = 0; i < deployQueue.Count; i++)
-			{
-				if (deployQueue[i].ownership == TURN && deployQueue[i].state == UnitState.inbattleLine)
-				{
-					deployQueue[i].RotateSettlement();
-					UpdateAttackRange();
-				}
-			}
+			RotateSettlement();
+
 
 
 			TURN = (TURN + 1) % 2;
+			eventTable[TURN].RaiseEvent("StartOfTurn", null, this);
 			//动画结算后回调
 			controller.UpdateTurnWithSettlement();
 		}
@@ -597,27 +598,28 @@ namespace LogicCore
 
 
 
-		//private void RotateSettlement()
-		//{
-		//	for (int i = 0; i < linesCapacity; i++)
-		//	{
-		//		for (int j = 0; j < battleLines[i].count; j++)
-		//		{
-		//			battleLines[i][j].battleSystem = this;
-		//		}
-		//	}
-		//	for (int i = 0; i < linesCapacity; i++)
-		//	{
-		//		if (battleLines[i].ownerShip == TURN)
-		//		{
-		//			for (int j = 0; j < battleLines[i].count; j++)
-		//			{
-		//				battleLines[i][j].RotateUpdate();
-		//			}
-		//		}
-		//	}
-		//}
-
+		private void RotateSettlement()
+		{
+			for (int i = 0; i < deployQueue.Count; i++)
+			{
+				if (deployQueue[i].ownership == TURN && deployQueue[i].state == UnitState.inBattleLine)
+				{
+					deployQueue[i].RotateSettlement();
+					UpdateAttackRange();
+				}
+			}
+		}
+		private void Settlement()
+		{
+			for (int i = 0; i < deployQueue.Count; i++)
+			{
+				if (deployQueue[i].state == UnitState.inBattleLine)
+				{
+					deployQueue[i].Settlement();
+					UpdateAttackRange();
+				}
+			}
+		}
 
 
 

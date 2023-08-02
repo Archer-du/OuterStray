@@ -82,6 +82,19 @@ namespace EventEffectModels
 		internal Hashtable buffer;
 
 		//non-args effects
+		internal void RecoverOperateCounter(UnitElement element, BattleSystem system)
+		{
+			element.operateCounter = 1;
+		}
+		//TODO
+		internal void SetMoveRange(UnitElement element, BattleSystem system)
+		{
+			element.moveRange = 9;
+		}
+		internal void Cleave(UnitElement element, BattleSystem system)
+		{
+			element.cleave = true;
+		}
 		internal void Parry(UnitElement element, BattleSystem system)
 		{
 			element.immunity = true;
@@ -109,6 +122,130 @@ namespace EventEffectModels
 
 
 		//args effects
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="element"></param>
+		/// <param name="system"></param>
+		/// <exception cref="InvalidOperationException"></exception>
+		internal void RecruitByID(UnitElement element, BattleSystem system)
+		{
+			int argsNum = 3;
+			if (!argsTable.ContainsKey("RecruitByID"))
+			{
+				throw new InvalidOperationException("argsTable fault");
+			}
+			if (((List<int>)argsTable["RecruitByID"]).Count != argsNum)
+			{
+				throw new InvalidOperationException("argsTable list length invalid");
+			}
+
+			//第一个参数是招募对象ID数值域
+			string ID = ((List<int>)argsTable["RecruitByID"])[0] < 10 
+				? "0" + ((List<int>)argsTable["RecruitByID"])[0].ToString() : ((List<int>)argsTable["RecruitByID"])[0].ToString();
+			//TODO
+			ID = element.ownership == 0 ? "human_" + ID : "mush_" + ID;
+			//第二个参数是招募位置
+			int position = ((List<int>)argsTable["RecruitByID"])[1];
+			//第三个参数是招募数量
+			int num = ((List<int>)argsTable["RecruitByID"])[2];
+
+			for(int i = 0; i < num; i++)
+			{
+				UnitElement unit = system.stacks[element.ownership].FindElementByID(ID) as UnitElement;
+				if (unit == null) break;
+				switch (position)
+				{
+					case 0:
+						if(system.battleLines[system.supportLines[element.ownership]].Receive(unit, 0) > 0)
+						{
+							system.stacks[element.ownership].PopElementByID(ID);
+						}
+						break;
+					case 1:
+						break;
+				}
+			}
+		}
+		internal void RecruitByCategory(UnitElement element, BattleSystem system)
+		{
+			int argsNum = 3;
+			if (!argsTable.ContainsKey("RecruitByCategory"))
+			{
+				throw new InvalidOperationException("argsTable fault");
+			}
+			if (((List<int>)argsTable["RecruitByCategory"]).Count != argsNum)
+			{
+				throw new InvalidOperationException("argsTable list length invalid");
+			}
+			int category = ((List<int>)argsTable["RecruitByCategory"])[0];
+			int position = ((List<int>)argsTable["RecruitByCategory"])[1];
+			int num = ((List<int>)argsTable["RecruitByCategory"])[2];
+		}
+		/// <summary>
+		/// 根据参数在指定位置召唤指定类型的Token(事件必须有源)
+		/// </summary>
+		/// <param name="element"></param>
+		/// <param name="system"></param>
+		/// <exception cref="InvalidOperationException"></exception>
+		internal void SummonToken(UnitElement element, BattleSystem system)
+		{
+			int argsNum = 3;
+			if (!argsTable.ContainsKey("SummonToken"))
+			{
+				throw new InvalidOperationException("argsTable fault");
+			}
+			if(((List<int>)argsTable["SummonToken"]).Count != argsNum)
+			{
+				throw new InvalidOperationException("argsTable list length invalid");
+			}
+			//第一个参数是Token种类
+			int category = ((List<int>)argsTable["SummonToken"])[0];
+			//第二个参数是Token位置
+			int position = ((List<int>)argsTable["SummonToken"])[1];
+			//第三个参数是Token数量
+			int num = ((List<int>)argsTable["SummonToken"])[2];
+
+
+			//解析完成， 逻辑处理
+			for (int i = 0; i < num; i++)
+			{
+				UnitCard card = null;
+				switch (category)
+				{
+					//召唤亮顶孢子
+					case 0: 
+						card = system.pool.GetCardByID("mush_00") as UnitCard;
+						break;
+					case 1:
+						break;
+					default:
+						break;
+				}
+				UnitElement unit = new UnitElement(card);
+
+				switch (position)
+				{
+					//召唤至支援战线
+					case 0:
+						system.battleLines[system.supportLines[element.ownership]].Receive(unit, 0);
+						break;
+					//召唤至当前战线
+					case 1:
+						element.battleLine.Receive(unit, 0);
+						break;
+				}
+			}
+		}
+		internal void AOEDamage(UnitElement element, BattleSystem system)
+		{
+			int argsNum = 2;
+
+		}
+		internal void SummonTokenInline(UnitElement element, BattleSystem system)
+		{
+
+		}
 		internal void Armor(UnitElement element, BattleSystem system)
 		{
 			if (!argsTable.ContainsKey("armor"))
@@ -135,6 +272,11 @@ namespace EventEffectModels
 			//新效果方法在这里注册
 			effectsTable = new Hashtable()
 			{
+				//non args
+				{"RecoverOperateCounter", (BattleEventHandler)RecoverOperateCounter },
+
+				//args
+				{"SummonToken", (BattleEventHandler)SummonToken },
 				{"Parry", (BattleEventHandler)Parry },
 				{"Lurk", (BattleEventHandler)Lurk },
 				//{"CLeave", (BattleEventHandler)Cleave },
@@ -147,6 +289,7 @@ namespace EventEffectModels
 			//如果需要参数，请在这里注册
 			argsTable = new Hashtable()
 			{
+				{"SummonToken", null },
 				{"armor", null },
 				{"batter", null }
 			};
@@ -175,6 +318,21 @@ namespace EventEffectModels
 
 	internal class CommandTable
 	{
+		internal Hashtable commandTable;
+		internal Hashtable argsTable;
+		internal Hashtable buffer;
 
+		internal CommandTable()
+		{
+			commandTable = new Hashtable()
+			{
+
+			};
+			argsTable = new Hashtable()
+			{
+
+			};
+			buffer = new Hashtable() { };
+		}
 	}
 }
