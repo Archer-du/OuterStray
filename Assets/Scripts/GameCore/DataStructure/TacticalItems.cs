@@ -1,6 +1,7 @@
 using DataCore.BattleElements;
 using DataCore.Cards;
 using DataCore.CultivateItems;
+using LogicCore;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,11 +10,18 @@ namespace DataCore.TacticalItems
 {
 	internal class Deck
 	{
+		BattleSystem battleSystem;
 		private List<BattleElement> deck;
 		internal int count { get => deck.Count; }
-		internal Deck()
+		//internal Deck()
+		//{
+		//	deck = new List<BattleElement>();
+		//}
+		//TODO remove
+		internal Deck(BattleSystem system)
 		{
 			deck = new List<BattleElement>();
+			battleSystem = system;
 		}
 		internal BattleElement this[int index]
 		{
@@ -41,24 +49,31 @@ namespace DataCore.TacticalItems
 				{
 					if(card.ownership == 0)
 					{
-						string category = (card as UnitCard).category;
-						switch (category)
+						if(card is UnitCard)
 						{
-							case "LightArmor":
-								deck.Add(new LightArmorElement(card as UnitCard));
-								break;
-							case "Motorized":
-								deck.Add(new MotorizedElement(card as UnitCard));
-								break;
-							case "Artillery":
-								deck.Add(new ArtilleryElement(card as UnitCard));
-								break;
-							case "Guardian":
-								deck.Add(new GuardianElement(card as UnitCard));
-								break;
-							case "Construction":
-								deck.Add(new ConstructionElement(card as UnitCard));
-								break;
+							string category = (card as UnitCard).category;
+							switch (category)
+							{
+								case "LightArmor":
+									deck.Add(new LightArmorElement(card as UnitCard, battleSystem));
+									break;
+								case "Motorized":
+									deck.Add(new MotorizedElement(card as UnitCard, battleSystem));
+									break;
+								case "Artillery":
+									deck.Add(new ArtilleryElement(card as UnitCard, battleSystem));
+									break;
+								case "Guardian":
+									deck.Add(new GuardianElement(card as UnitCard, battleSystem));
+									break;
+								case "Construction":
+									deck.Add(new ConstructionElement(card as UnitCard, battleSystem));
+									break;
+							}
+						}
+						else
+						{
+							deck.Add(new CommandElement(card as CommandCard, battleSystem));
 						}
 					}
 				}
@@ -67,26 +82,33 @@ namespace DataCore.TacticalItems
 			{
 				foreach (Card card in pool.cardPool)
 				{
-					if (card.ownership == 1)
+					if (card.ownership == 0)
 					{
-						string category = (card as UnitCard).category;
-						switch (category)
+						if (card is UnitCard)
 						{
-							case "LightArmor":
-								deck.Add(new LightArmorElement(card as UnitCard));
-								break;
-							case "Motorized":
-								deck.Add(new MotorizedElement(card as UnitCard));
-								break;
-							case "Artillery":
-								deck.Add(new ArtilleryElement(card as UnitCard));
-								break;
-							case "Guardian":
-								deck.Add(new GuardianElement(card as UnitCard));
-								break;
-							case "Construction":
-								deck.Add(new ConstructionElement(card as UnitCard));
-								break;
+							string category = (card as UnitCard).category;
+							switch (category)
+							{
+								case "LightArmor":
+									deck.Add(new LightArmorElement(card as UnitCard, battleSystem));
+									break;
+								case "Motorized":
+									deck.Add(new MotorizedElement(card as UnitCard, battleSystem));
+									break;
+								case "Artillery":
+									deck.Add(new ArtilleryElement(card as UnitCard, battleSystem));
+									break;
+								case "Guardian":
+									deck.Add(new GuardianElement(card as UnitCard, battleSystem));
+									break;
+								case "Construction":
+									deck.Add(new ConstructionElement(card as UnitCard, battleSystem));
+									break;
+							}
+						}
+						else
+						{
+							deck.Add(new CommandElement(card as CommandCard, battleSystem));
 						}
 					}
 				}

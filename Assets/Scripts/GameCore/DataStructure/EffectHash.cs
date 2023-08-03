@@ -10,7 +10,10 @@ using System.Collections.Generic;
 namespace EventEffectModels
 {
 
-	internal delegate void BattleEventHandler(UnitElement source, BattleSystem system);
+	internal delegate void BattleEventHandler(BattleElement source, BattleSystem system);
+
+	internal delegate void NonTargetCommandHandler(BattleSystem system);
+	internal delegate void TargetedCommandHandler(UnitElement target, BattleSystem system);
 
 	/// <summary>
 	/// 事件名字符串千万不能写错！！
@@ -56,7 +59,7 @@ namespace EventEffectModels
 		/// <param name="eventName"></param>
 		/// <param name="source">事件的发布者</param>
 		/// <exception cref="InvalidOperationException"></exception>
-		internal void RaiseEvent(string eventName, UnitElement source, BattleSystem system)
+		internal void RaiseEvent(string eventName, BattleElement source, BattleSystem system)
 		{
 			if (!eventTable.ContainsKey(eventName))
 			{
@@ -92,35 +95,41 @@ namespace EventEffectModels
 		internal Hashtable buffer;
 
 		//non-args effects---------------------------------------------
-		internal void Assault(UnitElement element, BattleSystem system)
+		internal void Assault(BattleElement source, BattleSystem system)
 		{
+			UnitElement element = source as UnitElement;
 			element.assault = true;
 		}
-		internal void AssaultOnEnable(UnitElement element, BattleSystem system)
+		internal void AssaultOnEnable(BattleElement source, BattleSystem system)
 		{
+			UnitElement element = source as UnitElement;
 			if (element.assault)
 			{
 				element.moveRange = 9;
 			}
 		}
-		internal void Raid(UnitElement element, BattleSystem system)
+		internal void Raid(BattleElement source, BattleSystem system)
 		{
+			UnitElement element = source as UnitElement;
 			element.raid = true;
 		}
-		internal void RaidOnEnable(UnitElement element, BattleSystem system)
+		internal void RaidOnEnable(BattleElement source, BattleSystem system)
 		{
+			UnitElement element = source as UnitElement;
 			if (element.raid)
 			{
 				element.operateCounter = 1;
 			}
 		}
-		internal void Cleave(UnitElement element, BattleSystem system)
+		internal void Cleave(BattleElement source, BattleSystem system)
 		{
+			UnitElement element = source as UnitElement;
 			element.cleave = true;
 		}
 		//必须订阅自体攻击前事件
-		internal void CleaveOnEnable(UnitElement element, BattleSystem system)
+		internal void CleaveOnEnable(BattleElement source, BattleSystem system)
 		{
+			UnitElement element = source as UnitElement;
 			if (element.cleave)
 			{
 				element.controller.CleaveAttackAnimationEvent(element.target.inlineIdx, element.target.battleLine.count);
@@ -129,13 +138,14 @@ namespace EventEffectModels
 				{
 					if (i != element.targetIdx)
 					{
-						element.attackRange[i]?.Damaged(element.dynAttack);
+						element.attackRange[i]?.Damaged(element.dynAttack, "immediate");
 					}
 				}
 			}
 		}
-		internal void Armor(UnitElement element, BattleSystem system)
+		internal void Armor(BattleElement source, BattleSystem system)
 		{
+			UnitElement element = source as UnitElement;
 			int argsNum = 1;
 			if (!argsTable.ContainsKey("Armor"))
 			{
@@ -148,27 +158,31 @@ namespace EventEffectModels
 
 			element.armor = ((List<int>)argsTable["Armor"])[0];
 		}
-		internal void ArmorOnEnable(UnitElement element, BattleSystem system)
+		internal void ArmorOnEnable(BattleElement source, BattleSystem system)
 		{
-			if(element.armor > 0)
+			UnitElement element = source as UnitElement;
+			if (element.armor > 0)
 			{
 				element.damage = element.damage - element.armor < 0 ? 0 : element.damage - element.armor;
 			}
 		}
-		internal void Parry(UnitElement element, BattleSystem system)
+		internal void Parry(BattleElement source, BattleSystem system)
 		{
+			UnitElement element = source as UnitElement;
 			element.parry = true;
 		}
 		//必须订阅自体受击前事件
-		internal void ParryOnEnable(UnitElement element, BattleSystem system)
+		internal void ParryOnEnable(BattleElement source, BattleSystem system)
 		{
+			UnitElement element = source as UnitElement;
 			if (element.parry)
 			{
 				element.damage = 0;
 			}
 		}
-		internal void ParryUnload(UnitElement element, BattleSystem system)
+		internal void ParryUnload(BattleElement source, BattleSystem system)
 		{
+			UnitElement element = source as UnitElement;
 			if (element.parry)
 			{
 				element.parry = false;
@@ -187,8 +201,9 @@ namespace EventEffectModels
 		/// <param name="element"></param>
 		/// <param name="system"></param>
 		/// <exception cref="InvalidOperationException"></exception>
-		internal void AttackCounterDecrease(UnitElement element, BattleSystem system)
+		internal void AttackCounterDecrease(BattleElement source, BattleSystem system)
 		{
+			UnitElement element = source as UnitElement;
 			int argsNum = 1;
 			if (!argsTable.ContainsKey("AttackCounterDecrease"))
 			{
@@ -205,7 +220,7 @@ namespace EventEffectModels
 
 			element.UpdateInfo();
 		}
-		internal void DrawCardsRandom(UnitElement element, BattleSystem system)
+		internal void DrawCardsRandom(BattleElement source, BattleSystem system)
 		{
 			int argsNum = 1;
 
@@ -221,7 +236,7 @@ namespace EventEffectModels
 				}
 			}
 		}
-		internal void RandomDamage(UnitElement element, BattleSystem system)
+		internal void RandomDamage(BattleElement source, BattleSystem system)
 		{
 			int argsNum = 2;
 
@@ -241,14 +256,16 @@ namespace EventEffectModels
 					break;
 			}
 
-			target?.Damaged(damage);
+			target?.Damaged(damage, "immediate");
 		}
-		internal void DoubleRecovery(UnitElement element, BattleSystem system)
+		internal void DoubleRecovery(BattleElement source, BattleSystem system)
 		{
+			UnitElement element = source as UnitElement;
 			element.recover *= 2;
 		}
-		internal void UnitGain(UnitElement element, BattleSystem system)
+		internal void UnitGain(BattleElement source, BattleSystem system)
 		{
+			UnitElement element = source as UnitElement;
 			int argsNum = 2;
 
 
@@ -256,7 +273,7 @@ namespace EventEffectModels
 			element.maxHealth += ((List<int>)argsTable["UnitGain"])[1];
 		}
 
-		internal void RandomRecoverDamaged(UnitElement element, BattleSystem system)
+		internal void RandomRecoverDamaged(BattleElement source, BattleSystem system)
 		{
 			int argsNum = 1;
 
@@ -267,17 +284,20 @@ namespace EventEffectModels
 			UnitElement unit = system.DamagedAlly();
 			unit?.Recover(recover);
 		}
-		internal void DamageAdjacent(UnitElement element, BattleSystem system)
+		internal void DamageAdjacent(BattleElement source, BattleSystem system)
 		{
+			UnitElement element = source as UnitElement;
 			int argsNum = 1;
 
 
 
 			int damage = ((List<int>)argsTable["DamageAdjacent"])[0];
 
+			if (element.battleLine.index != system.frontLines[element.ownership]) return;
+
 			for(int i = 0; i < system.battleLines[system.frontLines[element.ownership]].count; i++)
 			{
-				system.battleLines[system.frontLines[element.ownership]][i].Damaged(damage);
+				system.battleLines[system.frontLines[element.ownership]][i].Damaged(damage, "immediate");
 			}
 		}
 
@@ -319,8 +339,9 @@ namespace EventEffectModels
 		/// <param name="element"></param>
 		/// <param name="system"></param>
 		/// <exception cref="InvalidOperationException"></exception>
-		internal void RecruitByID(UnitElement element, BattleSystem system)
+		internal void RecruitByID(BattleElement source, BattleSystem system)
 		{
+			UnitElement element = source as UnitElement;
 			int argsNum = 3;
 			if (!argsTable.ContainsKey("RecruitByID"))
 			{
@@ -355,8 +376,9 @@ namespace EventEffectModels
 		/// <param name="element"></param>
 		/// <param name="system"></param>
 		/// <exception cref="InvalidOperationException"></exception>
-		internal void RecruitByCategory(UnitElement element, BattleSystem system)
+		internal void RecruitByCategory(BattleElement source, BattleSystem system)
 		{
+			UnitElement element = source as UnitElement;
 			int argsNum = 3;
 			if (!argsTable.ContainsKey("RecruitByCategory"))
 			{
@@ -432,8 +454,9 @@ namespace EventEffectModels
 		/// <param name="element"></param>
 		/// <param name="system"></param>
 		/// <exception cref="InvalidOperationException"></exception>
-		internal void SummonToken(UnitElement element, BattleSystem system)
+		internal void SummonToken(BattleElement source, BattleSystem system)
 		{
+			UnitElement element = source as UnitElement;
 			int argsNum = 3;
 			if (!argsTable.ContainsKey("SummonToken"))
 			{
@@ -466,7 +489,7 @@ namespace EventEffectModels
 					default:
 						break;
 				}
-				UnitElement unit = new UnitElement(card);
+				UnitElement unit = new UnitElement(card, system);
 
 				SummonToPosition(element, system, position, unit);
 			}
@@ -476,7 +499,7 @@ namespace EventEffectModels
 		/// </summary>
 		/// <param name="element"></param>
 		/// <param name="system"></param>
-		internal void TokenGain(UnitElement element, BattleSystem system)
+		internal void TokenGain(BattleElement source, BattleSystem system)
 		{
 			int argNum = 3;
 
@@ -499,7 +522,7 @@ namespace EventEffectModels
 
 			foreach(UnitElement unit in system.UnitIDDic[ID])
 			{
-				if(unit.state == UnitState.inBattleLine)
+				if(unit.state == ElementState.inBattleLine)
 				{
 					unit.DynAttack += atkGain;
 					unit.maxHealth += maxhealthGain;
@@ -508,7 +531,7 @@ namespace EventEffectModels
 		}
 
 
-		internal void AOEDamage(UnitElement element, BattleSystem system)
+		internal void AOEDamage(BattleElement source, BattleSystem system)
 		{
 			int argsNum = 2;
 
@@ -518,8 +541,9 @@ namespace EventEffectModels
 
 
 
-		internal void Aura(UnitElement element, BattleSystem system)
+		internal void Aura(BattleElement source, BattleSystem system)
 		{
+			UnitElement element = source as UnitElement;
 			int argsNum = 3;
 			if (!argsTable.ContainsKey("Aura"))
 			{
@@ -595,23 +619,4 @@ namespace EventEffectModels
 		}
 	}
 
-	internal class CommandTable
-	{
-		internal Hashtable commandTable;
-		internal Hashtable argsTable;
-		internal Hashtable buffer;
-
-		internal CommandTable()
-		{
-			commandTable = new Hashtable()
-			{
-
-			};
-			argsTable = new Hashtable()
-			{
-
-			};
-			buffer = new Hashtable() { };
-		}
-	}
 }

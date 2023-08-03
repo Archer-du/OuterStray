@@ -111,7 +111,7 @@ namespace DataCore.BattleItems
 		{
 			for (int i = 0; i < count; i++)
 			{
-				elementList[i].state = UnitState.inBattleLine;
+				elementList[i].state = ElementState.inBattleLine;
 				elementList[i].inlineIdx = i;
 				elementList[i].battleLine = this;
 			}
@@ -147,6 +147,7 @@ namespace DataCore.BattleItems
 		/// </summary>
 		internal List<BattleElement> stack;
 		internal Dictionary<string, List<UnitElement>> UnitIDDic;
+		internal Dictionary<string, List<CommandElement>> CommIDDic;
 
 		internal List<LightArmorElement> lightArmors;
 		internal List<MotorizedElement> motorizeds;
@@ -164,6 +165,12 @@ namespace DataCore.BattleItems
 			stack = new List<BattleElement>(SystemConfig.stackCapacity);
 			UnitIDDic = new Dictionary<string, List<UnitElement>>();
 
+
+			lightArmors = new List<LightArmorElement>();
+			motorizeds = new List<MotorizedElement>();
+			artillerys = new List<ArtilleryElement>();
+			guardians = new List<GuardianElement>();
+			constructions = new List<ConstructionElement>();
 		}
 
 		/// <summary>
@@ -190,41 +197,49 @@ namespace DataCore.BattleItems
 					{
 						LightArmorElement element = deck[i] as LightArmorElement;
 						lightArmors.Add(element);
-						element.state = UnitState.inStack;
+						element.state = ElementState.inStack;
 						element.controller = controller.InstantiateUnitElementInBattle(element.ownership);
 					}
 					if (deck[i] is MotorizedElement)
 					{
 						MotorizedElement element = deck[i] as MotorizedElement;
 						motorizeds.Add(element);
-						element.state = UnitState.inStack;
+						element.state = ElementState.inStack;
 						element.controller = controller.InstantiateUnitElementInBattle(element.ownership);
 					}
 					if (deck[i] is ArtilleryElement)
 					{
 						ArtilleryElement element = deck[i] as ArtilleryElement;
 						artillerys.Add(element);
-						element.state = UnitState.inStack;
+						element.state = ElementState.inStack;
 						element.controller = controller.InstantiateUnitElementInBattle(element.ownership);
 					}
 					if (deck[i] is GuardianElement)
 					{
 						GuardianElement element = deck[i] as GuardianElement;
 						guardians.Add(element);
-						element.state = UnitState.inStack;
+						element.state = ElementState.inStack;
 						element.controller = controller.InstantiateUnitElementInBattle(element.ownership);
 					}
 					if (deck[i] is ConstructionElement)
 					{
 						ConstructionElement element = deck[i] as ConstructionElement;
 						constructions.Add(element);
-						element.state = UnitState.inStack;
+						element.state = ElementState.inStack;
 						element.controller = controller.InstantiateUnitElementInBattle(element.ownership);
 					}
 				}
 				else
 				{
-					//TODO
+					if (!CommIDDic.ContainsKey(deck[i].backendID))
+					{
+						CommIDDic.Add(deck[i].backendID, new List<CommandElement>());
+					}
+					CommIDDic[deck[i].backendID].Add(deck[i] as CommandElement);
+
+					CommandElement element = deck[i] as CommandElement;
+					element.state = ElementState.inStack;
+					element.controller = controller.InstantiateCommandElementInBattle(element.ownership);
 				}
 			}
 
@@ -244,7 +259,7 @@ namespace DataCore.BattleItems
 			if (element is UnitElement)
 			{
 				UnitElement unit = element as UnitElement;
-				unit.state = UnitState.inStack;
+				unit.state = ElementState.inStack;
 			}
 			else
 			{
@@ -266,6 +281,20 @@ namespace DataCore.BattleItems
 
 			UpdateStackIdx();
 
+
+			return element;
+		}
+		//test tutorial TODO remove
+		internal BattleElement Pop()
+		{
+			if (stack.Count == 0)
+			{
+				return null;
+			}
+			BattleElement element = stack[count - 1];
+			stack.RemoveAt(count - 1);
+
+			UpdateStackIdx();
 
 			return element;
 		}
@@ -367,7 +396,7 @@ namespace DataCore.BattleItems
 		}
 		internal void Fill(List<BattleElement> list)
 		{
-			List<IUnitElementController> controllerList = new List<IUnitElementController>();
+			List<IBattleElementController> controllerList = new List<IBattleElementController>();
 
 			for(int i = 0; i < list.Count; i++)
 			{
@@ -380,7 +409,12 @@ namespace DataCore.BattleItems
 					controllerList.Add(unit.controller);
 					unit.Init();
 				}
-				else throw new InvalidOperationException();
+				else
+				{
+					CommandElement comm = list[i] as CommandElement;
+					controllerList.Add(comm.controller);
+					comm.Init();
+				}
 			}
 			if(controllerList.Count <= 0) { throw new Exception("list"); }
 			controller.Fill(controllerList);

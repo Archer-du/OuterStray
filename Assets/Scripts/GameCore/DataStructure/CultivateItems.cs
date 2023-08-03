@@ -48,7 +48,7 @@ namespace DataCore.CultivateItems
 		/// <returns></returns>
 		internal int LoadCardPool()
 		{
-			StreamReader reader = File.OpenText("\\UnityProject\\AIGC\\OuterStray\\Assets\\Config\\CardData.csv");
+			StreamReader reader = File.OpenText("\\UnityProject\\AIGC\\OuterStray\\Assets\\Config\\UnitCardData.csv");
 
 			string[] data;
 			int num = 0;
@@ -64,33 +64,53 @@ namespace DataCore.CultivateItems
 					line = reader.ReadLine();
 					continue;
 				}
-
+				Card card = null;
 
 				string id		= data[0];
 
-				int ownership	= data[1] == "human" ? 0 : 1;
+				int ownership = data[1] == "human" ? 0 : 1;
 
-				string name		= data[2];
+				string name = data[2];
 
-				string category = data[3];
+				if (id.Contains("comm"))
+				{
+					int cost = int.Parse(data[3]);
 
-				int cost		= int.Parse(data[4]);
-				int atk			= int.Parse(data[5]);
-				int hp			= int.Parse(data[6]);
-				//理解鹰角程序员，成为鹰角程序员//TODO
-				int atkc		= data[7] == "NA" ? 100000 : int.Parse(data[7]);
+					int durability = int.Parse(data[4]);
 
-				int department	= int.Parse(data[9]);
-				int pack		= int.Parse(data[10]);
+					int department = int.Parse(data[6]);
+					int pack = int.Parse(data[7]);
+
+					string effects = data[8];
+					effects = "none";
+
+					string description = data[5];
+
+					card = new CommandCard(id, ownership, name, description, cost, durability, department, pack, effects);
+				}
+				else
+				{
+					string category = data[3];
+
+					int cost		= int.Parse(data[4]);
+					int atk			= int.Parse(data[5]);
+					int hp			= int.Parse(data[6]);
+					//理解鹰角程序员，成为鹰角程序员//TODO
+					int atkc		= data[7] == "NA" ? 100000 : int.Parse(data[7]);
+
+					int department	= int.Parse(data[9]);
+					int pack		= int.Parse(data[10]);
 				
-				string effects	= data[11];
-				effects = "none";//TODO
+					string effects	= data[11];
+					effects = "none";//TODO
 
-				string description = data[8];
+					string description = data[8];
+
+
+					card = new UnitCard(id, ownership, name, category, cost, atk, hp, atkc, description, department, pack, effects);
+				}
 
 				//TODO
-				Card card = new UnitCard(id, ownership, name, category, cost, atk, hp, atkc, description, department, pack, effects);
-
 				cardPool.Add(card);
 				hashPool.Add(id, card);
 
@@ -102,10 +122,6 @@ namespace DataCore.CultivateItems
 				{
 					plantCardPool.Add(id, card);
 				}
-
-				//TODO category
-
-
 
 				line = reader.ReadLine();
 				num++;

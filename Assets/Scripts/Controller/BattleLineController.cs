@@ -35,7 +35,7 @@ public class BattleLineController : MonoBehaviour,
 	public int cardWidth = 360;
 	public float interval = 20f;
 
-	public float updateTime = 0.2f;
+	public static float updateTime = 0.2f;
 
 
 	public int childNum;
@@ -81,7 +81,7 @@ public class BattleLineController : MonoBehaviour,
 	public void UpdateInfo(int curlength, int ownerShip)
 	{
 		if (curlength != count)
-		{ throw new System.Exception("inaccurate"); }
+		{ throw new System.Exception("Data inconsistencies"); }
 		this.ownerShip = ownerShip;
 
 		if (ownerShip == 0)
@@ -165,6 +165,7 @@ public class BattleLineController : MonoBehaviour,
 		elementList.Insert(dstPos, element);
 
 		UpdateElementPosition();
+
 	}
 	/// <summary>
 	/// 成功移除卡牌时调用
@@ -208,15 +209,13 @@ public class BattleLineController : MonoBehaviour,
 				Vector3 rotateBy = new Vector3(0, 0, 180);
 
 
-				battleSceneManager.rotateSequence.Append(elementList[i].transform.DOBlendableMoveBy(moveBy, updateTime));
-				battleSceneManager.rotateSequence.Join(elementList[i].transform.DOBlendableRotateBy(rotateBy, updateTime));
+				elementList[i].transform.DOBlendableMoveBy(moveBy, updateTime);
+				elementList[i].transform.DOBlendableRotateBy(rotateBy, updateTime);
 			}
 			else
 			{
-				battleSceneManager.rotateSequence.Append(elementList[i].transform.DOMove(dstPos, updateTime));
+				elementList[i].transform.DOMove(dstPos, updateTime);
 			}
-			battleSceneManager.rotateSequence.AppendInterval(0.2f);
-			battleSceneManager.sequenceTime += updateTime + 0.2f;
 		}
 	}
 	private void UpdateElements()
@@ -227,6 +226,7 @@ public class BattleLineController : MonoBehaviour,
 			elementList[i].line = this;
 			elementList[i].transform.SetSiblingIndex(i + childNum);
 			elementList[i].logicPosition = GetLogicPosition(i);
+			elementList[i].canvas.sortingOrder = i - 100;
 		}
 	}
 

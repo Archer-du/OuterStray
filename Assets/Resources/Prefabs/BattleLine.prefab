@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1997180304254011892}
   - component: {fileID: 1350973223314816649}
   - component: {fileID: 3399883432698030461}
-  - component: {fileID: 635020648109737336}
+  - component: {fileID: 3818188158148333414}
   m_Layer: 5
   m_Name: BattleLine
   m_TagString: Untagged
@@ -52,16 +52,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 326539c34124bf743b9a45f05a4b7c82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  battleSceneManager: {fileID: 0}
   capacity: 0
   elementList: []
   background: {fileID: 2529723076203885583}
-  image: {fileID: 0}
+  image: {fileID: 987323226133151300}
   lineIdx: 0
   ownerShip: 0
   width: 0
-  interval: 20
-  updateTime: 0.2
   cardWidth: 360
+  interval: 20
+  childNum: 0
   returnTime: 0.2
   draggingElement: {fileID: 0}
 --- !u!222 &3399883432698030461
@@ -72,7 +73,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2340474308455216108}
   m_CullTransparentMesh: 1
---- !u!223 &635020648109737336
+--- !u!223 &3818188158148333414
 Canvas:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

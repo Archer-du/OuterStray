@@ -78,6 +78,7 @@ namespace DisplayInterface
 	{
 		public IUnitElementController InstantiateUnitElement();
 		public IUnitElementController InstantiateUnitElementInBattle(int turn);
+		public ICommandElementController InstantiateCommandElementInBattle(int turn);
 		public ICommandElementController InstantiateCommandElement();
 	}
 
@@ -86,15 +87,28 @@ namespace DisplayInterface
 	public interface IHandicapController
 	{
 		public void Init();
-		public void Fill(List<IUnitElementController> list);
-		public void Push(IUnitElementController element);
-		public IUnitElementController Pop(int handicapIdx);
+		public void Fill(List<IBattleElementController> list);
+		public void Push(IBattleElementController element);
+		public IBattleElementController Pop(int handicapIdx);
 	}
-	public interface IUnitElementController
-	{
-		public void Init(string ID, int ownership, IUnitInput input);
 
-		public void UpdateInfo(string name, string categories, int cost, int attackPoint, int healthPoint, int maxHealthPoint, int attackCounter, int operateCounter, UnitState state, int moveRange);
+
+
+
+
+
+
+
+	public interface IBattleElementController
+	{
+
+	}
+	public interface IUnitElementController : IBattleElementController
+	{
+		public void Init(string ID, int ownership, string name, string categories, string description, IUnitInput input);
+
+		public void UpdateInfo(int cost, int attackPoint, int healthPoint, int maxHealthPoint, int attackCounter, int operateCounter,
+			ElementState state, int moveRange, bool aura);
 
 		public void UpdateTarget(IUnitElementController t1, IUnitElementController t2, IUnitElementController t3, IUnitElementController target, int targetIdx);
 
@@ -104,21 +118,13 @@ namespace DisplayInterface
 
 		public void CleaveAttackAnimationEvent(int resIdx, int count);
 
-		public void DamageAnimationEvent(int health);
+		public void DamageAnimationEvent(int health, string method);
 
-		public void ImmediateDamageAnimationEvent(int health);
-
-		public void TerminateAnimationEvent();
-
-		//public void LogicElementDestroy(int resIdx, int count);
+		public void TerminateAnimationEvent(string method);
 
 	}
-
-
-
-
-	public interface ICommandElementController
+	public interface ICommandElementController : IBattleElementController
 	{
-
+		public void Init(string ID, int ownership, string name, string description);
 	}
 }

@@ -10,6 +10,8 @@ using DataCore.BattleElements;
 public class HandicapController : MonoBehaviour,
 	IHandicapController
 {
+
+
 	public Transform parent;
 
 
@@ -30,8 +32,8 @@ public class HandicapController : MonoBehaviour,
 
 	public bool awaked = false;
 
-	List<UnitElementController> handiCards;
-	internal UnitElementController this[int index]
+	List<BattleElementController> handiCards;
+	internal BattleElementController this[int index]
 	{
 		get => handiCards[index];
 		set => handiCards[index] = value;
@@ -53,7 +55,7 @@ public class HandicapController : MonoBehaviour,
 
 		isDragging = false;
 
-		handiCards = new List<UnitElementController>();
+		handiCards = new List<BattleElementController>();
 
 
 		awaked = true;
@@ -71,13 +73,13 @@ public class HandicapController : MonoBehaviour,
 	/// 
 	/// </summary>
 	/// <param name="list"></param>
-	public void Fill(List<IUnitElementController> list)
+	public void Fill(List<IBattleElementController> list)
 	{
 		Sequence seq = DOTween.Sequence();
 		pushing = true;
 		for (int i = 0; i < list.Count; i++)
 		{
-			UnitElementController element = list[i] as UnitElementController;
+			BattleElementController element = list[i] as BattleElementController;
 
 			element.gameObject.SetActive(true);
 			element.transform.SetParent(transform);
@@ -114,14 +116,14 @@ public class HandicapController : MonoBehaviour,
 	/// 播放动画，将element控件加入到手牌列表中
 	/// </summary>
 	/// <param name="element"></param>
-	public void Push(IUnitElementController controller)
+	public void Push(IBattleElementController controller)
 	{
 		if(count >= capacity)
 		{
 			return;
 		}
 
-		UnitElementController element = controller as UnitElementController;
+		BattleElementController element = controller as BattleElementController;
 		pushing = true;
 		element.gameObject.SetActive(true);
 		element.transform.SetParent(transform);
@@ -130,7 +132,7 @@ public class HandicapController : MonoBehaviour,
 
 	}
 
-	public void PushAnimation(UnitElementController element)
+	public void PushAnimation(BattleElementController element)
 	{
 		Vector3 moveBy = GetInsertionPosition(count) - element.transform.position;
 		Vector3 rotateBy = new Vector3(0, 0, (1 - (ownership * 2)) * 90);
@@ -152,7 +154,7 @@ public class HandicapController : MonoBehaviour,
 		for (int i = 0; i < handiCards.Count; i++)
 		{
 			handiCards[i].handicapIdx = i;
-			handiCards[i].dataState = UnitState.inHandicap;
+			handiCards[i].dataState = ElementState.inHandicap;
 		}
 	}
 
@@ -166,9 +168,9 @@ public class HandicapController : MonoBehaviour,
 	/// </summary>
 	/// <param name="handicapIdx"></param>
 	/// <returns></returns>
-	public IUnitElementController Pop(int handicapIdx)
+	public IBattleElementController Pop(int handicapIdx)
 	{
-		IUnitElementController controller = handiCards[handicapIdx];
+		BattleElementController controller = handiCards[handicapIdx];
 		handiCards.RemoveAt(handicapIdx);
 		UpdateElements();
 
@@ -176,7 +178,7 @@ public class HandicapController : MonoBehaviour,
 
 		UpdateHandicapPosition();
 
-		return controller;
+		return controller as IBattleElementController;
 	}
 	public float updateTime = 0.2f;
 	public void UpdateHandicapPosition()
@@ -188,7 +190,7 @@ public class HandicapController : MonoBehaviour,
 			//TODO config
 
 			handiCards[i].transform.DOMove(dstPos, updateTime).OnComplete(() => HandicapController.isDragging = false);
-
+			handiCards[i].canvas.sortingOrder = i;
 		}
 	}
 
@@ -197,8 +199,8 @@ public class HandicapController : MonoBehaviour,
 
 
 	public float returnTime = 0.2f;
-	public UnitElementController draggingElement;
-	public void Insert(UnitElementController element)
+	public BattleElementController draggingElement;
+	public void Insert(BattleElementController element)
 	{
 		//TODO 这里得锁住
 		isDragging = true;

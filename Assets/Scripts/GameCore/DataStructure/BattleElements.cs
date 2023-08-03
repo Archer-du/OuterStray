@@ -20,6 +20,24 @@ namespace DataCore.BattleElements
 	/// </summary>
 	internal abstract class BattleElement
 	{
+
+
+		/// <summary>
+		/// 指向作战系统，获取全局信息
+		/// </summary>
+		internal BattleSystem battleSystem;
+		/// <summary>
+		/// 个体事件系统
+		/// </summary>
+		internal EventTable eventTable;
+		/// <summary>
+		/// 效果表(CRITICAL)
+		/// </summary>
+		protected EffectsTable effectsTable;
+
+
+
+		internal ElementState state;
 		/// <summary>
 		/// 加载的静态卡牌信息
 		/// </summary>
@@ -49,8 +67,13 @@ namespace DataCore.BattleElements
 		internal int stackIdx;
 
 
-		internal BattleElement(Card __card)
+		internal BattleElement(Card __card, BattleSystem system)
 		{
+			battleSystem = system;
+			//初始化事件系统和效果表
+			eventTable = new EventTable();
+			effectsTable = new EffectsTable();
+
 			this.card = __card;
 			this.backendID = __card.backendID;
 			this.name = __card.name;
@@ -59,306 +82,11 @@ namespace DataCore.BattleElements
 			this.ownership = __card.ownership;
 			//TODO 维护
 			this.stackIdx = -1;
-		}
-	}
 
 
-
-
-	//CRITICAL!!
-	internal class UnitElement : BattleElement, IUnitInput
-	{
-		/// <summary>
-		/// 渲染层控件
-		/// </summary>
-		internal IUnitElementController controller;
-
-		/// <summary>
-		/// 指向作战系统，获取全局信息
-		/// </summary>
-		internal BattleSystem battleSystem;
-		/// <summary>
-		/// 战场中不会变化的唯一标识编号
-		/// </summary>
-		internal int battleID;
-		/// <summary>
-		/// 当前所在战线
-		/// </summary>
-		internal BattleLine battleLine;
-		/// <summary>
-		/// 所在战线指针
-		/// </summary>
-		internal int lineIdx;
-		/// <summary>
-		/// 战线内索引值
-		/// </summary>
-		internal int inlineIdx;
-
-
-		/// <summary>
-		/// 个体事件系统
-		/// </summary>
-		internal EventTable eventTable;
-		/// <summary>
-		/// 效果表(CRITICAL)
-		/// </summary>
-		protected EffectsTable effectsTable;
-
-		internal UnitState state;
-
-		/// <summary>
-		/// 兵种
-		/// </summary>
-		internal string category { get; private set; }
-
-
-
-
-		/// <summary>
-		/// 原始攻击力
-		/// </summary>
-		internal int oriAttack { get; private set; }
-		/// <summary>
-		/// 动态攻击力
-		/// </summary>
-		internal int DynAttack;
-		internal int dynAttack
-		{
-			get
-			{
-				int gainSum = 0;
-				foreach (KeyValuePair<int, int> entry in attackGain)
-				{
-					gainSum += entry.Value;
-				}
-				return DynAttack + gainSum;
-			}
-			set { DynAttack = value; }
-		}
-
-
-
-		/// <summary>
-		/// 原始攻击计数器最大值
-		/// </summary>
-		internal int oriAttackCounter { get; private set; }
-		/// <summary>
-		/// 动态攻击计数器
-		/// </summary>
-		private int DynAttackCounter;
-		internal int dynAttackCounter
-		{
-			get { return DynAttackCounter; }
-			set
-			{
-				DynAttackCounter = value;
-				if(value < 0) DynAttackCounter = 0;
-				if (value > oriAttackCounter) DynAttackCounter = oriAttackCounter;
-			}
-		}
-
-
-
-
-		/// <summary>
-		/// 原始最大生命值
-		/// </summary>
-		internal int oriHealth { get; private set; }
-		/// <summary>
-		/// 动态生命值
-		/// </summary>
-		private int DynHealth;
-		internal int dynHealth
-		{
-			get { return DynHealth; }
-			set
-			{
-				DynHealth = value;
-				if(value < 0) DynHealth = 0;
-				if(value > MaxHealth) DynHealth = MaxHealth;
-			}
-		}
-		/// <summary>
-		/// 动态最大生命值
-		/// </summary>
-		private int MaxHealth;
-		internal int maxHealth
-		{
-			get { return MaxHealth; }
-			set
-			{
-				DynHealth += value - MaxHealth;
-				MaxHealth = value;
-			}
-		}
-
-
-		/// <summary>
-		/// 记源攻击力增益
-		/// </summary>
-		internal Dictionary<int, int> attackGain;
-		/// <summary>
-		/// 记源最大生命值增益
-		/// </summary>
-		internal Dictionary<int, int> maxHealthGain;
-
-
-		/// <summary>
-		/// 治疗量寄存器
-		/// </summary>
-		internal int recover;
-		/// <summary>
-		/// 伤害量寄存器
-		/// </summary>
-		internal int damage;
-
-
-
-		/// <summary>
-		/// 攻击范围，长度为3
-		/// </summary>
-		internal UnitElement[] attackRange;
-		/// <summary>
-		/// 目标寄存器
-		/// </summary>
-		internal UnitElement target;
-		/// <summary>
-		/// 攻击范围目标索引值(0 ~ 2)
-		/// </summary>
-		internal int targetIdx;
-
-
-
-		/// <summary>
-		/// 操作计数器，为1时表示未被操作
-		/// </summary>
-		internal int operateCounter
-		{
-			get { return operateCounter; }
-			set
-			{
-				operateCounter = value > 1 ? 1 : value;
-			}
-		}
-
-
-		//legacy
-		/// <summary>
-		/// 移动时减少的攻击计数 default: 0
-		/// </summary>
-		internal int counterDecrease;
-		/// <summary>
-		/// 随机攻击
-		/// </summary>
-		internal bool randomAttack;
-		/// <summary>
-		/// 是否可以主动移动
-		/// </summary>
-		internal bool moveable;
-		/// <summary>
-		/// 嘲讽(重装)
-		/// </summary>
-		internal bool mocking;
-
-
-
-		
-		//附加属性
-		/// <summary>
-		/// 移动范围 default: 1
-		/// </summary>
-		internal int moveRange;
-
-
-
-		//std状态
-		/// <summary>
-		/// 格挡状态
-		/// </summary>
-		internal bool parry;
-		/// <summary>
-		/// 顺劈状态
-		/// </summary>
-		internal bool cleave;
-		internal bool assault;
-		internal bool raid;
-		internal int armor;
-		/// <summary>
-		/// 可选
-		/// </summary>
-		internal bool selectable;
-		/// <summary>
-		/// 反甲
-		/// </summary>
-		internal bool thorn;
-
-
-
-		internal bool aura;
-
-
-
-		internal UnitElement(UnitCard __card) : base(__card)
-		{
-			//初始化事件系统和效果表
-			eventTable = new EventTable();
-			effectsTable = new EffectsTable();
-
-			//初始状态在卡组中
-			state = UnitState.inDeck;
-
-			//从卡牌读取原始数据
-			this.category = __card.category;
-			this.oriAttack = __card.attackPoint;
-			this.oriHealth = __card.healthPoint;
-			this.oriAttackCounter = __card.attackCounter;
-
-			//初始化动态数据
-			this.DynAttack = __card.attackPoint;
-			this.dynAttack = __card.attackPoint;
-			this.DynHealth = __card.healthPoint;
-			this.dynHealth = __card.healthPoint;
-			this.MaxHealth = __card.healthPoint;
-			this.maxHealth = __card.healthPoint;
-			this.dynAttackCounter = __card.attackCounter;
-			this.operateCounter = 1;
-
-			//初始化攻击范围和攻击目标
-			this.attackRange = new UnitElement[3] { null, null, null };
-			this.targetIdx = -1;
-			this.target = null;
-
-			//寄存器初始化
-			attackGain = new Dictionary<int, int>();
-			maxHealthGain = new Dictionary<int, int>();
-
-			this.recover = 0;
-			this.damage = 0;
-
-
-			//兵种特性加载
-			this.counterDecrease = __card.counterDecrease;
-			this.randomAttack = __card.randomAttack;
-			this.moveable = __card.moveable;
-			this.mocking = __card.mocking;
-
-
-			//std attribute & status
-			//内嵌逻辑特性
-			this.moveRange = 1;
-
-			parry = false;
-			cleave = false;
-			this.armor = 0;
-
-			aura = false;
-
-			//效果形式化解析
 			EffectsParse(__card.effects);
-
-
-			eventTable.RaiseEvent("Initialize", this, null);
 		}
+
 		protected void EffectsParse(string effects)
 		{
 			if (effects != "none")
@@ -451,6 +179,266 @@ namespace DataCore.BattleElements
 				}
 			}
 		}
+	}
+
+
+
+
+	//CRITICAL!!
+	internal class UnitElement : BattleElement, IUnitInput
+	{
+
+		/// <summary>
+		/// 渲染层控件
+		/// </summary>
+		internal IUnitElementController controller;
+
+		/// <summary>
+		/// 战场中不会变化的唯一标识编号
+		/// </summary>
+		internal int battleID;
+		/// <summary>
+		/// 当前所在战线
+		/// </summary>
+		internal BattleLine battleLine;
+		/// <summary>
+		/// 所在战线指针
+		/// </summary>
+		internal int lineIdx;
+		/// <summary>
+		/// 战线内索引值
+		/// </summary>
+		internal int inlineIdx;
+
+
+
+
+		/// <summary>
+		/// 兵种
+		/// </summary>
+		internal string category { get; private set; }
+
+
+
+
+		/// <summary>
+		/// 原始攻击力
+		/// </summary>
+		internal int oriAttack { get; private set; }
+		/// <summary>
+		/// 动态攻击力
+		/// </summary>
+		internal int DynAttack;
+		internal int dynAttack
+		{
+			get
+			{
+				int gainSum = 0;
+				foreach (KeyValuePair<int, int> entry in attackGain)
+				{
+					gainSum += entry.Value;
+				}
+				return DynAttack + gainSum;
+			}
+			set { DynAttack = value; }
+		}
+
+
+
+		/// <summary>
+		/// 原始攻击计数器最大值
+		/// </summary>
+		internal int oriAttackCounter { get; private set; }
+		/// <summary>
+		/// 动态攻击计数器
+		/// </summary>
+		private int DynAttackCounter;
+		internal int dynAttackCounter
+		{
+			get { return DynAttackCounter; }
+			set
+			{
+				DynAttackCounter = value;
+				if(value < 0) DynAttackCounter = 0;
+			}
+		}
+
+
+
+
+		/// <summary>
+		/// 原始最大生命值
+		/// </summary>
+		internal int oriHealth { get; private set; }
+		/// <summary>
+		/// 动态生命值
+		/// </summary>
+		private int DynHealth;
+		internal int dynHealth
+		{
+			get { return DynHealth; }
+			set
+			{
+				DynHealth = value;
+				if(value < 0) DynHealth = 0;
+				if(value > MaxHealth) DynHealth = MaxHealth;
+			}
+		}
+		/// <summary>
+		/// 动态最大生命值
+		/// </summary>
+		private int MaxHealth;
+		internal int maxHealth
+		{
+			get { return MaxHealth; }
+			set
+			{
+				DynHealth += value - MaxHealth;
+				MaxHealth = value;
+			}
+		}
+
+
+		/// <summary>
+		/// 记源攻击力增益
+		/// </summary>
+		internal Dictionary<int, int> attackGain;
+		/// <summary>
+		/// 记源最大生命值增益
+		/// </summary>
+		internal Dictionary<int, int> maxHealthGain;
+
+
+		/// <summary>
+		/// 治疗量寄存器
+		/// </summary>
+		internal int recover;
+		/// <summary>
+		/// 伤害量寄存器
+		/// </summary>
+		internal int damage;
+
+
+
+		/// <summary>
+		/// 攻击范围，长度为3
+		/// </summary>
+		internal UnitElement[] attackRange;
+		/// <summary>
+		/// 目标寄存器
+		/// </summary>
+		internal UnitElement target;
+		/// <summary>
+		/// 攻击范围目标索引值(0 ~ 2)
+		/// </summary>
+		internal int targetIdx;
+
+
+
+		/// <summary>
+		/// 操作计数器，为1时表示未被操作
+		/// </summary>
+		internal int OperateCounter;
+		internal int operateCounter
+		{
+			get { return OperateCounter; }
+			set
+			{
+				OperateCounter = value > 1 ? 1 : value;
+			}
+		}
+
+
+		//legacy
+		/// <summary>
+		/// 嘲讽(重装)
+		/// </summary>
+		internal bool mocking;
+
+
+
+		
+		//附加属性
+		/// <summary>
+		/// 移动范围 default: 1
+		/// </summary>
+		internal int moveRange;
+
+
+
+		//std状态
+		/// <summary>
+		/// 格挡状态
+		/// </summary>
+		internal bool parry;
+		/// <summary>
+		/// 顺劈状态
+		/// </summary>
+		internal bool cleave;
+		internal bool assault;
+		internal bool raid;
+		internal int armor;
+		/// <summary>
+		/// 可选
+		/// </summary>
+		internal bool selectable;
+		/// <summary>
+		/// 反甲
+		/// </summary>
+		internal bool thorn;
+
+
+
+		internal bool aura;
+
+
+
+		internal UnitElement(UnitCard __card, BattleSystem system) : base(__card, system)
+		{
+			//初始状态在卡组中
+			state = ElementState.inDeck;
+
+			//从卡牌读取原始数据
+			this.category = __card.category;
+			this.oriAttack = __card.attackPoint;
+			this.oriHealth = __card.healthPoint;
+			this.oriAttackCounter = __card.attackCounter;
+
+			//初始化动态数据
+			this.DynAttack = __card.attackPoint;
+			this.MaxHealth = __card.healthPoint;
+			this.DynHealth = __card.healthPoint;
+			this.DynAttackCounter = __card.attackCounter;
+			this.operateCounter = 1;
+
+			//初始化攻击范围和攻击目标
+			this.attackRange = new UnitElement[3] { null, null, null };
+			this.targetIdx = -1;
+			this.target = null;
+
+			//寄存器初始化
+			attackGain = new Dictionary<int, int>();
+			maxHealthGain = new Dictionary<int, int>();
+
+			this.recover = 0;
+			this.damage = 0;
+
+
+
+			//std attribute & status
+			//内嵌逻辑特性
+			this.mocking = false;
+			this.moveRange = 1;
+
+			parry = false;
+			cleave = false;
+			this.armor = 0;
+
+			aura = false;
+
+			eventTable.RaiseEvent("Initialize", this, null);
+		}
+
 
 
 		///// <summary>
@@ -476,19 +464,10 @@ namespace DataCore.BattleElements
 		/// <param name="t3"></param>
 		internal virtual void SetAttackRange(UnitElement t1, UnitElement t2, UnitElement t3)
 		{
-			//炮兵没有攻击范围
-			if (randomAttack)
-			{
-				attackRange[0] = null;
-				attackRange[1] = null;
-				attackRange[2] = null;
-				return;
-			}
 			attackRange[0] = t1;
 			attackRange[1] = t2;
 			attackRange[2] = t3;
 			UpdateTarget();
-			
 		}
 		/// <summary>
 		/// 根据一定策略，更新即将攻击的目标（系统更新）
@@ -530,6 +509,25 @@ namespace DataCore.BattleElements
 					}
 				}
 			}
+
+			//顺序不能变
+			if (attackRange[0] != null && attackRange[0].category == "Guardian")
+			{
+				this.target = attackRange[0];
+				this.targetIdx = 0;
+			}
+			if (attackRange[2] != null && attackRange[2].category == "Guardian")
+			{
+				this.target = attackRange[2];
+				this.targetIdx = 2;
+			}
+			if (attackRange[1] != null && attackRange[1].category == "Guardian")
+			{
+				this.target = attackRange[1];
+				this.targetIdx = 1;
+			}
+
+
 			controller.UpdateTarget(attackRange[0]?.controller, attackRange[1]?.controller, attackRange[2]?.controller, target?.controller, targetIdx);
 			//if (attackRange[0] == null)
 			//{
@@ -619,24 +617,11 @@ namespace DataCore.BattleElements
 
 			if (this.dynAttackCounter <= 0)
 			{
-				if (randomAttack)
+				int result = -1;
+				result = Attack();
+				if (result > 0)
 				{
-					UnitElement tmpTarget = battleSystem.RandomEnemy();
-					int result = -1;
-					result = Attack(tmpTarget);
-					if (result > 0)
-					{
-						this.dynAttackCounter = this.oriAttackCounter;
-					}
-				}
-				else
-				{
-					int result = -1;
-					result = Attack();
-					if (result > 0)
-					{
-						this.dynAttackCounter = this.oriAttackCounter;
-					}
+					this.dynAttackCounter = this.oriAttackCounter;
 				}
 			}
 		}
@@ -679,17 +664,10 @@ namespace DataCore.BattleElements
 		/// </summary>
 		internal virtual void Move(BattleLine resLine, BattleLine dstLine, int resIdx, int dstPos)
 		{
-			//if (!moveable)
-			//{
-			//	return;//TODO
-			//}
-
 			eventTable.RaiseEvent("BeforeMove", this, battleSystem);
 
 
 			dstLine.Receive(resLine.Send(resIdx), dstPos);
-			this.dynAttackCounter -= counterDecrease;
-
 			this.operateCounter--;
 
 			UpdateInfo();
@@ -725,22 +703,7 @@ namespace DataCore.BattleElements
 			return 1;
 
 		}
-		//legacy
-		internal int Attack(UnitElement tmpTarget)
-		{
-			eventTable.RaiseEvent("BeforeAttack", this, battleSystem);
 
-			if (tmpTarget == null) return -1;
-
-			controller.RandomAttackAnimationEvent(tmpTarget.controller);
-			tmpTarget.Attacked(this);
-
-
-			eventTable.RaiseEvent("AfterAttack", this, battleSystem);
-
-			return 1;
-
-		}
 		/// <summary>
 		/// 有来源受击方法: 根据伤害源atk修改damage寄存值
 		/// </summary>
@@ -751,14 +714,14 @@ namespace DataCore.BattleElements
 
 			eventTable.RaiseEvent("BeforeAttacked", this, battleSystem);
 
-			Damaged();
+			Damaged("append");
 
 			eventTable.RaiseEvent("AfterAttacked", this, battleSystem);
 		}
 		/// <summary>
 		/// 无来源受伤方法: 根据damage寄存值受伤
 		/// </summary>
-		internal void Damaged()
+		internal void Damaged(string method)
 		{
 			eventTable.RaiseEvent("BeforeDamaged", this, battleSystem);
 			if(this.dynHealth == this.maxHealth)
@@ -767,7 +730,7 @@ namespace DataCore.BattleElements
 			}
 
 			this.dynHealth -= this.damage;
-			controller.DamageAnimationEvent(this.dynHealth);
+			controller.DamageAnimationEvent(this.dynHealth, method);
 
 			this.damage = 0;
 
@@ -780,10 +743,10 @@ namespace DataCore.BattleElements
 			eventTable.RaiseEvent("AfterDamaged", this, battleSystem);
 		}
 		/// <summary>
-		/// 立即瞬时受伤
+		/// 
 		/// </summary>
 		/// <param name="damage"></param>
-		internal void Damaged(int damage)
+		internal void Damaged(int damage, string method)
 		{
 			this.damage = damage;
 
@@ -794,7 +757,7 @@ namespace DataCore.BattleElements
 			}
 
 			this.dynHealth -= this.damage;
-			controller.ImmediateDamageAnimationEvent(this.dynHealth);
+			controller.DamageAnimationEvent(this.dynHealth, method);
 
 			this.damage = 0;
 
@@ -822,12 +785,12 @@ namespace DataCore.BattleElements
 			eventTable.RaiseEvent("BeforeTerminate", this, battleSystem);
 
 			//由自己修改的状态
-			this.state = UnitState.destroyed;
+			this.state = ElementState.destroyed;
 			UnloadEffects();
 
 
 			battleLine.ElementRemove(inlineIdx);
-			controller.TerminateAnimationEvent();
+			controller.TerminateAnimationEvent("append");
 
 
 			//not likely
@@ -872,13 +835,14 @@ namespace DataCore.BattleElements
 
 			parry = false;
 			cleave = false;
+			mocking = false;
 
 			aura = false;
 		}
 
 
 
-		internal void AuraGain(UnitElement element, BattleSystem system)
+		internal void AuraGain(BattleElement element, BattleSystem system)
 		{
 			if (aura)
 			{
@@ -911,11 +875,12 @@ namespace DataCore.BattleElements
 		internal void Init()
 		{
 			UpdateInfo();
-			controller.Init(backendID, ownership, this);
+			controller.Init(backendID, ownership, name, category, description, this);
 		}
 		internal void UpdateInfo()
 		{
-			controller.UpdateInfo(name, category, cost, dynAttack, dynHealth, maxHealth, dynAttackCounter, operateCounter, state, moveRange);
+			controller.UpdateInfo(cost, dynAttack, dynHealth, maxHealth, dynAttackCounter, operateCounter, 
+				state, moveRange, aura);
 		}
 
 
@@ -943,18 +908,20 @@ namespace DataCore.BattleElements
 
 	internal sealed class LightArmorElement : UnitElement
 	{
-		internal LightArmorElement(UnitCard __card) : base(__card) { }
+		internal LightArmorElement(UnitCard __card, BattleSystem system) : base(__card, system) { }
 	}
 	internal sealed class MotorizedElement : UnitElement
 	{
-		internal MotorizedElement(UnitCard __card) : base(__card) { }
+		internal MotorizedElement(UnitCard __card, BattleSystem system) : base(__card, system) { }
 		internal override void Move(BattleLine resLine, BattleLine dstLine, int resIdx, int dstPos)
 		{
 			eventTable.RaiseEvent("BeforeMove", this, battleSystem);
 
-			this.dynAttackCounter = this.dynAttackCounter - 1 < 0 ? 0 : this.dynAttackCounter - 1;
 
-			this.operateCounter = 0;
+			dstLine.Receive(resLine.Send(resIdx), dstPos);
+
+			this.dynAttackCounter -= 1;
+			this.operateCounter--;
 
 			UpdateInfo();
 
@@ -964,7 +931,7 @@ namespace DataCore.BattleElements
 	internal sealed class ArtilleryElement : UnitElement
 	{
 		internal UnitElement tmpTarget;
-		internal ArtilleryElement(UnitCard __card) : base(__card) { }
+		internal ArtilleryElement(UnitCard __card, BattleSystem system) : base(__card, system) { }
 		internal override void SetAttackRange(UnitElement t1, UnitElement t2, UnitElement t3)
 		{
 			attackRange[0] = null;
@@ -988,9 +955,10 @@ namespace DataCore.BattleElements
 		}
 		internal override int Attack()
 		{
+			if (tmpTarget == null) return -1;
+
 			eventTable.RaiseEvent("BeforeAttack", this, battleSystem);
 
-			if (tmpTarget == null) return -1;
 
 			controller.RandomAttackAnimationEvent(tmpTarget.controller);
 			tmpTarget.Attacked(this);
@@ -1004,19 +972,11 @@ namespace DataCore.BattleElements
 	}
 	internal sealed class GuardianElement : UnitElement
 	{
-		internal GuardianElement(UnitCard __card) : base(__card) { }
-		//TODO
-		internal override void SetAttackRange(UnitElement t1, UnitElement t2, UnitElement t3)
-		{
-			attackRange[0] = t1;
-			attackRange[1] = t2;
-			attackRange[2] = t3;
-			UpdateTarget();
-		}
+		internal GuardianElement(UnitCard __card, BattleSystem system) : base(__card, system) { }
 	}
 	internal sealed class ConstructionElement : UnitElement
 	{
-		internal ConstructionElement(UnitCard __card) : base(__card) { }
+		internal ConstructionElement(UnitCard __card, BattleSystem system) : base(__card, system) { }
 		internal override void Move(BattleLine resLine, BattleLine dstLine, int resIdx, int dstPos)
 		{
 			return;
@@ -1024,7 +984,7 @@ namespace DataCore.BattleElements
 	}
 	internal sealed class BehemothsElement : UnitElement
 	{
-		internal BehemothsElement(UnitCard __card) : base(__card)
+		internal BehemothsElement(UnitCard __card, BattleSystem system) : base(__card, system)
 		{
 		}
 	}
@@ -1038,19 +998,61 @@ namespace DataCore.BattleElements
 
 	internal sealed class CommandElement : BattleElement
 	{
-		//global info
-		/// <summary>
-		/// 指向作战系统，获取全局信息
-		/// </summary>
-		internal BattleSystem battleSystem;
+		internal ICommandElementController controller;
 
-		internal int durability { get; set; }
-		internal int targetNum { get; set; }
-		internal CommandElement(CommandCard __card) : base(__card)
+		internal int oriDurability { get; set; }
+		private int DynDurability;
+		internal int dynDurability
 		{
-			this.durability = __card.maxDurability;
+			get { return DynDurability; }
+			set
+			{
+				DynDurability = value;
+				if (value < 0) DynDurability = 0;
+			}
+		}
+
+
+		internal CommandElement(CommandCard __card, BattleSystem system) : base(__card, system)
+		{
+			this.oriDurability = __card.maxDurability;
+			this.DynDurability = __card.maxDurability;
+
+			eventTable.RaiseEvent("Initialize", this, null);
+		}
+
+
+		internal void Cast(UnitElement target)
+		{
+			eventTable.RaiseEvent("Cast", this, null);
+
+			dynDurability -= 1;
+		}
+		internal void Recover(int heal)
+		{
+			dynDurability += heal;
+		}
+
+		/// <summary>
+		/// 由手牌区初始化
+		/// </summary>
+		internal void Init()
+		{
+			UpdateInfo();
+			controller.Init(backendID, ownership, name, description);
+		}
+		internal void UpdateInfo()
+		{
+
+		}
+		public void UpdateManual()
+		{
+			UpdateInfo();
 		}
 	}
+
+
+
 
 
 	/// <summary>
@@ -1069,7 +1071,7 @@ namespace DataCore.BattleElements
 
 
 
-	public enum UnitState
+	public enum ElementState
 	{
 		inDeck,
 		inStack,

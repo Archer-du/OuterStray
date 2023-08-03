@@ -306,8 +306,6 @@ public class BattleSceneManager : MonoBehaviour,
 
 		rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
-		rotateSequence.AppendInterval(0.4f);
-		sequenceTime += 0.4f;
 
 		UnitElementController controller = handicapController[0].Pop(handicapIdx) as UnitElementController;
 
@@ -363,8 +361,6 @@ public class BattleSceneManager : MonoBehaviour,
 
 		rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
-		rotateSequence.AppendInterval(0.4f);
-		sequenceTime += 0.4f;
 
 		battleLineControllers[dstLineIdx].Receive(battleLineControllers[resLineIdx].Send(resIdx), dstPos);
 
@@ -393,7 +389,7 @@ public class BattleSceneManager : MonoBehaviour,
 		AISupportLine = battleLineControllers[3];
 		//TODO
 		AIAdjacentLine = battleLineControllers[2];
-		float waitTime = 1.0f;
+		float waitTime = 0.6f;
 
 		yield return new WaitForSeconds(waitTime);
 
@@ -408,8 +404,8 @@ public class BattleSceneManager : MonoBehaviour,
 			//支援战线没到上限
 			if (AISupportLine.count < 5)
 			{
-				yield return new WaitForSeconds(waitTime);
 				AIDeploy(idx);
+				yield return new WaitForSeconds(sequenceTime + waitTime);
 				cost = GetMaxCost();
 				idx = GetMaxCostPointer();
 				deploytimes++;
@@ -417,15 +413,14 @@ public class BattleSceneManager : MonoBehaviour,
 		}
 		int movetimes = 1;
 		idx = GetOperatorPointer();
-		while (AIAdjacentLine.count < AIAdjacentLine.capacity && idx >= 0)
+		while (AIAdjacentLine.count == 0 && AIAdjacentLine.count < AIAdjacentLine.capacity && idx >= 0)
 		{
-			yield return new WaitForSeconds(waitTime);
 			AIMove(idx);
+			yield return new WaitForSeconds(sequenceTime + waitTime);
 			idx = GetOperatorPointer();
 			movetimes++;
 		}
 
-		yield return new WaitForSeconds(waitTime);
 		Skip();
 	}
 	private int GetMaxCost()
@@ -460,7 +455,7 @@ public class BattleSceneManager : MonoBehaviour,
 	{
 		for (int i = 0; i < AISupportLine.count; i++)
 		{
-			if (AISupportLine[i].operateCounter == 1)
+			if (AISupportLine[i].operateCounter == 1 && AISupportLine[i].category != "Construction")
 			{
 				return i;
 			}
@@ -475,8 +470,6 @@ public class BattleSceneManager : MonoBehaviour,
 
 		rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
-		rotateSequence.AppendInterval(0.4f);
-		sequenceTime += 0.4f;
 
 
 		battleLineControllers[idx].Receive(controller, 0);
@@ -495,8 +488,6 @@ public class BattleSceneManager : MonoBehaviour,
 
 		rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
-		rotateSequence.AppendInterval(0.4f);
-		sequenceTime += 0.4f;
 
 
 		battleLineControllers[dstLineIdx].Receive(battleLineControllers[resLineIdx].Send(resIdx), dstPos);

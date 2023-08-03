@@ -22,15 +22,22 @@ namespace DataCore.Cards
 
 		internal int ownership;
 
+		internal int department;
 
+		internal int pack;
 
-		protected Card(string __id, string __name, string __description, int __cost, int ownership)
+		internal string effects;
+
+		protected Card(string __id, string __name, string __description, int __cost, int ownership, int department, int pack, string effects)
 		{
 			this.backendID = __id;
 			this.name = __name;
 			this.description = __description;
 			this.cost = __cost;
 			this.ownership = ownership;
+			this.department = department;
+			this.pack = pack;
+			this.effects = effects;
 		}
 		//TODO
 		protected Card(Card __card)
@@ -39,6 +46,9 @@ namespace DataCore.Cards
 			this.name = __card.name;
 			this.description = __card.description;
 			this.cost = __card.cost;
+			this.department = __card.department;
+			this.pack = __card.pack;
+			this.effects = __card.effects;
 		}
 	}
 	/// <summary>
@@ -52,12 +62,6 @@ namespace DataCore.Cards
 		internal int healthPoint { get; set; }
 		internal int attackCounter { get; set; }
 
-		//由UnitElement解析
-		internal string effects;
-
-		internal int department;
-
-		internal int pack;
 
 
 
@@ -74,17 +78,12 @@ namespace DataCore.Cards
 
 
 		internal UnitCard(string id, int ownership, string name, string category, int cost, int attack, int maxhealth, int attackCounter, string description, int department, int pack, string effects)
-			: base(id, name, description, cost, ownership)
+			: base(id, name, description, cost, ownership, department, pack, effects)
 		{
 			this.category = category;
 			this.attackPoint = attack;
 			this.healthPoint = maxhealth;
 			this.attackCounter = attackCounter;
-
-			this.effects = effects;
-
-			this.department = department;
-			this.pack = pack;
 
 
 			this.counterDecrease = 0;
@@ -131,14 +130,12 @@ namespace DataCore.Cards
 	internal sealed class CommandCard : Card
 	{
 		internal int maxDurability { get; set; }
-		internal int maxTargetsNum { get; set; }
 
 		//TODO
-		internal CommandCard(string __id, int ownership, string __name, string category, string __description, int __cost, int __maxDurability, int __maxTargetsNum)
-			: base(__id, __name, __description, __cost, ownership)
+		internal CommandCard(string __id, int ownership, string __name, string __description, int __cost, int __maxDurability, int department, int pack, string effects)
+			: base(__id, __name, __description, __cost, ownership, department, pack, effects)
 		{
 			this.maxDurability = __maxDurability;
-			this.maxTargetsNum = __maxTargetsNum;
 		}
 	}
 

@@ -116,8 +116,8 @@ namespace LogicCore
 			//test segment TODO------
 			pool = new Pool();
 			pool.LoadCardPool();
-			humanDeck = new Deck();
-			plantDeck = new Deck();
+			humanDeck = new Deck(this);
+			plantDeck = new Deck(this);
 			humanDeck.LoadDeckFromPool(pool, "ally");
 			plantDeck.LoadDeckFromPool(pool, "enemy");
 			//-----------------------
@@ -356,6 +356,21 @@ namespace LogicCore
 
 
 
+
+		public void Cast(int handicapIdx, int dstLineIdx, int dstIdx)
+		{
+			if (handicaps[TURN][handicapIdx] is CommandElement)
+			{
+				//throw event TODO
+				eventTable[TURN].RaiseEvent("", null, this);
+			}
+			//commandElement.Invoke
+		}
+
+
+
+
+
 		public void Move(int resLineIdx, int resIdx, int dstLineIdx, int dstPos)
 		{
 			UnitElement element = battleLines[resLineIdx][resIdx];
@@ -393,7 +408,7 @@ namespace LogicCore
 
 
 			//battleLines[dstLineIdx].Receive(battleLines[resLineIdx].Send(resIdx), dstPos);
-			element.Move(battleLines[dstLineIdx], battleLines[resLineIdx], resIdx, dstPos);
+			element.Move(battleLines[resLineIdx], battleLines[dstLineIdx], resIdx, dstPos);
 
 			//先更新前线再更新目标
 			UpdateFrontLine();
@@ -515,7 +530,7 @@ namespace LogicCore
 		{
 			for (int i = 0; i < deployQueue.Count; i++)
 			{
-				if (deployQueue[i].ownership == TURN && deployQueue[i].state == UnitState.inBattleLine)
+				if (deployQueue[i].ownership == TURN && deployQueue[i].state == ElementState.inBattleLine)
 				{
 					deployQueue[i].eventTable.RaiseEvent(eventName, deployQueue[i], this);
 				}
@@ -634,7 +649,7 @@ namespace LogicCore
 		{
 			for (int i = 0; i < deployQueue.Count; i++)
 			{
-				if (deployQueue[i].ownership == TURN && deployQueue[i].state == UnitState.inBattleLine)
+				if (deployQueue[i].ownership == TURN && deployQueue[i].state == ElementState.inBattleLine)
 				{
 					deployQueue[i].RotateSettlement();
 					UpdateAttackRange();
@@ -645,7 +660,7 @@ namespace LogicCore
 		{
 			for (int i = 0; i < deployQueue.Count; i++)
 			{
-				if (deployQueue[i].state == UnitState.inBattleLine)
+				if (deployQueue[i].state == ElementState.inBattleLine)
 				{
 					deployQueue[i].Settlement();
 					UpdateAttackRange();
@@ -668,7 +683,7 @@ namespace LogicCore
 			enemyNum = 0;
 			for (int i = 0; i < deployQueue.Count; i++)
 			{
-				if (deployQueue[i].state == UnitState.inBattleLine)
+				if (deployQueue[i].state == ElementState.inBattleLine)
 				{
 					allyNum += deployQueue[i].ownership == TURN ? 1 : 0;
 					enemyNum += deployQueue[i].ownership == (TURN + 1) % 2 ? 1 : 0;
@@ -712,7 +727,7 @@ namespace LogicCore
 		{
 			for (int i = 0; i < deployQueue.Count; i++)
 			{
-				if (deployQueue[i].state == UnitState.inBattleLine)
+				if (deployQueue[i].state == ElementState.inBattleLine)
 				{
 					if (deployQueue[i].maxHealth > deployQueue[i].dynHealth)
 					{
@@ -737,14 +752,6 @@ namespace LogicCore
 
 
 
-		public void Cast(int handicapIdx, int dstLineIdx, int dstIdx)
-		{
-			if (handicaps[TURN][handicapIdx] is CommandElement)
-			{
-				//throw event TODO
-				eventTable[TURN].RaiseEvent("", null, this);
-			}
-			//commandElement.Invoke
-		}
+
 	}
 }
