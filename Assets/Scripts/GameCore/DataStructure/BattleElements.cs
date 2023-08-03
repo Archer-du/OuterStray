@@ -390,6 +390,9 @@ namespace DataCore.BattleElements
 
 
 		internal bool aura;
+		internal int range;
+		internal int type;
+		internal int value;
 
 
 
@@ -600,7 +603,10 @@ namespace DataCore.BattleElements
 
 			if(this.operateCounter > 0)
 			{
-				this.dynAttackCounter -= 1;
+				if(this.ownership == BattleSystem.TURN)
+				{
+					this.dynAttackCounter -= 1;
+				}
 			}
 			//操作计数回复
 			this.operateCounter++;
@@ -799,14 +805,18 @@ namespace DataCore.BattleElements
 		/// <summary>
 		/// 撤退回到手牌区,回复状态
 		/// </summary>
-		internal void Retreat()
+		internal void Retreat(string method)
 		{
 			battleLine.ElementRemove(inlineIdx);
 
+			battleLine.Send(this.inlineIdx);
 			//TODO config
 			this.dynHealth += 2;
 			this.operateCounter = 1;
 			UnloadEffects();
+
+
+			controller.RetreatAnimationEvent(method);
 		}
 
 
@@ -874,8 +884,8 @@ namespace DataCore.BattleElements
 		/// </summary>
 		internal void Init()
 		{
-			UpdateInfo();
 			controller.Init(backendID, ownership, name, category, description, this);
+			UpdateInfo();
 		}
 		internal void UpdateInfo()
 		{
@@ -1013,10 +1023,14 @@ namespace DataCore.BattleElements
 		}
 
 
+		internal int tempBufferForCommMush07;
+
 		internal CommandElement(CommandCard __card, BattleSystem system) : base(__card, system)
 		{
 			this.oriDurability = __card.maxDurability;
 			this.DynDurability = __card.maxDurability;
+
+			tempBufferForCommMush07 = 0;
 
 			eventTable.RaiseEvent("Initialize", this, null);
 		}
@@ -1024,9 +1038,12 @@ namespace DataCore.BattleElements
 
 		internal void Cast(UnitElement target)
 		{
-			eventTable.RaiseEvent("Cast", this, null);
+			eventTable.RaiseEvent("Cast", target, null);
 
 			dynDurability -= 1;
+
+
+			controller.RetreatAnimationEvent("append");
 		}
 		internal void Recover(int heal)
 		{
@@ -1038,12 +1055,12 @@ namespace DataCore.BattleElements
 		/// </summary>
 		internal void Init()
 		{
-			UpdateInfo();
 			controller.Init(backendID, ownership, name, description);
+			UpdateInfo();
 		}
 		internal void UpdateInfo()
 		{
-
+			controller.UpdateInfo(cost, dynDurability);
 		}
 		public void UpdateManual()
 		{

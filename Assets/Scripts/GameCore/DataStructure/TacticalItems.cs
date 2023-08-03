@@ -82,7 +82,7 @@ namespace DataCore.TacticalItems
 			{
 				foreach (Card card in pool.cardPool)
 				{
-					if (card.ownership == 0)
+					if (card.ownership == 1)
 					{
 						if (card is UnitCard)
 						{

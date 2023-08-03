@@ -11,6 +11,8 @@ public class CardStackController : MonoBehaviour,
 
 	public GameObject unitPrototype;
 
+	public GameObject commandPrototype;
+
 
 
 
@@ -39,6 +41,20 @@ public class CardStackController : MonoBehaviour,
 
 		return unit.GetComponent<UnitElementController>();
 	}
+	public ICommandElementController InstantiateCommandElementInBattle(int turn)
+	{
+		if (awaked == false) Init();
+
+		Transform stacks = GameObject.Find("UI/Stacks").transform;
+		Quaternion initRotation = Quaternion.Euler(new Vector3(0, 0, -90));
+
+		GameObject comm = Instantiate(commandPrototype, transform.position, initRotation);
+		comm.transform.SetParent(transform);
+
+		comm.SetActive(false);
+
+		return comm.GetComponent<CommandElementController>();
+	}
 	/// <summary>
 	/// 用于pop
 	/// </summary>
@@ -53,4 +69,5 @@ public class CardStackController : MonoBehaviour,
 	{
 		throw new System.NotImplementedException();
 	}
+
 }

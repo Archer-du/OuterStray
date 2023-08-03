@@ -24,3 +24,13 @@ mush_07,plant,治疗菌毯,Construction,3,2,4,NA,回合结束时，为一个受�
 mush_08,plant,喷射孢子丛,Artillery,1,2,1,2,,-1,0,none
 mush_09,plant,摇曳菇,Artillery,4,3,2,3,部署：攻击计时-2。缜密：将该单位移回你的手牌。,-1,0,<self:AfterDeploy+AttackCounterDecrease-1-2>
 mush_10,plant,臭臭菇,Artillery,4,3,4,3,部署：对一个处于前线的随机敌方单位造成4点伤害。,-1,0,<self:AfterDeploy+RandomDamage-2-1-4>
+comm_mush_01,plant,菇军奋战,,3,1,,,将两个亮顶孢子添加至支援战线。使所有亮顶孢子获得+1/+2。,-1,0,<self:Cast+SummonToken-3-0-0-2>|<self:Cast+TokenGain-3-0-1-2>
+comm_mush_07,plant,蔓延,,,1,,,将两张“亮顶孢子”加入手牌。本次战役中，每使用一次“蔓延”，便额外加入一张。,-1,-1,<self:Cast+TokenAddToHandicapRecursive-1-0>
+comm_mush_08,plant,增殖,,,1,,,抽一张牌。你每控制一个亮顶孢子，便重复一次。,-1,-1,<self:Cast+DrawCardsRandom-1-1>
+comm_mush_13,plant,奇迹生长,,,1,,,抽三张牌。将一个耐久与攻击力等同于你手牌数量的亮顶孢子召唤至前线,-1,-1,<self:Cast+DrawCardsRandom-1-1>|<self:Cast+SummonTokenAndSetAtrributeByHandicapData-3-0-2-1>
+comm_mush_18,plant,腐蚀,,,1,,,对一个敌方单位造成5点伤害。随后，对该单位所在战线的所有单位造成两点伤害。,-1,-1,<self:Cast+RandomDamage-2-0-5>|<self:Cast+AOEDamage-2-1-2>
+comm_human_01,human,炮击,,2,3,,,对一个前线的敌方单位造成3点伤害，抽一张牌。,-1,0,<self:Cast+RandomDamage-2-1-3>|<self:Cast+DrawCardsRandom-1-1>
+comm_human_03,human,除草,,2,6,,,对前线所有敌人造成1点伤害。,-1,-1,<self:Cast+AOEDamge-2-2-1>
+comm_human_05,human,定点打击,,4,5,,,造成6点伤害。,-1,-1,<self:Cast+Damage-1-6>
+comm_human_13,human,环卡瓦兰,,8,3,,,使所有处于前线的敌方单位撤退，招募三个重装单位至前线。,-1,-1,<self:Cast:AOERetreat-1-2>|<self:Cast+RecruitByCategory-3-3-2-3>
+comm_human_21,human,,,3,4,,,抽二,-1,0,<self:Cast+DrawCardsRandom-1-2>

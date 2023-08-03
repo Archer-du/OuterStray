@@ -103,8 +103,6 @@ public class BattleSceneManager : MonoBehaviour,
 		skipButton.onClick.AddListener(Skip);
 		buttonImage = skipButton.gameObject.GetComponent<Image>();
 
-		rotateSequence.Pause();
-
 		fieldWidth = GameObject.Find("BattleField").GetComponent<RectTransform>().rect.width;
 		fieldHeight = GameObject.Find("BattleField").GetComponent<RectTransform>().rect.height;
 
@@ -231,7 +229,16 @@ public class BattleSceneManager : MonoBehaviour,
 	{
 		return new Vector2(-1700, (ownership * 2 - 1) * 400f);
 	}
+	public IUnitElementController InstantiateBase(int turn)
+	{
+		Quaternion initRotation = Quaternion.Euler(new Vector3(0, 0, turn * 180));
 
+		Debug.Log(battleLineControllers[turn == 0 ? 0 : 3].GetLogicPosition(0));
+		GameObject unit = Instantiate(unitPrototype, battleLineControllers[turn == 0? 0 : 1].GetLogicPosition(0), initRotation);
+		unit.transform.SetParent(battleLineControllers[0].transform);
+
+		return unit.GetComponent<UnitElementController>();
+	}
 
 
 
@@ -309,14 +316,40 @@ public class BattleSceneManager : MonoBehaviour,
 
 		UnitElementController controller = handicapController[0].Pop(handicapIdx) as UnitElementController;
 
-		battleLineControllers[idx].Receive(controller, pos);
+		//battleLineControllers[idx].Receive(controller, pos);
 
 		//data input 显示层检查完了再动数据层！！！
 		battleSystem.Deploy(handicapIdx, idx, pos);
 
 		return 1;
 	}
+	public int PlayerCast(Vector2 position, int handicapIdx)
+	{
+		//不是自己的回合
+		if (Turn != 0)
+		{
+			return -1;
+		}
+		int idx = GetBattleLineIdx(position.y);
+		if (idx < 0)
+		{
+			return -1;
+		}
+		if (energy[0] < handicapController[0][handicapIdx].cost)
+		{
+			humanEnergy.transform.DOShakePosition(0.3f, 30f);
+			return -1;
+		}
 
+		rotateSequence.Kill();
+		rotateSequence = DOTween.Sequence();
+
+		UnitElementController controller = handicapController[0].Pop(handicapIdx) as UnitElementController;
+
+		//battleSystem.Cast();
+
+		return 1;
+	}
 
 	/// <summary>
 	/// 
@@ -362,13 +395,36 @@ public class BattleSceneManager : MonoBehaviour,
 		rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
 
-		battleLineControllers[dstLineIdx].Receive(battleLineControllers[resLineIdx].Send(resIdx), dstPos);
+		//battleLineControllers[dstLineIdx].Receive(battleLineControllers[resLineIdx].Send(resIdx), dstPos);
 
 		battleSystem.Move(resLineIdx, resIdx, dstLineIdx, dstPos);
 
 		return 1;
 	}
+	public int PlayerRetreat(Vector2 position, BattleLineController resLine, UnitElementController element)
+	{
+		if (Turn != 0)
+		{
+			return -1;
+		}
+		if(resLine.lineIdx != 0)
+		{
+			return -1;
+		}
+		//TODO
+		if(position.x > 500)
+		{
+			return -1;
+		}
+		
 
+		rotateSequence.Kill();
+		rotateSequence = DOTween.Sequence();
+
+		battleSystem.Retreat(resLine.lineIdx, element.resIdx);
+
+		return 1;
+	}
 
 
 
@@ -443,7 +499,7 @@ public class BattleSceneManager : MonoBehaviour,
 		int maxPointer = -1;
 		for (int i = 0; i < AIHandicap.count; i++)
 		{
-			if (AIHandicap[i].cost >= maxCost)
+			if (AIHandicap[i].cost >= maxCost && AIHandicap[i] is UnitElementController)
 			{
 				maxCost = AIHandicap[i].cost;
 				maxPointer = i;
@@ -472,7 +528,7 @@ public class BattleSceneManager : MonoBehaviour,
 		rotateSequence = DOTween.Sequence();
 
 
-		battleLineControllers[idx].Receive(controller, 0);
+		//battleLineControllers[idx].Receive(controller, 0);
 
 
 		//data input 显示层检查完了再动数据层！！！
@@ -490,7 +546,7 @@ public class BattleSceneManager : MonoBehaviour,
 		rotateSequence = DOTween.Sequence();
 
 
-		battleLineControllers[dstLineIdx].Receive(battleLineControllers[resLineIdx].Send(resIdx), dstPos);
+		//battleLineControllers[dstLineIdx].Receive(battleLineControllers[resLineIdx].Send(resIdx), dstPos);
 
 		battleSystem.Move(resLineIdx, resIdx, dstLineIdx, dstPos);
 	}

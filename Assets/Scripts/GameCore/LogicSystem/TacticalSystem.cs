@@ -40,7 +40,7 @@ namespace LogicCore
 
 			//init
 			terrains = new List<Terrain>(SystemConfig.terrainNum);
-			deck = new Deck();
+			//deck = new Deck();
 			//testDeck = new Deck();
 
 			//test TODO

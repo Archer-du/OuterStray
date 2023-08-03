@@ -62,6 +62,9 @@ namespace DisplayInterface
 		public void UpdateEnergySupply(int turn, int supply);
 
 
+		public IUnitElementController InstantiateBase(int turn);
+
+
 		//public void PushElementIntoHandicap(IUnitElementController element);
 		//public void PushElementIntoHandicap(int turn, IUnitElementController element);
 
@@ -71,6 +74,7 @@ namespace DisplayInterface
 		public void Init(int capacity, int ownership);
 
 		public void Receive(IUnitElementController element, int dstPos);
+		public IUnitElementController Send(int idx);
 		public void UpdateInfo(int curlength, int ownership);
 	}
 
@@ -122,9 +126,13 @@ namespace DisplayInterface
 
 		public void TerminateAnimationEvent(string method);
 
+		public void RetreatAnimationEvent(string method);
 	}
 	public interface ICommandElementController : IBattleElementController
 	{
 		public void Init(string ID, int ownership, string name, string description);
+
+		public void UpdateInfo(int cost, int durability);
+		public void RetreatAnimationEvent(string method);
 	}
 }

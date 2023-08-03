@@ -13,7 +13,7 @@ public static class SystemConfig
 	public static int deckCapacity = 10;
 	public static int stackCapacity = 5;
 
-	public static int handicapInit = 5;
+	public static int handicapInit = 3;
 
 	public static int handicapCapacity = 10;
 

@@ -5,6 +5,8 @@ using PlasticPipe.PlasticProtocol.Messages;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Linq;
+using static System.Net.Mime.MediaTypeNames;
 
 
 namespace EventEffectModels
@@ -440,6 +442,7 @@ namespace EventEffectModels
 						unit.Deploy(system, element.battleLine, 0);
 					}
 					break;
+				//2: 前线
 				case 2:
 					if (system.battleLines[system.frontLines[element.ownership]].Receiveable())
 					{
@@ -529,12 +532,63 @@ namespace EventEffectModels
 				}
 			}
 		}
+		internal void TargetDamage(BattleElement source, BattleSystem system)
+		{
+			UnitElement target = source as UnitElement;
+			int argsNum = 1;
 
+
+
+			int damage = ((List<int>)argsTable["TargetDamage"])[0];
+			target.Damaged(damage, "immediate");
+		}
 
 		internal void AOEDamage(BattleElement source, BattleSystem system)
 		{
 			int argsNum = 2;
 
+
+
+			int position = ((List<int>)argsTable["AOEDamage"])[0];
+			int damage = ((List<int>)argsTable["AOEDamage"])[1];
+
+
+			switch (position)
+			{
+				//0：支援战线
+				case 0:
+					break;
+				//1：当前战线
+				case 1:
+					break;
+				//2: 前线
+				case 2:
+					for(int i = 0; i < system.battleLines[system.frontLines[(BattleSystem.TURN + 1) % 2]].count; i++)
+					{
+						system.battleLines[system.frontLines[BattleSystem.TURN]][i].Damaged(damage, "immediate");
+					}
+					break;
+			}
+		}
+		internal void AOERetreat(BattleElement source, BattleSystem system)
+		{
+			int argsNum = 1;
+
+			int position = ((List<int>)argsTable["AOEDamage"])[0];
+
+			switch (position)
+			{
+				case 0:
+					break;
+				case 1:
+					break;
+				case 2:
+					for(int i = 0; i < system.battleLines[system.frontLines[(BattleSystem.TURN + 1) % 2]].count; i++)
+					{
+						system.battleLines[system.frontLines[BattleSystem.TURN]][i].Retreat("immediate");
+					}
+					break;
+			}
 		}
 
 
@@ -572,6 +626,139 @@ namespace EventEffectModels
 
 
 
+
+
+
+
+
+
+
+		//temp
+		internal void DrawCommandCardsRandomAndRecover(BattleElement source, BattleSystem system)
+		{
+			int argsNum = 2;
+
+
+
+			int num = ((List<int>)argsTable["DrawCommandCardsRandomAndRecover"])[0];
+			int recover = ((List<int>)argsTable["DrawCommandCardsRandomAndRecover"])[1];
+
+			for (int i = 0; i < num; i++)
+			{
+				if (system.handicaps[BattleSystem.TURN].count < system.handicaps[BattleSystem.TURN].capacity)
+				{
+					CommandElement comm = system.stacks[BattleSystem.TURN].PopCommand();
+
+					comm.dynDurability += 2;
+
+					system.handicaps[BattleSystem.TURN].Push(comm);
+				}
+			}
+		}
+
+
+
+
+
+
+
+		internal void Comm_Mush_07(BattleElement source, BattleSystem system)
+		{
+			CommandElement element = source as CommandElement;
+
+			int category = 0;
+			int num = 2;
+			//解析完成， 逻辑处理
+			for (int i = 0; i < num + element.tempBufferForCommMush07; i++)
+			{
+				UnitCard card = null;
+				switch (category)
+				{
+					//召唤亮顶孢子
+					case 0:
+						card = system.pool.GetCardByID("mush_00") as UnitCard;
+						break;
+					case 1:
+						break;
+					default:
+						break;
+				}
+				UnitElement unit = new UnitElement(card, system);
+
+				if (system.handicaps[BattleSystem.TURN].count < system.handicaps[BattleSystem.TURN].capacity)
+				{
+					system.handicaps[BattleSystem.TURN].Push(unit);
+				}
+			}
+
+			element.tempBufferForCommMush07++;
+		}
+		internal void Comm_Mush_08(BattleElement source, BattleSystem system)
+		{
+			int count = 0;
+			for (int i = 0; i < system.linesCapacity; i++)
+			{
+				for (int j = 0; j < system.battleLines[i].count; j++)
+				{
+					if(system.battleLines[i][j].backendID == "mush_00")
+					{
+						count++;
+					}
+				}
+			}
+			for(int i = 0; i < count + 1; i++)
+			{
+				if (system.handicaps[BattleSystem.TURN].count < system.handicaps[BattleSystem.TURN].capacity)
+				{
+					BattleElement unit = system.stacks[BattleSystem.TURN].RandomPop();
+					system.handicaps[BattleSystem.TURN].Push(unit);
+				}
+			}
+		}
+		internal void Comm_Mush_13(BattleElement source, BattleSystem system)
+		{
+			UnitElement element = source as UnitElement;
+			for (int i = 0; i < 3; i++)
+			{
+				if (system.handicaps[BattleSystem.TURN].count < system.handicaps[BattleSystem.TURN].capacity)
+				{
+					BattleElement e = system.stacks[BattleSystem.TURN].RandomPop();
+					system.handicaps[BattleSystem.TURN].Push(e);
+				}
+			}
+
+			UnitCard card = null;
+			card = system.pool.GetCardByID("mush_00") as UnitCard;
+
+			UnitElement unit = new UnitElement(card, system);
+
+			unit.dynAttack = system.handicaps[element.ownership].count > 0 ? system.handicaps[element.ownership].count : 1;
+			unit.maxHealth = system.handicaps[element.ownership].count > 0 ? system.handicaps[element.ownership].count : 1;
+
+			SummonToPosition(element, system, 2, unit);
+		}
+		internal void Comm_Mush_18(BattleElement source, BattleSystem system)
+		{
+			UnitElement target = source as UnitElement;
+
+			target.Damaged(5, "immediate");
+			
+			for(int i = 0; i < target.battleLine.count; i++)
+			{
+				if (i == 0)
+				{
+					target.battleLine[i].Damaged(2, "append");
+					continue;
+				}
+				target.battleLine[i].Damaged(2, "immediate");
+			}
+		}
+		
+
+
+
+
+
 		internal EffectsTable()
 		{
 			//新效果方法在这里注册
@@ -582,10 +769,7 @@ namespace EventEffectModels
 				//args
 				{"SummonToken", (BattleEventHandler)SummonToken },
 				{"Parry", (BattleEventHandler)Parry },
-				//{"CLeave", (BattleEventHandler)Cleave },
-				//{"Mock",(BattleEventHandler)Mock },
-				//{"Thorn", (BattleEventHandler)Thorn },
-				//{"Unyield", (BattleEventHandler)Unyield },
+				{"CLeave", (BattleEventHandler)Cleave },
 				{"Armor",(BattleEventHandler)Armor }
 			};
 

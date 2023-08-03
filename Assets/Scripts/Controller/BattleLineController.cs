@@ -82,6 +82,8 @@ public class BattleLineController : MonoBehaviour,
 	{
 		if (curlength != count)
 		{ throw new System.Exception("Data inconsistencies"); }
+
+		UpdateElements();
 		this.ownerShip = ownerShip;
 
 		if (ownerShip == 0)
@@ -165,7 +167,6 @@ public class BattleLineController : MonoBehaviour,
 		elementList.Insert(dstPos, element);
 
 		UpdateElementPosition();
-
 	}
 	/// <summary>
 	/// 成功移除卡牌时调用
@@ -246,7 +247,7 @@ public class BattleLineController : MonoBehaviour,
 		draggingElement.transform.SetParent(transform);
 		draggingElement.transform.SetSiblingIndex(draggingElement.resIdx + childNum);
 	}
-	private Vector3 GetLogicPosition(int index)
+	public Vector3 GetLogicPosition(int index)
 	{
 		return transform.position + new Vector3((index - count / 2) * cardWidth + cardWidth / 2 * ((count + 1) % 2), 0, 0);
 	}

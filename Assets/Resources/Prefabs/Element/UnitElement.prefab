@@ -68,8 +68,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Decription
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 66b8d1886de806146a67cb7c95cc464b, type: 2}
-  m_sharedMaterial: {fileID: -5429788012524597403, guid: 66b8d1886de806146a67cb7c95cc464b, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 600236e9df5f4e94dab569f5d8a054c4, type: 2}
+  m_sharedMaterial: {fileID: 8423136443212993207, guid: 600236e9df5f4e94dab569f5d8a054c4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -896,7 +896,7 @@ MonoBehaviour:
   m_text: "\u201C\u9EC4 \u8702\u201D"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 600236e9df5f4e94dab569f5d8a054c4, type: 2}
-  m_sharedMaterial: {fileID: -3297319028956166189, guid: 600236e9df5f4e94dab569f5d8a054c4, type: 2}
+  m_sharedMaterial: {fileID: 8423136443212993207, guid: 600236e9df5f4e94dab569f5d8a054c4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1190,30 +1190,43 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   battleSceneManager: {fileID: 0}
   handicap: {fileID: 0}
-  line: {fileID: 0}
   handicapIdx: 0
+  ID: 
+  ownership: 0
+  nameContent: 
+  category: 
+  description: 
+  cost: 0
+  nameText: {fileID: 2424463536136595778}
+  descriptionPanel: {fileID: 3013587952181121247}
+  descriptionText: {fileID: 320388303175122387}
+  originTextScale: {x: 0, y: 0, z: 0}
+  targetTextScale: {x: 0, y: 0, z: 0}
+  dataState: 0
+  preprocessed: 0
+  scaleTime: 0.3
+  canvas: {fileID: 0}
+  CardImage: {fileID: 3209482883967444717}
+  enlargeScale: {x: 0, y: 0, z: 0}
+  originScale: {x: 0, y: 0, z: 0}
+  moveTime: 0.2
+  grayScale: 0.2
+  upperOrder: 100
+  lowerOrder: 0
+  offset: {x: 0, y: 0}
+  handicapChildNum: 2
+  inlineChildNum: 4
+  stack: {fileID: 0}
+  line: {fileID: 0}
   resIdx: 0
   logicPosition: {x: 0, y: 0, z: 0}
   logiPosition: {x: 0, y: 0, z: 0}
-  ownership: 0
-  preprocessed: 0
-  ID: 
-  nameContent: 
-  category: 
-  cost: 0
   attackPoint: 0
   healthPoint: 0
   maxHealthPoint: 0
   attackCounter: 0
   operateCounter: 0
   moveRange: 0
-  description: 
-  cardWidth: 360
-  canvas: {fileID: 0}
-  dataState: 0
-  controllerState: 0
-  offset: {x: 0, y: 0}
-  nameText: {fileID: 2424463536136595778}
   attackText: {fileID: 332679753968886912}
   healthText: {fileID: 4824679670394117744}
   attackCounterText: {fileID: 90673242082958544}
@@ -1223,33 +1236,20 @@ MonoBehaviour:
   NameTag: {fileID: 8028923749651894899}
   slot: {fileID: 4945833537149503253}
   costTag: {fileID: 2160217349511680626}
-  CardImage: {fileID: 3209482883967444717}
   mask: {fileID: 2259931645454541102}
   duration: 0.2
   leftArrow: {fileID: 6542804087958353489}
   rightArrow: {fileID: 4679756188197196581}
   midArrow: {fileID: 5840855469082734367}
-  descriptionPanel: {fileID: 3013587952181121247}
-  descriptionText: {fileID: 320388303175122387}
+  controllerState: 0
   arrowScale: {x: 0, y: 0, z: 0}
   enlargeArrowScale: {x: 0, y: 0, z: 0}
-  originTextScale: {x: 0, y: 0, z: 0}
-  targetTextScale: {x: 0, y: 0, z: 0}
   t1: {fileID: 0}
   t2: {fileID: 0}
   t3: {fileID: 0}
   target: {fileID: 0}
   attackOrder: 0
   oriOrder: -100
-  scaleTime: 0.3
-  handicapChildNum: 2
-  inlineChildNum: 4
-  enlargeScale: {x: 0, y: 0, z: 0}
-  originScale: {x: 0, y: 0, z: 0}
-  moveTime: 0.2
-  grayScale: 0.2
-  upperOrder: 100
-  lowerOrder: 0
 --- !u!222 &3680882019810687554
 CanvasRenderer:
   m_ObjectHideFlags: 0

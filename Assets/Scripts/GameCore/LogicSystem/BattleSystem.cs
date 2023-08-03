@@ -11,6 +11,7 @@ using System;
 using DataCore.CultivateItems;
 using System.Xml.Linq;
 using PlasticGui;
+using DataCore.Cards;
 
 namespace LogicCore
 {
@@ -141,7 +142,7 @@ namespace LogicCore
 
 			frontLines = new int[2] { 0, 1 };
 
-			energy = new int[2] { 10, 10 };
+			energy = new int[2] { 1, 1 };
 			energySupply = new int[2] { 1, 1 };
 
 			deployQueue = new List<UnitElement>();
@@ -178,6 +179,8 @@ namespace LogicCore
 			BuildPlantStack(enemyDeck);
 
 			InitializeHandicaps();
+
+			TutorialHumanBaseInit();
 		}
 		internal void UnloadBattleField()
 		{
@@ -268,10 +271,13 @@ namespace LogicCore
 			list[0] = new List<BattleElement>();
 			list[1] = new List<BattleElement>();
 			//初始化手牌
-			for (int i = 0; i < SystemConfig.handicapInit; i++)
+			for (int i = 0; i < 3; i++)
 			{
-				list[0].Add(stacks[0].RandomPop());
-				list[1].Add(stacks[1].RandomPop());
+				list[1].Add(stacks[1].Pop());
+			}
+			for(int i = 0; i < 1; i++)
+			{
+				list[0].Add(stacks[0].Pop());
 			}
 			handicaps[0].Fill(list[0]);
 			handicaps[1].Fill(list[1]);
@@ -282,8 +288,37 @@ namespace LogicCore
 			handicaps[1].Clear();
 		}
 
+		//tutorial temp function
+		private void TutorialHumanBaseInit()
+		{
+			//TODO
+			UnitCard card = new UnitCard("human_1000", 0, "基地车", "Construction", 0, 0, 30, 100000, "基地", -1, -1, "none");
+			bases[0] = new ConstructionElement(card, this);
+			bases[0].dynHealth = 3;
+			bases[0].controller = controller.InstantiateBase(0);
 
+			bases[0].Deploy(this, battleLines[0], 0);
+			bases[0].Init();
 
+			card = pool.GetCardByID("human_03") as UnitCard;
+			UnitElement human03 = new UnitElement(card, this);
+			human03.dynAttackCounter = 1;
+			human03.controller = controller.InstantiateBase(0);
+
+			human03.Deploy(this, battleLines[0], 0);
+			human03.Init();
+
+			card = pool.GetCardByID("mush_00") as UnitCard;
+			UnitElement mush1 = new UnitElement(card, this);
+			mush1.controller = controller.InstantiateBase(1);
+			UnitElement mush2 = new UnitElement(card, this);
+			mush2.controller = controller.InstantiateBase(1);
+
+			mush1.Deploy(this, battleLines[1], 0);
+			mush1.Init();
+			mush2.Deploy(this, battleLines[1], 0);
+			mush2.Init();
+		}
 
 
 
@@ -364,7 +399,31 @@ namespace LogicCore
 				//throw event TODO
 				eventTable[TURN].RaiseEvent("", null, this);
 			}
-			//commandElement.Invoke
+
+			int cost = handicaps[TURN][handicapIdx].cost;
+			//手牌区弹出卡牌
+			CommandElement element = handicaps[TURN].Pop(handicapIdx) as CommandElement;
+			//消耗费用
+			energy[TURN] -= cost;
+			//显示层更新
+			controller.UpdateEnergy(energy[TURN]);
+
+
+			element.Cast(battleLines[dstLineIdx][dstIdx]);
+
+			stacks[TURN].Push(element);
+
+			//更新前线指针
+			UpdateFrontLine();
+			UpdateAttackRange();
+			//更新目标
+			Settlement();
+
+
+			eventTable[TURN].RaiseEvent("UpdateAura", null, this);
+			eventTable[(TURN + 1) % 2].RaiseEvent("UpdateAura", null, this);
+
+			controller.Settlement();
 		}
 
 
@@ -473,10 +532,13 @@ namespace LogicCore
 				//显示层限制输入
 				throw new InvalidOperationException();
 			}
+			if(element.battleLine.index != supportLines[TURN])
+			{
+				throw new InvalidOperationException();
+			}
 
-
-			handicaps[TURN].Push(battleLines[resLineIdx][resIdx]);
-			element.Retreat();
+			stacks[TURN].Push(battleLines[resLineIdx][resIdx]);
+			element.Retreat("append");
 
 			UpdateFrontLine();
 			UpdateAttackRange();
@@ -521,7 +583,7 @@ namespace LogicCore
 
 		public void Exit()
 		{
-			throw new System.NotImplementedException();
+			throw new System.NotImplementedException("exit");
 		}
 
 
@@ -649,7 +711,7 @@ namespace LogicCore
 		{
 			for (int i = 0; i < deployQueue.Count; i++)
 			{
-				if (deployQueue[i].ownership == TURN && deployQueue[i].state == ElementState.inBattleLine)
+				if (deployQueue[i].state == ElementState.inBattleLine)
 				{
 					deployQueue[i].RotateSettlement();
 					UpdateAttackRange();

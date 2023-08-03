@@ -19,6 +19,8 @@ public class BattleElementController : MonoBehaviour,
 {
 	public BattleSceneManager battleSceneManager;
 
+	
+
 	public static int cardWidth = 360;
 
 
@@ -31,16 +33,22 @@ public class BattleElementController : MonoBehaviour,
 	public int ownership;
 	public string nameContent;
 
-	public string type;
 	public string category;
 	public string description;
 	public int cost;
 
+	public TMP_Text nameText;
+
 	public Image descriptionPanel;
 	public TMP_Text descriptionText;
 
+
+	public Vector3 originTextScale;
+	public Vector3 targetTextScale;
+
 	public ElementState dataState;
 
+	public int preprocessed;//TODO 敌方特有，之后会改
 
 
 	protected Transform buffer;
@@ -50,7 +58,7 @@ public class BattleElementController : MonoBehaviour,
 	public Canvas canvas;
 
 
-
+	public Image CardImage;
 
 
 	// 原始位置
@@ -84,7 +92,7 @@ public class BattleElementController : MonoBehaviour,
 	}
 
 
-	public virtual void OnDrag(PointerEventData eventData)
+	public void OnDrag(PointerEventData eventData)
 	{
 		if (ownership != 0)
 		{
@@ -136,17 +144,6 @@ public class BattleElementController : MonoBehaviour,
 		{
 			return;
 		}
-		//部署条件判定
-		if (dataState == ElementState.inHandicap)
-		{
-			HandicapController.isDragging = false; // 结束拖动
-			if (battleSceneManager.PlayerDeploy(eventData.position, this.handicapIdx) >= 0)
-			{
-				return;
-			}
-			handicap.Insert(this);
-		}
-
 	}
 
 	public virtual void OnPointerEnter(PointerEventData eventData)

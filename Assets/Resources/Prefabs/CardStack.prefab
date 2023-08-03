@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5304449116102711837}
   - component: {fileID: 8584149667183026796}
   - component: {fileID: 7136101978391975407}
-  - component: {fileID: 4617165056699762888}
+  - component: {fileID: 6350878541867704691}
   m_Layer: 5
   m_Name: CardStack
   m_TagString: Untagged
@@ -80,7 +80,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &4617165056699762888
+--- !u!114 &6350878541867704691
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -93,6 +93,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unitPrototype: {fileID: 5613162459952636112, guid: d0be87596100e184cbd70585fc0418fb, type: 3}
+  commandPrototype: {fileID: 1308769503806020367, guid: a0845758e8ed58a4fab0b2d1ec40f7a7, type: 3}
   awaked: 0
 --- !u!1 &7936406900343170411
 GameObject:

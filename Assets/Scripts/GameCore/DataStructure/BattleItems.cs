@@ -81,6 +81,8 @@ namespace DataCore.BattleItems
 			{
 				return -1;
 			}
+			controller.Receive(element.controller, pos);
+
 			this.ownerShip = element.ownership;
 
 			elementList.Insert(pos, element);
@@ -91,15 +93,17 @@ namespace DataCore.BattleItems
 			return 1;
 		}
 
-		internal UnitElement Send(int Idx)
+		internal UnitElement Send(int idx)
 		{
 			if(count <= 0)
 			{
 				return null;
 			}
-			UnitElement element = elementList[Idx];
+			controller.Send(idx);
 
-			elementList.RemoveAt(Idx);
+			UnitElement element = elementList[idx];
+
+			elementList.RemoveAt(idx);
 
 			UpdateElements();
 			UpdateInfo();
@@ -146,6 +150,10 @@ namespace DataCore.BattleItems
 		/// 
 		/// </summary>
 		internal List<BattleElement> stack;
+		internal List<UnitElement> unitStack;
+		internal List<CommandElement> commandStack;
+
+
 		internal Dictionary<string, List<UnitElement>> UnitIDDic;
 		internal Dictionary<string, List<CommandElement>> CommIDDic;
 
@@ -163,7 +171,9 @@ namespace DataCore.BattleItems
 		internal RandomCardStack()
 		{
 			stack = new List<BattleElement>(SystemConfig.stackCapacity);
+
 			UnitIDDic = new Dictionary<string, List<UnitElement>>();
+			CommIDDic = new Dictionary<string, List<CommandElement>>();
 
 
 			lightArmors = new List<LightArmorElement>();
@@ -254,7 +264,7 @@ namespace DataCore.BattleItems
 		}
 		internal void Push(BattleElement element)
 		{
-			stack.Add(element);
+			stack.Insert(0, element);
 
 			if (element is UnitElement)
 			{
@@ -291,8 +301,8 @@ namespace DataCore.BattleItems
 			{
 				return null;
 			}
-			BattleElement element = stack[count - 1];
-			stack.RemoveAt(count - 1);
+			BattleElement element = stack[0];
+			stack.RemoveAt(0);
 
 			UpdateStackIdx();
 
@@ -304,6 +314,22 @@ namespace DataCore.BattleItems
 			UnitIDDic.Clear();
 		}
 
+
+
+
+		internal CommandElement PopCommand()
+		{
+			if (stack.Count == 0) { return null; }
+			for(int i = 0; i < stack.Count; i++)
+			{
+				if (stack[i] is CommandElement)
+				{
+					CommandElement element = stack[i] as CommandElement;
+					return element;
+				}
+			}
+			return null;
+		}
 
 
 
@@ -436,7 +462,12 @@ namespace DataCore.BattleItems
 				controller.Push(unit.controller);
 				unit.Init();
 			}
-			else throw new InvalidOperationException();
+			else
+			{
+				CommandElement comm = element as CommandElement;
+				controller.Push(comm.controller);
+				comm.Init();
+			}
 		}
 		/// <summary>
 		/// 根据索引从手牌中移除一个元素(弃牌，被弃牌)

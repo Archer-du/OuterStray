@@ -26,15 +26,16 @@ public class UnitElementController : BattleElementController,
 
 	public IUnitInput input;
 
+
+
+	public Transform stack;
+
 	public BattleLineController line;
 	public int resIdx;
 
 
 	public Vector3 logicPosition;
 	public Vector3 logiPosition;
-
-
-	public int preprocessed;//TODO 敌方特有，之后会改
 
 
 	public int attackPoint;
@@ -45,7 +46,6 @@ public class UnitElementController : BattleElementController,
 	//legacy
 	public int moveRange;
 
-	public TMP_Text nameText;
 	public TMP_Text attackText;
 	public TMP_Text healthText;
 	public TMP_Text attackCounterText;
@@ -59,7 +59,7 @@ public class UnitElementController : BattleElementController,
 	public Image slot;
 	public Image costTag;
 
-	public Image CardImage;
+
 	public Image mask;
 
 
@@ -80,6 +80,7 @@ public class UnitElementController : BattleElementController,
 	/// <param name="ownership"></param>
 	public void Init(string ID, int ownership, string name, string categories, string description, IUnitInput input)
 	{
+		OnEnable();
 		this.input = input;
 		this.ownership = ownership;
 		this.nameContent = name;
@@ -102,7 +103,7 @@ public class UnitElementController : BattleElementController,
 		originTextScale = healthText.transform.localScale;
 		targetTextScale = healthText.transform.localScale * 1.5f;
 
-		
+
 
 		leftArrow.SetActive(false);
 		rightArrow.SetActive(false);
@@ -198,7 +199,7 @@ public class UnitElementController : BattleElementController,
 		this.dataState = state;
 		this.moveRange = moveRange;
 
-		nameText.text = name;
+		nameText.text = nameContent;
 		attackText.text = attackPoint.ToString();
 		healthText.text = healthPoint.ToString();
 		attackCounterText.text = this.category == "Construction" ? "" : attackCounter.ToString();
@@ -234,8 +235,7 @@ public class UnitElementController : BattleElementController,
 	public Vector3 arrowScale;
 	public Vector3 enlargeArrowScale;
 
-	public Vector3 originTextScale;
-	public Vector3 targetTextScale;
+
 
 	//TODO remove
 	public UnitElementController t1;
@@ -438,32 +438,40 @@ public class UnitElementController : BattleElementController,
 		);
 		battleSceneManager.sequenceTime += forwardTime;
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	public override void OnDrag(PointerEventData eventData)
+	public void RetreatAnimationEvent(string method)
 	{
-		base.OnDrag(eventData);
-		//拖动显示设置
-		if (HandicapController.isDragging) // 如果正在拖动
+		float retreatTime = 0.4f;
+
+		if(method == "append")
 		{
-			transform.SetParent(buffer);
-			transform.DOScale(originScale, scaleTime);
-			transform.position = eventData.position - offset; // 设置当前对象的位置为鼠标位置
+			battleSceneManager.rotateSequence.Append(
+				transform.DOMove(stack.transform.position + 500 * Vector3.left, retreatTime)
+				);
+			battleSceneManager.sequenceTime += retreatTime;
+		}
+		else
+		{
+			battleSceneManager.rotateSequence.Append(
+				transform.DOMove(stack.transform.position + 500 * Vector3.left, retreatTime)
+				);
+			battleSceneManager.sequenceTime += retreatTime;
 		}
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	public override void OnBeginDrag(PointerEventData eventData)
 	{
 		base.OnBeginDrag(eventData);
@@ -486,6 +494,16 @@ public class UnitElementController : BattleElementController,
 	public override void OnEndDrag(PointerEventData eventData)
 	{
 		base.OnEndDrag(eventData);
+		//部署条件判定
+		if (dataState == ElementState.inHandicap)
+		{
+			HandicapController.isDragging = false; // 结束拖动
+			if (battleSceneManager.PlayerDeploy(eventData.position, this.handicapIdx) >= 0)
+			{
+				return;
+			}
+			handicap.Insert(this);
+		}
 		//移动条件判定
 		if (dataState == ElementState.inBattleLine)
 		{
@@ -500,6 +518,10 @@ public class UnitElementController : BattleElementController,
 			}
 			HandicapController.isDragging = false;
 			if (battleSceneManager.PlayerMove(eventData.position, this.line, this) >= 0)
+			{
+				return;
+			}
+			else if (battleSceneManager.PlayerRetreat(eventData.position, this.line, this) >= 0)
 			{
 				return;
 			}
@@ -554,6 +576,8 @@ public class UnitElementController : BattleElementController,
 		}
 		return -1;
 	}
+
+
 
 
 

@@ -48,7 +48,7 @@ namespace DataCore.CultivateItems
 		/// <returns></returns>
 		internal int LoadCardPool()
 		{
-			StreamReader reader = File.OpenText("\\UnityProject\\AIGC\\OuterStray\\Assets\\Config\\UnitCardData.csv");
+			StreamReader reader = File.OpenText("\\UnityProject\\AIGC\\OuterStray\\Assets\\Config\\TutorialData.csv");
 
 			string[] data;
 			int num = 0;
@@ -74,17 +74,17 @@ namespace DataCore.CultivateItems
 
 				if (id.Contains("comm"))
 				{
-					int cost = int.Parse(data[3]);
+					int cost = int.Parse(data[4]);
 
-					int durability = int.Parse(data[4]);
+					int durability = int.Parse(data[5]);
 
-					int department = int.Parse(data[6]);
-					int pack = int.Parse(data[7]);
+					int department = int.Parse(data[9]);
+					int pack = int.Parse(data[10]);
 
-					string effects = data[8];
+					string effects = data[11];
 					effects = "none";
 
-					string description = data[5];
+					string description = data[8];
 
 					card = new CommandCard(id, ownership, name, description, cost, durability, department, pack, effects);
 				}
@@ -134,8 +134,6 @@ namespace DataCore.CultivateItems
 		{
 			return hashPool[ID] as Card;
 		}
-
-
 	}
 
 
