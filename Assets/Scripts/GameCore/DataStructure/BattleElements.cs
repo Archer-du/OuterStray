@@ -48,6 +48,10 @@ namespace DataCore.BattleElements
 		/// </summary>
 		internal string backendID { get; private set; }
 		/// <summary>
+		/// 战场中不会变化的唯一标识编号
+		/// </summary>
+		internal int battleID;
+		/// <summary>
 		/// 卡牌名称
 		/// </summary>
 		internal string name { get; set; }
@@ -72,7 +76,7 @@ namespace DataCore.BattleElements
 			battleSystem = system;
 			//初始化事件系统和效果表
 			eventTable = new EventTable();
-			effectsTable = new EffectsTable();
+			effectsTable = new EffectsTable(this);
 
 			this.card = __card;
 			this.backendID = __card.backendID;
@@ -146,9 +150,20 @@ namespace DataCore.BattleElements
 							//委托订阅对应事件
 							eventTable.RegisterHandler(triggerEvent[1], handler);
 						}
-						//如果是全局事件
-						else if (triggerEvent[0] == "global")
+						//如果是光环事件
+						else if (triggerEvent[0] == "Aura")
 						{
+							eventTable.RegisterHandler("AfterDeploy", effectsTable.GetHandler("Aura"));
+
+							eventTable.RegisterHandler("BeforeTerminate", effectsTable.GetHandler("AuraUnload"));
+							eventTable.RegisterHandler("BeforeRetreat", effectsTable.GetHandler("AuraUnload"));
+
+							battleSystem.eventTable[0].RegisterHandler("UnitTerminated", effectsTable.GetHandler("AuraDisable"));
+							battleSystem.eventTable[1].RegisterHandler("UnitTerminated", effectsTable.GetHandler("AuraDisable"));
+							battleSystem.eventTable[0].RegisterHandler("UnitRetreated", effectsTable.GetHandler("AuraDisable"));
+							battleSystem.eventTable[1].RegisterHandler("UnitRetreated", effectsTable.GetHandler("AuraDisable"));
+
+
 							//敌方触发还是我方触发
 							if (triggerEvent[1] == "ally")
 							{
@@ -193,10 +208,7 @@ namespace DataCore.BattleElements
 		/// </summary>
 		internal IUnitElementController controller;
 
-		/// <summary>
-		/// 战场中不会变化的唯一标识编号
-		/// </summary>
-		internal int battleID;
+
 		/// <summary>
 		/// 当前所在战线
 		/// </summary>
@@ -228,8 +240,13 @@ namespace DataCore.BattleElements
 		/// <summary>
 		/// 动态攻击力
 		/// </summary>
-		internal int DynAttack;
-		internal int dynAttack
+		private int DynAttack;
+		internal int dynAttackWriter
+		{
+			get { return DynAttack; }
+			set { DynAttack = value; }
+		}
+		internal int dynAttackReader
 		{
 			get
 			{
@@ -240,7 +257,6 @@ namespace DataCore.BattleElements
 				}
 				return DynAttack + gainSum;
 			}
-			set { DynAttack = value; }
 		}
 
 
@@ -281,20 +297,32 @@ namespace DataCore.BattleElements
 			{
 				DynHealth = value;
 				if(value < 0) DynHealth = 0;
-				if(value > MaxHealth) DynHealth = MaxHealth;
+				if(value > maxHealthReader) DynHealth = maxHealthReader;
 			}
 		}
 		/// <summary>
 		/// 动态最大生命值
 		/// </summary>
 		private int MaxHealth;
-		internal int maxHealth
+		internal int maxHealthWriter
 		{
 			get { return MaxHealth; }
 			set
 			{
 				DynHealth += value - MaxHealth;
 				MaxHealth = value;
+			}
+		}
+		internal int maxHealthReader
+		{
+			get
+			{
+				int gainSum = 0;
+				foreach (KeyValuePair<int, int> entry in maxHealthGain)
+				{
+					gainSum += entry.Value;
+				}
+				return MaxHealth + gainSum;
 			}
 		}
 
@@ -409,7 +437,7 @@ namespace DataCore.BattleElements
 
 			//初始化动态数据
 			this.DynAttack = __card.attackPoint;
-			this.MaxHealth = __card.healthPoint;
+			this.maxHealthWriter = __card.healthPoint;
 			this.DynHealth = __card.healthPoint;
 			this.DynAttackCounter = __card.attackCounter;
 			this.operateCounter = 1;
@@ -601,15 +629,15 @@ namespace DataCore.BattleElements
 		{
 			eventTable.RaiseEvent("RotateSettlement", this, battleSystem);
 
-			if(this.operateCounter > 0)
+			if(this.ownership == BattleSystem.TURN)
 			{
-				if(this.ownership == BattleSystem.TURN)
+				if(this.operateCounter > 0)
 				{
 					this.dynAttackCounter -= 1;
 				}
+				this.operateCounter++;
 			}
 			//操作计数回复
-			this.operateCounter++;
 
 			//自动更新
 			Settlement();
@@ -647,7 +675,6 @@ namespace DataCore.BattleElements
 			eventTable.RaiseEvent("BeforeDeploy", this, battleSystem);
 
 			//加入部署队列
-			this.battleID = battleSystem.deployQueue.Count;
 			battleSystem.deployQueue.Add(this);
 			//加入ID字典
 			if (!battleSystem.UnitIDDic.ContainsKey(this.backendID))
@@ -716,7 +743,7 @@ namespace DataCore.BattleElements
 		/// <param name="source"></param>
 		internal void Attacked(UnitElement source)
 		{
-			this.damage = source.dynAttack;
+			this.damage = source.dynAttackReader;
 
 			eventTable.RaiseEvent("BeforeAttacked", this, battleSystem);
 
@@ -730,7 +757,7 @@ namespace DataCore.BattleElements
 		internal void Damaged(string method)
 		{
 			eventTable.RaiseEvent("BeforeDamaged", this, battleSystem);
-			if(this.dynHealth == this.maxHealth)
+			if(this.dynHealth == this.maxHealthReader)
 			{
 				eventTable.RaiseEvent("Meticulous", this, battleSystem);
 			}
@@ -757,7 +784,7 @@ namespace DataCore.BattleElements
 			this.damage = damage;
 
 			eventTable.RaiseEvent("BeforeDamaged", this, battleSystem);
-			if (this.dynHealth == this.maxHealth)
+			if (this.dynHealth == this.maxHealthReader)
 			{
 				eventTable.RaiseEvent("Meticulous", this, battleSystem);
 			}
@@ -781,6 +808,8 @@ namespace DataCore.BattleElements
 			battleSystem.eventTable[ownership].RaiseEvent("UnitHealed", this, battleSystem);
 
 			this.dynHealth += recover;
+			controller.RecoverAnimationEvent(this.dynHealth, "append");
+
 			this.recover = 0;
 		}
 		/// <summary>
@@ -789,6 +818,7 @@ namespace DataCore.BattleElements
 		internal void Terminate()
 		{
 			eventTable.RaiseEvent("BeforeTerminate", this, battleSystem);
+			battleSystem.eventTable[ownership].RaiseEvent("UnitTerminated", this, battleSystem);
 
 			//由自己修改的状态
 			this.state = ElementState.destroyed;
@@ -807,7 +837,8 @@ namespace DataCore.BattleElements
 		/// </summary>
 		internal void Retreat(string method)
 		{
-			battleLine.ElementRemove(inlineIdx);
+			eventTable.RaiseEvent("BeforeRetreat", this, battleSystem);
+			battleSystem.eventTable[ownership].RaiseEvent("UnitRetreated", this, battleSystem);
 
 			battleLine.Send(this.inlineIdx);
 			//TODO config
@@ -884,12 +915,12 @@ namespace DataCore.BattleElements
 		/// </summary>
 		internal void Init()
 		{
-			controller.Init(backendID, ownership, name, category, description, this);
+			controller.UnitInit(backendID, ownership, name, category, description, this);
 			UpdateInfo();
 		}
 		internal void UpdateInfo()
 		{
-			controller.UpdateInfo(cost, dynAttack, dynHealth, maxHealth, dynAttackCounter, operateCounter, 
+			controller.UpdateInfo(cost, dynAttackReader, dynHealth, maxHealthReader, dynAttackCounter, operateCounter, 
 				state, moveRange, aura);
 		}
 
@@ -992,6 +1023,7 @@ namespace DataCore.BattleElements
 			return;
 		}
 	}
+	//legacy
 	internal sealed class BehemothsElement : UnitElement
 	{
 		internal BehemothsElement(UnitCard __card, BattleSystem system) : base(__card, system)
@@ -1010,6 +1042,7 @@ namespace DataCore.BattleElements
 	{
 		internal ICommandElementController controller;
 
+		internal string type;
 		internal int oriDurability { get; set; }
 		private int DynDurability;
 		internal int dynDurability
@@ -1027,6 +1060,7 @@ namespace DataCore.BattleElements
 
 		internal CommandElement(CommandCard __card, BattleSystem system) : base(__card, system)
 		{
+			this.type = __card.type;
 			this.oriDurability = __card.maxDurability;
 			this.DynDurability = __card.maxDurability;
 
@@ -1038,16 +1072,25 @@ namespace DataCore.BattleElements
 
 		internal void Cast(UnitElement target)
 		{
-			eventTable.RaiseEvent("Cast", target, null);
+			eventTable.RaiseEvent("Cast", target, battleSystem);
 
 			dynDurability -= 1;
+			if(dynDurability <= 0)
+			{
+				Terminate();
+			}
 
-
-			controller.RetreatAnimationEvent("append");
+			UpdateInfo();
+			controller.CastAnimationEvent("append");
 		}
 		internal void Recover(int heal)
 		{
 			dynDurability += heal;
+		}
+		internal void Terminate()
+		{
+			//由自己修改的状态
+			this.state = ElementState.destroyed;
 		}
 
 		/// <summary>
@@ -1055,12 +1098,12 @@ namespace DataCore.BattleElements
 		/// </summary>
 		internal void Init()
 		{
-			controller.Init(backendID, ownership, name, description);
+			controller.CommandInit(backendID, ownership, name, type, description);
 			UpdateInfo();
 		}
 		internal void UpdateInfo()
 		{
-			controller.UpdateInfo(cost, dynDurability);
+			controller.UpdateInfo(cost, dynDurability, state);
 		}
 		public void UpdateManual()
 		{

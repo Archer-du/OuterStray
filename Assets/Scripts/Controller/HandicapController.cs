@@ -95,8 +95,6 @@ public class HandicapController : MonoBehaviour,
 					UpdateElements();
 					UpdateHandicapPosition();
 				}));
-
-			
 		}
 		UpdateElements();
 
@@ -131,7 +129,7 @@ public class HandicapController : MonoBehaviour,
 		PushAnimation(element);
 
 	}
-
+	//FIXME TODO dataState有多驱动问题
 	public void PushAnimation(BattleElementController element)
 	{
 		Vector3 moveBy = GetInsertionPosition(count) - element.transform.position;
@@ -174,7 +172,7 @@ public class HandicapController : MonoBehaviour,
 		handiCards.RemoveAt(handicapIdx);
 		UpdateElements();
 
-		HandicapController.isDragging = true;
+		isDragging = true;
 
 		UpdateHandicapPosition();
 
@@ -189,10 +187,12 @@ public class HandicapController : MonoBehaviour,
 			Vector3 dstPos = GetInsertionPosition(i);
 			//TODO config
 
-			handiCards[i].transform.DOMove(dstPos, updateTime).OnComplete(() => HandicapController.isDragging = false);
+			handiCards[i].transform.DOMove(dstPos, updateTime).OnComplete(() => isDragging = false);
 			handiCards[i].canvas.sortingOrder = i;
 		}
 	}
+
+
 
 
 
@@ -216,6 +216,11 @@ public class HandicapController : MonoBehaviour,
 		draggingElement.transform.SetSiblingIndex(draggingElement.handicapIdx + 2);
 
 	}
+	public Vector3 GetInsertionPosition(int index)
+	{
+		Vector3 offset = new Vector3((index - count / 2) * gridWidth + gridWidth / 2 * ((count + 1) % 2), 0, 0);
+		return transform.position + offset;
+	}
 	/// <summary>
 	/// 根据索引获取对应手牌区位置坐标
 	/// </summary>
@@ -225,16 +230,6 @@ public class HandicapController : MonoBehaviour,
 	//{
 	//	return originalPosition + (1 - (ownership * 2)) * (index * new Vector3(gridWidth - length / 2, 0, 0));
 	//}
-	public Vector3 GetInsertionPosition(int index)
-	{
-		Vector3 offset = new Vector3((index - count / 2) * gridWidth + gridWidth / 2 * ((count + 1) % 2), 0, 0);
-		return transform.position + offset;
-	}
-	public Vector3 GetInsertionPosition(int index, int count)
-	{
-		Vector3 offset = new Vector3((index - count / 2) * gridWidth + gridWidth / 2 * ((count + 1) % 2), 0, 0);
-		return transform.position + offset;
-	}
 
 	//public void OnPointerEnter(PointerEventData eventData)
 	//{

@@ -264,7 +264,7 @@ namespace DataCore.BattleItems
 		}
 		internal void Push(BattleElement element)
 		{
-			stack.Insert(0, element);
+			stack.Insert(count - 1, element);
 
 			if (element is UnitElement)
 			{
@@ -273,7 +273,8 @@ namespace DataCore.BattleItems
 			}
 			else
 			{
-				//TODO
+				CommandElement comm = element as CommandElement;
+				comm.state = ElementState.inStack;
 			}
 
 			UpdateStackIdx();
@@ -427,7 +428,8 @@ namespace DataCore.BattleItems
 			for(int i = 0; i < list.Count; i++)
 			{
 				handicap.Add(list[i]);
-				
+				list[i].state = ElementState.inHandicap;
+
 				if (list[i] is UnitElement)
 				{
 					//display
@@ -453,6 +455,7 @@ namespace DataCore.BattleItems
 		{
 			if (element == null) { return; }
 			handicap.Add(element);
+			element.state = ElementState.inHandicap;
 
 
 			if (element is UnitElement)

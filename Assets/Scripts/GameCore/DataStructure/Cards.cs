@@ -129,12 +129,14 @@ namespace DataCore.Cards
 	/// </summary>
 	internal sealed class CommandCard : Card
 	{
+		internal string type;
 		internal int maxDurability { get; set; }
 
 		//TODO
-		internal CommandCard(string __id, int ownership, string __name, string __description, int __cost, int __maxDurability, int department, int pack, string effects)
+		internal CommandCard(string __id, int ownership, string __name, string type, string __description, int __cost, int __maxDurability, int department, int pack, string effects)
 			: base(__id, __name, __description, __cost, ownership, department, pack, effects)
 		{
+			this.type = type;
 			this.maxDurability = __maxDurability;
 		}
 	}
