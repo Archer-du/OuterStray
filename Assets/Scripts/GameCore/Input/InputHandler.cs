@@ -77,7 +77,7 @@ namespace InputHandler
 		/// <param name="dstPos"></param>
 		public void Move(int resLineIdx, int resIdx, int dstLineIdx, int dstPos);
 
-		public void VerticalMove(int resLineIdx, int resIdx, int dstPos);
+		//public void VerticalMove(int resLineIdx, int resIdx, int dstPos);
 
 		/// <summary>
 		/// 从战场指定战线指定位置撤退单位卡

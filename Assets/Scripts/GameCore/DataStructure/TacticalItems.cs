@@ -77,6 +77,11 @@ namespace DataCore.TacticalItems
 						}
 					}
 				}
+				//CRITICAL
+				for(int i = 0; i < count; i++)
+				{
+					deck[i].battleID = i;
+				}
 			}
 			else
 			{
@@ -111,6 +116,11 @@ namespace DataCore.TacticalItems
 							deck.Add(new CommandElement(card as CommandCard, battleSystem));
 						}
 					}
+				}
+				//CRITICAL
+				for(int i = 0; i < count; i++)
+				{
+					deck[i].battleID = -1 - i;
 				}
 			}
 		}

@@ -13,26 +13,52 @@ using InputHandler;
 using DataCore.BattleElements;
 
 
-
-public enum ControllerState
-{
-	attacking,
-	moving
-}
 public class UnitElementController : BattleElementController,
 	IUnitElementController
 {
-
-
 	public IUnitInput input;
 
 
-	public BattleLineController line;
+	public CanvasGroup InspectPanel;
+	public GameObject Inspector;
+	public Image InspectorImage;
+
+	public Image InspectorGround;
+	public Image InspectorShell;
+	public Image InspectorFrame;
+	public Image InspectorNameTag;
+	public Image InspectorCostTag;
+
+	public TMP_Text InspectorName;
+	public TMP_Text InspectorCost;
+	public TMP_Text InspectorAttack;
+	public TMP_Text InspectorMaxHealth;
+	public TMP_Text InspectorAttackCounter;
+	public TMP_Text InspectorDescription;
+
+
+
+
+	public TMP_Text attackText;
+	public TMP_Text healthText;
+	public TMP_Text attackCounterText;
+	public TMP_Text descriptionText;
+
+	public Image operateMask;
+
+
+	public GameObject leftArrow;
+	public GameObject rightArrow;
+	public GameObject midArrow;
+
+	public Vector3 arrowScale;
+	public Vector3 enlargeArrowScale;
+	/// <summary>
+	/// 
+	/// </summary>
+	public BattleLineController battleLine;
 	public int resIdx;
-
-
-	public Vector3 logicPosition;
-	public Vector3 logiPosition;
+	public UnitElementController target;
 
 
 	public int attackPoint;
@@ -43,170 +69,36 @@ public class UnitElementController : BattleElementController,
 	//legacy
 	public int moveRange;
 
-	public TMP_Text attackText;
-	public TMP_Text healthText;
-	public TMP_Text attackCounterText;
-	public TMP_Text costText;
-
-
-	public Image backGround;
-	//public Image shell;
-	public Image frame;
-	public Image NameTag;
-	public Image slot;
-	public Image costTag;
-
-
-	public Image mask;
-
+	public Vector3 logicPosition;
 
 	public float duration = 0.2f;
 
-	public GameObject leftArrow;
-	public GameObject rightArrow;
-	public GameObject midArrow;
-
-	public ControllerState controllerState;
-
-
-	private float timer = 0;
-	void Update()
-	{
-		// 如果鼠标悬停在元素上
-		if (timer > 0)
-		{
-			// 计时器递减
-			timer -= Time.deltaTime;
-			// 如果计时器小于等于 0
-			if (timer <= 0)
-			{
-				// 播放动画
-				//TODO 检视
-				canvas.sortingOrder = attackOrder;
-
-				descriptionPanel.DOColor(Color.gray, 0.2f).OnComplete(() => descriptionText.gameObject.SetActive(true));
-			}
-		}
-	}
+	public int attackOrder = 0;
+	public int oriOrder = -100;
 
 	/// <summary>
 	/// 从牌堆加入手牌或战场时初始化
 	/// </summary>
 	/// <param name="ownership"></param>
-	public void Init(string ID, int ownership, string name, string categories, string description, IUnitInput input)
+	public void UnitInit(string ID, int ownership, string name, string categories, string description, IUnitInput input)
 	{
-		OnEnable();
-		this.input = input;
-		this.ownership = ownership;
-		this.nameContent = name;
-		this.category = categories;
-		this.description = description;
-
-		line = null;
+		Init(ID, ownership, name, categories, description);
 
 
-		LoadCardResources(ID);
-
-		preprocessed = ownership;
-
-		originScale = transform.localScale;
-		enlargeScale = 1.35f * originScale;
 
 		arrowScale = leftArrow.transform.localScale;
 		enlargeArrowScale = arrowScale * 1.5f;
-
-		originTextScale = healthText.transform.localScale;
-		targetTextScale = healthText.transform.localScale * 1.5f;
-
-
 
 		leftArrow.SetActive(false);
 		rightArrow.SetActive(false);
 		midArrow.SetActive(false);
 
-		descriptionPanel.color = Color.clear;
-		descriptionText.gameObject.SetActive(false);
-	}
-	/// <summary>
-	/// 读取卡面图像音频等资源
-	/// </summary>
-	private void LoadCardResources(string ID)
-	{
-		CardImage.sprite = Resources.Load<Sprite>("CardImage/" + ID);
-		if (ownership == 1)
-		{
-			CardImage.rectTransform.sizeDelta = new Vector2(10, 13);
-		}
-		else
-		{
-			CardImage.rectTransform.sizeDelta = new Vector2(10, 11);
-		}
-		switch (category)
-		{
-			case "Guardian":
-				Color color;
-				if (UnityEngine.ColorUtility.TryParseHtmlString("#97A5A4", out color))
-				{
-					NameTag.color = color;
-					frame.color = color;
-					slot.color = color;
-					costTag.color = color;
-
-					backGround.sprite = Resources.LoadAll<Sprite>("CardFrame/frame2.0")[21];
-				}
-				break;
-			case "Artillery":
-				if (UnityEngine.ColorUtility.TryParseHtmlString("#CE8849", out color))
-				{
-					NameTag.color = color;
-					frame.color = color;
-					slot.color = color;
-					costTag.color = color;
-
-					backGround.sprite = Resources.LoadAll<Sprite>("CardFrame/frame2.0")[22];
-				}
-				break;
-			case "Motorized":
-				if (UnityEngine.ColorUtility.TryParseHtmlString("#426A84", out color)) // 尝试解析色号字符串，如果成功，返回 true 并赋值给 color 变量
-				{
-					NameTag.color = color; // 赋值给 Image 组件的 color 属性
-					frame.color = color;
-					slot.color = color;
-					costTag.color = color;
-
-					backGround.sprite = Resources.LoadAll<Sprite>("CardFrame/frame2.0")[23];
-				}
-				break;
-			case "LightArmor":
-				if (UnityEngine.ColorUtility.TryParseHtmlString("#429656", out color)) // 尝试解析色号字符串，如果成功，返回 true 并赋值给 color 变量
-				{
-					NameTag.color = color; // 赋值给 Image 组件的 color 属性
-					frame.color = color;
-					slot.color = color;
-					costTag.color = color;
-
-					backGround.sprite = Resources.LoadAll<Sprite>("CardFrame/frame2.0")[24];
-				}
-				break;
-			case "Construction":
-				if (UnityEngine.ColorUtility.TryParseHtmlString("#7855A5", out color)) // 尝试解析色号字符串，如果成功，返回 true 并赋值给 color 变量
-				{
-					NameTag.color = color; // 赋值给 Image 组件的 color 属性
-					frame.color = color;
-					slot.color = color;
-					costTag.color = color;
-
-					backGround.sprite = Resources.LoadAll<Sprite>("CardFrame/frame2.0")[25];
-				}
-				break;
-		}
+		InspectPanel.alpha = 0f;
 	}
 
 
 
-
-
-	public void UpdateInfo(int cost, int attackPoint, int healthPoint, int maxHealthPoint, int attackCounter, int operateCounter, 
+	public void UpdateInfo(int cost, int attackPoint, int healthPoint, int maxHealthPoint, int attackCounter, int operateCounter,
 		ElementState state, int moveRange, bool aura)
 	{
 		this.cost = cost;
@@ -227,19 +119,17 @@ public class UnitElementController : BattleElementController,
 
 		if (operateCounter == 0)
 		{
-			mask.DOColor(new Color(0, 0, 0, 0.5f), duration);
+			operateMask.DOColor(new Color(0, 0, 0, 0.5f), duration);
 		}
 		else
 		{
-			mask.DOColor(new Color(0, 0, 0, 0), duration);
+			operateMask.DOColor(new Color(0, 0, 0, 0), duration);
 		}
-		if(state == ElementState.inBattleLine)
+		if (state == ElementState.inBattleLine)
 		{
 			costTag.gameObject.SetActive(false);
 			costText.gameObject.SetActive(false);
 		}
-
-
 		//DOTween.To(
 		//	() => "", // getter返回空字符串
 		//	value => nameText.text = value, // setter设置costText的内容
@@ -247,32 +137,10 @@ public class UnitElementController : BattleElementController,
 		//	0.2f
 		//).SetEase(Ease.Linear); // 设置动画为线性变化
 	}
-
-
-
-
-	public Vector3 arrowScale;
-	public Vector3 enlargeArrowScale;
-
-
-
-	//TODO remove
-	public UnitElementController t1;
-	public UnitElementController t2;
-	public UnitElementController t3;
-	public UnitElementController target;
 	public void UpdateTarget(IUnitElementController t1, IUnitElementController t2, IUnitElementController t3, IUnitElementController target, int targetIdx)
 	{
-		this.t1 = t1 as UnitElementController;
-		this.t2 = t2 as UnitElementController;
-		this.t3 = t3 as UnitElementController;
 		this.target = target as UnitElementController;
 
-		//Debug.Log("line: " + line.lineIdx + "res: " + resIdx);
-		//Debug.Log(this.t1?.resIdx);
-		//Debug.Log(this.t2?.resIdx);
-		//Debug.Log(this.t3?.resIdx);
-		//Debug.Log(targetIdx);
 		switch (targetIdx)
 		{
 			case 0:
@@ -305,8 +173,9 @@ public class UnitElementController : BattleElementController,
 
 
 
-	public int attackOrder = 0;
-	public int oriOrder = -100;
+
+
+
 
 
 	/// <summary>
@@ -322,20 +191,23 @@ public class UnitElementController : BattleElementController,
 		Vector3 oriPosition = logicPosition;
 		Vector3 dstPosition = target.logicPosition;
 
-		Debug.Log("line: " + line.lineIdx + "res: " + resIdx + " attacked " + "line: " + target.line.lineIdx + "res: " + target.resIdx);
+		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + " attacked " + "line: " + target.battleLine.lineIdx + "res: " + target.resIdx);
 
+		//安全间隔
 		battleSceneManager.rotateSequence.AppendInterval(BattleLineController.updateTime + 0.2f);
 		battleSceneManager.sequenceTime += BattleLineController.updateTime + 0.2f;
 		//TODO time config
+		//层级设置
 		battleSceneManager.rotateSequence.InsertCallback(battleSceneManager.sequenceTime,
 			() =>
 			{
 				canvas.sortingOrder = attackOrder;
 			});
+		//动画设置
 		battleSceneManager.rotateSequence.Append(
-			transform.DOMove(dstPosition, 0.2f).OnComplete(() =>
+			transform.DOMove(dstPosition, forwardTime).OnComplete(() =>
 			{
-				transform.DOMove(oriPosition, 0.2f).OnComplete(() => line.UpdateElementPosition());
+				transform.DOMove(oriPosition, backlashTime).OnComplete(() => battleLine.UpdateElementPosition());
 				input.UpdateManual();
 			})
 		);
@@ -354,13 +226,13 @@ public class UnitElementController : BattleElementController,
 		UnitElementController controller = target as UnitElementController;
 		Vector3 oriPosition = logicPosition;
 
-		Debug.Log("line: " + line.lineIdx + "res: " + resIdx + " random attacked " + "line: " + controller.line.lineIdx + "res: " + controller.resIdx);
+		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + " random attacked " + "line: " + controller.battleLine.lineIdx + "res: " + controller.resIdx);
 
 		battleSceneManager.rotateSequence.AppendInterval(BattleLineController.updateTime + 0.2f);
 		battleSceneManager.sequenceTime += BattleLineController.updateTime + 0.2f;
 
 		battleSceneManager.rotateSequence.Append(
-			transform.DOMove(transform.position + 100f * Vector3.up * (2 * ownership - 1), forwardTime).OnComplete(() =>
+			transform.DOMove(logicPosition + 100f * Vector3.up * (2 * ownership - 1), forwardTime).OnComplete(() =>
 			{
 				transform.DOMove(oriPosition, backlashTime);
 				input.UpdateManual();
@@ -441,27 +313,23 @@ public class UnitElementController : BattleElementController,
 					healthText.DOColor(Color.white, forwardTime / 2f);
 				})
 			);
-
-
 	}
 	/// <summary>
 	/// 
 	/// </summary>
 	public void TerminateAnimationEvent(string method)
 	{
-		Debug.Log("line: " + line.lineIdx + "res: " + resIdx + " destroyed!");
+		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + " destroyed!");
 
 
 		battleSceneManager.rotateSequence.InsertCallback(battleSceneManager.sequenceTime,
 				() =>
 				{
-					line.ElementRemove(resIdx);
+					battleLine.ElementRemove(resIdx);
 					gameObject.SetActive(false);
 					input.UpdateManual();
 				}
 			);
-		//battleSceneManager.rotateSequence.AppendInterval(0.4f);
-		//battleSceneManager.sequenceTime += 0.4f;
 	}
 
 	public void CleaveAttackAnimationEvent(int resIdx, int count)
@@ -473,20 +341,23 @@ public class UnitElementController : BattleElementController,
 		Vector3 oriPosition = logicPosition;
 		Vector3 dstPosition = target.logicPosition;
 
-		Debug.Log("line: " + line.lineIdx + "res: " + resIdx + " attacked " + "line: " + target.line.lineIdx + "res: " + target.resIdx);
+		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + " attacked " + "line: " + target.battleLine.lineIdx + "res: " + target.resIdx);
 
+		//安全间隔
 		battleSceneManager.rotateSequence.AppendInterval(BattleLineController.updateTime + 0.2f);
 		battleSceneManager.sequenceTime += BattleLineController.updateTime + 0.2f;
 		//TODO time config
+		//层级设置
 		battleSceneManager.rotateSequence.InsertCallback(battleSceneManager.sequenceTime,
 			() =>
 			{
 				canvas.sortingOrder = attackOrder;
 			});
+		//动画设置
 		battleSceneManager.rotateSequence.Append(
-			transform.DOMove(dstPosition, 0.2f).OnComplete(() =>
+			transform.DOMove(dstPosition, forwardTime).OnComplete(() =>
 			{
-				transform.DOMove(oriPosition, 0.2f).OnComplete(() => line.UpdateElementPosition());
+				transform.DOMove(oriPosition, backlashTime).OnComplete(() => battleLine.UpdateElementPosition());
 				input.UpdateManual();
 			})
 		);
@@ -531,12 +402,39 @@ public class UnitElementController : BattleElementController,
 
 
 
+
+
+
+
+
+
+
+
+
+
+	private float timer = 0;
+	void Update()
+	{
+		// 如果鼠标悬停在元素上
+		if (timer > 0)
+		{
+			// 计时器递减
+			timer -= Time.deltaTime;
+			// 如果计时器小于等于 0
+			if (timer <= 0)
+			{
+				// 播放动画
+				//TODO 检视
+				canvas.sortingOrder = attackOrder;
+			}
+		}
+	}
 	public override void OnDrag(PointerEventData eventData)
 	{
 		base.OnDrag(eventData);
 		timer = -1;
+		InspectPanel.alpha = 0;
 	}
-
 
 	public override void OnBeginDrag(PointerEventData eventData)
 	{
@@ -560,20 +458,20 @@ public class UnitElementController : BattleElementController,
 	public override void OnEndDrag(PointerEventData eventData)
 	{
 		base.OnEndDrag(eventData);
+
+		HandicapController.isDragging = false;
 		//部署条件判定
 		if (dataState == ElementState.inHandicap)
 		{
-			HandicapController.isDragging = false; // 结束拖动
 			if (battleSceneManager.PlayerDeploy(eventData.position, this.handicapIdx) >= 0)
 			{
 				return;
 			}
 			handicap.Insert(this);
 		}
-		//移动条件判定
+		//移动撤退条件判定
 		if (dataState == ElementState.inBattleLine)
 		{
-			//好逆天的回调。。
 			if (operateCounter <= 0)
 			{
 				return;
@@ -582,16 +480,15 @@ public class UnitElementController : BattleElementController,
 			{
 				return;
 			}
-			HandicapController.isDragging = false;
-			if (battleSceneManager.PlayerMove(eventData.position, this.line, this) >= 0)
+			if (battleSceneManager.PlayerMove(eventData.position, this.battleLine, this) >= 0)
 			{
 				return;
 			}
-			else if (battleSceneManager.PlayerRetreat(eventData.position, this.line, this) >= 0)
+			if (this.battleLine.lineIdx == 0 && battleSceneManager.PlayerRetreat(eventData.position, this.battleLine, this) >= 0)
 			{
 				return;
 			}
-			line.Insert(this);
+			battleLine.Insert(this);
 		}
 	}
 
@@ -615,8 +512,6 @@ public class UnitElementController : BattleElementController,
 		{
 			timer = -1;
 			//TODO 检视
-			descriptionText.gameObject.SetActive(false);
-			descriptionPanel.DOColor(Color.clear, 0.1f);
 
 			canvas.sortingOrder = oriOrder;
 			return;
@@ -642,51 +537,4 @@ public class UnitElementController : BattleElementController,
 		}
 		return -1;
 	}
-
-
-
-
-
-	//public int GetDeployPos(float position)
-	//{
-	//	if (count >= capacity)
-	//	{
-	//		return -1;
-	//	}
-	//	float vtcPos = position - 1980f;
-	//	int pos;
-	//	//CRITICAL ALGORITHM
-	//	if (count % 2 == 0)
-	//	{
-	//		int start = count / 2;
-	//		//一半卡牌 + 一半间隔
-	//		int offset = vtcPos > 0 ? (int)((vtcPos + (cardWidth + interval) / 2) / (cardWidth + interval))
-	//			: (int)((vtcPos - (cardWidth + interval) / 2) / (cardWidth + interval));
-	//		pos = start + offset;
-	//		if (start + offset < 0)
-	//		{
-	//			pos = 0;
-	//		}
-	//		else if (start + offset > count)
-	//		{
-	//			pos = count;
-	//		}
-	//	}
-	//	else
-	//	{
-	//		int offset = (int)(vtcPos / (cardWidth + interval));
-	//		int start = vtcPos > 0 ? (count / 2 + 1) : (count / 2);
-	//		pos = start + offset;
-	//		if (start + offset < 0)
-	//		{
-	//			pos = 0;
-	//		}
-	//		else if (start + offset > count)
-	//		{
-	//			pos = count;
-	//		}
-	//	}
-
-	//	return pos;
-	//}
 }

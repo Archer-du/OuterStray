@@ -92,6 +92,8 @@ namespace EventEffectModels
 
 	internal class EffectsTable
 	{
+		internal BattleElement source;
+
 		internal Hashtable effectsTable;
 		internal Hashtable argsTable;
 		internal Hashtable buffer;
@@ -140,7 +142,7 @@ namespace EventEffectModels
 				{
 					if (i != element.targetIdx)
 					{
-						element.attackRange[i]?.Damaged(element.dynAttack, "immediate");
+						element.attackRange[i]?.Damaged(element.dynAttackReader, "immediate");
 					}
 				}
 			}
@@ -260,20 +262,8 @@ namespace EventEffectModels
 
 			target?.Damaged(damage, "append");
 		}
-		internal void DoubleRecovery(BattleElement source, BattleSystem system)
-		{
-			UnitElement element = source as UnitElement;
-			element.recover *= 2;
-		}
-		internal void UnitGain(BattleElement source, BattleSystem system)
-		{
-			UnitElement element = source as UnitElement;
-			int argsNum = 2;
 
 
-			element.DynAttack += ((List<int>)argsTable["UnitGain"])[0];
-			element.maxHealth += ((List<int>)argsTable["UnitGain"])[1];
-		}
 
 		internal void RandomRecoverDamaged(BattleElement source, BattleSystem system)
 		{
@@ -302,7 +292,39 @@ namespace EventEffectModels
 				system.battleLines[system.frontLines[element.ownership]][i].Damaged(damage, "immediate");
 			}
 		}
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="element"></param>
+		/// <param name="system"></param>
+		internal void TokenGain(BattleElement target, BattleSystem system)
+		{
+			int argNum = 3;
 
+			int category = ((List<int>)argsTable["TokenGain"])[0];
+			int atkGain = ((List<int>)argsTable["TokenGain"])[1];
+			int maxhealthGain = ((List<int>)argsTable["TokenGain"])[2];
+
+			string ID = null;
+			switch (category)
+			{
+				case 0:
+					ID = "mush_00";
+					break;
+			}
+
+			if (!system.UnitIDDic.ContainsKey(ID)) return;
+			if (system.UnitIDDic[ID].Count == 0) return;
+
+			foreach (UnitElement unit in system.UnitIDDic[ID])
+			{
+				if (unit.state == ElementState.inBattleLine)
+				{
+					unit.dynAttackWriter += atkGain;
+					unit.maxHealthWriter += maxhealthGain;
+				}
+			}
+		}
 
 
 
@@ -581,73 +603,69 @@ namespace EventEffectModels
 
 		internal void Aura(BattleElement source, BattleSystem system)
 		{
-			UnitElement element = source as UnitElement;
-			int argsNum = 3;
-			if (!argsTable.ContainsKey("Aura"))
-			{
-				throw new InvalidOperationException("argsTable fault");
-			}
-			if (((List<int>)argsTable["Aura"]).Count != argsNum)
-			{
-				throw new InvalidOperationException("argsTable list length invalid");
-			}
+			UnitElement publisher = this.source as UnitElement;
 
-			element.aura = true;
-			system.eventTable[0].RegisterHandler("UpdateAura", element.AuraGain);
-			system.eventTable[1].RegisterHandler("UpdateAura", element.AuraGain);
-
-
-			//作用范围
-			int range = ((List<int>)argsTable["Aura"])[0];
-			//作用效果
-			int type = ((List<int>)argsTable["Aura"])[1];
-			//作用数值
-			int value = ((List<int>)argsTable["Aura"])[2];
-
+			publisher.aura = true;
 		}
 		internal void AuraUnload(BattleElement source, BattleSystem system)
 		{
-			UnitElement element = source as UnitElement;
+			UnitElement publisher = this.source as UnitElement;
 
-			element.aura = false;
-		}
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="element"></param>
-		/// <param name="system"></param>
-		internal void TokenGain(BattleElement source, BattleSystem system)
-		{
-			int argNum = 3;
+			publisher.aura = false;
 
-
-
-			int category = ((List<int>)argsTable["TokenGain"])[0];
-			int atkGain = ((List<int>)argsTable["TokenGain"])[1];
-			int maxhealthGain = ((List<int>)argsTable["TokenGain"])[2];
-
-			string ID = null;
-			switch (category)
+			for(int i = 0; i < system.deployQueue.Count; i++)
 			{
-				case 0:
-					ID = "mush_00";
-					break;
-			}
-
-			if (!system.UnitIDDic.ContainsKey(ID)) return;
-			if (system.UnitIDDic[ID].Count == 0) return;
-
-			foreach (UnitElement unit in system.UnitIDDic[ID])
-			{
-				if (unit.state == ElementState.inBattleLine)
+				if (system.deployQueue[i].attackGain.ContainsKey(publisher.battleID))
 				{
-					unit.DynAttack += atkGain;
-					unit.maxHealth += maxhealthGain;
+					system.deployQueue[i].attackGain.Remove(publisher.battleID);
+				}
+				if (system.deployQueue[i].maxHealthGain.ContainsKey(publisher.battleID))
+				{
+					system.deployQueue[i].maxHealthGain.Remove(publisher.battleID);
 				}
 			}
 		}
+		internal void AuraDisable(BattleElement target, BattleSystem system)
+		{
+			UnitElement publisher = this.source as UnitElement;
+			UnitElement element = target as UnitElement;
+
+			if (element.attackGain.ContainsKey(publisher.battleID))
+			{
+				element.attackGain.Remove(publisher.battleID);
+			}
+			if (element.maxHealthGain.ContainsKey(publisher.battleID))
+			{
+				element.maxHealthGain.Remove(publisher.battleID);
+			}
+		}
+		
 
 
+
+
+		internal void UnitGain(BattleElement target, BattleSystem system)
+		{
+			UnitElement publisher = this.source as UnitElement;
+			if (!publisher.aura)
+			{
+				return;
+			}
+			UnitElement element = target as UnitElement;
+
+			int argsNum = 2;
+
+			int atkGain = ((List<int>)argsTable["UnitGain"])[0];
+			int mhpGain = ((List<int>)argsTable["UnitGain"])[1];
+
+			element.attackGain.Add(publisher.battleID, atkGain);
+			element.maxHealthGain.Add(publisher.battleID, mhpGain);
+		}
+		internal void DoubleRecovery(BattleElement source, BattleSystem system)
+		{
+			UnitElement element = source as UnitElement;
+			element.recover *= 2;
+		}
 
 
 
@@ -756,8 +774,8 @@ namespace EventEffectModels
 
 			UnitElement unit = new UnitElement(card, system);
 
-			unit.dynAttack = system.handicaps[element.ownership].count > 0 ? system.handicaps[element.ownership].count : 1;
-			unit.maxHealth = system.handicaps[element.ownership].count > 0 ? system.handicaps[element.ownership].count : 1;
+			unit.dynAttackWriter = system.handicaps[element.ownership].count > 0 ? system.handicaps[element.ownership].count : 1;
+			unit.maxHealthWriter = system.handicaps[element.ownership].count > 0 ? system.handicaps[element.ownership].count : 1;
 
 			SummonToPosition(element, system, 2, unit);
 		}
@@ -783,11 +801,15 @@ namespace EventEffectModels
 
 
 
-		internal EffectsTable()
+		internal EffectsTable(BattleElement source)
 		{
+			this.source	= source;
 			//新效果方法在这里注册
 			effectsTable = new Hashtable()
 			{
+				{"Aura", (BattleEventHandler)Aura },
+				{"AuraUnload", (BattleEventHandler)AuraUnload },
+				{"AuraDisable", (BattleEventHandler)AuraDisable },
 				{"Assault", (BattleEventHandler)Assault },
 				{"AssaultOnEnable", (BattleEventHandler)AssaultOnEnable },
 				{"Raid", (BattleEventHandler)Raid },
@@ -824,6 +846,9 @@ namespace EventEffectModels
 			//如果需要参数，请在这里注册
 			argsTable = new Hashtable()
 			{
+				{"Aura", null },
+				{"AuraUnload", null },
+				{"AuraDisable", null },
 				{"Assault", null },
 				{"AssaultOnEnable", null },
 				{"Raid", null },

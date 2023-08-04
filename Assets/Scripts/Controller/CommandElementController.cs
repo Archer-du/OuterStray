@@ -19,68 +19,43 @@ public class CommandElementController : BattleElementController,
 
 
 	public TMP_Text durabilityText;
-	public TMP_Text costText;
 
 	public int durability;
 	public string type;
 
-	public void Init(string ID, int ownership, string name, string type, string description)
+	public void CommandInit(string ID, int ownership, string name, string type, string description)
 	{
-		this.ownership = ownership;
-		this.nameContent = name;
-		this.category = "Command";
+		Init(ID, ownership, name, "Command", description);
+
 		this.type = type;
-		this.description = description;
-
-		LoadCardResources(ID);
-
-		preprocessed = ownership;
-
-		originScale = transform.localScale;
-		enlargeScale = 1.35f * originScale;
-
-		originTextScale = nameText.transform.localScale;
-		targetTextScale = nameText.transform.localScale * 1.5f;
-
-
-		descriptionPanel.color = Color.clear;
-		descriptionText.gameObject.SetActive(false);
 	}
 
-	public void UpdateInfo(int cost, int durability)
+	public void UpdateInfo(int cost, int durability, ElementState state)
 	{
 		this.cost = cost;
 		this.durability = durability;
+		this.dataState = state;
 
 		nameText.text = nameContent;
 		costText.text = cost.ToString();
 		durabilityText.text = durability.ToString();
-		descriptionText.text = description;
 	}
 
 
-	/// <summary>
-	/// 读取卡面图像音频等资源
-	/// </summary>
-	private void LoadCardResources(string ID)
-	{
-		CardImage.sprite = Resources.Load<Sprite>("CardImage/" + ID);
-		CardImage.rectTransform.sizeDelta = new Vector2(10, 13);
-		if (ownership == 1)
-		{
-			//TODO
-		}
-	}
 
 
-	public void RetreatAnimationEvent(string method)
+
+
+
+
+	public void CastAnimationEvent(string method)
 	{
 		float castTime = 0.4f;
 		float waitTime = 0.4f;
 
 		if (method == "append")
 		{
-			battleSceneManager.rotateSequence.Append(transform.DOMove(new Vector3(1920, 1080, 0), castTime));
+			battleSceneManager.rotateSequence.Append(transform.DOMove(new Vector3(1920 / 2, 1080 / 2, 0), castTime));
 			battleSceneManager.rotateSequence.AppendInterval(waitTime);
 			Vector3 rotateBy = new Vector3(0, 0, ((ownership * 2) - 1) * 90);
 			battleSceneManager.rotateSequence.Append(
@@ -93,7 +68,7 @@ public class CommandElementController : BattleElementController,
 		}
 		else
 		{
-			battleSceneManager.rotateSequence.Append(transform.DOMove(new Vector3(1920, 1080, 0), castTime));
+			battleSceneManager.rotateSequence.Append(transform.DOMove(new Vector3(1920 / 2, 1080 / 2, 0), castTime));
 			battleSceneManager.rotateSequence.AppendInterval(waitTime);
 			Vector3 rotateBy = new Vector3(0, 0, ((ownership * 2) - 1) * 90);
 			battleSceneManager.rotateSequence.Append(
@@ -105,6 +80,11 @@ public class CommandElementController : BattleElementController,
 			battleSceneManager.sequenceTime += castTime + waitTime;
 		}
 	}
+
+
+
+
+
 
 
 	public override void OnBeginDrag(PointerEventData eventData)

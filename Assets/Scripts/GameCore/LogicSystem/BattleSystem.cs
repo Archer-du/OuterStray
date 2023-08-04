@@ -9,8 +9,6 @@ using DisplayInterface;
 using SystemEventHandler;
 using System;
 using DataCore.CultivateItems;
-using System.Xml.Linq;
-using PlasticGui;
 using DataCore.Cards;
 
 namespace LogicCore
@@ -433,8 +431,10 @@ namespace LogicCore
 			{
 				element.Cast(battleLines[dstLineIdx][dstIdx]);
 			}
-
-			stacks[TURN].Push(element);
+			if(element.dynDurability > 0)
+			{
+				stacks[TURN].Push(element);
+			}
 
 			//更新前线指针
 			UpdateFrontLine();
@@ -787,7 +787,7 @@ namespace LogicCore
 			Random random = new Random();
 			int counter = random.Next(1, enemyNum + 1);
 			//从敌方战线开始
-			int line = linesCapacity - 1;
+			int line = TURN == 0 ? linesCapacity - 1 : 0;
 			while (counter > 0)
 			{
 				counter -= battleLines[line].count;
@@ -795,7 +795,8 @@ namespace LogicCore
 				{
 					return battleLines[line][battleLines[line].count - 1 + counter];
 				}
-				line--;
+				if(TURN == 0) { line--; }
+				else { line++; }
 			}
 			return null;
 		}
@@ -814,7 +815,7 @@ namespace LogicCore
 			{
 				if (deployQueue[i].state == ElementState.inBattleLine)
 				{
-					if (deployQueue[i].maxHealth > deployQueue[i].dynHealth)
+					if (deployQueue[i].maxHealthReader > deployQueue[i].dynHealth)
 					{
 						return deployQueue[i];
 					}
