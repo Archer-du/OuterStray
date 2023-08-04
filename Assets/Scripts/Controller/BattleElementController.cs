@@ -19,7 +19,7 @@ public class BattleElementController : MonoBehaviour,
 {
 	public BattleSceneManager battleSceneManager;
 
-	
+	public Transform stack;
 
 	public static int cardWidth = 360;
 
@@ -89,10 +89,12 @@ public class BattleElementController : MonoBehaviour,
 		handicap = battleSceneManager.handicapController[ownership];
 
 		buffer = GameObject.Find("Buffer").transform;
+
+		stack = battleSceneManager.cardStackController[ownership].transform;
 	}
 
 
-	public void OnDrag(PointerEventData eventData)
+	public virtual void OnDrag(PointerEventData eventData)
 	{
 		if (ownership != 0)
 		{

@@ -143,6 +143,35 @@ public class BattleLineController : MonoBehaviour,
 
 		return pos;
 	}
+	public int GetCastPos(float position)
+	{
+		float vtcPos = position - 1980f;
+		int pos;
+
+		if(count % 2 == 0)
+		{
+			int start = count / 2;
+			int offset = vtcPos > 0 ? (int)(vtcPos / (cardWidth + interval)) 
+				: (int)((vtcPos - cardWidth - interval) / (cardWidth + interval));
+			pos = start + offset;
+			if(pos < 0 || pos > count - 1)
+			{
+				return -1;
+			}
+		}
+		else
+		{
+			int start = count / 2;
+			int offset = vtcPos + (cardWidth + interval) / 2 > 0 ? (int)((vtcPos - (cardWidth + interval) / 2) / (cardWidth + interval))
+				: (int)((vtcPos - 3 * (cardWidth + interval) / 2) / (cardWidth + interval));
+			pos = start + offset;
+			if (pos < 0 || pos > count - 1)
+			{
+				return -1;
+			}
+		}
+		return pos;
+	}
 	//TODO
 	public int GetVerticalMovePos(float position)
 	{
@@ -254,5 +283,9 @@ public class BattleLineController : MonoBehaviour,
 	public Vector3 GetInsertionPosition(int index, int count)
 	{
 		return transform.position + new Vector3((index - count / 2) * cardWidth + cardWidth / 2 * ((count + 1) % 2), 0, 0);
+	}
+	public Vector3 GetLogicPosition(int index, int lineIdx)
+	{
+		return new Vector3(0, -234 + lineIdx * 400, 0) + new Vector3((index - count / 2) * cardWidth + cardWidth / 2 * ((count + 1) % 2), 0, 0);
 	}
 }

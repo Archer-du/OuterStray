@@ -64,6 +64,8 @@ namespace DisplayInterface
 
 		public IUnitElementController InstantiateBase(int turn);
 
+		public IUnitElementController InstantiateUnitInStack(int turn);
+
 
 		//public void PushElementIntoHandicap(IUnitElementController element);
 		//public void PushElementIntoHandicap(int turn, IUnitElementController element);
@@ -124,13 +126,15 @@ namespace DisplayInterface
 
 		public void DamageAnimationEvent(int health, string method);
 
+		public void RecoverAnimationEvent(int recover, string method);
+
 		public void TerminateAnimationEvent(string method);
 
 		public void RetreatAnimationEvent(string method);
 	}
 	public interface ICommandElementController : IBattleElementController
 	{
-		public void Init(string ID, int ownership, string name, string description);
+		public void Init(string ID, int ownership, string name, string type, string description);
 
 		public void UpdateInfo(int cost, int durability);
 		public void RetreatAnimationEvent(string method);

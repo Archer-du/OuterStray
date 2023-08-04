@@ -264,7 +264,7 @@ namespace DataCore.BattleItems
 		}
 		internal void Push(BattleElement element)
 		{
-			stack.Insert(0, element);
+			stack.Insert(count - 1, element);
 
 			if (element is UnitElement)
 			{
@@ -273,7 +273,8 @@ namespace DataCore.BattleItems
 			}
 			else
 			{
-				//TODO
+				CommandElement comm = element as CommandElement;
+				comm.state = ElementState.inStack;
 			}
 
 			UpdateStackIdx();

@@ -27,9 +27,6 @@ public class UnitElementController : BattleElementController,
 	public IUnitInput input;
 
 
-
-	public Transform stack;
-
 	public BattleLineController line;
 	public int resIdx;
 
@@ -72,7 +69,25 @@ public class UnitElementController : BattleElementController,
 	public ControllerState controllerState;
 
 
+	private float timer = 0;
+	void Update()
+	{
+		// 如果鼠标悬停在元素上
+		if (timer > 0)
+		{
+			// 计时器递减
+			timer -= Time.deltaTime;
+			// 如果计时器小于等于 0
+			if (timer <= 0)
+			{
+				// 播放动画
+				//TODO 检视
+				canvas.sortingOrder = attackOrder;
 
+				descriptionPanel.DOColor(Color.gray, 0.2f).OnComplete(() => descriptionText.gameObject.SetActive(true));
+			}
+		}
+	}
 
 	/// <summary>
 	/// 从牌堆加入手牌或战场时初始化
@@ -121,6 +136,10 @@ public class UnitElementController : BattleElementController,
 		if (ownership == 1)
 		{
 			CardImage.rectTransform.sizeDelta = new Vector2(10, 13);
+		}
+		else
+		{
+			CardImage.rectTransform.sizeDelta = new Vector2(10, 11);
 		}
 		switch (category)
 		{
@@ -387,6 +406,41 @@ public class UnitElementController : BattleElementController,
 					healthText.DOColor(Color.white, forwardTime / 2f);
 				})
 			);
+	}
+	public void RecoverAnimationEvent(int health, string method)
+	{
+		float forwardTime = 0.2f;
+
+		if (method == "append")
+		{
+			battleSceneManager.rotateSequence.Append(
+				transform.DOShakeRotation(forwardTime, 20f)
+				);
+			battleSceneManager.sequenceTime += forwardTime;
+		}
+		else
+		{
+			battleSceneManager.rotateSequence.Join(
+				transform.DOShakeRotation(forwardTime, 20f)
+				);
+		}
+		//放大
+		battleSceneManager.rotateSequence.Join(
+			healthText.transform.DOScale(targetTextScale, forwardTime / 2f)
+				.OnComplete(() =>
+				{
+					healthText.text = health.ToString();
+					healthText.transform.DOScale(originTextScale, forwardTime / 2f);
+				})
+			);
+		//变色
+		battleSceneManager.rotateSequence.Join(
+			healthText.DOColor(Color.green, forwardTime / 2f)
+				.OnComplete(() =>
+				{
+					healthText.DOColor(Color.white, forwardTime / 2f);
+				})
+			);
 
 
 	}
@@ -444,15 +498,23 @@ public class UnitElementController : BattleElementController,
 
 		if(method == "append")
 		{
+			Vector3 rotateBy = new Vector3(0, 0, ((ownership * 2) - 1) * 90);
 			battleSceneManager.rotateSequence.Append(
 				transform.DOMove(stack.transform.position + 500 * Vector3.left, retreatTime)
+				);
+			battleSceneManager.rotateSequence.Join(
+				transform.DOBlendableRotateBy(rotateBy, retreatTime)
 				);
 			battleSceneManager.sequenceTime += retreatTime;
 		}
 		else
 		{
+			Vector3 rotateBy = new Vector3(0, 0, ((ownership * 2) - 1) * 90);
 			battleSceneManager.rotateSequence.Append(
 				transform.DOMove(stack.transform.position + 500 * Vector3.left, retreatTime)
+				);
+			battleSceneManager.rotateSequence.Join(
+				transform.DOBlendableRotateBy(rotateBy, retreatTime)
 				);
 			battleSceneManager.sequenceTime += retreatTime;
 		}
@@ -469,7 +531,11 @@ public class UnitElementController : BattleElementController,
 
 
 
-
+	public override void OnDrag(PointerEventData eventData)
+	{
+		base.OnDrag(eventData);
+		timer = -1;
+	}
 
 
 	public override void OnBeginDrag(PointerEventData eventData)
@@ -486,7 +552,7 @@ public class UnitElementController : BattleElementController,
 			{
 				return;
 			}
-
+			timer = -1;
 			HandicapController.isDragging = true;
 		}
 	}
@@ -535,11 +601,9 @@ public class UnitElementController : BattleElementController,
 
 		if (dataState == ElementState.inBattleLine)
 		{
-			////TODO 检视
-			//canvas.sortingOrder = upperOrder;
+			timer = 0.8f;
 
-			//descriptionPanel.DOColor(Color.gray, 0.2f).OnComplete(() => descriptionText.gameObject.SetActive(true));
-			//return;
+			return;
 		}
 	}
 
@@ -549,11 +613,13 @@ public class UnitElementController : BattleElementController,
 
 		if (dataState == ElementState.inBattleLine)
 		{
-			////TODO 检视
-			//descriptionText.gameObject.SetActive(false);
-			//descriptionPanel.DOColor(Color.clear, 0.1f);
-			//line.UpdateElementPosition();
-			//return;
+			timer = -1;
+			//TODO 检视
+			descriptionText.gameObject.SetActive(false);
+			descriptionPanel.DOColor(Color.clear, 0.1f);
+
+			canvas.sortingOrder = oriOrder;
+			return;
 		}
 	}
 

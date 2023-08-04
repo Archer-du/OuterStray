@@ -258,7 +258,7 @@ namespace EventEffectModels
 					break;
 			}
 
-			target?.Damaged(damage, "immediate");
+			target?.Damaged(damage, "append");
 		}
 		internal void DoubleRecovery(BattleElement source, BattleSystem system)
 		{
@@ -432,6 +432,8 @@ namespace EventEffectModels
 				case 0:
 					if (system.battleLines[system.supportLines[element.ownership]].Receiveable())
 					{
+						unit.controller = system.controller.InstantiateUnitInStack(element.ownership);
+						unit.Init();
 						unit.Deploy(system, system.battleLines[system.supportLines[element.ownership]], 0);
 					}
 					break;
@@ -439,6 +441,8 @@ namespace EventEffectModels
 				case 1:
 					if (element.battleLine.Receiveable())
 					{
+						unit.controller = system.controller.InstantiateUnitInStack(element.ownership);
+						unit.Init();
 						unit.Deploy(system, element.battleLine, 0);
 					}
 					break;
@@ -446,6 +450,8 @@ namespace EventEffectModels
 				case 2:
 					if (system.battleLines[system.frontLines[element.ownership]].Receiveable())
 					{
+						unit.controller = system.controller.InstantiateUnitInStack(element.ownership);
+						unit.Init();
 						unit.Deploy(system, system.battleLines[system.frontLines[element.ownership]], 0);
 					}
 					break;
@@ -494,44 +500,11 @@ namespace EventEffectModels
 				}
 				UnitElement unit = new UnitElement(card, system);
 
+
 				SummonToPosition(element, system, position, unit);
 			}
 		}
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="element"></param>
-		/// <param name="system"></param>
-		internal void TokenGain(BattleElement source, BattleSystem system)
-		{
-			int argNum = 3;
 
-
-
-			int category = ((List<int>)argsTable["TokenGain"])[0];
-			int atkGain = ((List<int>)argsTable["TokenGain"])[1];
-			int maxhealthGain = ((List<int>)argsTable["TokenGain"])[2];
-
-			string ID = null;
-			switch (category)
-			{
-				case 0:
-					ID = "mush_00";
-					break;
-			}
-
-			if (!system.UnitIDDic.ContainsKey(ID)) return;
-			if (system.UnitIDDic[ID].Count == 0) return;
-
-			foreach(UnitElement unit in system.UnitIDDic[ID])
-			{
-				if(unit.state == ElementState.inBattleLine)
-				{
-					unit.DynAttack += atkGain;
-					unit.maxHealth += maxhealthGain;
-				}
-			}
-		}
 		internal void TargetDamage(BattleElement source, BattleSystem system)
 		{
 			UnitElement target = source as UnitElement;
@@ -565,7 +538,7 @@ namespace EventEffectModels
 				case 2:
 					for(int i = 0; i < system.battleLines[system.frontLines[(BattleSystem.TURN + 1) % 2]].count; i++)
 					{
-						system.battleLines[system.frontLines[BattleSystem.TURN]][i].Damaged(damage, "immediate");
+						system.battleLines[system.frontLines[(BattleSystem.TURN + 1) % 2]][i].Damaged(damage, "immediate");
 					}
 					break;
 			}
@@ -590,6 +563,17 @@ namespace EventEffectModels
 					break;
 			}
 		}
+		internal void RecoverBase(BattleElement source, BattleSystem system)
+		{
+			int argsNum = 1;
+
+			int value = ((List<int>)argsTable["RecoverBase"])[0];
+
+			system.bases[BattleSystem.TURN].Recover(value);
+		}
+
+
+
 
 
 
@@ -621,7 +605,47 @@ namespace EventEffectModels
 			int value = ((List<int>)argsTable["Aura"])[2];
 
 		}
+		internal void AuraUnload(BattleElement source, BattleSystem system)
+		{
+			UnitElement element = source as UnitElement;
 
+			element.aura = false;
+		}
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="element"></param>
+		/// <param name="system"></param>
+		internal void TokenGain(BattleElement source, BattleSystem system)
+		{
+			int argNum = 3;
+
+
+
+			int category = ((List<int>)argsTable["TokenGain"])[0];
+			int atkGain = ((List<int>)argsTable["TokenGain"])[1];
+			int maxhealthGain = ((List<int>)argsTable["TokenGain"])[2];
+
+			string ID = null;
+			switch (category)
+			{
+				case 0:
+					ID = "mush_00";
+					break;
+			}
+
+			if (!system.UnitIDDic.ContainsKey(ID)) return;
+			if (system.UnitIDDic[ID].Count == 0) return;
+
+			foreach (UnitElement unit in system.UnitIDDic[ID])
+			{
+				if (unit.state == ElementState.inBattleLine)
+				{
+					unit.DynAttack += atkGain;
+					unit.maxHealth += maxhealthGain;
+				}
+			}
+		}
 
 
 
@@ -764,21 +788,73 @@ namespace EventEffectModels
 			//新效果方法在这里注册
 			effectsTable = new Hashtable()
 			{
-				//non args
-
-				//args
-				{"SummonToken", (BattleEventHandler)SummonToken },
+				{"Assault", (BattleEventHandler)Assault },
+				{"AssaultOnEnable", (BattleEventHandler)AssaultOnEnable },
+				{"Raid", (BattleEventHandler)Raid },
+				{"RaidOnEnable", (BattleEventHandler)RaidOnEnable },
+				{"Cleave", (BattleEventHandler)Cleave },
+				{"CleaveOnEnable", (BattleEventHandler)CleaveOnEnable },
+				{"Armor", (BattleEventHandler)Armor },
+				{"ArmorOnEnable", (BattleEventHandler)ArmorOnEnable },
 				{"Parry", (BattleEventHandler)Parry },
-				{"CLeave", (BattleEventHandler)Cleave },
-				{"Armor",(BattleEventHandler)Armor }
+				{"ParryOnEnable", (BattleEventHandler)ParryOnEnable },
+				{"ParryUnload", (BattleEventHandler)ParryUnload },
+				{"AttackCounterDecrease", (BattleEventHandler)AttackCounterDecrease },
+				{"DrawCardsRandom", (BattleEventHandler)DrawCardsRandom },
+				{"RandomDamage", (BattleEventHandler)RandomDamage },
+				{"DoubleRecovery", (BattleEventHandler)DoubleRecovery },
+				{"UnitGain", (BattleEventHandler)UnitGain },
+				{"RandomRecoverDamaged", (BattleEventHandler)RandomRecoverDamaged },
+				{"DamageAdjacent", (BattleEventHandler)DamageAdjacent },
+				{"RecruitByID", (BattleEventHandler)RecruitByID },
+				{"RecruitByCategory", (BattleEventHandler)RecruitByCategory },
+				{"SummonToken", (BattleEventHandler)SummonToken },
+				{"TokenGain", (BattleEventHandler)TokenGain },
+				{"TargetDamage", (BattleEventHandler)TargetDamage },
+				{"AOEDamage", (BattleEventHandler)AOEDamage },
+				{"AOERetreat", (BattleEventHandler)AOERetreat },
+				{"DrawCommandCardsRandomAndRecover", (BattleEventHandler)DrawCommandCardsRandomAndRecover },
+				{"Comm_Mush_07", (BattleEventHandler)Comm_Mush_07 },
+				{"Comm_Mush_08", (BattleEventHandler)Comm_Mush_08 },
+				{"Comm_Mush_13", (BattleEventHandler)Comm_Mush_13 },
+				{"Comm_Mush_18", (BattleEventHandler)Comm_Mush_18 },
+				{"RecoverBase", (BattleEventHandler)RecoverBase }
 			};
 
 			//如果需要参数，请在这里注册
 			argsTable = new Hashtable()
 			{
+				{"Assault", null },
+				{"AssaultOnEnable", null },
+				{"Raid", null },
+				{"RaidOnEnable", null },
+				{"Cleave", null },
+				{"CleaveOnEnable",	null },
+				{"Armor", null },
+				{"ArmorOnEnable", null },
+				{"Parry", null },
+				{"ParryOnEnable", null },
+				{"ParryUnload", null },
+				{"AttackCounterDecrease", null },
+				{"DrawCardsRandom", null },
+				{"RandomDamage", null },
+				{"DoubleRecovery", null },
+				{"UnitGain", null },
+				{"RandomRecoverDamaged", null },
+				{"DamageAdjacent", null },
+				{"RecruitByID", null },
+				{"RecruitByCategory", null },
 				{"SummonToken", null },
-				{"armor", null },
-				{"batter", null }
+				{"TokenGain", null },
+				{"TargetDamage", null },
+				{"AOEDamage", null },
+				{"AOERetreat", null },
+				{"DrawCommandCardsRandomAndRecover", null },
+				{"Comm_Mush_07", null },
+				{"Comm_Mush_08", null },
+				{"Comm_Mush_13", null },
+				{"Comm_Mush_18", null },
+				{"RecoverBase", null }
 			};
 
 			//TODO ignore

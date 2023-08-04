@@ -60,6 +60,7 @@ public class BattleSceneManager : MonoBehaviour,
 
 
 	public GameObject unitPrototype;
+	public GameObject commandPrototype;
 
 	/// <summary>
 	/// 战场战线容量
@@ -201,6 +202,8 @@ public class BattleSceneManager : MonoBehaviour,
 	public IBattleLineController InstantiateBattleLine(int idx, int capacity)
 	{
 		GameObject battleLine = Instantiate(battleLinePrototype, GameObject.Find("BattleField").transform);
+		//TODO
+		battleLine.transform.position = new Vector3(0, idx * 466 - 700, 0);
 		battleLineControllers[idx] = battleLine.GetComponent<BattleLineController>();
 		battleLineControllers[idx].lineIdx = idx;
 		return battleLineControllers[idx];
@@ -229,19 +232,25 @@ public class BattleSceneManager : MonoBehaviour,
 	{
 		return new Vector2(-1700, (ownership * 2 - 1) * 400f);
 	}
+
 	public IUnitElementController InstantiateBase(int turn)
 	{
 		Quaternion initRotation = Quaternion.Euler(new Vector3(0, 0, turn * 180));
 
-		Debug.Log(battleLineControllers[turn == 0 ? 0 : 3].GetLogicPosition(0));
-		GameObject unit = Instantiate(unitPrototype, battleLineControllers[turn == 0? 0 : 1].GetLogicPosition(0), initRotation);
-		unit.transform.SetParent(battleLineControllers[0].transform);
+
+		GameObject unit = Instantiate(unitPrototype, battleLineControllers[turn].GetLogicPosition(0, turn), initRotation);
 
 		return unit.GetComponent<UnitElementController>();
 	}
 
+	public IUnitElementController InstantiateUnitInStack(int turn)
+	{
+		Quaternion initRotation = Quaternion.Euler(new Vector3(0, 0, turn * 180));
 
+		GameObject unit = Instantiate(unitPrototype, transform.position - new Vector3(100, 0, 0), initRotation);
 
+		return unit.GetComponent<UnitElementController>();
+	}
 
 
 
@@ -340,13 +349,16 @@ public class BattleSceneManager : MonoBehaviour,
 			humanEnergy.transform.DOShakePosition(0.3f, 30f);
 			return -1;
 		}
+		int pos = battleLineControllers[idx].GetCastPos(position.x);
+		string type = (handicapController[0][handicapIdx] as CommandElementController).type;
+		if(pos < 0 && type == "Target") return -1;
 
 		rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
 
 		UnitElementController controller = handicapController[0].Pop(handicapIdx) as UnitElementController;
 
-		//battleSystem.Cast();
+		battleSystem.Cast(handicapIdx, idx, pos);
 
 		return 1;
 	}
@@ -452,30 +464,37 @@ public class BattleSceneManager : MonoBehaviour,
 
 
 		int deploytimes = 1;
-		int cost = GetMaxCost();
-		int idx = GetMaxCostPointer();
-		//有足够的能量
-		while (cost <= energy[1] && idx >= 0)
+		int movetimes = 1;
+		int cost = GetMinCost();
+
+		//把支援战线铺满
+		while(AISupportLine.count < 5)
 		{
-			//支援战线没到上限
-			if (AISupportLine.count < 5)
+			int idx = GetMinCostUnitPointer();
+			if (idx >= 0)
 			{
 				AIDeploy(idx);
 				yield return new WaitForSeconds(sequenceTime + waitTime);
-				cost = GetMaxCost();
-				idx = GetMaxCostPointer();
 				deploytimes++;
 			}
+			else break;
 		}
-		int movetimes = 1;
-		idx = GetOperatorPointer();
-		while (AIAdjacentLine.count == 0 && AIAdjacentLine.count < AIAdjacentLine.capacity && idx >= 0)
+		while (AIAdjacentLine.count < AIAdjacentLine.capacity)
 		{
-			AIMove(idx);
-			yield return new WaitForSeconds(sequenceTime + waitTime);
-			idx = GetOperatorPointer();
-			movetimes++;
+			if (AIAdjacentLine.count == 0 || AIAdjacentLine.ownerShip == 1)
+			{
+				int idx = GetOperatorPointerInSupportLine();
+				if (idx >= 0)
+				{
+					AIMove(idx);
+					yield return new WaitForSeconds(sequenceTime + waitTime);
+					movetimes++;
+				}
+				else break;
+			}
+			else break;
 		}
+
 
 		Skip();
 	}
@@ -493,7 +512,21 @@ public class BattleSceneManager : MonoBehaviour,
 		}
 		return maxCost;
 	}
-	private int GetMaxCostPointer()
+	private int GetMinCost()
+	{
+		int minCost = 100;
+		int minPointer = -1;
+		for(int i = 0; i < AIHandicap.count; i++)
+		{
+			if (AIHandicap[i].cost < minCost)
+			{
+				minCost = AIHandicap[i].cost;
+				minPointer = i;
+			}
+		}
+		return minCost;
+	}
+	private int GetMaxCostUnitPointer()
 	{
 		int maxCost = 0;
 		int maxPointer = -1;
@@ -505,22 +538,64 @@ public class BattleSceneManager : MonoBehaviour,
 				maxPointer = i;
 			}
 		}
+		if (AIHandicap[maxPointer].cost > energy[1])
+		{
+			return -1;
+		}
 		return maxPointer;
 	}
-	private int GetOperatorPointer()
+	/// <summary>
+	/// 只有在费用不足时才会返回-1
+	/// </summary>
+	/// <returns></returns>
+	private int GetMinCostUnitPointer()
+	{
+		int minCost = 10000;
+		int minPointer = -1;
+		for (int i = 0; i < AIHandicap.count; i++)
+		{
+			if (AIHandicap[i].cost < minCost && AIHandicap[i] is UnitElementController)
+			{
+				minCost = AIHandicap[i].cost;
+				minPointer = i;
+			}
+		}
+		if(minPointer == -1)
+		{
+			return -1;
+		}
+		if (AIHandicap[minPointer].cost > energy[1])
+		{
+			return -1;
+		}
+		return minPointer;
+	}
+	/// <summary>
+	/// 若没有合适的操作目标返回-1
+	/// </summary>
+	/// <returns></returns>
+	private int GetOperatorPointerInSupportLine()
 	{
 		for (int i = 0; i < AISupportLine.count; i++)
 		{
-			if (AISupportLine[i].operateCounter == 1 && AISupportLine[i].category != "Construction")
+			if (AISupportLine[i].operateCounter == 1 && (AISupportLine[i].category != "Construction" && AISupportLine[i].category != "Artillery"))
 			{
 				return i;
 			}
 		}
 		return -1;
 	}
+	//private int GetArtilleryUnitPointer()
+	//{
+
+	//}
+	//private int GetConstructionUnitPointer()
+	//{
+
+	//}
 	public void AIDeploy(int handicapIdx)
 	{
-		int idx = 3;//TODO
+		int lineidx = 3;//supportline
 		UnitElementController controller = AIHandicap.Pop(handicapIdx) as UnitElementController;
 
 
@@ -528,13 +603,13 @@ public class BattleSceneManager : MonoBehaviour,
 		rotateSequence = DOTween.Sequence();
 
 
-		//battleLineControllers[idx].Receive(controller, 0);
-
-
 		//data input 显示层检查完了再动数据层！！！
-		battleSystem.Deploy(handicapIdx, idx, 0);
+		battleSystem.Deploy(handicapIdx, lineidx, 0);
 	}
+	public void AICast(int handicapIdx)
+	{
 
+	}
 
 	public void AIMove(int resIdx)
 	{
@@ -545,8 +620,6 @@ public class BattleSceneManager : MonoBehaviour,
 		rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
 
-
-		//battleLineControllers[dstLineIdx].Receive(battleLineControllers[resLineIdx].Send(resIdx), dstPos);
 
 		battleSystem.Move(resLineIdx, resIdx, dstLineIdx, dstPos);
 	}

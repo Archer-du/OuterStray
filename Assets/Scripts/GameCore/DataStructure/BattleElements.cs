@@ -601,15 +601,15 @@ namespace DataCore.BattleElements
 		{
 			eventTable.RaiseEvent("RotateSettlement", this, battleSystem);
 
-			if(this.operateCounter > 0)
+			if(this.ownership == BattleSystem.TURN)
 			{
-				if(this.ownership == BattleSystem.TURN)
+				if(this.operateCounter > 0)
 				{
 					this.dynAttackCounter -= 1;
 				}
+				this.operateCounter++;
 			}
 			//操作计数回复
-			this.operateCounter++;
 
 			//自动更新
 			Settlement();
@@ -781,6 +781,8 @@ namespace DataCore.BattleElements
 			battleSystem.eventTable[ownership].RaiseEvent("UnitHealed", this, battleSystem);
 
 			this.dynHealth += recover;
+			controller.RecoverAnimationEvent(this.dynHealth, "append");
+
 			this.recover = 0;
 		}
 		/// <summary>
@@ -807,8 +809,6 @@ namespace DataCore.BattleElements
 		/// </summary>
 		internal void Retreat(string method)
 		{
-			battleLine.ElementRemove(inlineIdx);
-
 			battleLine.Send(this.inlineIdx);
 			//TODO config
 			this.dynHealth += 2;
@@ -1010,6 +1010,7 @@ namespace DataCore.BattleElements
 	{
 		internal ICommandElementController controller;
 
+		internal string type;
 		internal int oriDurability { get; set; }
 		private int DynDurability;
 		internal int dynDurability
@@ -1027,6 +1028,7 @@ namespace DataCore.BattleElements
 
 		internal CommandElement(CommandCard __card, BattleSystem system) : base(__card, system)
 		{
+			this.type = __card.type;
 			this.oriDurability = __card.maxDurability;
 			this.DynDurability = __card.maxDurability;
 
@@ -1038,10 +1040,10 @@ namespace DataCore.BattleElements
 
 		internal void Cast(UnitElement target)
 		{
-			eventTable.RaiseEvent("Cast", target, null);
+			eventTable.RaiseEvent("Cast", target, battleSystem);
 
 			dynDurability -= 1;
-
+			UpdateInfo();
 
 			controller.RetreatAnimationEvent("append");
 		}
@@ -1055,7 +1057,7 @@ namespace DataCore.BattleElements
 		/// </summary>
 		internal void Init()
 		{
-			controller.Init(backendID, ownership, name, description);
+			controller.Init(backendID, ownership, name, type, description);
 			UpdateInfo();
 		}
 		internal void UpdateInfo()

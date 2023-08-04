@@ -17,19 +17,19 @@ public class CommandElementController : BattleElementController,
 	ICommandElementController
 {
 
-	public Transform stack;
-
 
 	public TMP_Text durabilityText;
 	public TMP_Text costText;
 
 	public int durability;
+	public string type;
 
-	public void Init(string ID, int ownership, string name, string description)
+	public void Init(string ID, int ownership, string name, string type, string description)
 	{
 		this.ownership = ownership;
 		this.nameContent = name;
 		this.category = "Command";
+		this.type = type;
 		this.description = description;
 
 		LoadCardResources(ID);
@@ -75,21 +75,34 @@ public class CommandElementController : BattleElementController,
 
 	public void RetreatAnimationEvent(string method)
 	{
-		float retreatTime = 0.4f;
+		float castTime = 0.4f;
+		float waitTime = 0.4f;
 
 		if (method == "append")
 		{
+			battleSceneManager.rotateSequence.Append(transform.DOMove(new Vector3(1920, 1080, 0), castTime));
+			battleSceneManager.rotateSequence.AppendInterval(waitTime);
+			Vector3 rotateBy = new Vector3(0, 0, ((ownership * 2) - 1) * 90);
 			battleSceneManager.rotateSequence.Append(
-				transform.DOMove(stack.transform.position + 500 * Vector3.left, retreatTime)
+				transform.DOMove(stack.transform.position + 500 * Vector3.left, castTime)
 				);
-			battleSceneManager.sequenceTime += retreatTime;
+			battleSceneManager.rotateSequence.Join(
+				transform.DOBlendableRotateBy(rotateBy, castTime)
+				);
+			battleSceneManager.sequenceTime += castTime + waitTime;
 		}
 		else
 		{
+			battleSceneManager.rotateSequence.Append(transform.DOMove(new Vector3(1920, 1080, 0), castTime));
+			battleSceneManager.rotateSequence.AppendInterval(waitTime);
+			Vector3 rotateBy = new Vector3(0, 0, ((ownership * 2) - 1) * 90);
 			battleSceneManager.rotateSequence.Append(
-				transform.DOMove(stack.transform.position + 500 * Vector3.left, retreatTime)
+				transform.DOMove(stack.transform.position + 500 * Vector3.left, castTime)
 				);
-			battleSceneManager.sequenceTime += retreatTime;
+			battleSceneManager.rotateSequence.Join(
+				transform.DOBlendableRotateBy(rotateBy, castTime)
+				);
+			battleSceneManager.sequenceTime += castTime + waitTime;
 		}
 	}
 
@@ -107,17 +120,11 @@ public class CommandElementController : BattleElementController,
 		{
 			HandicapController.isDragging = false; // 结束拖动
 
-			foreach(GameObject obj in eventData.hovered)
+			if (battleSceneManager.PlayerCast(eventData.position, this.handicapIdx) >= 0)
 			{
-				if(obj.GetComponent<UnitElementController>() != null)
-				{
-					if (battleSceneManager.PlayerCast(eventData.position, this.handicapIdx) >= 0)
-					{
-						return;
-					}
-					else break;
-				}
+				return;
 			}
+
 			handicap.Insert(this);
 		}
 	}

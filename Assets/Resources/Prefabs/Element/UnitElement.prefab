@@ -69,7 +69,7 @@ MonoBehaviour:
   m_text: Decription
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 600236e9df5f4e94dab569f5d8a054c4, type: 2}
-  m_sharedMaterial: {fileID: 8423136443212993207, guid: 600236e9df5f4e94dab569f5d8a054c4, type: 2}
+  m_sharedMaterial: {fileID: -3815973376372354358, guid: 600236e9df5f4e94dab569f5d8a054c4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -602,7 +602,7 @@ MonoBehaviour:
   m_Color: {r: 0.454902, g: 0.454902, b: 0.454902, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
+  m_Maskable: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -896,7 +896,7 @@ MonoBehaviour:
   m_text: "\u201C\u9EC4 \u8702\u201D"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 600236e9df5f4e94dab569f5d8a054c4, type: 2}
-  m_sharedMaterial: {fileID: 8423136443212993207, guid: 600236e9df5f4e94dab569f5d8a054c4, type: 2}
+  m_sharedMaterial: {fileID: -3815973376372354358, guid: 600236e9df5f4e94dab569f5d8a054c4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1100,7 +1100,7 @@ MonoBehaviour:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
+  m_Maskable: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -1189,6 +1189,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   battleSceneManager: {fileID: 0}
+  stack: {fileID: 0}
   handicap: {fileID: 0}
   handicapIdx: 0
   ID: 
@@ -1216,7 +1217,6 @@ MonoBehaviour:
   offset: {x: 0, y: 0}
   handicapChildNum: 2
   inlineChildNum: 4
-  stack: {fileID: 0}
   line: {fileID: 0}
   resIdx: 0
   logicPosition: {x: 0, y: 0, z: 0}
@@ -2144,7 +2144,7 @@ MonoBehaviour:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
+  m_Maskable: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
