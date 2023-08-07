@@ -6,12 +6,10 @@ using TMPro;
 using UnityEngine.EventSystems;
 using DataCore.Cards;
 using DG.Tweening;
-using Unity.VisualScripting;
 using UnityEngine.UI;
 using UnityEngine.Rendering;
 using InputHandler;
 using DataCore.BattleElements;
-using static UnityEditor.Timeline.TimelinePlaybackControls;
 
 public class CommandElementController : BattleElementController,
 	ICommandElementController
@@ -54,35 +52,34 @@ public class CommandElementController : BattleElementController,
 		float castTime = 0.4f;
 		float waitTime = 0.4f;
 
+		Sequence seq = DOTween.Sequence();
 		if (method == "append")
 		{
-			battleSceneManager.rotateSequence.Append(transform.DOMove(new Vector3(1920 / 2, 1080 / 2, 0), castTime));
-			battleSceneManager.rotateSequence.AppendInterval(waitTime);
+			seq.Append(transform.DOMove(inputOffset / 2, castTime));
+			seq.AppendInterval(waitTime);
 			Vector3 rotateBy = new Vector3(0, 0, ((ownership * 2) - 1) * 90);
-			battleSceneManager.rotateSequence.Append(
+			seq.Append(
 				transform.DOMove(stack.transform.position + 500 * Vector3.left, castTime)
 				.OnComplete(() => animeLock = false)
 				);
-			battleSceneManager.rotateSequence.Join(
+			seq.Join(
 				transform.DOBlendableRotateBy(rotateBy, castTime)
 				);
-			battleSceneManager.rotateSequence.Join(transform.DOScale(handicapScale, castTime));
-			battleSceneManager.sequenceTime += castTime + waitTime;
+			seq.Join(transform.DOScale(handicapScale, castTime));
 		}
 		else
 		{
-			battleSceneManager.rotateSequence.Append(transform.DOMove(new Vector3(1920 / 2, 1080 / 2, 0), castTime));
-			battleSceneManager.rotateSequence.AppendInterval(waitTime);
+			seq.Append(transform.DOMove(inputOffset / 2, castTime));
+			seq.AppendInterval(waitTime);
 			Vector3 rotateBy = new Vector3(0, 0, ((ownership * 2) - 1) * 90);
-			battleSceneManager.rotateSequence.Append(
+			seq.Append(
 				transform.DOMove(stack.transform.position + 500 * Vector3.left, castTime)
 				.OnComplete(() => animeLock = false)
 				);
-			battleSceneManager.rotateSequence.Join(
+			seq.Join(
 				transform.DOBlendableRotateBy(rotateBy, castTime)
 				);
-			battleSceneManager.rotateSequence.Join(transform.DOScale(handicapScale, castTime));
-			battleSceneManager.sequenceTime += castTime + waitTime;
+			seq.Join(transform.DOScale(handicapScale, castTime));
 		}
 	}
 

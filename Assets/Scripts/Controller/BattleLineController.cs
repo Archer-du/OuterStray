@@ -229,7 +229,7 @@ public class BattleLineController : MonoBehaviour,
 	/// </summary>
 	public void UpdateElementPosition()
 	{
-		//updating = true;
+		updating = true;
 		UpdateElements();
 
 		for(int i = 0; i < elementList.Count; i++)
@@ -237,8 +237,8 @@ public class BattleLineController : MonoBehaviour,
 			Vector3 oriPos = elementList[i].transform.position;
 			Vector3 dstPos = elementList[i].logicPosition;
 
-			elementList[i].transform.DOMove(dstPos, updateTime);
-				//.OnComplete(() => elementList[i].transform.localScale = elementList[i].battleFieldScale);
+			elementList[i].transform.DOMove(dstPos, updateTime)
+				.OnComplete(() => updating = false);
 		}
 	}
 	private void UpdateElements()
