@@ -74,6 +74,7 @@ namespace DataCore.CultivateItems
 
 				if (id.Contains("comm"))
 				{
+					string type = data[3];
 					int cost = int.Parse(data[4]);
 
 					int durability = int.Parse(data[5]);
@@ -82,11 +83,10 @@ namespace DataCore.CultivateItems
 					int pack = int.Parse(data[10]);
 
 					string effects = data[11];
-					effects = "none";
 
 					string description = data[8];
 
-					card = new CommandCard(id, ownership, name, description, cost, durability, department, pack, effects);
+					card = new CommandCard(id, ownership, name, type, description, cost, durability, department, pack, effects);
 				}
 				else
 				{
@@ -102,7 +102,6 @@ namespace DataCore.CultivateItems
 					int pack		= int.Parse(data[10]);
 				
 					string effects	= data[11];
-					effects = "none";//TODO
 
 					string description = data[8];
 

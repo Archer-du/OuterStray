@@ -9,8 +9,6 @@ using DisplayInterface;
 using SystemEventHandler;
 using System;
 using DataCore.CultivateItems;
-using System.Xml.Linq;
-using PlasticGui;
 using DataCore.Cards;
 
 namespace LogicCore
@@ -31,7 +29,7 @@ namespace LogicCore
 		/// <summary>
 		/// 战斗场景渲染接口
 		/// </summary>
-		private IBattleSceneController controller;
+		public IBattleSceneController controller;
 		//display-----------------------------------
 
 
@@ -112,6 +110,10 @@ namespace LogicCore
 			controller = bsdspl;
 			//返回输入句柄
 			controller.FieldInitialize(this);
+			//TODO 之后由战术层参数化
+			eventTable = new EventTable[2] { new EventTable(), new EventTable() };
+
+			bases = new UnitElement[2];
 
 
 			//test segment TODO------
@@ -123,10 +125,6 @@ namespace LogicCore
 			plantDeck.LoadDeckFromPool(pool, "enemy");
 			//-----------------------
 
-			//TODO 之后由战术层参数化
-			eventTable = new EventTable[2] { new EventTable(), new EventTable() };
-
-			bases = new UnitElement[2];
 
 			//初始回合为玩家
 			TURN = 0;
@@ -211,9 +209,21 @@ namespace LogicCore
 				}
 				else
 				{
-					int len = random.Next(2, 7);
-					battleLines.Add(new BattleLine(len));
-					battleLines[i].controller = controller.InstantiateBattleLine(i,	len);
+					//TODO temp
+					switch (i)
+					{
+						case 1: 
+							battleLines.Add(new BattleLine(4));
+							battleLines[i].controller = controller.InstantiateBattleLine(i, 4);
+							break;
+						case 2:
+							battleLines.Add(new BattleLine(3));
+							battleLines[i].controller = controller.InstantiateBattleLine(i, 3);
+							break;
+					}
+					//int len = random.Next(2, 7);
+					//battleLines.Add(new BattleLine(len));
+					//battleLines[i].controller = controller.InstantiateBattleLine(i,	len);
 				}
 				battleLines[i].index = i;
 
@@ -297,7 +307,6 @@ namespace LogicCore
 			bases[0].dynHealth = 3;
 			bases[0].controller = controller.InstantiateBase(0);
 
-			bases[0].Deploy(this, battleLines[0], 0);
 			bases[0].Init();
 
 			card = pool.GetCardByID("human_03") as UnitCard;
@@ -305,7 +314,6 @@ namespace LogicCore
 			human03.dynAttackCounter = 1;
 			human03.controller = controller.InstantiateBase(0);
 
-			human03.Deploy(this, battleLines[0], 0);
 			human03.Init();
 
 			card = pool.GetCardByID("mush_00") as UnitCard;
@@ -314,10 +322,17 @@ namespace LogicCore
 			UnitElement mush2 = new UnitElement(card, this);
 			mush2.controller = controller.InstantiateBase(1);
 
-			mush1.Deploy(this, battleLines[1], 0);
 			mush1.Init();
-			mush2.Deploy(this, battleLines[1], 0);
 			mush2.Init();
+
+
+
+			bases[0].Deploy(this, battleLines[0], 0);
+			human03.Deploy(this, battleLines[0], 0);
+			mush1.Deploy(this, battleLines[1], 0);
+			mush2.Deploy(this, battleLines[1], 0);
+			
+
 		}
 
 
@@ -408,10 +423,18 @@ namespace LogicCore
 			//显示层更新
 			controller.UpdateEnergy(energy[TURN]);
 
-
-			element.Cast(battleLines[dstLineIdx][dstIdx]);
-
-			stacks[TURN].Push(element);
+			if(element.type != "Target")
+			{
+				element.Cast(null);
+			}
+			else
+			{
+				element.Cast(battleLines[dstLineIdx][dstIdx]);
+			}
+			if(element.dynDurability > 0)
+			{
+				stacks[TURN].Push(element);
+			}
 
 			//更新前线指针
 			UpdateFrontLine();
@@ -565,7 +588,7 @@ namespace LogicCore
 			//发牌
 			if (handicaps[TURN].count < handicaps[TURN].capacity)
 			{
-				BattleElement element = stacks[TURN].RandomPop();
+				BattleElement element = stacks[TURN].Pop();
 				handicaps[TURN].Push(element);
 			}
 
@@ -764,7 +787,7 @@ namespace LogicCore
 			Random random = new Random();
 			int counter = random.Next(1, enemyNum + 1);
 			//从敌方战线开始
-			int line = linesCapacity - 1;
+			int line = TURN == 0 ? linesCapacity - 1 : 0;
 			while (counter > 0)
 			{
 				counter -= battleLines[line].count;
@@ -772,7 +795,8 @@ namespace LogicCore
 				{
 					return battleLines[line][battleLines[line].count - 1 + counter];
 				}
-				line--;
+				if(TURN == 0) { line--; }
+				else { line++; }
 			}
 			return null;
 		}
@@ -791,7 +815,7 @@ namespace LogicCore
 			{
 				if (deployQueue[i].state == ElementState.inBattleLine)
 				{
-					if (deployQueue[i].maxHealth > deployQueue[i].dynHealth)
+					if (deployQueue[i].maxHealthReader > deployQueue[i].dynHealth)
 					{
 						return deployQueue[i];
 					}

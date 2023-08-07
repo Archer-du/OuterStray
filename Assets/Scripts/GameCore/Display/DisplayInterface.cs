@@ -11,22 +11,22 @@ namespace DisplayInterface
 	{
 
 	}
-	public interface IPoolDisplay
-	{
+	//public interface IPoolDisplay
+	//{
 
-	}
-	public interface IBuildingDisplay
-	{
+	//}
+	//public interface IBuildingDisplay
+	//{
 
-	}
-	public interface ICardDisplay
-	{
-		//public void TextDisplay(string __name, CardCategories __categories, int __attackPoint, int __cost, int __maxHealthPoint);
-	}
-	public interface ICommodityDisplay
-	{
+	//}
+	//public interface ICardDisplay
+	//{
+	//	//public void TextDisplay(string __name, CardCategories __categories, int __attackPoint, int __cost, int __maxHealthPoint);
+	//}
+	//public interface ICommodityDisplay
+	//{
 
-	}
+	//}
 
 
 
@@ -63,6 +63,8 @@ namespace DisplayInterface
 
 
 		public IUnitElementController InstantiateBase(int turn);
+
+		public IUnitElementController InstantiateUnitInStack(int turn);
 
 
 		//public void PushElementIntoHandicap(IUnitElementController element);
@@ -109,7 +111,7 @@ namespace DisplayInterface
 	}
 	public interface IUnitElementController : IBattleElementController
 	{
-		public void Init(string ID, int ownership, string name, string categories, string description, IUnitInput input);
+		public void UnitInit(string ID, int ownership, string name, string categories, string description, IUnitInput input);
 
 		public void UpdateInfo(int cost, int attackPoint, int healthPoint, int maxHealthPoint, int attackCounter, int operateCounter,
 			ElementState state, int moveRange, bool aura);
@@ -124,15 +126,17 @@ namespace DisplayInterface
 
 		public void DamageAnimationEvent(int health, string method);
 
+		public void RecoverAnimationEvent(int recover, string method);
+
 		public void TerminateAnimationEvent(string method);
 
 		public void RetreatAnimationEvent(string method);
 	}
 	public interface ICommandElementController : IBattleElementController
 	{
-		public void Init(string ID, int ownership, string name, string description);
+		public void CommandInit(string ID, int ownership, string name, string type, string description);
 
-		public void UpdateInfo(int cost, int durability);
-		public void RetreatAnimationEvent(string method);
+		public void UpdateInfo(int cost, int durability, ElementState state);
+		public void CastAnimationEvent(string method);
 	}
 }

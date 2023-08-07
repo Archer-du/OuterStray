@@ -32,7 +32,6 @@ public class BattleLineController : MonoBehaviour,
 
 	public float width;
 
-	public int cardWidth = 360;
 	public float interval = 20f;
 
 	public static float updateTime = 0.2f;
@@ -71,8 +70,6 @@ public class BattleLineController : MonoBehaviour,
 
 		childNum = transform.childCount;
 	}
-
-
 	/// <summary>
 	/// 根据归属权更新战线显示方式
 	/// </summary>
@@ -96,6 +93,9 @@ public class BattleLineController : MonoBehaviour,
 		}
 	}
 
+
+
+	public float inputOffsetX = 1980f;
 	/// <summary>
 	/// 根据指针横向坐标判断部署位置，限制输入
 	/// </summary>
@@ -107,15 +107,15 @@ public class BattleLineController : MonoBehaviour,
 		{
 			return -1;
 		}
-		float vtcPos = position - 1980f;
+		float vtcPos = position - inputOffsetX;
 		int pos;
 		//CRITICAL ALGORITHM
 		if (count % 2 == 0)
 		{
 			int start = count / 2;
 			//一半卡牌 + 一半间隔
-			int offset = vtcPos > 0 ? (int)((vtcPos + (cardWidth + interval) / 2) / (cardWidth + interval))
-				: (int)((vtcPos - (cardWidth + interval) / 2) / (cardWidth + interval));
+			int offset = vtcPos > 0 ? (int)((vtcPos + (BattleElementController.cardWidth + interval) / 2) / (BattleElementController.cardWidth + interval))
+				: (int)((vtcPos - (BattleElementController.cardWidth + interval) / 2) / (BattleElementController.cardWidth + interval));
 			pos = start + offset;
 			if (start + offset < 0)
 			{
@@ -128,7 +128,7 @@ public class BattleLineController : MonoBehaviour,
 		}
 		else
 		{
-			int offset = (int)(vtcPos / (cardWidth + interval));
+			int offset = (int)(vtcPos / (BattleElementController.cardWidth + interval));
 			int start = vtcPos > 0 ? (count / 2 + 1) : (count / 2);
 			pos = start + offset;
 			if (start + offset < 0)
@@ -143,10 +143,34 @@ public class BattleLineController : MonoBehaviour,
 
 		return pos;
 	}
-	//TODO
-	public int GetVerticalMovePos(float position)
+	public int GetCastPos(float position)
 	{
-		throw new NotImplementedException();
+		float vtcPos = position - inputOffsetX;
+		int pos;
+
+		if(count % 2 == 0)
+		{
+			int start = count / 2;
+			int offset = vtcPos > 0 ? (int)(vtcPos / (BattleElementController.cardWidth + interval)) 
+				: (int)((vtcPos - BattleElementController.cardWidth - interval) / (BattleElementController.cardWidth + interval));
+			pos = start + offset;
+			if(pos < 0 || pos > count - 1)
+			{
+				return -1;
+			}
+		}
+		else
+		{
+			int start = count / 2;
+			int offset = vtcPos + (BattleElementController.cardWidth + interval) / 2 > 0 ? (int)((vtcPos - (BattleElementController.cardWidth + interval) / 2) / (BattleElementController.cardWidth + interval))
+				: (int)((vtcPos - 3 * (BattleElementController.cardWidth + interval) / 2) / (BattleElementController.cardWidth + interval));
+			pos = start + offset;
+			if (pos < 0 || pos > count - 1)
+			{
+				return -1;
+			}
+		}
+		return pos;
 	}
 
 
@@ -217,6 +241,7 @@ public class BattleLineController : MonoBehaviour,
 			{
 				elementList[i].transform.DOMove(dstPos, updateTime);
 			}
+			elementList[i].transform.DOScale(elementList[i].battleFieldScale, updateTime);
 		}
 	}
 	private void UpdateElements()
@@ -224,12 +249,15 @@ public class BattleLineController : MonoBehaviour,
 		for (int i = 0; i < elementList.Count; i++)
 		{
 			elementList[i].resIdx = i;
-			elementList[i].line = this;
+			elementList[i].battleLine = this;
 			elementList[i].transform.SetSiblingIndex(i + childNum);
 			elementList[i].logicPosition = GetLogicPosition(i);
 			elementList[i].canvas.sortingOrder = i - 100;
 		}
 	}
+
+
+
 
 
 
@@ -249,10 +277,10 @@ public class BattleLineController : MonoBehaviour,
 	}
 	public Vector3 GetLogicPosition(int index)
 	{
-		return transform.position + new Vector3((index - count / 2) * cardWidth + cardWidth / 2 * ((count + 1) % 2), 0, 0);
+		return transform.position + new Vector3((index - count / 2) * BattleElementController.cardWidth + BattleElementController.cardWidth / 2 * ((count + 1) % 2), 0, 0);
 	}
-	public Vector3 GetInsertionPosition(int index, int count)
+	public Vector3 GetLogicPosition(int index, int lineIdx)
 	{
-		return transform.position + new Vector3((index - count / 2) * cardWidth + cardWidth / 2 * ((count + 1) % 2), 0, 0);
+		return new Vector3(0, -234 + lineIdx * 400, 0) + new Vector3((index - count / 2) * BattleElementController.cardWidth + BattleElementController.cardWidth / 2 * ((count + 1) % 2), 0, 0);
 	}
 }
