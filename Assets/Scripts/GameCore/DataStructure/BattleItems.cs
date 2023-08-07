@@ -208,35 +208,35 @@ namespace DataCore.BattleItems
 						LightArmorElement element = deck[i] as LightArmorElement;
 						lightArmors.Add(element);
 						element.state = ElementState.inStack;
-						element.controller = controller.InstantiateUnitElementInBattle(element.ownership);
+						element.controller = controller.InstantiateUnitElementInBattle();
 					}
 					if (deck[i] is MotorizedElement)
 					{
 						MotorizedElement element = deck[i] as MotorizedElement;
 						motorizeds.Add(element);
 						element.state = ElementState.inStack;
-						element.controller = controller.InstantiateUnitElementInBattle(element.ownership);
+						element.controller = controller.InstantiateUnitElementInBattle();
 					}
 					if (deck[i] is ArtilleryElement)
 					{
 						ArtilleryElement element = deck[i] as ArtilleryElement;
 						artillerys.Add(element);
 						element.state = ElementState.inStack;
-						element.controller = controller.InstantiateUnitElementInBattle(element.ownership);
+						element.controller = controller.InstantiateUnitElementInBattle();
 					}
 					if (deck[i] is GuardianElement)
 					{
 						GuardianElement element = deck[i] as GuardianElement;
 						guardians.Add(element);
 						element.state = ElementState.inStack;
-						element.controller = controller.InstantiateUnitElementInBattle(element.ownership);
+						element.controller = controller.InstantiateUnitElementInBattle();
 					}
 					if (deck[i] is ConstructionElement)
 					{
 						ConstructionElement element = deck[i] as ConstructionElement;
 						constructions.Add(element);
 						element.state = ElementState.inStack;
-						element.controller = controller.InstantiateUnitElementInBattle(element.ownership);
+						element.controller = controller.InstantiateUnitElementInBattle();
 					}
 				}
 				else
@@ -249,7 +249,7 @@ namespace DataCore.BattleItems
 
 					CommandElement element = deck[i] as CommandElement;
 					element.state = ElementState.inStack;
-					element.controller = controller.InstantiateCommandElementInBattle(element.ownership);
+					element.controller = controller.InstantiateCommandElementInBattle();
 				}
 			}
 
@@ -331,15 +331,14 @@ namespace DataCore.BattleItems
 			}
 			return null;
 		}
-
-
-
-
 		internal BattleElement PopElementByStackIdx(int stackIdx)
 		{
 			BattleElement element = stack[stackIdx];
 			stack[stackIdx].stackIdx = -1;
 			stack.RemoveAt(stackIdx);
+
+			UpdateStackIdx();
+
 			return element;
 		}
 
@@ -375,27 +374,36 @@ namespace DataCore.BattleItems
 		}
 		internal UnitElement RandomFindUnitByCategory(string category)
 		{
-			Random random = new Random();
-			int idx = 0;
-			switch(category)
+			for(int i = stack.Count - 1; i >= 0; i--)
 			{
-				case "LightArmor":
-					idx = random.Next(0, lightArmors.Count);
-					return lightArmors[idx];
-				case "Motorized":
-					idx = random.Next(0, motorizeds.Count);
-					return motorizeds[idx];
-				case "Artillery":
-					idx = random.Next(0, artillerys.Count);
-					return artillerys[idx];
-				case "Guardian":
-					idx = random.Next(0, guardians.Count);
-					return guardians[idx];
-				case "Construction":
-					idx = random.Next(0, constructions.Count);
-					return constructions[idx];
+				UnitElement element = stack[i] as UnitElement;
+				if (element != null && element.category == category)
+				{
+					return element;
+				}
 			}
 			return null;
+			//Random random = new Random();
+			//int idx = 0;
+			//switch(category)
+			//{
+			//	case "LightArmor":
+			//		idx = random.Next(0, lightArmors.Count);
+			//		return lightArmors[idx];
+			//	case "Motorized":
+			//		idx = random.Next(0, motorizeds.Count);
+			//		return motorizeds[idx];
+			//	case "Artillery":
+			//		idx = random.Next(0, artillerys.Count);
+			//		return artillerys[idx];
+			//	case "Guardian":
+			//		idx = random.Next(0, guardians.Count);
+			//		return guardians[idx];
+			//	case "Construction":
+			//		idx = random.Next(0, constructions.Count);
+			//		return constructions[idx];
+			//}
+			//return null;
 		}
 	}
 
@@ -435,13 +443,13 @@ namespace DataCore.BattleItems
 					//display
 					UnitElement unit = list[i] as UnitElement;
 					controllerList.Add(unit.controller);
-					unit.Init();
+					unit.UnitInit();
 				}
 				else
 				{
 					CommandElement comm = list[i] as CommandElement;
 					controllerList.Add(comm.controller);
-					comm.Init();
+					comm.CommandInit();
 				}
 			}
 			if(controllerList.Count <= 0) { throw new Exception("list"); }
@@ -463,13 +471,13 @@ namespace DataCore.BattleItems
 				//display
 				UnitElement unit = element as UnitElement;
 				controller.Push(unit.controller);
-				unit.Init();
+				unit.UnitInit();
 			}
 			else
 			{
 				CommandElement comm = element as CommandElement;
 				controller.Push(comm.controller);
-				comm.Init();
+				comm.CommandInit();
 			}
 		}
 		/// <summary>

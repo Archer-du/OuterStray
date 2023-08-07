@@ -77,6 +77,8 @@ public class BattleSceneManager : MonoBehaviour,
 
 	//TODO
 	public GameObject humanEnergy;
+	public GameObject[] humanSlots;
+	public GameObject[] plantSlots;
 
 	//结算锁
 	public static bool settlement = false;
@@ -100,12 +102,17 @@ public class BattleSceneManager : MonoBehaviour,
 		handicapController = new HandicapController[2];
 
 
-		skipButton = GameObject.Find("UI/SkipButton").GetComponent<Button>();
 		skipButton.onClick.AddListener(Skip);
 		buttonImage = skipButton.gameObject.GetComponent<Image>();
 
 		fieldWidth = GameObject.Find("BattleField").GetComponent<RectTransform>().rect.width;
 		fieldHeight = GameObject.Find("BattleField").GetComponent<RectTransform>().rect.height;
+
+		for(int i = 0; i < 5; i++)
+		{
+			humanSlots[i].SetActive(false);
+			plantSlots[i].SetActive(false);
+		}
 
 		check = true;
 	}
@@ -181,14 +188,26 @@ public class BattleSceneManager : MonoBehaviour,
 	{
 		this.energySupply[Turn] = supply;
 		this.energySupplyText[Turn].text = "+" + supply.ToString();
+		UpdateSlotsDisplay();
 	}
 
 	public void UpdateEnergySupply(int turn, int supplyPoint)
 	{
 		this.energySupply[turn] = supplyPoint;
 		energySupplyText[turn].text = "+" + supplyPoint.ToString();
+		UpdateSlotsDisplay();
 	}
-
+	public void UpdateSlotsDisplay()
+	{
+		for (int i = 0; i < this.energySupply[0]; i++)
+		{
+			humanSlots[i].SetActive(true);
+		}
+		for(int i = 0; i < this.energySupply[1]; i++)
+		{
+			plantSlots[i].SetActive(true);
+		}
+	}
 
 
 
@@ -220,15 +239,25 @@ public class BattleSceneManager : MonoBehaviour,
 		cardStackController[ownership] = stack.GetComponent<CardStackController>();
 		return cardStackController[ownership];
 	}
-	public IUnitElementController InstantiateBase(int turn)
+
+
+
+
+
+
+	public IUnitElementController InstantiateUnitInBattleField(int ownership, int lineIdx, int pos)
 	{
-		Quaternion initRotation = Quaternion.Euler(new Vector3(0, 0, turn * 180));
+		Quaternion initRotation = Quaternion.Euler(new Vector3(0, 0, ownership * 180));
 
-
-		GameObject unit = Instantiate(unitPrototype, battleLineControllers[turn].GetLogicPosition(0, turn), initRotation);
+		GameObject unit = Instantiate(unitPrototype, battleLineControllers[lineIdx].GetLogicPosition(pos), initRotation);
 
 		return unit.GetComponent<UnitElementController>();
 	}
+	/// <summary>
+	/// 在牌堆位置生成单位并返回句柄（通常用于Summon的动画）
+	/// </summary>
+	/// <param name="turn"></param>
+	/// <returns></returns>
 	public IUnitElementController InstantiateUnitInStack(int turn)
 	{
 		Quaternion initRotation = Quaternion.Euler(new Vector3(0, 0, turn * 180));
@@ -241,27 +270,27 @@ public class BattleSceneManager : MonoBehaviour,
 
 
 
+	float fieldLowerBound = 220f;
+	float fieldUpperBound = 1970f;
+	float lineInterval = 66f;
+	float lineWidth = 400f;
 
-	public float handicapOffsetY = 1200f;
 	private Vector2 GetHandicapPosition(int ownership)
 	{
+		float handicapOffsetY = 1200f;
 		return new Vector2(0, (ownership * 2 - 1) * handicapOffsetY);
 	}
-	public float cardStackOffsetX = -1700f;
-	public float cardStackOffsetY = 400f;
 	private Vector2 GetCardStackPosition(int ownership)
 	{
+		float cardStackOffsetX = -1700f;
+		float cardStackOffsetY = 400f;
 		return new Vector2(cardStackOffsetX, (ownership * 2 - 1) * cardStackOffsetY);
 	}
-	public float fieldLowerBound = 220f;
-	public float fieldUpperBound = 1970f;
-	public float lineInterval = 66f;
-	public float lineWidth = 400f;
 	public int GetBattleLineIdx(float y)
 	{
-		if(y > fieldLowerBound && y < fieldUpperBound)
+		if(y > BattleLineController.fieldLowerBound && y < BattleLineController.fieldUpperBound)
 		{
-			return (int)((y - 180) / (lineWidth + lineInterval));
+			return (int)((y - 180) / (BattleLineController.lineWidth + BattleLineController.lineInterval));
 		}
 		return -1;
 	}
@@ -298,10 +327,6 @@ public class BattleSceneManager : MonoBehaviour,
 			return -1;
 		}
 		int idx = GetBattleLineIdx(position.y);
-		if(idx < 0)
-		{
-			return -1;
-		}
 		//没有部署在支援战线 TODO 扩展
 		if(idx != 0)
 		{
@@ -382,7 +407,7 @@ public class BattleSceneManager : MonoBehaviour,
 		{
 			return -1;
 		}
-
+		if (dstLineIdx == resLineIdx) return -1;
 		if(Math.Abs(dstLineIdx - resLineIdx) > element.moveRange) return -1;
 
 
@@ -444,7 +469,7 @@ public class BattleSceneManager : MonoBehaviour,
 		AISupportLine = battleLineControllers[3];
 		//TODO
 		AIAdjacentLine = battleLineControllers[2];
-		float waitTime = 0.6f;
+		float waitTime = 0.9f;
 
 		yield return new WaitForSeconds(waitTime);
 

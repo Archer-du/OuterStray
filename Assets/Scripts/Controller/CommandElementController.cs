@@ -23,9 +23,9 @@ public class CommandElementController : BattleElementController,
 	public int durability;
 	public string type;
 
-	public void CommandInit(string ID, int ownership, string name, string type, string description)
+	public void CommandInit(string ID, int ownership, string name, string type, int cost, string description)
 	{
-		Init(ID, ownership, name, "Command", description);
+		Init(ID, ownership, name, "Command", cost, description);
 
 		this.type = type;
 	}
@@ -50,6 +50,7 @@ public class CommandElementController : BattleElementController,
 
 	public void CastAnimationEvent(string method)
 	{
+		animeLock = true;
 		float castTime = 0.4f;
 		float waitTime = 0.4f;
 
@@ -60,10 +61,12 @@ public class CommandElementController : BattleElementController,
 			Vector3 rotateBy = new Vector3(0, 0, ((ownership * 2) - 1) * 90);
 			battleSceneManager.rotateSequence.Append(
 				transform.DOMove(stack.transform.position + 500 * Vector3.left, castTime)
+				.OnComplete(() => animeLock = false)
 				);
 			battleSceneManager.rotateSequence.Join(
 				transform.DOBlendableRotateBy(rotateBy, castTime)
 				);
+			battleSceneManager.rotateSequence.Join(transform.DOScale(handicapScale, castTime));
 			battleSceneManager.sequenceTime += castTime + waitTime;
 		}
 		else
@@ -73,10 +76,12 @@ public class CommandElementController : BattleElementController,
 			Vector3 rotateBy = new Vector3(0, 0, ((ownership * 2) - 1) * 90);
 			battleSceneManager.rotateSequence.Append(
 				transform.DOMove(stack.transform.position + 500 * Vector3.left, castTime)
+				.OnComplete(() => animeLock = false)
 				);
 			battleSceneManager.rotateSequence.Join(
 				transform.DOBlendableRotateBy(rotateBy, castTime)
 				);
+			battleSceneManager.rotateSequence.Join(transform.DOScale(handicapScale, castTime));
 			battleSceneManager.sequenceTime += castTime + waitTime;
 		}
 	}

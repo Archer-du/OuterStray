@@ -111,15 +111,24 @@ namespace DataCore.CultivateItems
 
 				//TODO
 				cardPool.Add(card);
-				hashPool.Add(id, card);
+				if (!hashPool.ContainsKey(id))
+				{
+					hashPool.Add(id, card);
+				}
 
 				if(ownership == 0)
 				{
-					humanCardPool.Add(id, card);
+					if(!humanCardPool.ContainsKey(id))
+					{
+						humanCardPool.Add(id, card);
+					}
 				}
 				else
 				{
-					plantCardPool.Add(id, card);
+					if(!plantCardPool.ContainsKey(id))
+					{
+						plantCardPool.Add(id, card);
+					}
 				}
 
 				line = reader.ReadLine();

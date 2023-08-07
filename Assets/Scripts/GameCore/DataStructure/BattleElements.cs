@@ -214,10 +214,6 @@ namespace DataCore.BattleElements
 		/// </summary>
 		internal BattleLine battleLine;
 		/// <summary>
-		/// 所在战线指针
-		/// </summary>
-		internal int lineIdx;
-		/// <summary>
 		/// 战线内索引值
 		/// </summary>
 		internal int inlineIdx;
@@ -683,9 +679,9 @@ namespace DataCore.BattleElements
 			}
 			battleSystem.UnitIDDic[this.backendID].Add(this);
 
+			controller.DeployAnimationEvent();
 			//战线接收
 			dstLine.Receive(this, dstPos);
-			this.battleSystem = battleSystem;
 			this.operateCounter--;
 
 			eventTable.RaiseEvent("AfterDeploy", this, battleSystem);
@@ -699,6 +695,7 @@ namespace DataCore.BattleElements
 		{
 			eventTable.RaiseEvent("BeforeMove", this, battleSystem);
 
+			controller.MoveAnimationEvent();
 
 			dstLine.Receive(resLine.Send(resIdx), dstPos);
 			this.operateCounter--;
@@ -754,12 +751,16 @@ namespace DataCore.BattleElements
 		/// <summary>
 		/// 无来源受伤方法: 根据damage寄存值受伤
 		/// </summary>
-		internal void Damaged(string method)
+		internal int Damaged(string method)
 		{
 			eventTable.RaiseEvent("BeforeDamaged", this, battleSystem);
 			if(this.dynHealth == this.maxHealthReader)
 			{
 				eventTable.RaiseEvent("Meticulous", this, battleSystem);
+			}
+			if(this == battleSystem.bases[ownership])
+			{
+				battleSystem.eventTable[ownership].RaiseEvent("BaseAttacked", this, battleSystem);
 			}
 
 			this.dynHealth -= this.damage;
@@ -770,16 +771,18 @@ namespace DataCore.BattleElements
 
 			if (this.dynHealth <= 0)
 			{
-				Terminate();
+				Terminate("append");
+				return -1;
 			}
 
 			eventTable.RaiseEvent("AfterDamaged", this, battleSystem);
+			return 1;
 		}
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="damage"></param>
-		internal void Damaged(int damage, string method)
+		internal int Damaged(int damage, string method)
 		{
 			this.damage = damage;
 
@@ -796,10 +799,12 @@ namespace DataCore.BattleElements
 
 			if (this.dynHealth <= 0)
 			{
-				Terminate();
+				Terminate("append");
+				return -1;
 			}
 
 			eventTable.RaiseEvent("AfterDamaged", this, battleSystem);
+			return 1;
 		}
 		internal void Recover(int heal)
 		{
@@ -815,7 +820,7 @@ namespace DataCore.BattleElements
 		/// <summary>
 		/// 死亡
 		/// </summary>
-		internal void Terminate()
+		internal void Terminate(string method)
 		{
 			eventTable.RaiseEvent("BeforeTerminate", this, battleSystem);
 			battleSystem.eventTable[ownership].RaiseEvent("UnitTerminated", this, battleSystem);
@@ -826,7 +831,7 @@ namespace DataCore.BattleElements
 
 
 			battleLine.ElementRemove(inlineIdx);
-			controller.TerminateAnimationEvent("append");
+			controller.TerminateAnimationEvent(method);
 
 
 			//not likely
@@ -913,15 +918,15 @@ namespace DataCore.BattleElements
 		/// <summary>
 		/// 由手牌区初始化
 		/// </summary>
-		internal void Init()
+		internal void UnitInit()
 		{
-			controller.UnitInit(backendID, ownership, name, category, description, this);
 			UpdateInfo();
+			controller.UnitInit(backendID, ownership, name, category, cost, description, this);
 		}
 		internal void UpdateInfo()
 		{
 			controller.UpdateInfo(cost, dynAttackReader, dynHealth, maxHealthReader, dynAttackCounter, operateCounter, 
-				state, moveRange, aura);
+				state, moveRange, aura, dynAttackReader - oriAttack, maxHealthReader - oriHealth);
 		}
 
 
@@ -985,7 +990,7 @@ namespace DataCore.BattleElements
 
 			if (this.dynAttackCounter <= 0)
 			{
-				tmpTarget = battleSystem.RandomEnemy();
+				tmpTarget = battleSystem.RandomEnemy(this.ownership);
 				int result = -1;
 				result = Attack();
 				if (result > 0)
@@ -1096,10 +1101,10 @@ namespace DataCore.BattleElements
 		/// <summary>
 		/// 由手牌区初始化
 		/// </summary>
-		internal void Init()
+		internal void CommandInit()
 		{
-			controller.CommandInit(backendID, ownership, name, type, description);
 			UpdateInfo();
+			controller.CommandInit(backendID, ownership, name, type, cost, description);
 		}
 		internal void UpdateInfo()
 		{

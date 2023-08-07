@@ -123,6 +123,7 @@ public class HandicapController : MonoBehaviour,
 
 		BattleElementController element = controller as BattleElementController;
 		pushing = true;
+
 		element.gameObject.SetActive(true);
 		element.transform.SetParent(transform);
 
@@ -152,7 +153,6 @@ public class HandicapController : MonoBehaviour,
 		for (int i = 0; i < handiCards.Count; i++)
 		{
 			handiCards[i].handicapIdx = i;
-			handiCards[i].dataState = ElementState.inHandicap;
 		}
 	}
 
@@ -168,11 +168,11 @@ public class HandicapController : MonoBehaviour,
 	/// <returns></returns>
 	public IBattleElementController Pop(int handicapIdx)
 	{
+		isDragging = true;
 		BattleElementController controller = handiCards[handicapIdx];
 		handiCards.RemoveAt(handicapIdx);
 		UpdateElements();
 
-		isDragging = true;
 
 		UpdateHandicapPosition();
 
@@ -202,6 +202,10 @@ public class HandicapController : MonoBehaviour,
 	public BattleElementController draggingElement;
 	public void Insert(BattleElementController element)
 	{
+		if(element.animeLock)
+		{
+			return;
+		}
 		//TODO 这里得锁住
 		isDragging = true;
 

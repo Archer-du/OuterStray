@@ -11,32 +11,13 @@ using UnityEngine.UI;
 using UnityEngine.Rendering;
 using InputHandler;
 using DataCore.BattleElements;
+using System;
 
 
 public class UnitElementController : BattleElementController,
 	IUnitElementController
 {
 	public IUnitInput input;
-
-
-	public CanvasGroup InspectPanel;
-	public GameObject Inspector;
-	public Image InspectorImage;
-
-	public Image InspectorGround;
-	public Image InspectorShell;
-	public Image InspectorFrame;
-	public Image InspectorNameTag;
-	public Image InspectorCostTag;
-
-	public TMP_Text InspectorName;
-	public TMP_Text InspectorCost;
-	public TMP_Text InspectorAttack;
-	public TMP_Text InspectorMaxHealth;
-	public TMP_Text InspectorAttackCounter;
-	public TMP_Text InspectorDescription;
-
-
 
 
 	public TMP_Text attackText;
@@ -46,13 +27,11 @@ public class UnitElementController : BattleElementController,
 
 	public Image operateMask;
 
+	public GameObject Arrows;
+	public Image leftArrow;
+	public Image rightArrow;
+	public Image midArrow;
 
-	public GameObject leftArrow;
-	public GameObject rightArrow;
-	public GameObject midArrow;
-
-	public Vector3 arrowScale;
-	public Vector3 enlargeArrowScale;
 	/// <summary>
 	/// 
 	/// </summary>
@@ -60,6 +39,8 @@ public class UnitElementController : BattleElementController,
 	public int resIdx;
 	public UnitElementController target;
 
+	public Image attackBuff;
+	public Image maxHealthBuff;
 
 	public int attackPoint;
 	public int healthPoint;
@@ -76,30 +57,38 @@ public class UnitElementController : BattleElementController,
 	public int attackOrder = 0;
 	public int oriOrder = -100;
 
+	public static float componentMove = 10f;
+	public static float componentMoveTime = 0.25f;
 	/// <summary>
 	/// 从牌堆加入手牌或战场时初始化
 	/// </summary>
 	/// <param name="ownership"></param>
-	public void UnitInit(string ID, int ownership, string name, string categories, string description, IUnitInput input)
+	public void UnitInit(string ID, int ownership, string name, string categories, int cost, string description, IUnitInput input)
 	{
-		Init(ID, ownership, name, categories, description);
+		Init(ID, ownership, name, categories, cost, description);
 
+		this.input = input;
+		Arrows.transform.localScale = new Vector3(1, (1 - ownership * 2) * 1, 1);
 
-
-		arrowScale = leftArrow.transform.localScale;
-		enlargeArrowScale = arrowScale * 1.5f;
-
-		leftArrow.SetActive(false);
-		rightArrow.SetActive(false);
-		midArrow.SetActive(false);
-
+		Arrows.GetComponent<CanvasGroup>().alpha = 0;
 		InspectPanel.alpha = 0f;
+
+		InspectorName.text = name;
+		InspectorCost.text = cost.ToString();
+		InspectorDescription.text = description;
+		InspectorAttack.text = attackText.text;
+		InspectorMaxHealth.text = maxHealthPoint.ToString();
+		InspectorAttackCounter.text = this.category == "Construction" ? "" : attackCounter.ToString();
+
+		InspectorImage.sprite = CardImage.sprite;
+		InspectorGround.color = elementGround.color;
+		InspectorFrame.color = elementGround.color;
+		InspectorNameTag.color = elementGround.color;
+		InspectorCostTag.color = elementGround.color;
+		InspectorCategoryIcon.sprite = componentCategoryIcon.sprite;
 	}
-
-
-
 	public void UpdateInfo(int cost, int attackPoint, int healthPoint, int maxHealthPoint, int attackCounter, int operateCounter,
-		ElementState state, int moveRange, bool aura)
+		ElementState state, int moveRange, bool aura, int attackBuff, int maxHealthBuff)
 	{
 		this.cost = cost;
 		this.attackPoint = attackPoint;
@@ -113,22 +102,48 @@ public class UnitElementController : BattleElementController,
 		nameText.text = nameContent;
 		attackText.text = attackPoint.ToString();
 		healthText.text = healthPoint.ToString();
-		attackCounterText.text = this.category == "Construction" ? "" : attackCounter.ToString();
+		attackCounterText.text = attackCounter > 100 ? "" : attackCounter.ToString();
 		costText.text = cost.ToString();
 		descriptionText.text = description;
 
 		if (operateCounter == 0)
 		{
-			operateMask.DOColor(new Color(0, 0, 0, 0.5f), duration);
+			operateMask.DOColor(new UnityEngine.Color(0, 0, 0, 0.5f), duration);
 		}
 		else
 		{
-			operateMask.DOColor(new Color(0, 0, 0, 0), duration);
+			operateMask.DOColor(new UnityEngine.Color(0, 0, 0, 0), duration);
 		}
-		if (state == ElementState.inBattleLine)
+
+		this.attackBuff.gameObject.SetActive(false);
+		this.maxHealthBuff.gameObject.SetActive(false);
+		if (attackBuff != 0)
 		{
-			costTag.gameObject.SetActive(false);
-			costText.gameObject.SetActive(false);
+			this.attackBuff.gameObject.SetActive(true);
+			if(attackBuff > 0)
+			{
+				this.attackBuff.color = Color.green;
+				this.attackBuff.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 0));
+			}
+			if(attackBuff < 0)
+			{
+				this.attackBuff.color = Color.red;
+				this.attackBuff.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 180));
+			}
+		}
+		if(maxHealthBuff != 0)
+		{
+			this.maxHealthBuff.gameObject.SetActive(true);
+			if (attackBuff > 0)
+			{
+				this.maxHealthBuff.color = Color.green;
+				this.maxHealthBuff.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 0));
+			}
+			if (attackBuff < 0)
+			{
+				this.maxHealthBuff.color = Color.red;
+				this.maxHealthBuff.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 180));
+			}
 		}
 		//DOTween.To(
 		//	() => "", // getter返回空字符串
@@ -141,32 +156,28 @@ public class UnitElementController : BattleElementController,
 	{
 		this.target = target as UnitElementController;
 
-		switch (targetIdx)
+		Arrows.GetComponent<CanvasGroup>().alpha = 0;
+		if (targetIdx == 0)
 		{
-			case 0:
-				leftArrow.transform.DOScale(enlargeArrowScale, 0.2f);
-				midArrow.transform.DOScale(arrowScale, 0.2f);
-				rightArrow.transform.DOScale(arrowScale, 0.2f);
-				break;
-			case 1:
-				leftArrow.transform.DOScale(arrowScale, 0.2f);
-				midArrow.transform.DOScale(enlargeArrowScale, 0.2f);
-				rightArrow.transform.DOScale(arrowScale, 0.2f);
-				break;
-			case 2:
-				leftArrow.transform.DOScale(arrowScale, 0.2f);
-				midArrow.transform.DOScale(arrowScale, 0.2f);
-				rightArrow.transform.DOScale(enlargeArrowScale, 0.2f);
-				break;
-			default:
-				leftArrow.transform.DOScale(arrowScale, 0.2f);
-				midArrow.transform.DOScale(arrowScale, 0.2f);
-				rightArrow.transform.DOScale(arrowScale, 0.2f);
-				break;
+			Arrows.GetComponent<CanvasGroup>().alpha = 1;
+			leftArrow.DOFade(1, duration);
+			midArrow.DOFade(0, duration);
+			rightArrow.DOFade(0, duration);
 		}
-		leftArrow.SetActive(targetIdx == 0);
-		midArrow.SetActive(targetIdx == 1);
-		rightArrow.SetActive(targetIdx == 2);
+		if(targetIdx == 1)
+		{
+			Arrows.GetComponent<CanvasGroup>().alpha = 1;
+			leftArrow.DOFade(0, duration);
+			midArrow.DOFade(1, duration);
+			rightArrow.DOFade(0, duration);
+		}
+		if(targetIdx == 2)
+		{
+			Arrows.GetComponent<CanvasGroup>().alpha = 1;
+			leftArrow.DOFade(0, duration);
+			midArrow.DOFade(0, duration);
+			rightArrow.DOFade(1, duration);
+		}
 	}
 
 
@@ -178,6 +189,36 @@ public class UnitElementController : BattleElementController,
 
 
 
+	public void DeployAnimationEvent()
+	{
+		animeLock = true;
+
+		NameTag.gameObject.SetActive(false);
+		nameText.gameObject.SetActive(false);
+		costTag.gameObject.SetActive(false);
+		costText.gameObject.SetActive(false);
+
+		if (transform.eulerAngles != Vector3.zero)
+		{
+			Vector3 rotateBy = -transform.eulerAngles;
+			transform.DOBlendableRotateBy(rotateBy, componentMoveTime);
+		}
+		gameObject.SetActive(true);
+		InspectComponent.transform.DOBlendableLocalMoveBy(new Vector3(0, -componentMove, 0), componentMoveTime)
+			.OnComplete(() => animeLock = false);
+		RectTransform counterTransform = counterIcon.GetComponent<RectTransform>();
+		counterTransform.DOScale(counterScaleEnlarge, componentMoveTime);
+		//healthText.fontSize = normalFontSizeEnlarge;
+		//attackText.fontSize = normalFontSizeEnlarge;
+		attackCounterText.fontSize = counterfontSizeEnlarge;
+		transform.DOScale(battleFieldScale, componentMoveTime);
+	}
+	public void MoveAnimationEvent()
+	{
+		animeLock = true;
+		transform.DOScale(battleFieldScale, componentMoveTime)
+			.OnComplete(() => animeLock = false);
+	}
 	/// <summary>
 	/// 攻击动画加入结算队列
 	/// </summary>
@@ -260,6 +301,10 @@ public class UnitElementController : BattleElementController,
 			battleSceneManager.rotateSequence.Join(
 				transform.DOShakeRotation(forwardTime, 20f)
 				);
+			if(battleSceneManager.sequenceTime == 0)
+			{
+				battleSceneManager.sequenceTime += forwardTime;
+			}
 		}
 		//放大
 		battleSceneManager.rotateSequence.Join(
@@ -272,10 +317,10 @@ public class UnitElementController : BattleElementController,
 			);
 		//变色
 		battleSceneManager.rotateSequence.Join(
-			healthText.DOColor(Color.red, forwardTime / 2f)
+			healthText.DOColor(UnityEngine.Color.red, forwardTime / 2f)
 				.OnComplete(() =>
 				{
-					healthText.DOColor(Color.white, forwardTime / 2f);
+					healthText.DOColor(UnityEngine.Color.white, forwardTime / 2f);
 				})
 			);
 	}
@@ -307,10 +352,10 @@ public class UnitElementController : BattleElementController,
 			);
 		//变色
 		battleSceneManager.rotateSequence.Join(
-			healthText.DOColor(Color.green, forwardTime / 2f)
+			healthText.DOColor(UnityEngine.Color.green, forwardTime / 2f)
 				.OnComplete(() =>
 				{
-					healthText.DOColor(Color.white, forwardTime / 2f);
+					healthText.DOColor(UnityEngine.Color.white, forwardTime / 2f);
 				})
 			);
 	}
@@ -321,17 +366,31 @@ public class UnitElementController : BattleElementController,
 	{
 		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + " destroyed!");
 
-
-		battleSceneManager.rotateSequence.InsertCallback(battleSceneManager.sequenceTime,
+		if(method == "append")
+		{
+			battleSceneManager.rotateSequence.InsertCallback(battleSceneManager.sequenceTime,
 				() =>
 				{
 					battleLine.ElementRemove(resIdx);
+					battleLine.UpdateElementPosition();
 					gameObject.SetActive(false);
 					input.UpdateManual();
 				}
 			);
+		}
+		else
+		{
+			battleLine.ElementRemove(resIdx);
+			battleSceneManager.rotateSequence.InsertCallback(battleSceneManager.sequenceTime,
+				() =>
+				{
+					battleLine.UpdateElementPosition();
+					gameObject.SetActive(false);
+					input.UpdateManual();
+				}
+			);
+		}
 	}
-
 	public void CleaveAttackAnimationEvent(int resIdx, int count)
 	{
 		if (target == null) return;
@@ -367,30 +426,46 @@ public class UnitElementController : BattleElementController,
 	{
 		float retreatTime = 0.4f;
 
-		if(method == "append")
+		InspectComponent.transform.DOBlendableLocalMoveBy(new Vector3(0, componentMove, 0), componentMoveTime);
+		RectTransform counterTransform = counterIcon.GetComponent<RectTransform>();
+		counterTransform.DOScale(counterScaleOrigin, componentMoveTime);
+		//healthText.fontSize = normalFontSizeOrigin;
+		//attackText.fontSize = normalFontSizeOrigin;
+		attackCounterText.fontSize = counterfontSizeOrigin;
+		UpdateInspectComponent();
+
+		if (method == "append")
 		{
 			Vector3 rotateBy = new Vector3(0, 0, ((ownership * 2) - 1) * 90);
 			battleSceneManager.rotateSequence.Append(
 				transform.DOMove(stack.transform.position + 500 * Vector3.left, retreatTime)
+				.OnComplete(() => this.gameObject.SetActive(false))
 				);
 			battleSceneManager.rotateSequence.Join(
 				transform.DOBlendableRotateBy(rotateBy, retreatTime)
 				);
+			battleSceneManager.rotateSequence.Join(transform.DOScale(handicapScale, retreatTime));
 			battleSceneManager.sequenceTime += retreatTime;
 		}
 		else
 		{
 			Vector3 rotateBy = new Vector3(0, 0, ((ownership * 2) - 1) * 90);
-			battleSceneManager.rotateSequence.Append(
+			battleSceneManager.rotateSequence.Join(
 				transform.DOMove(stack.transform.position + 500 * Vector3.left, retreatTime)
+				.OnComplete(() => this.gameObject.SetActive(false))
 				);
 			battleSceneManager.rotateSequence.Join(
 				transform.DOBlendableRotateBy(rotateBy, retreatTime)
 				);
+			battleSceneManager.rotateSequence.Join(transform.DOScale(handicapScale, retreatTime));
+			transform.DOScale(handicapScale, retreatTime);
 			battleSceneManager.sequenceTime += retreatTime;
 		}
 	}
+	public void UpdateInspectComponent()
+	{
 
+	}
 
 
 
@@ -425,6 +500,9 @@ public class UnitElementController : BattleElementController,
 			{
 				// 播放动画
 				//TODO 检视
+				InspectPanel.transform.position = transform.position + 400 * Vector3.right;
+				InspectPanel.DOFade(1f, duration);
+
 				canvas.sortingOrder = attackOrder;
 			}
 		}
@@ -432,6 +510,7 @@ public class UnitElementController : BattleElementController,
 	public override void OnDrag(PointerEventData eventData)
 	{
 		base.OnDrag(eventData);
+		Arrows.GetComponent<CanvasGroup>().alpha = 0f;
 		timer = -1;
 		InspectPanel.alpha = 0;
 	}
@@ -459,14 +538,16 @@ public class UnitElementController : BattleElementController,
 	{
 		base.OnEndDrag(eventData);
 
-		HandicapController.isDragging = false;
+		//HandicapController.isDragging = false;
 		//部署条件判定
 		if (dataState == ElementState.inHandicap)
 		{
 			if (battleSceneManager.PlayerDeploy(eventData.position, this.handicapIdx) >= 0)
 			{
+				HandicapController.isDragging = false;
 				return;
 			}
+			HandicapController.isDragging = false;
 			handicap.Insert(this);
 		}
 		//移动撤退条件判定
@@ -474,20 +555,25 @@ public class UnitElementController : BattleElementController,
 		{
 			if (operateCounter <= 0)
 			{
+				HandicapController.isDragging = false;
 				return;
 			}
 			if (category == "Construction")
 			{
-				return;
-			}
-			if (battleSceneManager.PlayerMove(eventData.position, this.battleLine, this) >= 0)
-			{
+				HandicapController.isDragging = false;
 				return;
 			}
 			if (this.battleLine.lineIdx == 0 && battleSceneManager.PlayerRetreat(eventData.position, this.battleLine, this) >= 0)
 			{
+				HandicapController.isDragging = false;
 				return;
 			}
+			if (battleSceneManager.PlayerMove(eventData.position, this.battleLine, this) >= 0)
+			{
+				HandicapController.isDragging = false;
+				return;
+			}
+			HandicapController.isDragging = false;
 			battleLine.Insert(this);
 		}
 	}
@@ -495,11 +581,13 @@ public class UnitElementController : BattleElementController,
 	public override void OnPointerEnter(PointerEventData eventData)
 	{
 		base.OnPointerEnter(eventData);
-
+		if(BattleLineController.updating)
+		{
+			return;
+		}
 		if (dataState == ElementState.inBattleLine)
 		{
 			timer = 0.8f;
-
 			return;
 		}
 	}
@@ -507,34 +595,19 @@ public class UnitElementController : BattleElementController,
 	public override void OnPointerExit(PointerEventData eventData)
 	{
 		base.OnPointerExit(eventData);
-
+		if (BattleLineController.updating)
+		{
+			return;
+		}
 		if (dataState == ElementState.inBattleLine)
 		{
 			timer = -1;
 			//TODO 检视
+			InspectPanel.DOFade(0f, duration);
 
 			canvas.sortingOrder = oriOrder;
 			return;
 		}
 	}
 
-
-
-
-
-
-
-
-
-
-
-	//TODO
-	public int GetBattleLineIdx(float y)
-	{
-		if (y > 220 && y < 1970)
-		{
-			return (int)((y - 180) / 466);
-		}
-		return -1;
-	}
 }
