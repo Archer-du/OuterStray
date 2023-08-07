@@ -440,8 +440,12 @@ public class UnitElementController : BattleElementController,
 			Vector3 rotateBy = new Vector3(0, 0, ((ownership * 2) - 1) * 90);
 			battleSceneManager.rotateSequence.Append(
 				transform.DOMove(stack.transform.position + 500 * Vector3.left, retreatTime)
-				.OnComplete(() => this.gameObject.SetActive(false))
-				);
+				.OnComplete(() =>
+				{
+					animeLock = false;
+					this.gameObject.SetActive(false);
+				})
+			);
 			battleSceneManager.rotateSequence.Join(
 				transform.DOBlendableRotateBy(rotateBy, retreatTime)
 				);
@@ -453,8 +457,12 @@ public class UnitElementController : BattleElementController,
 			Vector3 rotateBy = new Vector3(0, 0, ((ownership * 2) - 1) * 90);
 			battleSceneManager.rotateSequence.Join(
 				transform.DOMove(stack.transform.position + 500 * Vector3.left, retreatTime)
-				.OnComplete(() => this.gameObject.SetActive(false))
-				);
+				.OnComplete(() =>
+				{
+					animeLock = false;
+					this.gameObject.SetActive(false);
+				})
+			);
 			battleSceneManager.rotateSequence.Join(
 				transform.DOBlendableRotateBy(rotateBy, retreatTime)
 				);

@@ -140,7 +140,7 @@ public class BattleSceneManager : MonoBehaviour,
 	public void UpdateTurn(int TURN)
 	{
 		Turn = TURN;
-		Turn++;
+		turnNum++;
 		if(Turn == 0)
 		{
 			buttonImage.color = Color.white;
@@ -156,7 +156,7 @@ public class BattleSceneManager : MonoBehaviour,
 	private void UpdateTurn()
 	{
 		Turn = (Turn + 1) % 2;
-		Turn++;
+		turnNum++;
 		Debug.Log("next turn: " + Turn);
 		if (Turn == 0)
 		{
@@ -367,6 +367,10 @@ public class BattleSceneManager : MonoBehaviour,
 		{
 			return -1;
 		}
+		if (BattleLineController.updating)
+		{
+			return -1;
+		}
 		int idx = GetBattleLineIdx(position.y);
 		if (idx < 0)
 		{
@@ -401,6 +405,10 @@ public class BattleSceneManager : MonoBehaviour,
 	public int PlayerMove(Vector2 position, BattleLineController resLine, UnitElementController element)
 	{
 		if (Turn != 0)
+		{
+			return -1;
+		}
+		if (BattleLineController.updating)
 		{
 			return -1;
 		}
