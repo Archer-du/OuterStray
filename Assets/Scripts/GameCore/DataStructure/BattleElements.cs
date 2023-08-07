@@ -537,86 +537,29 @@ namespace DataCore.BattleElements
 				}
 			}
 
+			this.mocking = false;
 			//顺序不能变
 			if (attackRange[0] != null && attackRange[0].category == "Guardian")
 			{
+				this.mocking = true;
 				this.target = attackRange[0];
 				this.targetIdx = 0;
 			}
 			if (attackRange[2] != null && attackRange[2].category == "Guardian")
 			{
+				this.mocking = true;
 				this.target = attackRange[2];
 				this.targetIdx = 2;
 			}
 			if (attackRange[1] != null && attackRange[1].category == "Guardian")
 			{
+				this.mocking = true;
 				this.target = attackRange[1];
 				this.targetIdx = 1;
 			}
 
 
-			controller.UpdateTarget(attackRange[0]?.controller, attackRange[1]?.controller, attackRange[2]?.controller, target?.controller, targetIdx);
-			//if (attackRange[0] == null)
-			//{
-			//	if (attackRange[1] == null)
-			//	{
-			//		if (attackRange[2] == null)
-			//		{
-			//			this.target = null;
-			//			this.targetIdx = -1;
-			//		}
-			//		else
-			//		{
-			//			this.target = attackRange[2];
-			//			this.targetIdx = 2;
-			//		}
-			//	}
-			//	else
-			//	{
-			//		if (attackRange[2] == null)
-			//		{
-			//			this.target = attackRange[1];
-			//			this.targetIdx = 1;
-			//		}
-			//		else
-			//		{
-			//			this.target = (attackRange[1].dynHealth < attackRange[2].dynHealth) ? attackRange[1] : attackRange[2];
-			//			this.targetIdx = (attackRange[1].dynHealth < attackRange[2].dynHealth) ? 1 : 2;
-			//		}
-			//	}
-			//}
-			//else
-			//{
-			//	if (attackRange[1] == null)
-			//	{
-			//		if (attackRange[2] == null)
-			//		{
-			//			this.target = attackRange[0];
-			//			this.targetIdx = 0;
-			//		}
-			//		else
-			//		{
-			//			this.target = (attackRange[0].dynHealth < attackRange[2].dynHealth) ? attackRange[0] : attackRange[2];
-			//			this.targetIdx = (attackRange[0].dynHealth < attackRange[2].dynHealth) ? 0 : 2;
-			//		}
-			//	}
-			//	else
-			//	{
-			//		if (attackRange[2] == null)
-			//		{
-			//			this.target = (attackRange[0].dynHealth < attackRange[1].dynHealth) ? attackRange[0] : attackRange[1];
-			//			this.targetIdx = (attackRange[0].dynHealth < attackRange[1].dynHealth) ? 0 : 1;
-			//		}
-			//		else
-			//		{
-			//			this.target = (attackRange[1].dynHealth < attackRange[2].dynHealth) ? attackRange[1] : attackRange[2];
-			//			this.targetIdx = (attackRange[1].dynHealth < attackRange[2].dynHealth) ? 1 : 2;
-			//			this.target = (attackRange[0].dynHealth < target.dynHealth) ? attackRange[0] : target;
-			//			this.targetIdx = (attackRange[0].dynHealth < target.dynHealth) ? 0 : targetIdx;
-			//		}
-			//	}
-			//}
-			//controller.UpdateTarget(attackRange[0]?.controller, attackRange[1]?.controller, attackRange[2]?.controller, target?.controller, targetIdx);
+			controller.UpdateTarget(target?.controller, targetIdx, mocking, cleave);
 		}
 		/// <summary>
 		/// 回合结束结算攻击，回复操作数（系统更新）
@@ -888,15 +831,6 @@ namespace DataCore.BattleElements
 
 
 
-		internal void AuraGain(BattleElement element, BattleSystem system)
-		{
-			if (aura)
-			{
-
-			}
-		}
-
-
 
 
 
@@ -925,7 +859,7 @@ namespace DataCore.BattleElements
 		}
 		internal void UpdateInfo()
 		{
-			controller.UpdateInfo(cost, dynAttackReader, dynHealth, maxHealthReader, dynAttackCounter, operateCounter, 
+			controller.UpdateInfo(cost, dynAttackReader, maxHealthReader, dynAttackCounter, operateCounter, 
 				state, moveRange, aura, dynAttackReader - oriAttack, maxHealthReader - oriHealth);
 		}
 

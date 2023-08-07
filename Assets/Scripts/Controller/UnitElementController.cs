@@ -28,9 +28,13 @@ public class UnitElementController : BattleElementController,
 	public Image operateMask;
 
 	public GameObject Arrows;
+	public CanvasGroup arrowsGroup;
 	public Image leftArrow;
 	public Image rightArrow;
 	public Image midArrow;
+	public Image leftArrowMocked;
+	public Image rightArrowMocked;
+	public Image midArrowMocked;
 
 	/// <summary>
 	/// 
@@ -67,11 +71,13 @@ public class UnitElementController : BattleElementController,
 	{
 		Init(ID, ownership, name, categories, cost, description);
 
-		pastScale = handicapScale;
+		healthText.text = maxHealthPoint.ToString();
+
 		this.input = input;
 		Arrows.transform.localScale = new Vector3(1, (1 - ownership * 2) * 1, 1);
 
-		Arrows.GetComponent<CanvasGroup>().alpha = 0;
+		arrowsGroup = Arrows.GetComponent<CanvasGroup>();
+		arrowsGroup.alpha = 0;
 		InspectPanel.alpha = 0f;
 
 		InspectorName.text = name;
@@ -88,12 +94,11 @@ public class UnitElementController : BattleElementController,
 		InspectorCostTag.color = elementGround.color;
 		InspectorCategoryIcon.sprite = componentCategoryIcon.sprite;
 	}
-	public void UpdateInfo(int cost, int attackPoint, int healthPoint, int maxHealthPoint, int attackCounter, int operateCounter,
+	public void UpdateInfo(int cost, int attackPoint, int maxHealthPoint, int attackCounter, int operateCounter,
 		ElementState state, int moveRange, bool aura, int attackBuff, int maxHealthBuff)
 	{
 		this.cost = cost;
 		this.attackPoint = attackPoint;
-		this.healthPoint = healthPoint;
 		this.maxHealthPoint = maxHealthPoint;
 		this.attackCounter = attackCounter;
 		this.operateCounter = operateCounter;
@@ -102,7 +107,6 @@ public class UnitElementController : BattleElementController,
 
 		nameText.text = nameContent;
 		attackText.text = attackPoint.ToString();
-		healthText.text = healthPoint.ToString();
 		attackCounterText.text = attackCounter > 100 ? "" : attackCounter.ToString();
 		costText.text = cost.ToString();
 		descriptionText.text = description;
@@ -153,34 +157,59 @@ public class UnitElementController : BattleElementController,
 		//	0.2f
 		//).SetEase(Ease.Linear); // 设置动画为线性变化
 	}
-	public void UpdateTarget(IUnitElementController t1, IUnitElementController t2, IUnitElementController t3, IUnitElementController target, int targetIdx)
+	public void UpdateTarget(IUnitElementController target, int targetIdx, bool mocking, bool cleave)
 	{
 		this.target = target as UnitElementController;
-
-		Arrows.GetComponent<CanvasGroup>().alpha = 0;
+		battleSceneManager.rotateSequence.InsertCallback(battleSceneManager.sequenceTime,
+			() =>
+			{
+				UpdateTarget(targetIdx, mocking, cleave);
+			}
+		);
+	}
+	private void UpdateTarget(int targetIdx, bool mocking, bool cleave)
+	{
+		arrowsGroup.alpha = 0;
+		
+		if (cleave)
+		{
+			arrowsGroup.alpha = 1;
+			leftArrow.DOFade(1, duration);
+			midArrow.DOFade(1, duration);
+			rightArrow.DOFade(1, duration);
+			return;
+		}
 		if (targetIdx == 0)
 		{
-			Arrows.GetComponent<CanvasGroup>().alpha = 1;
+			arrowsGroup.alpha = 1;
 			leftArrow.DOFade(1, duration);
+			leftArrowMocked.DOFade(mocking ? 1 : 0, duration);
 			midArrow.DOFade(0, duration);
+			midArrowMocked.DOFade(0, duration);
 			rightArrow.DOFade(0, duration);
+			rightArrowMocked.DOFade(0, duration);
 		}
-		if(targetIdx == 1)
+		if (targetIdx == 1)
 		{
-			Arrows.GetComponent<CanvasGroup>().alpha = 1;
+			arrowsGroup.alpha = 1;
 			leftArrow.DOFade(0, duration);
+			leftArrowMocked.DOFade(0, duration);
 			midArrow.DOFade(1, duration);
+			midArrowMocked.DOFade(mocking ? 1 : 0, duration);
 			rightArrow.DOFade(0, duration);
+			rightArrowMocked.DOFade(0, duration);
 		}
-		if(targetIdx == 2)
+		if (targetIdx == 2)
 		{
-			Arrows.GetComponent<CanvasGroup>().alpha = 1;
+			arrowsGroup.alpha = 1;
 			leftArrow.DOFade(0, duration);
+			leftArrowMocked.DOFade(0, duration);
 			midArrow.DOFade(0, duration);
+			midArrowMocked.DOFade(0, duration);
 			rightArrow.DOFade(1, duration);
+			rightArrowMocked.DOFade(mocking ? 1 : 0, duration);
 		}
 	}
-
 
 
 

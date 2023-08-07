@@ -116,6 +116,9 @@ public class BattleSceneManager : MonoBehaviour,
 			plantSlots[i].SetActive(false);
 		}
 
+		rotateSequence.Kill();
+		rotateSequence = DOTween.Sequence();
+
 		check = true;
 	}
 	/// <summary>
@@ -382,6 +385,7 @@ public class BattleSceneManager : MonoBehaviour,
 			return -1;
 		}
 		int pos = battleLineControllers[idx].GetCastPos(position.x);
+		Debug.Log(pos);
 		string type = (handicapController[0][handicapIdx] as CommandElementController).type;
 		if(pos < 0 && type == "Target") return -1;
 
