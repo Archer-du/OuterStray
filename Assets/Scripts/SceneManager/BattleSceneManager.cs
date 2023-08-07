@@ -36,6 +36,7 @@ public class BattleSceneManager : MonoBehaviour,
 	/// 渲染层TURN备份
 	/// </summary>
 	public static int Turn;
+	public int turnNum;
 
 
 
@@ -91,6 +92,7 @@ public class BattleSceneManager : MonoBehaviour,
 	public void FieldInitialize(IBattleSystemInput handler)
 	{
 		battleSystem = handler;
+		turnNum = 0;
 
 		fieldCapacity = 4;
 		battleLineControllers = new BattleLineController[fieldCapacity];
@@ -138,7 +140,7 @@ public class BattleSceneManager : MonoBehaviour,
 	public void UpdateTurn(int TURN)
 	{
 		Turn = TURN;
-		
+		Turn++;
 		if(Turn == 0)
 		{
 			buttonImage.color = Color.white;
@@ -154,6 +156,7 @@ public class BattleSceneManager : MonoBehaviour,
 	private void UpdateTurn()
 	{
 		Turn = (Turn + 1) % 2;
+		Turn++;
 		Debug.Log("next turn: " + Turn);
 		if (Turn == 0)
 		{
