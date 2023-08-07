@@ -563,6 +563,27 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: Atlas-UI_0
+      rect:
+        serializedVersion: 2
+        x: 997
+        y: 642
+        width: 236
+        height: 19
+      alignment: 9
+      pivot: {x: 0.50000054, y: 0.45449668}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b9a2576b5956eff49a010365904cabf9
+      internalID: -368541170
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []

@@ -85,11 +85,14 @@ public class BattleSceneManager : MonoBehaviour,
 	public static bool settlement = false;
 	public bool check = false;
 
+	//对话框
+	public GameObject dialog;
+	public GameObject text;
+    public TextMeshPro nameText;
+	public string[] nameTag;
 
 
-
-
-	public void FieldInitialize(IBattleSystemInput handler)
+    public void FieldInitialize(IBattleSystemInput handler)
 	{
 		battleSystem = handler;
 		turnNum = 0;
@@ -109,8 +112,17 @@ public class BattleSceneManager : MonoBehaviour,
 
 		fieldWidth = GameObject.Find("BattleField").GetComponent<RectTransform>().rect.width;
 		fieldHeight = GameObject.Find("BattleField").GetComponent<RectTransform>().rect.height;
+		
+		
+		dialog = GameObject.Find("Dialog");
+		text = dialog.transform.Find("Text(TMP)").gameObject;
+        dialog.SetActive(false);
+		nameTag = new string[2];
+        //nameText = dialog.transform.Find("Text(TMP)").GetComponent<TextMeshPro>();
+        nameTag[0] = "Hello world";
+		nameTag[1] = "你好";
 
-		for(int i = 0; i < 5; i++)
+        for (int i = 0; i < 5; i++)
 		{
 			humanSlots[i].SetActive(false);
 			plantSlots[i].SetActive(false);
@@ -118,10 +130,33 @@ public class BattleSceneManager : MonoBehaviour,
 
 		check = true;
 	}
-	/// <summary>
-	/// 
-	/// </summary>
-	public void UpdateTurnWithSettlement()
+
+
+    private void DisplayDialog()
+    {
+        if (turnNum % 2 == 1)
+        {
+            dialog.SetActive(true);
+        }
+    }
+
+    private void Update()
+    {
+        if (turnNum % 2 == 1)
+        {
+            DisplayDialog();
+/*			DOTween.To(
+				() => "", // getter返回空字符串
+				value => nameText.text = value, // setter设置costText的内容
+				nameTag, // endValue是原始内容
+				0.2f
+			).SetEase(Ease.Linear); // 设置动画为线性变化*/
+		}
+    }
+    /// <summary>
+    /// 
+    /// </summary>
+    public void UpdateTurnWithSettlement()
 	{
 		//结算攻击动画
 		rotateSequence.InsertCallback(sequenceTime, () =>
@@ -140,7 +175,7 @@ public class BattleSceneManager : MonoBehaviour,
 	public void UpdateTurn(int TURN)
 	{
 		Turn = TURN;
-		Turn++;
+		turnNum++;
 		if(Turn == 0)
 		{
 			buttonImage.color = Color.white;
@@ -156,7 +191,7 @@ public class BattleSceneManager : MonoBehaviour,
 	private void UpdateTurn()
 	{
 		Turn = (Turn + 1) % 2;
-		Turn++;
+		turnNum++;
 		Debug.Log("next turn: " + Turn);
 		if (Turn == 0)
 		{
@@ -170,12 +205,11 @@ public class BattleSceneManager : MonoBehaviour,
 			StartCoroutine(AIBehavior());
 		}
 	}
-	
 
 
 
 
-	public void UpdateEnergy(int energy)
+    public void UpdateEnergy(int energy)
 	{
 		this.energy[Turn] = energy;
 		this.energyText[Turn].text = energy.ToString();
@@ -367,7 +401,11 @@ public class BattleSceneManager : MonoBehaviour,
 		{
 			return -1;
 		}
-		int idx = GetBattleLineIdx(position.y);
+        if (BattleLineController.updating)
+        {
+            return -1;
+        }
+        int idx = GetBattleLineIdx(position.y);
 		if (idx < 0)
 		{
 			return -1;
