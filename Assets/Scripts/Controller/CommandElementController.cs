@@ -60,8 +60,12 @@ public class CommandElementController : BattleElementController,
 			Vector3 rotateBy = new Vector3(0, 0, ((ownership * 2) - 1) * 90);
 			seq.Append(
 				transform.DOMove(stack.transform.position + 500 * Vector3.left, castTime)
-				.OnComplete(() => animeLock = false)
-				);
+				.OnComplete(() =>
+				{
+					animeLock = false;
+					this.gameObject.SetActive(false);
+				})
+			);
 			seq.Join(
 				transform.DOBlendableRotateBy(rotateBy, castTime)
 				);
@@ -74,8 +78,12 @@ public class CommandElementController : BattleElementController,
 			Vector3 rotateBy = new Vector3(0, 0, ((ownership * 2) - 1) * 90);
 			seq.Append(
 				transform.DOMove(stack.transform.position + 500 * Vector3.left, castTime)
-				.OnComplete(() => animeLock = false)
-				);
+				.OnComplete(() =>
+				{
+					animeLock = false;
+					this.gameObject.SetActive(false);
+				})
+			);
 			seq.Join(
 				transform.DOBlendableRotateBy(rotateBy, castTime)
 				);

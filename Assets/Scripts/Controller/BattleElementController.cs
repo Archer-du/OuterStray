@@ -153,8 +153,6 @@ public class BattleElementController : MonoBehaviour,
 		battleFieldScale = transform.localScale;
 		handicapScale = 1.35f * battleFieldScale;
 		inspectScale = 1.2f * handicapScale;
-		Debug.Log(battleFieldScale);
-		Debug.Log(handicapScale);
 	}
 
 

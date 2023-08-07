@@ -115,10 +115,10 @@ namespace DisplayInterface
 	{
 		public void UnitInit(string ID, int ownership, string name, string categories, int cost, string description, IUnitInput input);
 
-		public void UpdateInfo(int cost, int attackPoint, int healthPoint, int maxHealthPoint, int attackCounter, int operateCounter,
+		public void UpdateInfo(int cost, int attackPoint, int maxHealthPoint, int attackCounter, int operateCounter,
 			ElementState state, int moveRange, bool aura, int attackBuff, int maxHealthBuff);
 
-		public void UpdateTarget(IUnitElementController t1, IUnitElementController t2, IUnitElementController t3, IUnitElementController target, int targetIdx);
+		public void UpdateTarget(IUnitElementController target, int targetIdx, bool mocking, bool cleave);
 
 		public void DeployAnimationEvent();
 		public void MoveAnimationEvent();

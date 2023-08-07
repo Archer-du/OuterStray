@@ -128,6 +128,9 @@ public class BattleSceneManager : MonoBehaviour,
 			plantSlots[i].SetActive(false);
 		}
 
+		rotateSequence.Kill();
+		rotateSequence = DOTween.Sequence();
+
 		check = true;
 	}
 
@@ -401,11 +404,11 @@ public class BattleSceneManager : MonoBehaviour,
 		{
 			return -1;
 		}
-        if (BattleLineController.updating)
-        {
-            return -1;
-        }
-        int idx = GetBattleLineIdx(position.y);
+		if (BattleLineController.updating)
+		{
+			return -1;
+		}
+		int idx = GetBattleLineIdx(position.y);
 		if (idx < 0)
 		{
 			return -1;
@@ -416,6 +419,7 @@ public class BattleSceneManager : MonoBehaviour,
 			return -1;
 		}
 		int pos = battleLineControllers[idx].GetCastPos(position.x);
+		Debug.Log(pos);
 		string type = (handicapController[0][handicapIdx] as CommandElementController).type;
 		if(pos < 0 && type == "Target") return -1;
 
@@ -439,6 +443,10 @@ public class BattleSceneManager : MonoBehaviour,
 	public int PlayerMove(Vector2 position, BattleLineController resLine, UnitElementController element)
 	{
 		if (Turn != 0)
+		{
+			return -1;
+		}
+		if (BattleLineController.updating)
 		{
 			return -1;
 		}

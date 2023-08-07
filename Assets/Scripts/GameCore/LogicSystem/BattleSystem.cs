@@ -602,7 +602,7 @@ namespace LogicCore
 
 			TURN = (TURN + 1) % 2;
 
-			energy[TURN] += energySupply[TURN];
+			energy[TURN] = energy[TURN] + energySupply[TURN] > 15 ? 15 : energy[TURN] + energySupply[TURN];
 			controller.UpdateEnergy(TURN, energy[TURN]);
 
 			eventTable[TURN].RaiseEvent("StartOfTurn", null, this);

@@ -289,16 +289,11 @@ namespace EventEffectModels
 
 			if (element.battleLine.index != system.frontLines[element.ownership]) return;
 
-			//for(int i = 0; i < system.battleLines[system.frontLines[element.ownership]].count; i++)
-			//{
-			//	system.battleLines[system.frontLines[element.ownership]][i].Damaged(damage, "immediate");
-			//}
 			int i = 0; int j = 0;
-			//这里注意，可能会爆栈
-			int num = system.battleLines[system.frontLines[BattleSystem.TURN]].count;
+			int num = system.battleLines[system.frontLines[(this.source.ownership + 1) % 2]].count;
 			while (i < num)
 			{
-				UnitElement e = system.battleLines[system.frontLines[BattleSystem.TURN]][j];
+				UnitElement e = system.battleLines[system.frontLines[(this.source.ownership + 1) % 2]][j];
 				if (e.Damaged(damage, "immediate") > 0)
 				{
 					j++;
@@ -585,10 +580,6 @@ namespace EventEffectModels
 						}
 						i++;
 					}
-					//for(int i = 0; i < system.battleLines[system.frontLines[(BattleSystem.TURN + 1) % 2]].count; i++)
-					//{
-					//	system.battleLines[system.frontLines[(BattleSystem.TURN + 1) % 2]][i].Damaged(damage, "immediate");
-					//}
 					break;
 			}
 		}
@@ -653,6 +644,7 @@ namespace EventEffectModels
 				{
 					system.deployQueue[i].maxHealthGain.Remove(publisher.battleID);
 				}
+				system.deployQueue[i].UpdateInfo();
 			}
 		}
 		internal void AuraDisable(BattleElement target, BattleSystem system)
@@ -668,6 +660,7 @@ namespace EventEffectModels
 			{
 				element.maxHealthGain.Remove(publisher.battleID);
 			}
+			element.UpdateInfo();
 		}
 
 		internal void AuraRandomDamage(BattleElement element, BattleSystem system)
