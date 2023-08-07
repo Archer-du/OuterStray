@@ -9,8 +9,7 @@ using UnityEngine.UI;
 using System;
 using System.Xml.Linq;
 using System.Data;
-using static UnityEditor.PlayerSettings;
-
+using System.IO;
 
 public class AnimationQueue
 {
@@ -85,11 +84,16 @@ public class BattleSceneManager : MonoBehaviour,
 	public static bool settlement = false;
 	public bool check = false;
 
+	//对话框
+	public GameObject dialogFrame;
+    public TextMeshProUGUI nameText;
+	public string dialogs;
+    private int previousTurnNum = -1;
+
+	StreamReader reader;
 
 
-
-
-	public void FieldInitialize(IBattleSystemInput handler)
+    public void FieldInitialize(IBattleSystemInput handler)
 	{
 		battleSystem = handler;
 		turnNum = 0;
@@ -109,8 +113,17 @@ public class BattleSceneManager : MonoBehaviour,
 
 		fieldWidth = GameObject.Find("BattleField").GetComponent<RectTransform>().rect.width;
 		fieldHeight = GameObject.Find("BattleField").GetComponent<RectTransform>().rect.height;
+		
+		
+		dialogFrame = GameObject.Find("Dialog");
+        nameText = dialogFrame.transform.Find("Text(TMP)").GetComponent<TextMeshProUGUI>();
+        dialogFrame.SetActive(false);
 
-		for(int i = 0; i < 5; i++)
+        reader = File.OpenText("\\UnityProject\\AIGC\\OuterStray\\Assets\\Tutorial\\TutorialDialog.txt");
+
+        
+
+        for (int i = 0; i < 5; i++)
 		{
 			humanSlots[i].SetActive(false);
 			plantSlots[i].SetActive(false);
@@ -121,10 +134,42 @@ public class BattleSceneManager : MonoBehaviour,
 
 		check = true;
 	}
-	/// <summary>
-	/// 
-	/// </summary>
-	public void UpdateTurnWithSettlement()
+
+
+    private void DisplayDialog()
+    {
+        if (turnNum % 2 == 1)
+        {
+            dialogs = reader.ReadLine();
+			if (dialogs == null) return;
+            dialogFrame.SetActive(true);
+			DOTween.To(
+				() => "",
+				value => nameText.text = value,
+				dialogs,
+				0.8f
+			).SetEase(Ease.Linear);
+        }
+    }
+
+    private void Update()
+    {
+        if (turnNum % 2 == 1 && turnNum != previousTurnNum)
+        {
+            DisplayDialog();
+            previousTurnNum = turnNum;
+        }
+        if (turnNum % 2 == 0 && turnNum != previousTurnNum)
+        {
+            dialogFrame.SetActive(false);
+            previousTurnNum = turnNum;
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void UpdateTurnWithSettlement()
 	{
 		//结算攻击动画
 		rotateSequence.InsertCallback(sequenceTime, () =>
@@ -173,12 +218,11 @@ public class BattleSceneManager : MonoBehaviour,
 			StartCoroutine(AIBehavior());
 		}
 	}
-	
 
 
 
 
-	public void UpdateEnergy(int energy)
+    public void UpdateEnergy(int energy)
 	{
 		this.energy[Turn] = energy;
 		this.energyText[Turn].text = energy.ToString();
