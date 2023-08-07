@@ -645,6 +645,7 @@ namespace EventEffectModels
 					system.deployQueue[i].maxHealthGain.Remove(publisher.battleID);
 				}
 				system.deployQueue[i].UpdateInfo();
+				system.deployQueue[i].UpdateHealth();
 			}
 		}
 		internal void AuraDisable(BattleElement target, BattleSystem system)
@@ -661,6 +662,7 @@ namespace EventEffectModels
 				element.maxHealthGain.Remove(publisher.battleID);
 			}
 			element.UpdateInfo();
+			element.UpdateHealth();
 		}
 
 		internal void AuraRandomDamage(BattleElement element, BattleSystem system)
@@ -733,6 +735,8 @@ namespace EventEffectModels
 				element.attackGain.Add(publisher.battleID, atkGain);
 				element.maxHealthGain.Add(publisher.battleID, mhpGain);
 			}
+			element.UpdateInfo();
+			element.UpdateHealth();
 		}
 		internal void AuraConstantUnitGain(BattleElement target, BattleSystem system)
 		{
@@ -755,6 +759,8 @@ namespace EventEffectModels
 					element.attackGain.Add(publisher.battleID, atkGain);
 					element.maxHealthGain.Add(publisher.battleID, mhpGain);
 				}
+				element.UpdateInfo();
+				element.UpdateHealth();
 			}
 		}
 		internal void AuraDoubleRecover(BattleElement target, BattleSystem system)
@@ -782,6 +788,7 @@ namespace EventEffectModels
 			{
 				element.dynHealth = 1;
 				element.damage = 0;
+				element.UpdateHealth();
 			}
 		}
 
@@ -893,6 +900,7 @@ namespace EventEffectModels
 
 			unit.dynAttackWriter = system.handicaps[element.ownership].count > 0 ? system.handicaps[element.ownership].count : 1;
 			unit.maxHealthWriter = system.handicaps[element.ownership].count > 0 ? system.handicaps[element.ownership].count : 1;
+			unit.UpdateHealth();
 
 			SummonToPosition(element, system, 2, unit);
 		}
@@ -918,6 +926,7 @@ namespace EventEffectModels
 
 			publisher.dynAttackWriter += 2;
 			publisher.maxHealthWriter += 2;
+			publisher.UpdateHealth();
 
 			if (publisher.dynAttackWriter >= 15)
 			{

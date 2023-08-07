@@ -484,11 +484,11 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 385801062226062653}
-  - {fileID: 3195750323980107043}
+  - {fileID: 2223305051395042996}
   - {fileID: 8304068817361055204}
   - {fileID: 714164908030721394}
   - {fileID: 6287772431107451084}
-  - {fileID: 2223305051395042996}
+  - {fileID: 3195750323980107043}
   m_Father: {fileID: 2380469442781658781}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1171,7 +1171,7 @@ GameObject:
   - component: {fileID: 7006875275643311388}
   - component: {fileID: 2746271527344825118}
   m_Layer: 0
-  m_Name: LeftArrowMocked
+  m_Name: RightArrowMocked
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1247,7 +1247,7 @@ GameObject:
   - component: {fileID: 8544698024203457283}
   - component: {fileID: 3258223755577703646}
   m_Layer: 0
-  m_Name: RightArrowMocked
+  m_Name: LeftArrowMocked
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2448,8 +2448,8 @@ MonoBehaviour:
   leftArrow: {fileID: 4374081778183381601}
   rightArrow: {fileID: 4604591679549227896}
   midArrow: {fileID: 8715966167778204923}
-  leftArrowMocked: {fileID: 2746271527344825118}
-  rightArrowMocked: {fileID: 3258223755577703646}
+  leftArrowMocked: {fileID: 3258223755577703646}
+  rightArrowMocked: {fileID: 2746271527344825118}
   midArrowMocked: {fileID: 3486708091901537818}
   battleLine: {fileID: 0}
   resIdx: 0

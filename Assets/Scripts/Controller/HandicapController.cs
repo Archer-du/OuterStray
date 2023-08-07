@@ -85,7 +85,6 @@ public class HandicapController : MonoBehaviour,
 			element.gameObject.SetActive(true);
 			element.transform.SetParent(transform);
 			element.transform.localScale = element.handicapScale;
-			Debug.Log(element.handicapScale);
 
 			Vector3 moveBy = GetInsertionPosition(i) - element.transform.position;
 			Vector3 rotateBy = new Vector3(0, 0, (1 - (ownership * 2)) * 90);

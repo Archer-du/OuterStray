@@ -157,6 +157,15 @@ public class UnitElementController : BattleElementController,
 		//	0.2f
 		//).SetEase(Ease.Linear); // 设置动画为线性变化
 	}
+	public void UpdateHealth(int dynHealth)
+	{
+		battleSceneManager.rotateSequence.InsertCallback(battleSceneManager.sequenceTime,
+			() =>
+			{
+				healthText.text = dynHealth.ToString();
+			}
+		);
+	}
 	public void UpdateTarget(IUnitElementController target, int targetIdx, bool mocking, bool cleave)
 	{
 		this.target = target as UnitElementController;

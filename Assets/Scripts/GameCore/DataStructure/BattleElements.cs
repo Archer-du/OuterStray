@@ -622,6 +622,9 @@ namespace DataCore.BattleElements
 			}
 			battleSystem.UnitIDDic[this.backendID].Add(this);
 
+			UpdateInfo();
+			UpdateHealth();
+			UpdateTarget();
 			controller.DeployAnimationEvent();
 			//战线接收
 			dstLine.Receive(this, dstPos);
@@ -862,7 +865,10 @@ namespace DataCore.BattleElements
 			controller.UpdateInfo(cost, dynAttackReader, maxHealthReader, dynAttackCounter, operateCounter, 
 				state, moveRange, aura, dynAttackReader - oriAttack, maxHealthReader - oriHealth);
 		}
-
+		internal void UpdateHealth()
+		{
+			controller.UpdateHealth(this.dynHealth);
+		}
 
 
 

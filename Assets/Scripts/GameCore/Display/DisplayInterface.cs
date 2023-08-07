@@ -118,6 +118,8 @@ namespace DisplayInterface
 		public void UpdateInfo(int cost, int attackPoint, int maxHealthPoint, int attackCounter, int operateCounter,
 			ElementState state, int moveRange, bool aura, int attackBuff, int maxHealthBuff);
 
+		public void UpdateHealth(int dynHealth);
+
 		public void UpdateTarget(IUnitElementController target, int targetIdx, bool mocking, bool cleave);
 
 		public void DeployAnimationEvent();
