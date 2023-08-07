@@ -9,8 +9,7 @@ using UnityEngine.UI;
 using System;
 using System.Xml.Linq;
 using System.Data;
-using static UnityEditor.PlayerSettings;
-
+using System.IO;
 
 public class AnimationQueue
 {
@@ -86,10 +85,12 @@ public class BattleSceneManager : MonoBehaviour,
 	public bool check = false;
 
 	//对话框
-	public GameObject dialog;
-	public GameObject text;
-    public TextMeshPro nameText;
-	public string[] nameTag;
+	public GameObject dialogFrame;
+    public TextMeshProUGUI nameText;
+	public string dialogs;
+    private int previousTurnNum = -1;
+
+	StreamReader reader;
 
 
     public void FieldInitialize(IBattleSystemInput handler)
@@ -114,13 +115,13 @@ public class BattleSceneManager : MonoBehaviour,
 		fieldHeight = GameObject.Find("BattleField").GetComponent<RectTransform>().rect.height;
 		
 		
-		dialog = GameObject.Find("Dialog");
-		text = dialog.transform.Find("Text(TMP)").gameObject;
-        dialog.SetActive(false);
-		nameTag = new string[2];
-        //nameText = dialog.transform.Find("Text(TMP)").GetComponent<TextMeshPro>();
-        nameTag[0] = "Hello world";
-		nameTag[1] = "你好";
+		dialogFrame = GameObject.Find("Dialog");
+        nameText = dialogFrame.transform.Find("Text(TMP)").GetComponent<TextMeshProUGUI>();
+        dialogFrame.SetActive(false);
+
+        reader = File.OpenText("\\UnityProject\\AIGC\\OuterStray\\Assets\\Tutorial\\TutorialDialog.txt");
+
+        
 
         for (int i = 0; i < 5; i++)
 		{
@@ -139,23 +140,32 @@ public class BattleSceneManager : MonoBehaviour,
     {
         if (turnNum % 2 == 1)
         {
-            dialog.SetActive(true);
+            dialogs = reader.ReadLine();
+			if (dialogs == null) return;
+            dialogFrame.SetActive(true);
+			DOTween.To(
+				() => "",
+				value => nameText.text = value,
+				dialogs,
+				0.8f
+			).SetEase(Ease.Linear);
         }
     }
 
     private void Update()
     {
-        if (turnNum % 2 == 1)
+        if (turnNum % 2 == 1 && turnNum != previousTurnNum)
         {
             DisplayDialog();
-/*			DOTween.To(
-				() => "", // getter返回空字符串
-				value => nameText.text = value, // setter设置costText的内容
-				nameTag, // endValue是原始内容
-				0.2f
-			).SetEase(Ease.Linear); // 设置动画为线性变化*/
-		}
+            previousTurnNum = turnNum;
+        }
+        if (turnNum % 2 == 0 && turnNum != previousTurnNum)
+        {
+            dialogFrame.SetActive(false);
+            previousTurnNum = turnNum;
+        }
     }
+
     /// <summary>
     /// 
     /// </summary>
