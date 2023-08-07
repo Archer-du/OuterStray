@@ -124,6 +124,17 @@ namespace DataCore.BattleItems
 		{
 			elementList.RemoveAt(idx);
 			UpdateElements();
+
+			List<IUnitElementController> controllerList = new List<IUnitElementController>();
+
+			for (int i = 0; i < count; i++)
+			{
+				//display
+				UnitElement unit = elementList[i];
+				controllerList.Add(unit.controller);
+				unit.UnitInit();
+			}
+			controller.UpdateElementLogicPosition(controllerList);
 		}
 
 		internal void Init()
@@ -470,14 +481,14 @@ namespace DataCore.BattleItems
 			{
 				//display
 				UnitElement unit = element as UnitElement;
-				controller.Push(unit.controller);
 				unit.UnitInit();
+				controller.Push(unit.controller);
 			}
 			else
 			{
 				CommandElement comm = element as CommandElement;
-				controller.Push(comm.controller);
 				comm.CommandInit();
+				controller.Push(comm.controller);
 			}
 		}
 		/// <summary>

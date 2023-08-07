@@ -254,7 +254,14 @@ public class BattleLineController : MonoBehaviour,
 	}
 
 
-
+	public void UpdateElementLogicPosition(List<IUnitElementController> list)
+	{
+		for(int i = 0; i < list.Count; i++)
+		{
+			UnitElementController unit = list[i] as UnitElementController;
+			unit.logicPosition = GetLogicPosition(i, list.Count);
+		}
+	}
 
 
 
@@ -277,6 +284,10 @@ public class BattleLineController : MonoBehaviour,
 
 	//TODO
 	public Vector3 GetLogicPosition(int pos)
+	{
+		return new Vector3(0, -700 + lineIdx * 466, 0) + new Vector3((pos - count / 2) * BattleElementController.cardWidth + BattleElementController.cardWidth / 2 * ((count + 1) % 2), 0, 0);
+	}
+	public Vector3 GetLogicPosition(int pos, int count)
 	{
 		return new Vector3(0, -700 + lineIdx * 466, 0) + new Vector3((pos - count / 2) * BattleElementController.cardWidth + BattleElementController.cardWidth / 2 * ((count + 1) % 2), 0, 0);
 	}

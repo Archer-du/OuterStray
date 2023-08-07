@@ -78,6 +78,8 @@ namespace DisplayInterface
 		public void Receive(IUnitElementController element, int dstPos);
 		public IUnitElementController Send(int idx);
 		public void UpdateInfo(int curlength, int ownership);
+
+		public void UpdateElementLogicPosition(List<IUnitElementController> list);
 	}
 
 	public interface ICardStackController

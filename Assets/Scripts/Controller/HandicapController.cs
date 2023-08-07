@@ -28,7 +28,7 @@ public class HandicapController : MonoBehaviour,
 	/// //TODO
 	public int count { get => handiCards.Count; }
 
-	public static bool isDragging;
+	public bool isDragging;
 
 	public bool awaked = false;
 
@@ -54,6 +54,7 @@ public class HandicapController : MonoBehaviour,
 		capacity = 8;
 
 		isDragging = false;
+		pushing = false;
 
 		handiCards = new List<BattleElementController>();
 
@@ -83,6 +84,8 @@ public class HandicapController : MonoBehaviour,
 
 			element.gameObject.SetActive(true);
 			element.transform.SetParent(transform);
+			element.transform.localScale = element.handicapScale;
+			Debug.Log(element.handicapScale);
 
 			Vector3 moveBy = GetInsertionPosition(i) - element.transform.position;
 			Vector3 rotateBy = new Vector3(0, 0, (1 - (ownership * 2)) * 90);
@@ -109,7 +112,7 @@ public class HandicapController : MonoBehaviour,
 
 
 
-	public static bool pushing = false;
+	public bool pushing;
 	/// <summary>
 	/// 播放动画，将element控件加入到手牌列表中
 	/// </summary>
@@ -124,8 +127,11 @@ public class HandicapController : MonoBehaviour,
 		BattleElementController element = controller as BattleElementController;
 		pushing = true;
 
+		handiCards.Add(element);
+
 		element.gameObject.SetActive(true);
 		element.transform.SetParent(transform);
+		element.transform.localScale = element.handicapScale;
 
 		PushAnimation(element);
 
@@ -141,7 +147,6 @@ public class HandicapController : MonoBehaviour,
 		seq.Join(element.transform.DOBlendableRotateBy(rotateBy, popTime)
 			.OnComplete(() =>
 			{
-				handiCards.Add(element);
 				UpdateElements();
 				UpdateHandicapPosition();
 				pushing = false;

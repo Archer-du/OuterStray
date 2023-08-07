@@ -103,7 +103,7 @@ public class CommandElementController : BattleElementController,
 		//cast条件判定
 		if (dataState == ElementState.inHandicap)
 		{
-			HandicapController.isDragging = false; // 结束拖动
+			handicap.isDragging = false; // 结束拖动
 
 			if (battleSceneManager.PlayerCast(eventData.position, this.handicapIdx) >= 0)
 			{

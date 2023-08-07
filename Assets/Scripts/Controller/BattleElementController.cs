@@ -153,8 +153,8 @@ public class BattleElementController : MonoBehaviour,
 		battleFieldScale = transform.localScale;
 		handicapScale = 1.35f * battleFieldScale;
 		inspectScale = 1.2f * handicapScale;
-
-		transform.localScale = handicapScale;
+		Debug.Log(battleFieldScale);
+		Debug.Log(handicapScale);
 	}
 
 
@@ -257,7 +257,7 @@ public class BattleElementController : MonoBehaviour,
 			return;
 		}
 		//拖动显示设置
-		if (HandicapController.isDragging)
+		if (handicap.isDragging)
 		{
 			transform.SetParent(buffer);
 			transform.DOScale(handicapScale, scaleTime);
@@ -282,7 +282,7 @@ public class BattleElementController : MonoBehaviour,
 		//在手牌区：部署或cast
 		if (dataState == ElementState.inHandicap)
 		{
-			HandicapController.isDragging = true;
+			handicap.isDragging = true;
 		}
 	}
 
@@ -314,11 +314,11 @@ public class BattleElementController : MonoBehaviour,
 		{
 			return;
 		}
-		if (HandicapController.isDragging)
+		if (handicap.isDragging)
 		{
 			return;
 		}
-		if (HandicapController.pushing)
+		if (handicap.pushing)
 		{
 			return;
 		}
@@ -328,7 +328,6 @@ public class BattleElementController : MonoBehaviour,
 		}
 		if (dataState == ElementState.inHandicap)
 		{
-			Debug.Log("inspect");
 			canvas.sortingOrder = upperOrder;
 			transform.DOScale(inspectScale, moveTime);
 			transform.DOMove(handicap.GetInsertionPosition(handicapIdx) + moveUp * Vector3.up, moveTime);
@@ -345,11 +344,11 @@ public class BattleElementController : MonoBehaviour,
 		{
 			return;
 		}
-		if (HandicapController.isDragging)
+		if (handicap.isDragging)
 		{
 			return;
 		}
-		if (HandicapController.pushing)
+		if (handicap.pushing)
 		{
 			return;
 		}

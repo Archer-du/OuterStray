@@ -67,6 +67,7 @@ public class UnitElementController : BattleElementController,
 	{
 		Init(ID, ownership, name, categories, cost, description);
 
+		pastScale = handicapScale;
 		this.input = input;
 		Arrows.transform.localScale = new Vector3(1, (1 - ownership * 2) * 1, 1);
 
@@ -488,8 +489,18 @@ public class UnitElementController : BattleElementController,
 
 
 	private float timer = 0;
+	public Vector3 pastScale;
 	void Update()
 	{
+		if(handicap.isDragging == false && dataState == ElementState.inBattleLine)
+		{
+			transform.DOScale(battleFieldScale, duration);
+		}
+		//if(HandicapController.isDragging == false && dataState == ElementState.inHandicap)
+		//{
+		//	transform.DOScale(handicapScale, duration);
+		//}
+
 		// 如果鼠标悬停在元素上
 		if (timer > 0)
 		{
@@ -530,7 +541,7 @@ public class UnitElementController : BattleElementController,
 				return;
 			}
 			timer = -1;
-			HandicapController.isDragging = true;
+			handicap.isDragging = true;
 		}
 	}
 
@@ -544,10 +555,10 @@ public class UnitElementController : BattleElementController,
 		{
 			if (battleSceneManager.PlayerDeploy(eventData.position, this.handicapIdx) >= 0)
 			{
-				HandicapController.isDragging = false;
+				handicap.isDragging = false;
 				return;
 			}
-			HandicapController.isDragging = false;
+			handicap.isDragging = false;
 			handicap.Insert(this);
 		}
 		//移动撤退条件判定
@@ -555,25 +566,25 @@ public class UnitElementController : BattleElementController,
 		{
 			if (operateCounter <= 0)
 			{
-				HandicapController.isDragging = false;
+				handicap.isDragging = false;
 				return;
 			}
 			if (category == "Construction")
 			{
-				HandicapController.isDragging = false;
+				handicap.isDragging = false;
 				return;
 			}
 			if (this.battleLine.lineIdx == 0 && battleSceneManager.PlayerRetreat(eventData.position, this.battleLine, this) >= 0)
 			{
-				HandicapController.isDragging = false;
+				handicap.isDragging = false;
 				return;
 			}
 			if (battleSceneManager.PlayerMove(eventData.position, this.battleLine, this) >= 0)
 			{
-				HandicapController.isDragging = false;
+				handicap.isDragging = false;
 				return;
 			}
-			HandicapController.isDragging = false;
+			handicap.isDragging = false;
 			battleLine.Insert(this);
 		}
 	}

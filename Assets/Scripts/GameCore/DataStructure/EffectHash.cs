@@ -141,11 +141,12 @@ namespace EventEffectModels
 				element.target.Attacked(element);
 				for (int i = 0; i < 3; i++)
 				{
-					if (i != element.targetIdx)
+					if (i != element.targetIdx && element.attackRange[i] != null)
 					{
-						element.attackRange[i]?.Damaged(element.dynAttackReader, "immediate");
+						element.attackRange[i].Damaged(element.dynAttackReader, "immediate");
 					}
 				}
+				system.UpdateAttackRange();
 			}
 		}
 		internal void Armor(BattleElement source, BattleSystem system)
@@ -293,9 +294,12 @@ namespace EventEffectModels
 			//	system.battleLines[system.frontLines[element.ownership]][i].Damaged(damage, "immediate");
 			//}
 			int i = 0; int j = 0;
-			while (i < system.battleLines[system.frontLines[(BattleSystem.TURN + 1) % 2]].count)
+			//这里注意，可能会爆栈
+			int num = system.battleLines[system.frontLines[BattleSystem.TURN]].count;
+			while (i < num)
 			{
-				if (system.battleLines[system.frontLines[(BattleSystem.TURN + 1) % 2]][j].Damaged(damage, "immediate") > 0)
+				UnitElement e = system.battleLines[system.frontLines[BattleSystem.TURN]][j];
+				if (e.Damaged(damage, "immediate") > 0)
 				{
 					j++;
 				}
@@ -731,8 +735,11 @@ namespace EventEffectModels
 
 			UnitElement element = target as UnitElement;
 
-			element.attackGain.Add(publisher.battleID, atkGain);
-			element.maxHealthGain.Add(publisher.battleID, mhpGain);
+			if(element != this.source)
+			{
+				element.attackGain.Add(publisher.battleID, atkGain);
+				element.maxHealthGain.Add(publisher.battleID, mhpGain);
+			}
 		}
 		internal void AuraConstantUnitGain(BattleElement target, BattleSystem system)
 		{
