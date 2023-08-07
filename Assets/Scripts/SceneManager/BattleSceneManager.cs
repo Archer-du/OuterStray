@@ -329,6 +329,10 @@ public class BattleSceneManager : MonoBehaviour,
 		{
 			return -1;
 		}
+		if (BattleLineController.updating)
+		{
+			return -1;
+		}
 		int idx = GetBattleLineIdx(position.y);
 		//没有部署在支援战线 TODO 扩展
 		if(idx != 0)

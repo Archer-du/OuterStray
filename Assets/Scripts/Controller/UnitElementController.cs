@@ -592,10 +592,7 @@ public class UnitElementController : BattleElementController,
 	public override void OnPointerEnter(PointerEventData eventData)
 	{
 		base.OnPointerEnter(eventData);
-		if(BattleLineController.updating)
-		{
-			return;
-		}
+
 		if (dataState == ElementState.inBattleLine)
 		{
 			timer = 0.8f;
@@ -606,10 +603,7 @@ public class UnitElementController : BattleElementController,
 	public override void OnPointerExit(PointerEventData eventData)
 	{
 		base.OnPointerExit(eventData);
-		if (BattleLineController.updating)
-		{
-			return;
-		}
+
 		if (dataState == ElementState.inBattleLine)
 		{
 			timer = -1;
