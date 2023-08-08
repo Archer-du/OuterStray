@@ -237,7 +237,8 @@ namespace EventEffectModels
 			{
 				if (system.handicaps[BattleSystem.TURN].count < system.handicaps[BattleSystem.TURN].capacity)
 				{
-					BattleElement unit = system.stacks[BattleSystem.TURN].RandomPop();
+					//TODO
+					BattleElement unit = system.stacks[BattleSystem.TURN].Pop();
 					system.handicaps[BattleSystem.TURN].Push(unit);
 				}
 			}
@@ -332,7 +333,9 @@ namespace EventEffectModels
 					unit.dynAttackWriter += atkGain;
 					unit.maxHealthWriter += maxhealthGain;
 				}
-			}
+                unit.UpdateInfo();
+                unit.UpdateHealth();
+            }
 		}
 
 
@@ -572,7 +575,8 @@ namespace EventEffectModels
 				//2: 前线
 				case 2:
 					int i = 0; int j = 0;
-					while(i < system.battleLines[system.frontLines[(BattleSystem.TURN + 1) % 2]].count)
+					int num = system.battleLines[system.frontLines[(BattleSystem.TURN + 1) % 2]].count;
+                    while (i < num)
 					{
 						if(system.battleLines[system.frontLines[(BattleSystem.TURN + 1) % 2]][j].Damaged(damage, "immediate") > 0)
 						{

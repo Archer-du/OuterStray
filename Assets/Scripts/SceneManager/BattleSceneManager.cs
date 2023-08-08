@@ -88,7 +88,6 @@ public class BattleSceneManager : MonoBehaviour,
 	public GameObject dialogFrame;
     public TMP_Text nameText;
 	public string dialogs;
-    private int previousTurnNum = -1;
 
 	StreamReader reader;
 
@@ -145,24 +144,22 @@ public class BattleSceneManager : MonoBehaviour,
             dialogFrame.SetActive(true);
 			DOTween.To(
 				() => "",
-				value => nameText.text = value,
+				value => nameText.text = value, // setter设置costText的内容
 				dialogs,
 				0.8f
 			).SetEase(Ease.Linear);
         }
     }
 
-    private void Update()
+    private void UpdateDialog()
     {
-        if (turnNum % 2 == 1 && turnNum != previousTurnNum)
+        if (turnNum % 2 == 1)
         {
             DisplayDialog();
-            previousTurnNum = turnNum;
         }
-        if (turnNum % 2 == 0 && turnNum != previousTurnNum)
+        if (turnNum % 2 == 0)
         {
             dialogFrame.SetActive(false);
-            previousTurnNum = turnNum;
         }
     }
 
@@ -189,6 +186,7 @@ public class BattleSceneManager : MonoBehaviour,
 	{
 		Turn = TURN;
 		turnNum++;
+		UpdateDialog();
 		if(Turn == 0)
 		{
 			buttonImage.color = Color.white;
@@ -200,18 +198,19 @@ public class BattleSceneManager : MonoBehaviour,
 
 			StartCoroutine(AIBehavior());
 		}
-	}
+    }
 	private void UpdateTurn()
 	{
 		Turn = (Turn + 1) % 2;
 		turnNum++;
 		Debug.Log("next turn: " + Turn);
+		UpdateDialog();
 		if (Turn == 0)
 		{
 			buttonImage.color = Color.white;
-		}
-		//如果是敌方回合，启动行为树
-		else
+        }
+        //如果是敌方回合，启动行为树
+        else
 		{
 			buttonImage.color = Color.gray;
 
