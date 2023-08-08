@@ -622,7 +622,6 @@ namespace DataCore.BattleElements
 			}
 			battleSystem.UnitIDDic[this.backendID].Add(this);
 
-			UpdateInfo();
 			UpdateHealth();
 			UpdateTarget();
 			controller.DeployAnimationEvent();

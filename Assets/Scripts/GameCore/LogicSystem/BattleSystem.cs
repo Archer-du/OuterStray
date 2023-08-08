@@ -178,7 +178,7 @@ namespace LogicCore
 
 			InitializeHandicaps();
 
-			TutorialHumanBaseInit();
+			TutorialInit();
 
 			energy[TURN] += energySupply[TURN];
 			controller.UpdateEnergy(energy[TURN]);
@@ -311,7 +311,7 @@ namespace LogicCore
 
 		}
 		//tutorial temp function
-		private void TutorialHumanBaseInit()
+		private void TutorialInit()
 		{
 			//TODO
 			UnitCard card = new UnitCard("human_10000", 0, "基地车", "Construction", 0, 0, 30, 100000, "基地", -1, -1, "none");
@@ -320,29 +320,39 @@ namespace LogicCore
 			bases[0].controller = controller.InstantiateUnitInBattleField(0, 0, 0);
 			bases[0].UnitInit();
 			bases[0].Deploy(this, battleLines[0], 0);
+			bases[0].operateCounter = 1;
+			bases[0].UpdateInfo();
 
 			card = pool.GetCardByID("human_03") as UnitCard;
 			LightArmorElement human03 = new LightArmorElement(card, this);
 			human03.dynAttackCounter = 1;
-			human03.controller = controller.InstantiateUnitInBattleField(0, 0, 0);
+            human03.controller = controller.InstantiateUnitInBattleField(0, 0, 0);
 			human03.UnitInit();
 			human03.Deploy(this, battleLines[0], 0);
+			human03.operateCounter = 1;
+			human03.UpdateInfo();
 
 			card = pool.GetCardByID("mush_00") as UnitCard;
 			LightArmorElement mush1 = new LightArmorElement(card, this);
 			mush1.controller = controller.InstantiateUnitInBattleField(1, 1, 0);
 			LightArmorElement mush2 = new LightArmorElement(card, this);
 			mush2.controller = controller.InstantiateUnitInBattleField(1, 1, 0);
-			mush1.UnitInit();
+            mush1.UnitInit();
 			mush2.UnitInit();
 			mush1.Deploy(this, battleLines[1], 0);
 			mush2.Deploy(this, battleLines[1], 0);
+			mush1.operateCounter = 1;
+			mush2.operateCounter = 1;
+			mush1.UpdateInfo();
+			mush2.UpdateInfo();
 
 			card = pool.GetCardByID("mush_99_01") as UnitCard;
 			ConstructionElement strangeMush = new ConstructionElement(card, this);
-			strangeMush.controller = controller.InstantiateUnitInBattleField(1, 3, 0);
+            strangeMush.controller = controller.InstantiateUnitInBattleField(1, 3, 0);
 			strangeMush.UnitInit();
 			strangeMush.Deploy(this, this.battleLines[3], 0);
+			strangeMush.operateCounter = 1;
+			strangeMush.UpdateInfo();
 
 			UpdateFrontLine();
 			UpdateAttackRange();
