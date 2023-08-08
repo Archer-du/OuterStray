@@ -53,6 +53,7 @@ public class GameManager : MonoBehaviour, IGameManagement
 
 	public StartSceneManager startSceneManager;
 	public CultivateSceneManager cultivateSceneManager;
+	public TacticalSceneManager tacticalSceneManager;
 	public BattleSceneManager battleSceneManager;
 
 	//定义一个公共方法，用于更新游戏状态，并根据不同的状态执行不同的逻辑
@@ -70,6 +71,7 @@ public class GameManager : MonoBehaviour, IGameManagement
 
 			case GameState.Tactical:
 				SceneManager.LoadScene("TacticalScene");
+				tacticalSceneManager = GameObject.Find("TacticalSceneManager").GetComponent<TacticalSceneManager>();
 				break;
 
 			case GameState.Battle:
@@ -96,9 +98,9 @@ public class GameManager : MonoBehaviour, IGameManagement
 		battleSceneManager = GameObject.Find("BattleSceneManager").GetComponent<BattleSceneManager>();
 		//EXTEND
 
-		cultivationSystem = new CultivationSystem();
-		tacticalSystem = new TacticalSystem();
 		battleSystem = new BattleSystem(battleSceneManager);
+		tacticalSystem = new TacticalSystem(tacticalSceneManager, battleSystem as BattleSystem);
+		cultivationSystem = new CultivationSystem(cultivateSceneManager, tacticalSystem as TacticalSystem);
 
 	}
 

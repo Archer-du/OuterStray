@@ -150,12 +150,6 @@ public class UnitElementController : BattleElementController,
 				this.maxHealthBuff.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 180));
 			}
 		}
-		//DOTween.To(
-		//	() => "", // getter返回空字符串
-		//	value => nameText.text = value, // setter设置costText的内容
-		//	nameTag, // endValue是原始内容
-		//	0.2f
-		//).SetEase(Ease.Linear); // 设置动画为线性变化
 	}
 	public void UpdateHealth(int dynHealth)
 	{

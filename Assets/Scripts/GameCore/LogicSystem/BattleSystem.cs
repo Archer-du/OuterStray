@@ -50,7 +50,7 @@ namespace LogicCore
 		internal int linesCapacity;
 
 
-
+		
 		/// <summary>
 		/// (TURN mapped)敌我事件系统
 		/// </summary>
@@ -98,10 +98,6 @@ namespace LogicCore
 
 		//data access (test)
 		internal Pool pool;
-		internal Deck humanDeck;
-		internal Deck plantDeck;
-
-
 
 
 		public BattleSystem(IBattleSceneController bsdspl)
@@ -119,29 +115,14 @@ namespace LogicCore
 			//test segment TODO------
 			pool = new Pool();
 			pool.LoadCardPool();
-			humanDeck = new Deck(this);
-			plantDeck = new Deck(this);
-			humanDeck.LoadDeckFromPool(pool, "ally");
-			plantDeck.LoadDeckFromPool(pool, "enemy");
+			//humanDeck = new Deck(this);
+			//plantDeck = new Deck(this);
+			//humanDeck.LoadDeckFromPool(pool, "ally");
+			//plantDeck.LoadDeckFromPool(pool, "enemy");
 			//-----------------------
 
 
-			//初始回合为玩家
-			TURN = 0;
-			controller.UpdateTurn(TURN);
 
-			//数据层初始化
-			linesCapacity = 4;
-			battleLines = new List<BattleLine>(linesCapacity);
-
-			supportLines = new int[2] { 0, linesCapacity - 1 };
-			stacks = new RandomCardStack[2];
-			handicaps = new RedemptionZone[2];
-
-			frontLines = new int[2] { 0, 1 };
-
-			energy = new int[2] { 0, 0 };
-			energySupply = new int[2] { 1, 1 };
 
 			deployQueue = new List<UnitElement>();
 			UnitIDDic = new Dictionary<string, List<UnitElement>>();
@@ -171,6 +152,23 @@ namespace LogicCore
 		/// <param name="enemyDeck"></param>
 		internal void BuildBattleField(Deck deck, Deck enemyDeck, int lineCapacity)
 		{
+			//初始回合为玩家
+			TURN = 0;
+			controller.UpdateTurn(TURN);
+
+			//数据层初始化
+			linesCapacity = 4;
+			battleLines = new List<BattleLine>(linesCapacity);
+
+			supportLines = new int[2] { 0, linesCapacity - 1 };
+			stacks = new RandomCardStack[2];
+			handicaps = new RedemptionZone[2];
+
+			frontLines = new int[2] { 0, 1 };
+
+			energy = new int[2] { 0, 0 };
+			energySupply = new int[2] { 1, 1 };
+
 			BuildBattleLine(lineCapacity);
 
 			BuildHumanStack(deck);
@@ -246,7 +244,7 @@ namespace LogicCore
 			stacks[0] = new RandomCardStack();
 			stacks[0].controller = controller.InstantiateCardStack(0);
 
-			stacks[0].Fill(humanDeck);
+			stacks[0].Fill(deck);
 		}
 		private void UnloadHumanStack()
 		{
@@ -261,7 +259,7 @@ namespace LogicCore
 			stacks[1] = new RandomCardStack();
 			stacks[1].controller = controller.InstantiateCardStack(1);
 
-			stacks[1].Fill(plantDeck);
+			stacks[1].Fill(deck);
 		}
 		private void UnloadPlantStack()
 		{

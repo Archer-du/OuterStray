@@ -11,13 +11,13 @@ using System.Xml.Linq;
 using System.Data;
 using System.IO;
 
-public class AnimationQueue
-{
-	public Sequence sequence;
-	public int eventNum;
-	public float sequenceTime;
+//public class AnimationQueue
+//{
+//	public Sequence sequence;
+//	public int eventNum;
+//	public float sequenceTime;
 
-}
+//}
 public class BattleSceneManager : MonoBehaviour,
 	IBattleSceneController
 {
@@ -86,7 +86,7 @@ public class BattleSceneManager : MonoBehaviour,
 
 	//对话框
 	public GameObject dialogFrame;
-    public TextMeshProUGUI nameText;
+    public TMP_Text nameText;
 	public string dialogs;
     private int previousTurnNum = -1;
 
@@ -116,7 +116,7 @@ public class BattleSceneManager : MonoBehaviour,
 		
 		
 		dialogFrame = GameObject.Find("Dialog");
-        nameText = dialogFrame.transform.Find("Text(TMP)").GetComponent<TextMeshProUGUI>();
+        nameText = dialogFrame.transform.Find("Text(TMP)").GetComponent<TMP_Text>();
         dialogFrame.SetActive(false);
 
         reader = File.OpenText("\\UnityProject\\AIGC\\OuterStray\\Assets\\Tutorial\\TutorialDialog.txt");

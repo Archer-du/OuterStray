@@ -37,11 +37,6 @@ namespace InputHandler
 		/// <param name="hrztIdx"></param>
 		/// <param name="vtcIdx"></param>
 		public void EnterNode(int hrztIdx, int vtcIdx);
-		/// <summary>
-		/// 检测合法性，进入index或point索引的节点
-		/// </summary>
-		/// <param name="targetPoint"></param>
-		public void EnterNode(string targetPoint);
 
 		/// <summary>
 		/// 检测合法性，进入下一层terrain
@@ -77,8 +72,6 @@ namespace InputHandler
 		/// <param name="dstPos"></param>
 		public void Move(int resLineIdx, int resIdx, int dstLineIdx, int dstPos);
 
-		//public void VerticalMove(int resLineIdx, int resIdx, int dstPos);
-
 		/// <summary>
 		/// 从战场指定战线指定位置撤退单位卡
 		/// </summary>
@@ -94,11 +87,6 @@ namespace InputHandler
 
 
 		public void Exit();
-
-
-
-		//ML interface
-		//TODO
 	}
 
 

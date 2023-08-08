@@ -33,10 +33,19 @@ namespace DisplayInterface
 
 
 
+	public interface ICultivateSceneController
+	{
 
+	}
 
+	public interface ITacticalSceneController
+	{
 
+	}
+	public interface INodeController
+	{
 
+	}
 	public interface IBattleSceneController
 	{
 		/// <summary>
@@ -76,7 +85,9 @@ namespace DisplayInterface
 		public void Init(int capacity, int ownership);
 
 		public void Receive(IUnitElementController element, int dstPos);
+
 		public IUnitElementController Send(int idx);
+
 		public void UpdateInfo(int curlength, int ownership);
 
 		public void UpdateElementLogicPosition(List<IUnitElementController> list);
@@ -123,6 +134,7 @@ namespace DisplayInterface
 		public void UpdateTarget(IUnitElementController target, int targetIdx, bool mocking, bool cleave);
 
 		public void DeployAnimationEvent();
+
 		public void MoveAnimationEvent();
 
 		public void AttackAnimationEvent(int resIdx, int count);
@@ -144,6 +156,7 @@ namespace DisplayInterface
 		public void CommandInit(string ID, int ownership, string name, string type, int cost, string description);
 
 		public void UpdateInfo(int cost, int durability, ElementState state);
+
 		public void CastAnimationEvent(string method);
 	}
 }
