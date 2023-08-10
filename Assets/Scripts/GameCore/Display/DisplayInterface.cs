@@ -59,6 +59,7 @@ namespace DisplayInterface
 	}
 	public interface INodeController
 	{
+		public void Init();
 		public void SetAdjacentNode(List<INodeController> adjList);
 		public void CastEvent();
 	}

@@ -3,6 +3,7 @@ using DataCore.Cards;
 using DataCore.CultivateItems;
 using DisplayInterface;
 using LogicCore;
+using Serilog.Formatting.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -148,9 +149,9 @@ namespace DataCore.TacticalItems
 		{
 			get => nodeList[0][0];
 		}
-		internal Node dstNode
+		internal BattleNode dstNode
 		{
-			get => nodeList[length - 1][0];
+			get => nodeList[length - 1][0] as BattleNode;
 		}
 
 
@@ -232,8 +233,10 @@ namespace DataCore.TacticalItems
 						//如果是源terrain
 						if(prevTerrain == null)
 						{
+							//SourceNode 全局唯一
 							SourceNode s = new SourceNode(i, j, this);
 							s.controller = controller.InstantiateNode(length, width[i], i, j, "source");
+							s.controller.Init();
 							nodeList[i].Add(s);
 						}
 						//否则源节点是上一terrain的目的节点
@@ -247,6 +250,7 @@ namespace DataCore.TacticalItems
 					{
 						BattleNode bn = new BattleNode(i, j, this, battleSystem);
 						bn.controller = controller.InstantiateNode(length, width[i], i, j, "battle");
+						bn.controller.Init();
 						nodeList[i].Add(bn);
 					}
 					//以一定权重随机生成 TODO
@@ -261,24 +265,28 @@ namespace DataCore.TacticalItems
 							{
 								PromoteNode pn = new PromoteNode(i, j, this);
 								pn.controller = controller.InstantiateNode(length, width[i], i, j, "promote");
+								pn.controller.Init();
 								nodeList[i].Add(pn);
 							}
 							if(randSeed >= 3 && randSeed < 6)
 							{
 								LegacyNode ln = new LegacyNode(i, j, this);
 								ln.controller = controller.InstantiateNode(length, width[i], i, j, "legacy");
+								ln.controller.Init();
 								nodeList[i].Add(ln);
 							}
 							if(randSeed >= 6 && randSeed < 8)
 							{
 								OutPostNode on = new OutPostNode(i, j, this);
 								on.controller = controller.InstantiateNode(length, width[i], i, j, "outpost");
+								on.controller.Init();
 								nodeList[i].Add(on);
 							}
 							if(randSeed >= 8 && randSeed < 10)
 							{
 								MedicalNode mn = new MedicalNode(i, j, this);
 								mn.controller = controller.InstantiateNode(length, width[i], i, j, "medical");
+								mn.controller.Init();
 								nodeList[i].Add(mn);
 							}
 							itNodeCounter--;
@@ -289,6 +297,7 @@ namespace DataCore.TacticalItems
 							int randSeed = random.Next(0, 6);
 							SupplyNode sn = new SupplyNode(i, j, this);
 							sn.controller = controller.InstantiateNode(length, width[i], i, j, "supply");
+							sn.controller.Init();
 							nodeList[i].Add(sn);
 							switch (randSeed)
 							{
@@ -319,6 +328,7 @@ namespace DataCore.TacticalItems
 			//生成边
 			for(int i = 0; i < length - 1; i++)
 			{
+				int connectionCounter = width[i + 1];
 				for(int j = 0; j < width[i]; j++)
 				{
 					//源节点与下一层节点全部连通
@@ -328,23 +338,39 @@ namespace DataCore.TacticalItems
 						for(int k = 0; k < width[i + 1]; k++)
 						{
 							nodeList[i][j].adjNode[k] = nodeList[i + 1][k];
+							nodeList[i + 1][k].inDegree++;
 						}
-						nodeList[i][j].SetAdjacentNode();
 						break;
 					}
-					//其余节点最多与其他两个节点连通
+					//其余节点大概率仅与其他一个或两个节点连通
 					int nodeIdx1 = random.Next(0, width[i + 1]);
 					int nodeIdx2 = random.Next(0, width[i + 1]);
 					if(nodeIdx1 == nodeIdx2)
 					{
 						nodeList[i][j].adjNode[0] = nodeList[i + 1][nodeIdx1];
 						nodeList[i][j].adjNode[1] = null;
+						nodeList[i + 1][nodeIdx1].inDegree++;
 					}
 					else
 					{
 						nodeList[i][j].adjNode[0] = nodeList[i + 1][nodeIdx1];
 						nodeList[i][j].adjNode[1] = nodeList[i + 1][nodeIdx2];
+						nodeList[i + 1][nodeIdx1].inDegree++;
+						nodeList[i + 1][nodeIdx2].inDegree++;
 					}
+				}
+				//维护连通性
+				for(int j = 0; j < width[i + 1]; j++)
+				{
+					if (nodeList[i + 1][j].inDegree == 0)
+					{
+						int randomEnum = random.Next(0, width[i]);
+						nodeList[i][randomEnum].adjNode[2] = nodeList[i + 1][j];
+						nodeList[i + 1][j].inDegree++;
+					}
+				}
+				for(int j = 0; j < width[i]; j++)
+				{
 					nodeList[i][j].SetAdjacentNode();
 				}
 			}
@@ -370,9 +396,14 @@ namespace DataCore.TacticalItems
 		internal int verticalIdx;
 
 		internal Node[] adjNode;
+		internal int inDegree;
+
+		internal bool casted;
 
 		internal Node(int horizontalIdx, int verticalIdx, Terrain terrain)
 		{
+			inDegree = 0;
+			casted = false;
 			this.horizontalIdx = horizontalIdx;
 			this.verticalIdx = verticalIdx;
 
@@ -399,7 +430,10 @@ namespace DataCore.TacticalItems
 			return this == terrain.dstNode;
 		}
 
-		internal virtual void CastNodeEvent() { }
+		internal virtual void CastNodeEvent()
+		{
+			casted = true;
+		}
 		internal void SetAdjacentNode()
 		{
 			List<INodeController> adjList = new List<INodeController>();
@@ -411,6 +445,7 @@ namespace DataCore.TacticalItems
 					adjList.Add(adjNode[i].controller);
 				}
 			}
+			if (adjList.Count == 0) throw new Exception("adj");
 			controller.SetAdjacentNode(adjList);
 		}
 	}
@@ -424,6 +459,8 @@ namespace DataCore.TacticalItems
 	{
 		internal BattleSystem system;
 
+		internal Terrain nextTerrain;
+
 		internal string[] battleConfig;
 
 		internal string plots;
@@ -436,6 +473,7 @@ namespace DataCore.TacticalItems
 		internal BattleNode(int horizontalIdx, int verticalIdx, Terrain terrain, BattleSystem system)
 			: base(horizontalIdx, verticalIdx, terrain)
 		{
+			nextTerrain = null;
 			this.system = system;
 		}
 

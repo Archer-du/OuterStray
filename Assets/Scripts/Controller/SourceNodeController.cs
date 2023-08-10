@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class SourceNodeController : NodeController
 {
-	public override void CastEvent()
+	public override void Init()
 	{
-		base.CastEvent();
+		base.Init();
+		casted = true;
 	}
 }

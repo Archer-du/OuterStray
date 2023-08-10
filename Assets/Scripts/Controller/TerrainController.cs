@@ -3,10 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TerrainController : MonoBehaviour,
 	ITerrainController
 {
+	public TacticalSceneManager tacticalManager;
+
+	public int index;
 	public GameObject linePrototype;
 
     public GameObject nodePrototype;
@@ -16,10 +20,10 @@ public class TerrainController : MonoBehaviour,
 
 	public float leftBound = -1200;
 	public float rightBound = 1200;
-	public float topBound = 700;
-	public float bottomBound = -700;
+	public float topBound = 1000;
+	public float bottomBound = -1000;
 
-	public float vtcOffsetRange = 120; 
+	public float vtcOffsetRange = 100; 
 	public float hrztOffsetRange = 200; 
 
 	public void Init()
@@ -57,6 +61,7 @@ public class TerrainController : MonoBehaviour,
 				break;
 		}
 		nodes.Add(controller);
+		controller.tacticalManager = tacticalManager;
 		SetPosition(controller, length, width, hrztIdx, vtcIdx);
 		return controller;
 	}
@@ -89,7 +94,6 @@ public class TerrainController : MonoBehaviour,
 	{
 		GenerateLineNet(srcNode);
 	}
-	//（好像是这个项目第一次用到递归。。
 	public void GenerateLineNet(NodeController node)
 	{
 		if(node == dstNode)
@@ -102,9 +106,21 @@ public class TerrainController : MonoBehaviour,
 			GenerateLineNet(adj);
 		}
 	}
+	public void ClearNodes()
+	{
+		foreach(NodeController node in nodes)
+		{
+			if(node != dstNode)
+			{
+				node.ClearLines();
+				node.gameObject.SetActive(false);
+			}
+		}
+	}
 	private void InstantiateLine(NodeController resNode, NodeController dstNode)
 	{
-		GameObject line = Instantiate(linePrototype, transform);
+		GameObject line = Instantiate(linePrototype, resNode.transform);
+		resNode.lines.Add(line.GetComponent<Image>());
 
 		Vector3 vector = dstNode.transform.position - resNode.transform.position;
 		
@@ -126,4 +142,7 @@ public class TerrainController : MonoBehaviour,
 		Vector3 euler = new Vector3(0, 0, deg);
 		return euler;
 	}
+
+
+
 }

@@ -25,7 +25,18 @@ namespace LogicCore
 		private Node currentNode;
 		private Terrain currentTerrain
 		{
-			get => currentNode.terrain;
+			get
+			{
+				if(currentNode is BattleNode)
+				{
+					BattleNode node = currentNode as BattleNode;
+					return node.nextTerrain;
+				}
+				else
+				{
+					return currentNode.terrain;
+				}
+			}
 		}
 
 		internal static bool isInNode;
@@ -66,9 +77,9 @@ namespace LogicCore
 			playerDeck = new Deck(system);
 			enemyDeck = new Deck(system);
 
-			controller.TerrrainsInitialize(this, battleNodeNum);
 
 			//TODO
+			controller.TerrrainsInitialize(this, battleNodeNum);
 			BuildTerrains();
 		}
 
@@ -92,8 +103,13 @@ namespace LogicCore
 			{
 				terrain.GenerateNodes();
 			}
+			for(int i = 0; i < battleNodeNum - 1; i++)
+			{
+				terrains[i].dstNode.nextTerrain = terrains[i + 1];
+			}
 
 			currentNode = terrains[0].resNode;
+			currentNode.CastNodeEvent();
 
 			controller.UpdateCurrentNode(currentNode.controller);
 
@@ -113,17 +129,23 @@ namespace LogicCore
 				throw new InvalidOperationException();
 			}
 
-			targetNode.CastNodeEvent();
 			isInNode = true;
+			targetNode.CastNodeEvent();
 			currentNode = targetNode;
+
+
+			//TODO test
+			CampaignCompleted();
 		}
 
 		public void CampaignCompleted()
 		{
 			isInNode = false;
+			controller.UpdateCurrentNode(currentNode.controller);
 			if (currentNode.IsDstNodeCurTerrain())
 			{
 				controller.EnterNextTerrain();
+				currentTerrain.controller.GenerateLineNetFromSource();
 			}
 		}
 
