@@ -140,7 +140,7 @@ namespace LogicCore
 
 			frontLines = new int[2] { 0, 1 };
 
-			energy = new int[2] { 1, 1 };
+			energy = new int[2] { 0, 0 };
 			energySupply = new int[2] { 1, 1 };
 
 			deployQueue = new List<UnitElement>();
@@ -178,7 +178,10 @@ namespace LogicCore
 
 			InitializeHandicaps();
 
-			TutorialHumanBaseInit();
+			TutorialInit();
+
+			energy[TURN] += energySupply[TURN];
+			controller.UpdateEnergy(energy[TURN]);
 		}
 		internal void UnloadBattleField()
 		{
@@ -298,41 +301,61 @@ namespace LogicCore
 			handicaps[1].Clear();
 		}
 
+
+
+
+
+
+		internal void FieldPreset()
+		{
+
+		}
 		//tutorial temp function
-		private void TutorialHumanBaseInit()
+		private void TutorialInit()
 		{
 			//TODO
-			UnitCard card = new UnitCard("human_1000", 0, "基地车", "Construction", 0, 0, 30, 100000, "基地", -1, -1, "none");
+			UnitCard card = new UnitCard("human_10000", 0, "基地车", "Construction", 0, 0, 30, 100000, "基地", -1, -1, "none");
 			bases[0] = new ConstructionElement(card, this);
 			bases[0].dynHealth = 3;
-			bases[0].controller = controller.InstantiateBase(0);
-
-			bases[0].Init();
+			bases[0].controller = controller.InstantiateUnitInBattleField(0, 0, 0);
+			bases[0].UnitInit();
+			bases[0].Deploy(this, battleLines[0], 0);
+			bases[0].operateCounter = 1;
+			bases[0].UpdateInfo();
 
 			card = pool.GetCardByID("human_03") as UnitCard;
-			UnitElement human03 = new UnitElement(card, this);
+			LightArmorElement human03 = new LightArmorElement(card, this);
 			human03.dynAttackCounter = 1;
-			human03.controller = controller.InstantiateBase(0);
-
-			human03.Init();
+            human03.controller = controller.InstantiateUnitInBattleField(0, 0, 0);
+			human03.UnitInit();
+			human03.Deploy(this, battleLines[0], 0);
+			human03.operateCounter = 1;
+			human03.UpdateInfo();
 
 			card = pool.GetCardByID("mush_00") as UnitCard;
-			UnitElement mush1 = new UnitElement(card, this);
-			mush1.controller = controller.InstantiateBase(1);
-			UnitElement mush2 = new UnitElement(card, this);
-			mush2.controller = controller.InstantiateBase(1);
-
-			mush1.Init();
-			mush2.Init();
-
-
-
-			bases[0].Deploy(this, battleLines[0], 0);
-			human03.Deploy(this, battleLines[0], 0);
+			LightArmorElement mush1 = new LightArmorElement(card, this);
+			mush1.controller = controller.InstantiateUnitInBattleField(1, 1, 0);
+			LightArmorElement mush2 = new LightArmorElement(card, this);
+			mush2.controller = controller.InstantiateUnitInBattleField(1, 1, 0);
+            mush1.UnitInit();
+			mush2.UnitInit();
 			mush1.Deploy(this, battleLines[1], 0);
 			mush2.Deploy(this, battleLines[1], 0);
-			
+			mush1.operateCounter = 1;
+			mush2.operateCounter = 1;
+			mush1.UpdateInfo();
+			mush2.UpdateInfo();
 
+			card = pool.GetCardByID("mush_99_01") as UnitCard;
+			ConstructionElement strangeMush = new ConstructionElement(card, this);
+            strangeMush.controller = controller.InstantiateUnitInBattleField(1, 3, 0);
+			strangeMush.UnitInit();
+			strangeMush.Deploy(this, this.battleLines[3], 0);
+			strangeMush.operateCounter = 1;
+			strangeMush.UpdateInfo();
+
+			UpdateFrontLine();
+			UpdateAttackRange();
 		}
 
 
@@ -374,9 +397,6 @@ namespace LogicCore
 			//显示层更新
 			controller.UpdateEnergy(energy[TURN]);
 
-
-
-			//battleLines[dstLineIdx].Receive(element, dstPos);
 			element.Deploy(this, battleLines[dstLineIdx], dstPos);
 
 
@@ -487,9 +507,6 @@ namespace LogicCore
 
 			eventTable[TURN].RaiseEvent("MoveUnit", null, this);
 
-
-
-			//battleLines[dstLineIdx].Receive(battleLines[resLineIdx].Send(resIdx), dstPos);
 			element.Move(battleLines[resLineIdx], battleLines[dstLineIdx], resIdx, dstPos);
 
 			//先更新前线再更新目标
@@ -515,7 +532,7 @@ namespace LogicCore
 
 
 
-
+		//legacy
 		public void VerticalMove(int resLineIdx, int resIdx, int dstPos)
 		{
 			if (dstPos >= battleLines[resLineIdx].count)
@@ -560,7 +577,7 @@ namespace LogicCore
 				throw new InvalidOperationException();
 			}
 
-			stacks[TURN].Push(battleLines[resLineIdx][resIdx]);
+			stacks[TURN].Push(element);
 			element.Retreat("append");
 
 			UpdateFrontLine();
@@ -569,7 +586,10 @@ namespace LogicCore
 			eventTable[TURN].RaiseEvent("UpdateAura", null, this);
 			eventTable[(TURN + 1) % 2].RaiseEvent("UpdateAura", null, this);
 		}
-
+		//public void PullOut(int resLineIdx, int resIdx)
+		//{
+		//	UnitElement element = battleLines[resLineIdx][resIdx];
+		//}
 
 
 
@@ -577,10 +597,6 @@ namespace LogicCore
 		{
 			eventTable[TURN].RaiseEvent("EndOfTurn", null, this);
 			BroadCastEvent("EndOfTurn");
-
-			//TODO 可能有上限
-			energy[TURN] += energySupply[TURN];
-			controller.UpdateEnergy(energy[TURN]);
 
 			energySupply[TURN] = energySupply[TURN] + 1 > 5 ? 5 : energySupply[TURN] + 1;
 			controller.UpdateEnergySupply(energySupply[TURN]);
@@ -594,9 +610,11 @@ namespace LogicCore
 
 			RotateSettlement();
 
-
-
 			TURN = (TURN + 1) % 2;
+
+			energy[TURN] = energy[TURN] + energySupply[TURN] > 15 ? 15 : energy[TURN] + energySupply[TURN];
+			controller.UpdateEnergy(TURN, energy[TURN]);
+
 			eventTable[TURN].RaiseEvent("StartOfTurn", null, this);
 			BroadCastEvent("StartOfTurn");
 
@@ -779,7 +797,7 @@ namespace LogicCore
 		/// 查询敌方随机目标 TODO
 		/// </summary>
 		/// <returns></returns>
-		internal UnitElement RandomEnemy()
+		internal UnitElement RandomEnemy(int ownership)
 		{
 			UpdateUnitNum();
 			if (enemyNum == 0) return null;
@@ -787,7 +805,7 @@ namespace LogicCore
 			Random random = new Random();
 			int counter = random.Next(1, enemyNum + 1);
 			//从敌方战线开始
-			int line = TURN == 0 ? linesCapacity - 1 : 0;
+			int line = ownership == 0 ? linesCapacity - 1 : 0;
 			while (counter > 0)
 			{
 				counter -= battleLines[line].count;
@@ -795,18 +813,18 @@ namespace LogicCore
 				{
 					return battleLines[line][battleLines[line].count - 1 + counter];
 				}
-				if(TURN == 0) { line--; }
+				if(ownership == 0) { line--; }
 				else { line++; }
 			}
 			return null;
 		}
-		internal UnitElement RandomEnemyAtFrontLine()
+		internal UnitElement RandomEnemyAtFrontLine(int ownership)
 		{
 			Random random = new Random();
-			if (battleLines[frontLines[(TURN + 1) % 2]].count == 0) return null;
+			if (battleLines[frontLines[(ownership + 1) % 2]].count == 0) return null;
 
-			int counter = random.Next(0, battleLines[frontLines[(TURN + 1) % 2]].count);
-			return battleLines[frontLines[(TURN + 1) % 2]][counter];
+			int counter = random.Next(0, battleLines[frontLines[(ownership + 1) % 2]].count);
+			return battleLines[frontLines[(ownership + 1) % 2]][counter];
 		}
 
 		internal UnitElement DamagedAlly()

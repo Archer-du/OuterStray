@@ -62,7 +62,7 @@ namespace DisplayInterface
 		public void UpdateEnergySupply(int turn, int supply);
 
 
-		public IUnitElementController InstantiateBase(int turn);
+		public IUnitElementController InstantiateUnitInBattleField(int ownership, int lineIdx, int pos);
 
 		public IUnitElementController InstantiateUnitInStack(int turn);
 
@@ -78,13 +78,15 @@ namespace DisplayInterface
 		public void Receive(IUnitElementController element, int dstPos);
 		public IUnitElementController Send(int idx);
 		public void UpdateInfo(int curlength, int ownership);
+
+		public void UpdateElementLogicPosition(List<IUnitElementController> list);
 	}
 
 	public interface ICardStackController
 	{
 		public IUnitElementController InstantiateUnitElement();
-		public IUnitElementController InstantiateUnitElementInBattle(int turn);
-		public ICommandElementController InstantiateCommandElementInBattle(int turn);
+		public IUnitElementController InstantiateUnitElementInBattle();
+		public ICommandElementController InstantiateCommandElementInBattle();
 		public ICommandElementController InstantiateCommandElement();
 	}
 
@@ -111,12 +113,17 @@ namespace DisplayInterface
 	}
 	public interface IUnitElementController : IBattleElementController
 	{
-		public void UnitInit(string ID, int ownership, string name, string categories, string description, IUnitInput input);
+		public void UnitInit(string ID, int ownership, string name, string categories, int cost, string description, IUnitInput input);
 
-		public void UpdateInfo(int cost, int attackPoint, int healthPoint, int maxHealthPoint, int attackCounter, int operateCounter,
-			ElementState state, int moveRange, bool aura);
+		public void UpdateInfo(int cost, int attackPoint, int maxHealthPoint, int attackCounter, int operateCounter,
+			ElementState state, int moveRange, bool aura, int attackBuff, int maxHealthBuff);
 
-		public void UpdateTarget(IUnitElementController t1, IUnitElementController t2, IUnitElementController t3, IUnitElementController target, int targetIdx);
+		public void UpdateHealth(int dynHealth);
+
+		public void UpdateTarget(IUnitElementController target, int targetIdx, bool mocking, bool cleave);
+
+		public void DeployAnimationEvent();
+		public void MoveAnimationEvent();
 
 		public void AttackAnimationEvent(int resIdx, int count);
 
@@ -134,7 +141,7 @@ namespace DisplayInterface
 	}
 	public interface ICommandElementController : IBattleElementController
 	{
-		public void CommandInit(string ID, int ownership, string name, string type, string description);
+		public void CommandInit(string ID, int ownership, string name, string type, int cost, string description);
 
 		public void UpdateInfo(int cost, int durability, ElementState state);
 		public void CastAnimationEvent(string method);

@@ -6,12 +6,10 @@ using TMPro;
 using UnityEngine.EventSystems;
 using DataCore.Cards;
 using DG.Tweening;
-using Unity.VisualScripting;
 using UnityEngine.UI;
 using UnityEngine.Rendering;
 using InputHandler;
 using DataCore.BattleElements;
-using static UnityEditor.Timeline.TimelinePlaybackControls;
 
 public class CommandElementController : BattleElementController,
 	ICommandElementController
@@ -23,9 +21,9 @@ public class CommandElementController : BattleElementController,
 	public int durability;
 	public string type;
 
-	public void CommandInit(string ID, int ownership, string name, string type, string description)
+	public void CommandInit(string ID, int ownership, string name, string type, int cost, string description)
 	{
-		Init(ID, ownership, name, "Command", description);
+		Init(ID, ownership, name, "Command", cost, description);
 
 		this.type = type;
 	}
@@ -50,34 +48,46 @@ public class CommandElementController : BattleElementController,
 
 	public void CastAnimationEvent(string method)
 	{
+		animeLock = true;
 		float castTime = 0.4f;
 		float waitTime = 0.4f;
 
+		Sequence seq = DOTween.Sequence();
 		if (method == "append")
 		{
-			battleSceneManager.rotateSequence.Append(transform.DOMove(new Vector3(1920 / 2, 1080 / 2, 0), castTime));
-			battleSceneManager.rotateSequence.AppendInterval(waitTime);
+			seq.Append(transform.DOMove(inputOffset / 2, castTime));
+			seq.AppendInterval(waitTime);
 			Vector3 rotateBy = new Vector3(0, 0, ((ownership * 2) - 1) * 90);
-			battleSceneManager.rotateSequence.Append(
+			seq.Append(
 				transform.DOMove(stack.transform.position + 500 * Vector3.left, castTime)
-				);
-			battleSceneManager.rotateSequence.Join(
+				.OnComplete(() =>
+				{
+					animeLock = false;
+					this.gameObject.SetActive(false);
+				})
+			);
+			seq.Join(
 				transform.DOBlendableRotateBy(rotateBy, castTime)
 				);
-			battleSceneManager.sequenceTime += castTime + waitTime;
+			seq.Join(transform.DOScale(handicapScale, castTime));
 		}
 		else
 		{
-			battleSceneManager.rotateSequence.Append(transform.DOMove(new Vector3(1920 / 2, 1080 / 2, 0), castTime));
-			battleSceneManager.rotateSequence.AppendInterval(waitTime);
+			seq.Append(transform.DOMove(inputOffset / 2, castTime));
+			seq.AppendInterval(waitTime);
 			Vector3 rotateBy = new Vector3(0, 0, ((ownership * 2) - 1) * 90);
-			battleSceneManager.rotateSequence.Append(
+			seq.Append(
 				transform.DOMove(stack.transform.position + 500 * Vector3.left, castTime)
-				);
-			battleSceneManager.rotateSequence.Join(
+				.OnComplete(() =>
+				{
+					animeLock = false;
+					this.gameObject.SetActive(false);
+				})
+			);
+			seq.Join(
 				transform.DOBlendableRotateBy(rotateBy, castTime)
 				);
-			battleSceneManager.sequenceTime += castTime + waitTime;
+			seq.Join(transform.DOScale(handicapScale, castTime));
 		}
 	}
 
@@ -98,7 +108,7 @@ public class CommandElementController : BattleElementController,
 		//cast条件判定
 		if (dataState == ElementState.inHandicap)
 		{
-			HandicapController.isDragging = false; // 结束拖动
+			handicap.isDragging = false; // 结束拖动
 
 			if (battleSceneManager.PlayerCast(eventData.position, this.handicapIdx) >= 0)
 			{

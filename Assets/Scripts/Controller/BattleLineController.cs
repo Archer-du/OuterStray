@@ -25,20 +25,15 @@ public class BattleLineController : MonoBehaviour,
 	public GameObject background;
 	public Image image;
 
-
 	public int lineIdx;
 	public int ownerShip;
 
-
 	public float width;
 
-	public float interval = 20f;
 
 	public static float updateTime = 0.2f;
 
-
 	public int childNum;
-
 
 	internal UnitElementController this[int index]
 	{
@@ -46,6 +41,12 @@ public class BattleLineController : MonoBehaviour,
 		set => elementList[index] = value;
 	}
 
+	public static bool updating;
+
+	public static float fieldLowerBound = 220f;
+	public static float fieldUpperBound = 1970f;
+	public static float lineInterval = 66f;
+	public static float lineWidth = 400f;
 	/// <summary>
 	/// 数据层准备好时立刻调用Init
 	/// </summary>
@@ -53,6 +54,8 @@ public class BattleLineController : MonoBehaviour,
 	/// <param name="ownership"></param>
 	public void Init(int capacity, int ownership)
 	{
+		updating = false;
+
 		battleSceneManager = GameObject.Find("BattleSceneManager").GetComponent<BattleSceneManager>();
 		elementList = new List<UnitElementController>();
 
@@ -95,7 +98,6 @@ public class BattleLineController : MonoBehaviour,
 
 
 
-	public float inputOffsetX = 1980f;
 	/// <summary>
 	/// 根据指针横向坐标判断部署位置，限制输入
 	/// </summary>
@@ -103,6 +105,10 @@ public class BattleLineController : MonoBehaviour,
 	/// <returns></returns>
 	public int GetDeployPos(float position)
 	{
+		float inputOffsetX = 1980f;
+		float interval = 20f;
+
+
 		if (count >= capacity)
 		{
 			return -1;
@@ -145,6 +151,9 @@ public class BattleLineController : MonoBehaviour,
 	}
 	public int GetCastPos(float position)
 	{
+		float inputOffsetX = 1980f;
+		float interval = 20f;
+
 		float vtcPos = position - inputOffsetX;
 		int pos;
 
@@ -210,16 +219,17 @@ public class BattleLineController : MonoBehaviour,
 	{
 		elementList.RemoveAt(idx);
 
-		UpdateElementPosition();
+		UpdateElements();
 	}
 
 
-
+	
 	/// <summary>
 	/// 动画效果
 	/// </summary>
 	public void UpdateElementPosition()
 	{
+		updating = true;
 		UpdateElements();
 
 		for(int i = 0; i < elementList.Count; i++)
@@ -227,21 +237,8 @@ public class BattleLineController : MonoBehaviour,
 			Vector3 oriPos = elementList[i].transform.position;
 			Vector3 dstPos = elementList[i].logicPosition;
 
-			if (elementList[i].preprocessed == 1)
-			{
-				elementList[i].preprocessed = 0;
-				Vector3 moveBy = dstPos - oriPos;
-				Vector3 rotateBy = new Vector3(0, 0, 180);
-
-
-				elementList[i].transform.DOBlendableMoveBy(moveBy, updateTime);
-				elementList[i].transform.DOBlendableRotateBy(rotateBy, updateTime);
-			}
-			else
-			{
-				elementList[i].transform.DOMove(dstPos, updateTime);
-			}
-			elementList[i].transform.DOScale(elementList[i].battleFieldScale, updateTime);
+			elementList[i].transform.DOMove(dstPos, updateTime)
+				.OnComplete(() => updating = false);
 		}
 	}
 	private void UpdateElements()
@@ -257,7 +254,14 @@ public class BattleLineController : MonoBehaviour,
 	}
 
 
-
+	public void UpdateElementLogicPosition(List<IUnitElementController> list)
+	{
+		for(int i = 0; i < list.Count; i++)
+		{
+			UnitElementController unit = list[i] as UnitElementController;
+			unit.logicPosition = GetLogicPosition(i, list.Count);
+		}
+	}
 
 
 
@@ -267,7 +271,9 @@ public class BattleLineController : MonoBehaviour,
 	public UnitElementController draggingElement;
 	public void Insert(UnitElementController element)
 	{
+		updating = true;
 		draggingElement = element;
+		draggingElement.transform.DOScale(draggingElement.battleFieldScale, updateTime).OnComplete(() => updating = false);
 		element.transform.DOMove(GetLogicPosition(element.resIdx), returnTime).OnComplete(ResetHierachy);
 	}
 	private void ResetHierachy()
@@ -275,12 +281,14 @@ public class BattleLineController : MonoBehaviour,
 		draggingElement.transform.SetParent(transform);
 		draggingElement.transform.SetSiblingIndex(draggingElement.resIdx + childNum);
 	}
-	public Vector3 GetLogicPosition(int index)
+
+	//TODO
+	public Vector3 GetLogicPosition(int pos)
 	{
-		return transform.position + new Vector3((index - count / 2) * BattleElementController.cardWidth + BattleElementController.cardWidth / 2 * ((count + 1) % 2), 0, 0);
+		return new Vector3(0, -700 + lineIdx * 466, 0) + new Vector3((pos - count / 2) * BattleElementController.cardWidth + BattleElementController.cardWidth / 2 * ((count + 1) % 2), 0, 0);
 	}
-	public Vector3 GetLogicPosition(int index, int lineIdx)
+	public Vector3 GetLogicPosition(int pos, int count)
 	{
-		return new Vector3(0, -234 + lineIdx * 400, 0) + new Vector3((index - count / 2) * BattleElementController.cardWidth + BattleElementController.cardWidth / 2 * ((count + 1) % 2), 0, 0);
+		return new Vector3(0, -700 + lineIdx * 466, 0) + new Vector3((pos - count / 2) * BattleElementController.cardWidth + BattleElementController.cardWidth / 2 * ((count + 1) % 2), 0, 0);
 	}
 }

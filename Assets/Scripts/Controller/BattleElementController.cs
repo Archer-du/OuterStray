@@ -22,13 +22,10 @@ public class BattleElementController : MonoBehaviour,
 	protected Transform buffer;
 	public Canvas canvas;
 
-
 	public static int cardWidth = 360;
-
 
 	public HandicapController handicap;
 	public int handicapIdx;
-
 
 	public string ID;
 	public int ownership;
@@ -41,53 +38,90 @@ public class BattleElementController : MonoBehaviour,
 	public int preprocessed;//TODO 敌方特有，之后会改
 
 	public Image CardImage;
+	public Image InspectorImage;
 
 	public Image elementGround;
 	public Image elementShell;
 	public Image elementFrame;
 	public Image NameTag;
 	public Image costTag;
-	public Image categoryIcon;
-
-	public GameObject InspectComponent;
-	public Image componentFrame;
-	public TMP_Text componentAttackText;
-	public TMP_Text componentHealthText;
-	public TMP_Text componentAttackCounterText;
-	public TMP_Text componentDescriptionText;
-	public Image componentCategoryIcon;
-
-
-	public Image slot;
-
 
 	public TMP_Text nameText;
 	public TMP_Text costText;
 
-	public Vector3 originTextScale;
-	public Vector3 targetTextScale;
+	public CanvasGroup InspectPanel;
+	public GameObject Inspector;
+
+	public Image InspectorGround;
+	public Image InspectorShell;
+	public Image InspectorFrame;
+	public Image InspectorCategoryIcon;
+	public Image InspectorNameTag;
+	public Image InspectorCostTag;
+
+	public TMP_Text InspectorName;
+	public TMP_Text InspectorCost;
+	public TMP_Text InspectorAttack;
+	public TMP_Text InspectorMaxHealth;
+	public TMP_Text InspectorAttackCounter;
+	public TMP_Text InspectorDescription;
+
+	public GameObject counterIcon;
+
+	public GameObject InspectComponent;
+	public Image componentFrame;
+	public Image componentCategoryIcon;
+	public TMP_Text componentDescriptionText;
+	public Vector3 componentPosition;
 
 	public Vector3 handicapScale;
 	public Vector3 inspectScale;
 	public Vector3 battleFieldScale;
 
+	public Vector3 battleFieldPosition;
+
+	public Vector3 targetTextScale;
+	public Vector3 originTextScale;
+
+	public Vector3 counterScaleOrigin;
+	public Vector3 counterScaleEnlarge;
+
+	public float counterfontSizeOrigin;
+	public float counterfontSizeEnlarge;
+
+	public float normalFontSizeOrigin;
+	public float normalFontSizeEnlarge;
+
 	public float scaleTime = 0.3f;
 
 	public float moveTime = 0.2f;
-
-	public float grayScale = 0.2f;
 
 	public int upperOrder = 100;
 	public int lowerOrder = 0;
 
 	public Vector2 inputOffset;
 
-
+	public bool animeLock;
 
 	public void OnEnable()
 	{
+		animeLock = false;
 		//输入偏移量
 		inputOffset = new Vector2(1980, 1080);
+
+		componentPosition = InspectComponent.transform.position;
+
+		targetTextScale = nameText.transform.localScale * 1.35f;
+		originTextScale = nameText.transform.localScale;
+
+		counterScaleOrigin = new Vector3(1, 1, 1);
+		counterScaleEnlarge = new Vector3(1.5f, 1.5f, 1);
+
+		counterfontSizeOrigin = 36;
+		counterfontSizeEnlarge = 60;
+
+		normalFontSizeOrigin = 40;
+		normalFontSizeEnlarge = 50;
 
 		canvas = GetComponent<Canvas>();
 		buffer = GameObject.Find("Buffer").transform;
@@ -99,15 +133,18 @@ public class BattleElementController : MonoBehaviour,
 	}
 
 
-
-
-	public void Init(string ID, int ownership, string name, string categories, string description)
+	public void Init(string ID, int ownership, string name, string categories, int cost, string description)
 	{
-		OnEnable();
 		this.ownership = ownership;
 		this.nameContent = name;
 		this.category = categories;
 		this.description = description;
+
+		OnEnable();
+
+		nameText.text = name;
+		costText.text = cost.ToString();
+		componentDescriptionText.text = description;
 
 		LoadCardResources(ID);
 
@@ -116,92 +153,84 @@ public class BattleElementController : MonoBehaviour,
 		battleFieldScale = transform.localScale;
 		handicapScale = 1.35f * battleFieldScale;
 		inspectScale = 1.2f * handicapScale;
-
-		originTextScale = nameText.transform.localScale;
-		targetTextScale = nameText.transform.localScale * 1.5f;
-
-		transform.localScale = handicapScale;
 	}
 
 
 	private void LoadCardResources(string ID)
 	{
 		CardImage.sprite = Resources.Load<Sprite>("CardImage/" + ID);
-		//if (ownership == 1)
-		//{
-		//	CardImage.rectTransform.sizeDelta = new Vector2(10, 13);
-		//}
-		//else
-		//{
-		//	CardImage.rectTransform.sizeDelta = new Vector2(10, 11);
-		//}
+		if (ownership == 1)
+		{
+			CardImage.rectTransform.sizeDelta = new Vector2(10, 13);
+		}
 
 		Color color;
 		switch (category)
 		{
-			case "Guardian":
-				if (UnityEngine.ColorUtility.TryParseHtmlString("#97A5A4", out color))
+			case "LightArmor":
+				if (UnityEngine.ColorUtility.TryParseHtmlString("#429656", out color))
 				{
 					elementGround.color = color;
 					elementFrame.color = color;
-					//slot.color = color;
+					componentFrame.color = color;
 					NameTag.color = color;
 					costTag.color = color;
+					componentCategoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[11];
 				}
 				break;
 			case "Artillery":
 				if (UnityEngine.ColorUtility.TryParseHtmlString("#CE8849", out color))
 				{
-					NameTag.color = color;
+					elementGround.color = color;
 					elementFrame.color = color;
-					slot.color = color;
+					componentFrame.color = color;
+					NameTag.color = color;
 					costTag.color = color;
-
-					elementGround.sprite = Resources.LoadAll<Sprite>("CardFrame/frame2.0")[22];
+					componentCategoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[8];
 				}
 				break;
 			case "Motorized":
 				if (UnityEngine.ColorUtility.TryParseHtmlString("#426A84", out color))
 				{
-					NameTag.color = color; // 赋值给 Image 组件的 color 属性
+					elementGround.color = color;
 					elementFrame.color = color;
-					slot.color = color;
+					componentFrame.color = color;
+					NameTag.color = color;
 					costTag.color = color;
-
-					elementGround.sprite = Resources.LoadAll<Sprite>("CardFrame/frame2.0")[23];
+					componentCategoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[9];
 				}
 				break;
-			case "LightArmor":
-				if (UnityEngine.ColorUtility.TryParseHtmlString("#429656", out color))
+			case "Guardian":
+				if (UnityEngine.ColorUtility.TryParseHtmlString("#97A5A4", out color))
 				{
-					NameTag.color = color; // 赋值给 Image 组件的 color 属性
+					elementGround.color = color;
 					elementFrame.color = color;
-					slot.color = color;
+					componentFrame.color = color;
+					NameTag.color = color;
 					costTag.color = color;
-
-					elementGround.sprite = Resources.LoadAll<Sprite>("CardFrame/frame2.0")[24];
+					componentCategoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[10];
 				}
 				break;
 			case "Construction":
 				if (UnityEngine.ColorUtility.TryParseHtmlString("#7855A5", out color))
 				{
-					NameTag.color = color; // 赋值给 Image 组件的 color 属性
+					elementGround.color = color;
 					elementFrame.color = color;
-					slot.color = color;
+					componentFrame.color = color;
+					NameTag.color = color;
 					costTag.color = color;
-
-					elementGround.sprite = Resources.LoadAll<Sprite>("CardFrame/frame2.0")[25];
+					componentCategoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[12];
 				}
 				break;
 			case "Command":
 				if (UnityEngine.ColorUtility.TryParseHtmlString("#7855A5", out color))
 				{
-					NameTag.color = color; // 赋值给 Image 组件的 color 属性
+					elementGround.color = color;
 					elementFrame.color = color;
-					slot.color = color;
+					componentFrame.color = color;
+					NameTag.color = color;
 					costTag.color = color;
-
-					elementGround.sprite = Resources.LoadAll<Sprite>("CardFrame/frame2.0")[25];
+					CardImage.rectTransform.sizeDelta = new Vector2(10, 13);
 				}
 				break;
 		}
@@ -226,7 +255,7 @@ public class BattleElementController : MonoBehaviour,
 			return;
 		}
 		//拖动显示设置
-		if (HandicapController.isDragging)
+		if (handicap.isDragging)
 		{
 			transform.SetParent(buffer);
 			transform.DOScale(handicapScale, scaleTime);
@@ -235,6 +264,10 @@ public class BattleElementController : MonoBehaviour,
 	}
 	public virtual void OnBeginDrag(PointerEventData eventData)
 	{
+		if (animeLock)
+		{
+			return;
+		}
 		if (ownership != 0)
 		{
 			return;
@@ -247,12 +280,16 @@ public class BattleElementController : MonoBehaviour,
 		//在手牌区：部署或cast
 		if (dataState == ElementState.inHandicap)
 		{
-			HandicapController.isDragging = true;
+			handicap.isDragging = true;
 		}
 	}
 
 	public virtual void OnEndDrag(PointerEventData eventData)
 	{
+		if (animeLock)
+		{
+			return;
+		}
 		if (ownership != 0)
 		{
 			return;
@@ -264,14 +301,22 @@ public class BattleElementController : MonoBehaviour,
 		}
 	}
 
-	public float moveUp = 400f;
+	public static float moveUp = 450f;
 	public virtual void OnPointerEnter(PointerEventData eventData)
 	{
-		if (HandicapController.isDragging)
+		if(animeLock)
 		{
 			return;
 		}
-		if (HandicapController.pushing)
+		if(BattleLineController.updating)
+		{
+			return;
+		}
+		if (handicap.isDragging)
+		{
+			return;
+		}
+		if (handicap.pushing)
 		{
 			return;
 		}
@@ -289,11 +334,19 @@ public class BattleElementController : MonoBehaviour,
 
 	public virtual void OnPointerExit(PointerEventData eventData)
 	{
-		if (HandicapController.isDragging)
+		if (animeLock)
 		{
 			return;
 		}
-		if (HandicapController.pushing)
+		if (BattleLineController.updating)
+		{
+			return;
+		}
+		if (handicap.isDragging)
+		{
+			return;
+		}
+		if (handicap.pushing)
 		{
 			return;
 		}

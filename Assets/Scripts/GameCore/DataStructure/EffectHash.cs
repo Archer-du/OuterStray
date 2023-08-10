@@ -1,4 +1,5 @@
 using DataCore.BattleElements;
+using DataCore.BattleItems;
 using DataCore.Cards;
 using LogicCore;
 using PlasticPipe.PlasticProtocol.Messages;
@@ -136,15 +137,16 @@ namespace EventEffectModels
 			UnitElement element = source as UnitElement;
 			if (element.cleave)
 			{
-				element.controller.CleaveAttackAnimationEvent(element.target.inlineIdx, element.target.battleLine.count);
+				element.controller.AttackAnimationEvent(element.target.inlineIdx, element.target.battleLine.count);
 				element.target.Attacked(element);
 				for (int i = 0; i < 3; i++)
 				{
-					if (i != element.targetIdx)
+					if (i != element.targetIdx && element.attackRange[i] != null)
 					{
-						element.attackRange[i]?.Damaged(element.dynAttackReader, "immediate");
+						element.attackRange[i].Damaged(element.dynAttackReader, "immediate");
 					}
 				}
+				system.UpdateAttackRange();
 			}
 		}
 		internal void Armor(BattleElement source, BattleSystem system)
@@ -235,12 +237,13 @@ namespace EventEffectModels
 			{
 				if (system.handicaps[BattleSystem.TURN].count < system.handicaps[BattleSystem.TURN].capacity)
 				{
-					BattleElement unit = system.stacks[BattleSystem.TURN].RandomPop();
+					//TODO
+					BattleElement unit = system.stacks[BattleSystem.TURN].Pop();
 					system.handicaps[BattleSystem.TURN].Push(unit);
 				}
 			}
 		}
-		internal void RandomDamage(BattleElement source, BattleSystem system)
+		internal void RandomDamage(BattleElement element, BattleSystem system)
 		{
 			int argsNum = 2;
 
@@ -253,10 +256,10 @@ namespace EventEffectModels
 			switch (range)
 			{
 				case 0:
-					target = system.RandomEnemy();
+					target = system.RandomEnemy(this.source.ownership);
 					break;
 				case 1:
-					target = system.RandomEnemyAtFrontLine();
+					target = system.RandomEnemyAtFrontLine(this.source.ownership);
 					break;
 			}
 
@@ -287,9 +290,16 @@ namespace EventEffectModels
 
 			if (element.battleLine.index != system.frontLines[element.ownership]) return;
 
-			for(int i = 0; i < system.battleLines[system.frontLines[element.ownership]].count; i++)
+			int i = 0; int j = 0;
+			int num = system.battleLines[system.frontLines[(this.source.ownership + 1) % 2]].count;
+			while (i < num)
 			{
-				system.battleLines[system.frontLines[element.ownership]][i].Damaged(damage, "immediate");
+				UnitElement e = system.battleLines[system.frontLines[(this.source.ownership + 1) % 2]][j];
+				if (e.Damaged(damage, "immediate") > 0)
+				{
+					j++;
+				}
+				i++;
 			}
 		}
 		/// <summary>
@@ -323,36 +333,42 @@ namespace EventEffectModels
 					unit.dynAttackWriter += atkGain;
 					unit.maxHealthWriter += maxhealthGain;
 				}
-			}
+                unit.UpdateInfo();
+                unit.UpdateHealth();
+            }
 		}
 
 
 
-		private void RecruitToPosition(UnitElement element, BattleSystem system, int position, UnitElement unit)
+		private void RecruitToPosition(BattleSystem system, int position, UnitElement unit)
 		{
 			switch (position)
 			{
 				//0：支援战线
 				case 0:
-					if (system.battleLines[system.supportLines[element.ownership]].Receiveable())
+					if (system.battleLines[system.supportLines[this.source.ownership]].Receiveable())
 					{
-						unit.Deploy(system, system.battleLines[system.supportLines[element.ownership]], 0);
-						system.stacks[element.ownership].PopElementByStackIdx(unit.stackIdx);
+						unit.UnitInit();
+						system.stacks[this.source.ownership].PopElementByStackIdx(unit.stackIdx);
+						unit.Deploy(system, system.battleLines[system.supportLines[this.source.ownership]], 0);
 					}
 					break;
 				//1：当前战线
 				case 1:
+					UnitElement element = this.source as UnitElement;
 					if (element.battleLine.Receiveable())
 					{
+						unit.UnitInit();
+						system.stacks[this.source.ownership].PopElementByStackIdx(unit.stackIdx);
 						unit.Deploy(system, element.battleLine, 0);
-						system.stacks[element.ownership].PopElementByStackIdx(unit.stackIdx);
 					}
 					break;
 				case 2:
-					if (system.battleLines[system.frontLines[element.ownership]].Receiveable())
+					if (system.battleLines[system.frontLines[this.source.ownership]].Receiveable())
 					{
-						unit.Deploy(system, system.battleLines[system.frontLines[element.ownership]], 0);
-						system.stacks[element.ownership].PopElementByStackIdx(unit.stackIdx);
+						unit.UnitInit();
+						system.stacks[this.source.ownership].PopElementByStackIdx(unit.stackIdx);
+						unit.Deploy(system, system.battleLines[system.frontLines[this.source.ownership]], 0);
 					}
 					break;
 			}
@@ -391,7 +407,7 @@ namespace EventEffectModels
 				UnitElement unit = system.stacks[element.ownership].RandomFindUnitByID(ID);
 				if (unit == null) break;
 
-				RecruitToPosition(element, system, position, unit);
+				RecruitToPosition(system, position, unit);
 			}
 		}
 		/// <summary>
@@ -402,7 +418,7 @@ namespace EventEffectModels
 		/// <exception cref="InvalidOperationException"></exception>
 		internal void RecruitByCategory(BattleElement source, BattleSystem system)
 		{
-			UnitElement element = source as UnitElement;
+			UnitElement element = this.source as UnitElement;
 			int argsNum = 3;
 			if (!argsTable.ContainsKey("RecruitByCategory"))
 			{
@@ -422,24 +438,24 @@ namespace EventEffectModels
 				switch (category)
 				{
 					case 0:
-						unit = system.stacks[element.ownership].RandomFindUnitByCategory("LightArmor");
+						unit = system.stacks[this.source.ownership].RandomFindUnitByCategory("LightArmor");
 						break;
 					case 1:
-						unit = system.stacks[element.ownership].RandomFindUnitByCategory("Motorized");
+						unit = system.stacks[this.source.ownership].RandomFindUnitByCategory("Motorized");
 						break;
 					case 2:
-						unit = system.stacks[element.ownership].RandomFindUnitByCategory("Artillery");
+						unit = system.stacks[this.source.ownership].RandomFindUnitByCategory("Artillery");
 						break;
 					case 3:
-						unit = system.stacks[element.ownership].RandomFindUnitByCategory("Guardian");
+						unit = system.stacks[this.source.ownership].RandomFindUnitByCategory("Guardian");
 						break;
 					case 4:
-						unit = system.stacks[element.ownership].RandomFindUnitByCategory("Construction");
+						unit = system.stacks[this.source.ownership].RandomFindUnitByCategory("Construction");
 						break;
 				}
 				if (unit == null) break;
 
-				RecruitToPosition(element, system, position, unit);
+				RecruitToPosition(system, position, unit);
 			}
 		}
 
@@ -455,7 +471,7 @@ namespace EventEffectModels
 					if (system.battleLines[system.supportLines[element.ownership]].Receiveable())
 					{
 						unit.controller = system.controller.InstantiateUnitInStack(element.ownership);
-						unit.Init();
+						unit.UnitInit();
 						unit.Deploy(system, system.battleLines[system.supportLines[element.ownership]], 0);
 					}
 					break;
@@ -464,7 +480,7 @@ namespace EventEffectModels
 					if (element.battleLine.Receiveable())
 					{
 						unit.controller = system.controller.InstantiateUnitInStack(element.ownership);
-						unit.Init();
+						unit.UnitInit();
 						unit.Deploy(system, element.battleLine, 0);
 					}
 					break;
@@ -473,7 +489,7 @@ namespace EventEffectModels
 					if (system.battleLines[system.frontLines[element.ownership]].Receiveable())
 					{
 						unit.controller = system.controller.InstantiateUnitInStack(element.ownership);
-						unit.Init();
+						unit.UnitInit();
 						unit.Deploy(system, system.battleLines[system.frontLines[element.ownership]], 0);
 					}
 					break;
@@ -558,9 +574,15 @@ namespace EventEffectModels
 					break;
 				//2: 前线
 				case 2:
-					for(int i = 0; i < system.battleLines[system.frontLines[(BattleSystem.TURN + 1) % 2]].count; i++)
+					int i = 0; int j = 0;
+					int num = system.battleLines[system.frontLines[(BattleSystem.TURN + 1) % 2]].count;
+                    while (i < num)
 					{
-						system.battleLines[system.frontLines[(BattleSystem.TURN + 1) % 2]][i].Damaged(damage, "immediate");
+						if(system.battleLines[system.frontLines[(BattleSystem.TURN + 1) % 2]][j].Damaged(damage, "immediate") > 0)
+						{
+							j++;
+						}
+						i++;
 					}
 					break;
 			}
@@ -569,7 +591,7 @@ namespace EventEffectModels
 		{
 			int argsNum = 1;
 
-			int position = ((List<int>)argsTable["AOEDamage"])[0];
+			int position = ((List<int>)argsTable["AOERetreat"])[0];
 
 			switch (position)
 			{
@@ -578,9 +600,12 @@ namespace EventEffectModels
 				case 1:
 					break;
 				case 2:
-					for(int i = 0; i < system.battleLines[system.frontLines[(BattleSystem.TURN + 1) % 2]].count; i++)
+					int num = system.battleLines[system.frontLines[(BattleSystem.TURN + 1) % 2]].count;
+					for (int i = 0; i < num; i++)
 					{
-						system.battleLines[system.frontLines[BattleSystem.TURN]][i].Retreat("immediate");
+						UnitElement unit = system.battleLines[system.frontLines[(BattleSystem.TURN + 1) % 2]][0];
+						system.stacks[(BattleSystem.TURN + 1) % 2].Push(unit);
+						unit.Retreat("immediate");
 					}
 					break;
 			}
@@ -593,7 +618,7 @@ namespace EventEffectModels
 
 			system.bases[BattleSystem.TURN].Recover(value);
 		}
-
+		
 
 
 
@@ -623,6 +648,8 @@ namespace EventEffectModels
 				{
 					system.deployQueue[i].maxHealthGain.Remove(publisher.battleID);
 				}
+				system.deployQueue[i].UpdateInfo();
+				system.deployQueue[i].UpdateHealth();
 			}
 		}
 		internal void AuraDisable(BattleElement target, BattleSystem system)
@@ -638,35 +665,136 @@ namespace EventEffectModels
 			{
 				element.maxHealthGain.Remove(publisher.battleID);
 			}
+			element.UpdateInfo();
+			element.UpdateHealth();
 		}
-		
 
-
-
-
-		internal void UnitGain(BattleElement target, BattleSystem system)
+		internal void AuraRandomDamage(BattleElement element, BattleSystem system)
 		{
 			UnitElement publisher = this.source as UnitElement;
 			if (!publisher.aura)
 			{
 				return;
 			}
-			UnitElement element = target as UnitElement;
-
 			int argsNum = 2;
 
-			int atkGain = ((List<int>)argsTable["UnitGain"])[0];
-			int mhpGain = ((List<int>)argsTable["UnitGain"])[1];
 
-			element.attackGain.Add(publisher.battleID, atkGain);
-			element.maxHealthGain.Add(publisher.battleID, mhpGain);
+
+			int range = ((List<int>)argsTable["AuraRandomDamage"])[0];
+			int damage = ((List<int>)argsTable["AuraRandomDamage"])[1];
+
+			UnitElement target = null;
+			switch (range)
+			{
+				case 0:
+					target = system.RandomEnemy(this.source.ownership);
+					break;
+				case 1:
+					target = system.RandomEnemyAtFrontLine(this.source.ownership);
+					break;
+			}
+
+			target?.Damaged(damage, "append");
 		}
-		internal void DoubleRecovery(BattleElement source, BattleSystem system)
+		internal void AuraAttackCounterDecrease(BattleElement element, BattleSystem system)
 		{
-			UnitElement element = source as UnitElement;
+			UnitElement publisher = this.source as UnitElement;
+			if (!publisher.aura)
+			{
+				return;
+			}
+			int argsNum = 1;
+			if (!argsTable.ContainsKey("AuraAttackCounterDecrease"))
+			{
+				throw new InvalidOperationException("argsTable fault");
+			}
+			if (((List<int>)argsTable["AuraAttackCounterDecrease"]).Count != argsNum)
+			{
+				throw new InvalidOperationException("argsTable list length invalid");
+			}
+
+			int decrease = ((List<int>)argsTable["AuraAttackCounterDecrease"])[0];
+
+			publisher.dynAttackCounter -= decrease;
+
+			publisher.UpdateInfo();
+		}
+		internal void AuraUnitGain(BattleElement target, BattleSystem system)
+		{
+			UnitElement publisher = this.source as UnitElement;
+			if (!publisher.aura)
+			{
+				return;
+			}
+			int argsNum = 2;
+
+
+			int atkGain = ((List<int>)argsTable["AuraUnitGain"])[0];
+			int mhpGain = ((List<int>)argsTable["AuraUnitGain"])[1];
+
+			UnitElement element = target as UnitElement;
+
+			if(element != this.source)
+			{
+				element.attackGain.Add(publisher.battleID, atkGain);
+				element.maxHealthGain.Add(publisher.battleID, mhpGain);
+			}
+			element.UpdateInfo();
+			element.UpdateHealth();
+		}
+		internal void AuraConstantUnitGain(BattleElement target, BattleSystem system)
+		{
+			UnitElement publisher = this.source as UnitElement;
+			if (!publisher.aura)
+			{
+				return;
+			}
+			int argsNum = 2;
+
+
+			int atkGain = ((List<int>)argsTable["AuraUnitGain"])[0];
+			int mhpGain = ((List<int>)argsTable["AuraUnitGain"])[1];
+
+			for(int i = 0; i < system.deployQueue.Count; i++)
+			{
+				UnitElement element = system.deployQueue[i];
+				if(element.ownership == publisher.ownership && element.state == ElementState.inBattleLine)
+				{
+					element.attackGain.Add(publisher.battleID, atkGain);
+					element.maxHealthGain.Add(publisher.battleID, mhpGain);
+				}
+				element.UpdateInfo();
+				element.UpdateHealth();
+			}
+		}
+		internal void AuraDoubleRecover(BattleElement target, BattleSystem system)
+		{
+			UnitElement publisher = this.source as UnitElement;
+			if (!publisher.aura)
+			{
+				return;
+			}
+
+
+			UnitElement element = target as UnitElement;
 			element.recover *= 2;
 		}
+		internal void AuraBaseImmunity(BattleElement target, BattleSystem system)
+		{
+			UnitElement publisher = this.source as UnitElement;
+			if (!publisher.aura)
+			{
+				return;
+			}
 
+			UnitElement element = target as UnitElement;
+			if(element.dynHealth - element.damage <= 0)
+			{
+				element.dynHealth = 1;
+				element.damage = 0;
+				element.UpdateHealth();
+			}
+		}
 
 
 
@@ -776,6 +904,7 @@ namespace EventEffectModels
 
 			unit.dynAttackWriter = system.handicaps[element.ownership].count > 0 ? system.handicaps[element.ownership].count : 1;
 			unit.maxHealthWriter = system.handicaps[element.ownership].count > 0 ? system.handicaps[element.ownership].count : 1;
+			unit.UpdateHealth();
 
 			SummonToPosition(element, system, 2, unit);
 		}
@@ -795,11 +924,26 @@ namespace EventEffectModels
 				target.battleLine[i].Damaged(2, "immediate");
 			}
 		}
-		
+		internal void StrangeGrowth(BattleElement element, BattleSystem system)
+		{
+			UnitElement publisher = this.source as UnitElement;
 
+			publisher.dynAttackWriter += 2;
+			publisher.maxHealthWriter += 2;
+			publisher.UpdateHealth();
 
-
-
+			if (publisher.dynAttackWriter >= 15)
+			{
+				BattleLine line = publisher.battleLine;
+				int resIdx = publisher.inlineIdx;
+				publisher.Terminate("immediate");
+				UnitCard card = system.pool.GetCardByID("mush_99_00") as UnitCard;
+				UnitElement unit = new GuardianElement(card, system);
+				unit.controller = system.controller.InstantiateUnitInBattleField(element.ownership, line.index, resIdx);
+				unit.UnitInit();
+				unit.Deploy(system, line, resIdx);
+			}
+		}
 
 		internal EffectsTable(BattleElement source)
 		{
@@ -807,9 +951,7 @@ namespace EventEffectModels
 			//新效果方法在这里注册
 			effectsTable = new Hashtable()
 			{
-				{"Aura", (BattleEventHandler)Aura },
-				{"AuraUnload", (BattleEventHandler)AuraUnload },
-				{"AuraDisable", (BattleEventHandler)AuraDisable },
+				//basic
 				{"Assault", (BattleEventHandler)Assault },
 				{"AssaultOnEnable", (BattleEventHandler)AssaultOnEnable },
 				{"Raid", (BattleEventHandler)Raid },
@@ -824,8 +966,6 @@ namespace EventEffectModels
 				{"AttackCounterDecrease", (BattleEventHandler)AttackCounterDecrease },
 				{"DrawCardsRandom", (BattleEventHandler)DrawCardsRandom },
 				{"RandomDamage", (BattleEventHandler)RandomDamage },
-				{"DoubleRecovery", (BattleEventHandler)DoubleRecovery },
-				{"UnitGain", (BattleEventHandler)UnitGain },
 				{"RandomRecoverDamaged", (BattleEventHandler)RandomRecoverDamaged },
 				{"DamageAdjacent", (BattleEventHandler)DamageAdjacent },
 				{"RecruitByID", (BattleEventHandler)RecruitByID },
@@ -835,20 +975,32 @@ namespace EventEffectModels
 				{"TargetDamage", (BattleEventHandler)TargetDamage },
 				{"AOEDamage", (BattleEventHandler)AOEDamage },
 				{"AOERetreat", (BattleEventHandler)AOERetreat },
+				{"RecoverBase", (BattleEventHandler)RecoverBase },
 				{"DrawCommandCardsRandomAndRecover", (BattleEventHandler)DrawCommandCardsRandomAndRecover },
+				{"StrangeGrowth", (BattleEventHandler)StrangeGrowth },
+				{"AuraConstantUnitGain", (BattleEventHandler)AuraConstantUnitGain },
+
+				//aura
+				{"Aura", (BattleEventHandler)Aura },
+				{"AuraUnload", (BattleEventHandler)AuraUnload },
+				{"AuraDisable", (BattleEventHandler)AuraDisable },
+
+				{"AuraRandomDamage", (BattleEventHandler)AuraRandomDamage },
+				{"AuraAttackCounterDecrease", (BattleEventHandler)AuraAttackCounterDecrease },
+				{"AuraUnitGain", (BattleEventHandler)AuraUnitGain },
+				{"AuraDoubleRecover", (BattleEventHandler)AuraDoubleRecover },
+				{"AuraBaseImmunity", (BattleEventHandler)AuraBaseImmunity },
+
+				//command
 				{"Comm_Mush_07", (BattleEventHandler)Comm_Mush_07 },
 				{"Comm_Mush_08", (BattleEventHandler)Comm_Mush_08 },
 				{"Comm_Mush_13", (BattleEventHandler)Comm_Mush_13 },
 				{"Comm_Mush_18", (BattleEventHandler)Comm_Mush_18 },
-				{"RecoverBase", (BattleEventHandler)RecoverBase }
 			};
 
 			//如果需要参数，请在这里注册
 			argsTable = new Hashtable()
 			{
-				{"Aura", null },
-				{"AuraUnload", null },
-				{"AuraDisable", null },
 				{"Assault", null },
 				{"AssaultOnEnable", null },
 				{"Raid", null },
@@ -863,8 +1015,6 @@ namespace EventEffectModels
 				{"AttackCounterDecrease", null },
 				{"DrawCardsRandom", null },
 				{"RandomDamage", null },
-				{"DoubleRecovery", null },
-				{"UnitGain", null },
 				{"RandomRecoverDamaged", null },
 				{"DamageAdjacent", null },
 				{"RecruitByID", null },
@@ -875,15 +1025,30 @@ namespace EventEffectModels
 				{"AOEDamage", null },
 				{"AOERetreat", null },
 				{"DrawCommandCardsRandomAndRecover", null },
+				{"RecoverBase", null },
+				{"StrangeGrowth", null },
+				{"AuraConstantUnitGain", null },
+
+				{"Aura", null },
+				{"AuraUnload", null },
+				{"AuraDisable", null },
+				{"AuraRandomDamage", null },
+				{"AuraAttackCounterDecrease", null },
+				{"AuraUnitGain", null },
+				{"AuraDoubleRecover", null },
+				{"AuraBaseImmunity", null },
+
 				{"Comm_Mush_07", null },
 				{"Comm_Mush_08", null },
 				{"Comm_Mush_13", null },
 				{"Comm_Mush_18", null },
-				{"RecoverBase", null }
 			};
 
 			//TODO ignore
-			buffer = new Hashtable() { };
+			buffer = new Hashtable()
+			{
+				{"StrangeGrowth", new List<int>(1) {0} }
+			};
 		}
 
 		internal BattleEventHandler GetHandler(string effectsName)
