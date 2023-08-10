@@ -20,14 +20,22 @@ namespace LogicCore
 
 		private BattleSystem battleSystem;
 
-
 		private List<Terrain> terrains;
 
 		private Node currentNode;
+		private Terrain currentTerrain
+		{
+			get => currentNode.terrain;
+		}
+
+		internal static bool isInNode;
+
 
 		private Deck playerDeck;
 		private Deck enemyDeck;
 
+		internal int baseHealth;
+		internal int gasMineToken;
 
 		public int battleNodeNum;
 
@@ -45,13 +53,23 @@ namespace LogicCore
 			this.battleSystem = system;
 
 			//init
+			isInNode = false;
+
 			//TODO test
 			battleNodeNum = 5;
 
-			terrains = new List<Terrain>(battleNodeNum - 1);
+			terrains = new List<Terrain>(battleNodeNum);
+
+			//TODO remove
+			playerPool = new Pool();
 
 			playerDeck = new Deck(system);
 			enemyDeck = new Deck(system);
+
+			controller.TerrrainsInitialize(this, battleNodeNum);
+
+			//TODO
+			BuildTerrains();
 		}
 
 
@@ -59,7 +77,10 @@ namespace LogicCore
 		{
 			for(int i = 0; i < battleNodeNum; i++)
 			{
-				terrains.Add(new Terrain(i));
+				Terrain t = new Terrain(i, this, battleSystem);
+				t.controller = controller.InstantiateTerrain(i);
+				t.Init();
+				terrains.Add(t);
 			}
 			//连接各terrain
 			for(int i = 0; i < battleNodeNum - 1; i++)
@@ -71,20 +92,50 @@ namespace LogicCore
 			{
 				terrain.GenerateNodes();
 			}
+
 			currentNode = terrains[0].resNode;
+
+			controller.UpdateCurrentNode(currentNode.controller);
+
+			currentTerrain.controller.GenerateLineNetFromSource();
 		}
 
 
-
-		public void EnterNode(int hrztIdx, int vtcIdx)
+		public void EnterNode(int terrainIdx, int hrztIdx, int vtcIdx)
 		{
+			if(isInNode)
+			{
+				return;
+			}
+			Node targetNode = terrains[terrainIdx][hrztIdx][vtcIdx];
+			if (!currentNode.IsReachable(targetNode))
+			{
+				throw new InvalidOperationException();
+			}
 
+			targetNode.CastNodeEvent();
+			isInNode = true;
+			currentNode = targetNode;
 		}
 
-
-		public void EnterNextTerrain()
+		public void CampaignCompleted()
 		{
+			isInNode = false;
+			if (currentNode.IsDstNodeCurTerrain())
+			{
+				controller.EnterNextTerrain();
+			}
+		}
 
+		public void CampaignFailed()
+		{
+			isInNode = false;
+			//向上通知
+		}
+
+		public void Exit()
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

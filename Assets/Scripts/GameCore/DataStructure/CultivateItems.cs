@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-
+using Codice.CM.Common;
 using DataCore.Cards;
 
 using DisplayInterface;
@@ -129,6 +129,83 @@ namespace DataCore.CultivateItems
 					{
 						plantCardPool.Add(id, card);
 					}
+				}
+
+				line = reader.ReadLine();
+				num++;
+				index++;
+			}
+			reader.Close();
+			return num;
+		}
+		internal int LoadCardPool(string path)
+		{
+			StreamReader reader = File.OpenText(path);
+
+			string[] data;
+			int num = 0;
+			string line = reader.ReadLine();
+			int index = 0;
+
+
+			while (line != null)
+			{
+				data = line.Split(',');
+				if (data[1] == "#")
+				{
+					line = reader.ReadLine();
+					continue;
+				}
+				Card card = null;
+
+				string id = data[0];
+
+				int ownership = data[1] == "human" ? 0 : 1;
+
+				string name = data[2];
+
+				if (id.Contains("comm"))
+				{
+					string type = data[3];
+					int cost = int.Parse(data[4]);
+
+					int durability = int.Parse(data[5]);
+
+					int department = int.Parse(data[9]);
+					int pack = int.Parse(data[10]);
+
+					string effects = data[11];
+
+					string description = data[8];
+
+					card = new CommandCard(id, ownership, name, type, description, cost, durability, department, pack, effects);
+				}
+				else
+				{
+					string category = data[3];
+
+					int cost = int.Parse(data[4]);
+					int atk = int.Parse(data[5]);
+					int hp = int.Parse(data[6]);
+					//理解鹰角程序员，成为鹰角程序员//TODO
+					int atkc = data[7] == "NA" ? 100000 : int.Parse(data[7]);
+
+					int department = int.Parse(data[9]);
+					int pack = int.Parse(data[10]);
+
+					string effects = data[11];
+
+					string description = data[8];
+
+
+					card = new UnitCard(id, ownership, name, category, cost, atk, hp, atkc, description, department, pack, effects);
+				}
+
+				//TODO
+				cardPool.Add(card);
+				if (!hashPool.ContainsKey(id))
+				{
+					hashPool.Add(id, card);
 				}
 
 				line = reader.ReadLine();

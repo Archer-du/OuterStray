@@ -32,6 +32,7 @@ namespace LogicCore
 		public IBattleSceneController controller;
 		//display-----------------------------------
 
+		internal TacticalSystem system;
 
 		//global
 		/// <summary>
@@ -121,20 +122,8 @@ namespace LogicCore
 			//plantDeck.LoadDeckFromPool(pool, "enemy");
 			//-----------------------
 
-
-
-
 			deployQueue = new List<UnitElement>();
 			UnitIDDic = new Dictionary<string, List<UnitElement>>();
-
-
-
-			//渲染控件初始化
-			controller.UpdateEnergy(0, energy[0]);
-			controller.UpdateEnergy(1, energy[1]);
-
-			controller.UpdateEnergySupply(0, energySupply[0]);
-			controller.UpdateEnergySupply(1, energySupply[1]);
 
 			//TODO remove
 			BuildBattleField(null, null, 4);
@@ -168,6 +157,13 @@ namespace LogicCore
 
 			energy = new int[2] { 0, 0 };
 			energySupply = new int[2] { 1, 1 };
+
+			//渲染控件初始化
+			controller.UpdateEnergy(0, energy[0]);
+			controller.UpdateEnergy(1, energy[1]);
+
+			controller.UpdateEnergySupply(0, energySupply[0]);
+			controller.UpdateEnergySupply(1, energySupply[1]);
 
 			BuildBattleLine(lineCapacity);
 
@@ -422,9 +418,6 @@ namespace LogicCore
 		}
 
 
-
-
-
 		public void Cast(int handicapIdx, int dstLineIdx, int dstIdx)
 		{
 			if (handicaps[TURN][handicapIdx] is CommandElement)
@@ -468,9 +461,6 @@ namespace LogicCore
 		}
 
 
-
-
-
 		public void Move(int resLineIdx, int resIdx, int dstLineIdx, int dstPos)
 		{
 			UnitElement element = battleLines[resLineIdx][resIdx];
@@ -501,8 +491,6 @@ namespace LogicCore
 				throw new InvalidOperationException("battleLine receive denied");
 			}
 
-
-
 			eventTable[TURN].RaiseEvent("MoveUnit", null, this);
 
 			element.Move(battleLines[resLineIdx], battleLines[dstLineIdx], resIdx, dstPos);
@@ -511,10 +499,6 @@ namespace LogicCore
 			UpdateFrontLine();
 			UpdateAttackRange();
 			Settlement();
-
-
-
-
 
 			if (dstLineIdx == frontLines[TURN])
 			{
@@ -527,10 +511,9 @@ namespace LogicCore
 
 			controller.Settlement();
 		}
+		[Obsolete("legacy")]
 
 
-
-		//legacy
 		public void VerticalMove(int resLineIdx, int resIdx, int dstPos)
 		{
 			if (dstPos >= battleLines[resLineIdx].count)
@@ -558,8 +541,6 @@ namespace LogicCore
 		}
 
 
-
-
 		public void Retreat(int resLineIdx, int resIdx)
 		{
 			UnitElement element = battleLines[resLineIdx][resIdx];
@@ -584,11 +565,6 @@ namespace LogicCore
 			eventTable[TURN].RaiseEvent("UpdateAura", null, this);
 			eventTable[(TURN + 1) % 2].RaiseEvent("UpdateAura", null, this);
 		}
-		//public void PullOut(int resLineIdx, int resIdx)
-		//{
-		//	UnitElement element = battleLines[resLineIdx][resIdx];
-		//}
-
 
 
 		public void Skip()
@@ -606,7 +582,7 @@ namespace LogicCore
 				handicaps[TURN].Push(element);
 			}
 
-			RotateSettlement();
+			Settlement();
 
 			TURN = (TURN + 1) % 2;
 
@@ -619,10 +595,23 @@ namespace LogicCore
 			//动画结算后回调
 			controller.UpdateTurnWithSettlement();
 		}
-
+		/// <summary>
+		/// 退出 返回作战结果：失败
+		/// </summary>
+		/// <returns></returns>
 		public void Exit()
 		{
-			throw new System.NotImplementedException("exit");
+			BattleFailed();
+		}
+
+
+		public void BattleFailed()
+		{
+
+		}
+		public void BattleWinned()
+		{
+
 		}
 
 
@@ -641,27 +630,13 @@ namespace LogicCore
 
 
 
-		private bool ExistFrontLine()
-		{
-			for (int i = 0; i < linesCapacity - 1; i++)
-			{
-				if (battleLines[i].ownerShip != battleLines[i + 1].ownerShip)
-				{
-					return true;
-				}
-			}
-			return false;
-		}
+
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <returns></returns>
 		private bool FrontLineAlign()
 		{
-			if (!ExistFrontLine())
-			{
-				return false;
-			}
 			return (battleLines[frontLines[0]].count + battleLines[frontLines[1]].count) % 2 == 0;
 		}
 		/// <summary>
@@ -692,68 +667,51 @@ namespace LogicCore
 					battleLines[i][j].SetAttackRange(null, null, null);
 				}
 			}
-			if (ExistFrontLine())
+			if (FrontLineAlign())
 			{
-				if (FrontLineAlign())
+				//我方
+				for (int j = 0; j < battleLines[frontLines[0]].count; j++)
 				{
-					//我方
-					for (int j = 0; j < battleLines[frontLines[0]].count; j++)
-					{
-						int idx2 = j + (battleLines[frontLines[1]].count - battleLines[frontLines[0]].count) / 2;
-						int idx1 = idx2 - 1;
-						int idx3 = idx2 + 1;
-						UnitElement element = battleLines[frontLines[0]][j];
-						UnitElement target1 = idx1 < 0 || idx1 >= battleLines[frontLines[1]].count ? null : battleLines[frontLines[1]][idx1];
-						UnitElement target2 = idx2 < 0 || idx2 >= battleLines[frontLines[1]].count ? null : battleLines[frontLines[1]][idx2];
-						UnitElement target3 = idx3 < 0 || idx3 >= battleLines[frontLines[1]].count ? null : battleLines[frontLines[1]][idx3];
-						element.SetAttackRange(target1, target2, target3);
-					}
-					for (int j = 0; j < battleLines[frontLines[1]].count; j++)
-					{
-						int idx2 = j + (battleLines[frontLines[0]].count - battleLines[frontLines[1]].count) / 2;
-						int idx1 = idx2 - 1;
-						int idx3 = idx2 + 1;
-						UnitElement element = battleLines[frontLines[1]][j];
-						UnitElement target1 = idx1 < 0 || idx1 >= battleLines[frontLines[0]].count ? null : battleLines[frontLines[0]][idx1];
-						UnitElement target2 = idx2 < 0 || idx2 >= battleLines[frontLines[0]].count ? null : battleLines[frontLines[0]][idx2];
-						UnitElement target3 = idx3 < 0 || idx3 >= battleLines[frontLines[0]].count ? null : battleLines[frontLines[0]][idx3];
-						element.SetAttackRange(target1, target2, target3);
-					}
+					int idx2 = j + (battleLines[frontLines[1]].count - battleLines[frontLines[0]].count) / 2;
+					int idx1 = idx2 - 1;
+					int idx3 = idx2 + 1;
+					UnitElement element = battleLines[frontLines[0]][j];
+					UnitElement target1 = idx1 < 0 || idx1 >= battleLines[frontLines[1]].count ? null : battleLines[frontLines[1]][idx1];
+					UnitElement target2 = idx2 < 0 || idx2 >= battleLines[frontLines[1]].count ? null : battleLines[frontLines[1]][idx2];
+					UnitElement target3 = idx3 < 0 || idx3 >= battleLines[frontLines[1]].count ? null : battleLines[frontLines[1]][idx3];
+					element.SetAttackRange(target1, target2, target3);
 				}
-				else
+				for (int j = 0; j < battleLines[frontLines[1]].count; j++)
 				{
-					for (int j = 0; j < battleLines[frontLines[0]].count; j++)
-					{
-						int idx1 = j + (int)Math.Floor((battleLines[frontLines[1]].count - battleLines[frontLines[0]].count) / 2f);
-						int idx3 = idx1 + 1;
-						UnitElement element = battleLines[frontLines[0]][j];
-						UnitElement target1 = idx1 < 0 || idx1 >= battleLines[frontLines[1]].count ? null : battleLines[frontLines[1]][idx1];
-						UnitElement target3 = idx3 < 0 || idx3 >= battleLines[frontLines[1]].count ? null : battleLines[frontLines[1]][idx3];
-						element.SetAttackRange(target1, null, target3);
-					}
-					for (int j = 0; j < battleLines[frontLines[1]].count; j++)
-					{
-						int idx1 = j + (int)Math.Floor((battleLines[frontLines[0]].count - battleLines[frontLines[1]].count) / 2f);
-						int idx3 = idx1 + 1;
-						UnitElement element = battleLines[frontLines[1]][j];
-						UnitElement target1 = idx1 < 0 || idx1 >= battleLines[frontLines[0]].count ? null : battleLines[frontLines[0]][idx1];
-						UnitElement target3 = idx3 < 0 || idx3 >= battleLines[frontLines[0]].count ? null : battleLines[frontLines[0]][idx3];
-						element.SetAttackRange(target1, null, target3);
-					}
+					int idx2 = j + (battleLines[frontLines[0]].count - battleLines[frontLines[1]].count) / 2;
+					int idx1 = idx2 - 1;
+					int idx3 = idx2 + 1;
+					UnitElement element = battleLines[frontLines[1]][j];
+					UnitElement target1 = idx1 < 0 || idx1 >= battleLines[frontLines[0]].count ? null : battleLines[frontLines[0]][idx1];
+					UnitElement target2 = idx2 < 0 || idx2 >= battleLines[frontLines[0]].count ? null : battleLines[frontLines[0]][idx2];
+					UnitElement target3 = idx3 < 0 || idx3 >= battleLines[frontLines[0]].count ? null : battleLines[frontLines[0]][idx3];
+					element.SetAttackRange(target1, target2, target3);
 				}
 			}
-		}
-
-
-
-		private void RotateSettlement()
-		{
-			for (int i = 0; i < deployQueue.Count; i++)
+			else
 			{
-				if (deployQueue[i].state == ElementState.inBattleLine)
+				for (int j = 0; j < battleLines[frontLines[0]].count; j++)
 				{
-					deployQueue[i].RotateSettlement();
-					UpdateAttackRange();
+					int idx1 = j + (int)Math.Floor((battleLines[frontLines[1]].count - battleLines[frontLines[0]].count) / 2f);
+					int idx3 = idx1 + 1;
+					UnitElement element = battleLines[frontLines[0]][j];
+					UnitElement target1 = idx1 < 0 || idx1 >= battleLines[frontLines[1]].count ? null : battleLines[frontLines[1]][idx1];
+					UnitElement target3 = idx3 < 0 || idx3 >= battleLines[frontLines[1]].count ? null : battleLines[frontLines[1]][idx3];
+					element.SetAttackRange(target1, null, target3);
+				}
+				for (int j = 0; j < battleLines[frontLines[1]].count; j++)
+				{
+					int idx1 = j + (int)Math.Floor((battleLines[frontLines[0]].count - battleLines[frontLines[1]].count) / 2f);
+					int idx3 = idx1 + 1;
+					UnitElement element = battleLines[frontLines[1]][j];
+					UnitElement target1 = idx1 < 0 || idx1 >= battleLines[frontLines[0]].count ? null : battleLines[frontLines[0]][idx1];
+					UnitElement target3 = idx3 < 0 || idx3 >= battleLines[frontLines[0]].count ? null : battleLines[frontLines[0]][idx3];
+					element.SetAttackRange(target1, null, target3);
 				}
 			}
 		}
@@ -768,6 +726,8 @@ namespace LogicCore
 				}
 			}
 		}
+
+
 
 
 
@@ -839,21 +799,5 @@ namespace LogicCore
 			}
 			return null;
 		}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	}
 }

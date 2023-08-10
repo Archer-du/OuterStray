@@ -11,9 +11,6 @@ namespace InputHandler
 		/// console version
 		/// </summary>
 		public void EnterTacticalSystem();
-
-
-
 		/// <summary>
 		/// 选择指定建筑物的指定卡包，将卡包导入到卡组中
 		/// </summary>
@@ -36,12 +33,9 @@ namespace InputHandler
 		/// </summary>
 		/// <param name="hrztIdx"></param>
 		/// <param name="vtcIdx"></param>
-		public void EnterNode(int hrztIdx, int vtcIdx);
+		public void EnterNode(int terrainIdx, int hrztIdx, int vtcIdx);
 
-		/// <summary>
-		/// 检测合法性，进入下一层terrain
-		/// </summary>
-		public void EnterNextTerrain();
+		public void Exit();
 	}
 
 

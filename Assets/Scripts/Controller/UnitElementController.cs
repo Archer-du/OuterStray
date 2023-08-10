@@ -529,7 +529,6 @@ public class UnitElementController : BattleElementController,
 
 
 	private float timer = 0;
-	public Vector3 pastScale;
 	void Update()
 	{
 		if(handicap.isDragging == false && dataState == ElementState.inBattleLine)

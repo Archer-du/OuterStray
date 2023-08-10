@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using DataCore.BattleElements;
 using DataCore.Cards;
 using InputHandler;
+using Unity.Plastic.Antlr3.Runtime.Tree;
 
 namespace DisplayInterface
 {
@@ -38,14 +39,34 @@ namespace DisplayInterface
 
 	}
 
+
+
+
+
 	public interface ITacticalSceneController
 	{
+		public void TerrrainsInitialize(ITacticalSystemInput handler, int terrainsLength);
+		public ITerrainController InstantiateTerrain(int idx);
+		public void EnterNextTerrain();
+		public void UpdateCurrentNode(INodeController controller);
+	}
+	public interface ITerrainController
+	{
+		public INodeController InstantiateNode(int length, int width, int hrztIdx, int vtcIdx, string category);
+		public void Init();
 
+		public void GenerateLineNetFromSource();
 	}
 	public interface INodeController
 	{
-
+		public void SetAdjacentNode(List<INodeController> adjList);
+		public void CastEvent();
 	}
+
+
+
+
+
 	public interface IBattleSceneController
 	{
 		/// <summary>
@@ -95,9 +116,9 @@ namespace DisplayInterface
 
 	public interface ICardStackController
 	{
-		public IUnitElementController InstantiateUnitElement();
 		public IUnitElementController InstantiateUnitElementInBattle();
 		public ICommandElementController InstantiateCommandElementInBattle();
+		public IUnitElementController InstantiateUnitElement();
 		public ICommandElementController InstantiateCommandElement();
 	}
 

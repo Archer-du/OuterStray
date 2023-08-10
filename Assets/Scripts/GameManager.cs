@@ -95,10 +95,11 @@ public class GameManager : MonoBehaviour, IGameManagement
 		gameState = GameState.Battle;
 
 
-		battleSceneManager = GameObject.Find("BattleSceneManager").GetComponent<BattleSceneManager>();
+		//battleSceneManager = GameObject.Find("BattleSceneManager").GetComponent<BattleSceneManager>();
+		tacticalSceneManager = GameObject.Find("TacticalSceneManager").GetComponent<TacticalSceneManager>();
 		//EXTEND
 
-		battleSystem = new BattleSystem(battleSceneManager);
+		//battleSystem = new BattleSystem(battleSceneManager);
 		tacticalSystem = new TacticalSystem(tacticalSceneManager, battleSystem as BattleSystem);
 		cultivationSystem = new CultivationSystem(cultivateSceneManager, tacticalSystem as TacticalSystem);
 

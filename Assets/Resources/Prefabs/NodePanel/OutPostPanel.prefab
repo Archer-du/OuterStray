@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &8752344673338651891
+--- !u!1 &5325806612725533943
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,24 +8,23 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 6495564025079464592}
-  - component: {fileID: 8371088614698621869}
-  - component: {fileID: 6777790733325193564}
-  - component: {fileID: 2888162479322204188}
+  - component: {fileID: 2018366604837609319}
+  - component: {fileID: 2598501367980136871}
+  - component: {fileID: 4959503230160332480}
   m_Layer: 5
-  m_Name: Terrain
+  m_Name: OutPostPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!224 &6495564025079464592
+--- !u!224 &2018366604837609319
 RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8752344673338651891}
+  m_GameObject: {fileID: 5325806612725533943}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -36,31 +35,31 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 116, y: 0}
+  m_SizeDelta: {x: -2815.4253, y: -1446.583}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!222 &8371088614698621869
+--- !u!222 &2598501367980136871
 CanvasRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8752344673338651891}
+  m_GameObject: {fileID: 5325806612725533943}
   m_CullTransparentMesh: 1
---- !u!114 &6777790733325193564
+--- !u!114 &4959503230160332480
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8752344673338651891}
+  m_GameObject: {fileID: 5325806612725533943}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.21698111, g: 0.21698111, b: 0.21698111, a: 1}
+  m_Color: {r: 0.5566038, g: 0.5566038, b: 0.5566038, a: 0.80784315}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -77,26 +76,3 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &2888162479322204188
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8752344673338651891}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8d1c08d23b8a5c5459a10fc9569ae539, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  linePrototype: {fileID: 1366516552537488563, guid: 47a7b10af0eb7e64ba1f2304047f8ecd, type: 3}
-  nodePrototype: {fileID: 6266398735313231642, guid: a5d59128366038c44b548c57e4ee69dd, type: 3}
-  nodes: []
-  srcNode: {fileID: 0}
-  dstNode: {fileID: 0}
-  leftBound: -1200
-  rightBound: 1200
-  topBound: 700
-  bottomBound: -700
-  vtcOffsetRange: 200
-  hrztOffsetRange: 200

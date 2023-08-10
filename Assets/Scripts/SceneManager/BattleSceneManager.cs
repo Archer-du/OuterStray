@@ -86,10 +86,10 @@ public class BattleSceneManager : MonoBehaviour,
 
 	//对话框
 	public GameObject dialogFrame;
-    public TMP_Text nameText;
+    public TMP_Text dialogText;
 	public string dialogs;
 
-	StreamReader reader;
+	StreamReader dialogReader;
 
 
     public void FieldInitialize(IBattleSystemInput handler)
@@ -97,6 +97,7 @@ public class BattleSceneManager : MonoBehaviour,
 		battleSystem = handler;
 		turnNum = 0;
 
+		//TODO config
 		fieldCapacity = 4;
 		battleLineControllers = new BattleLineController[fieldCapacity];
 
@@ -115,10 +116,10 @@ public class BattleSceneManager : MonoBehaviour,
 		
 		
 		dialogFrame = GameObject.Find("Dialog");
-        nameText = dialogFrame.transform.Find("Text(TMP)").GetComponent<TMP_Text>();
+        dialogText = dialogFrame.transform.Find("Text(TMP)").GetComponent<TMP_Text>();
         dialogFrame.SetActive(false);
 
-        reader = File.OpenText("\\UnityProject\\AIGC\\OuterStray\\Assets\\Tutorial\\TutorialDialog.txt");
+        dialogReader = File.OpenText("\\UnityProject\\AIGC\\OuterStray\\Assets\\Tutorial\\TutorialDialog.txt");
 
         
 
@@ -139,12 +140,12 @@ public class BattleSceneManager : MonoBehaviour,
     {
         if (turnNum % 2 == 1)
         {
-            dialogs = reader.ReadLine();
+            dialogs = dialogReader.ReadLine();
 			if (dialogs == null) return;
             dialogFrame.SetActive(true);
 			DOTween.To(
 				() => "",
-				value => nameText.text = value, // setter设置costText的内容
+				value => dialogText.text = value, // setter设置costText的内容
 				dialogs,
 				0.8f
 			).SetEase(Ease.Linear);
@@ -191,7 +192,7 @@ public class BattleSceneManager : MonoBehaviour,
 		{
 			buttonImage.color = Color.white;
 		}
-		//如果是地方回合，启动行为树
+		//如果是敌方回合，启动行为树
 		else
 		{
 			buttonImage.color = Color.gray;
@@ -528,6 +529,7 @@ public class BattleSceneManager : MonoBehaviour,
 	IEnumerator AIBehavior()
 	{
 		AIHandicap = handicapController[1];
+		//TODO
 		AISupportLine = battleLineControllers[3];
 		//TODO
 		AIAdjacentLine = battleLineControllers[2];
