@@ -225,6 +225,7 @@ public class BattleElementController : MonoBehaviour,
 			case "Command":
 				if (UnityEngine.ColorUtility.TryParseHtmlString("#7855A5", out color))
 				{
+					color = Color.gray;
 					elementGround.color = color;
 					elementFrame.color = color;
 					componentFrame.color = color;

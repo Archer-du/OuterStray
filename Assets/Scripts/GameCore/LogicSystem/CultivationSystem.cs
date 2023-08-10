@@ -22,11 +22,8 @@ namespace LogicCore
 		private List<Department> departments;
 		private int unlockProgress;
 
-		public CultivationSystem()
+		public CultivationSystem(ICultivateSceneController controller, TacticalSystem system)
 		{
-			//register
-			TacticalSystem.ProgressEvent += new UnlockHandler(UnlockBuilding);
-
 			//display
 			//gameManagement = gmdspl;
 

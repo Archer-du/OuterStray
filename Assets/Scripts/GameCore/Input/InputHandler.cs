@@ -11,9 +11,6 @@ namespace InputHandler
 		/// console version
 		/// </summary>
 		public void EnterTacticalSystem();
-
-
-
 		/// <summary>
 		/// 选择指定建筑物的指定卡包，将卡包导入到卡组中
 		/// </summary>
@@ -36,17 +33,9 @@ namespace InputHandler
 		/// </summary>
 		/// <param name="hrztIdx"></param>
 		/// <param name="vtcIdx"></param>
-		public void EnterNode(int hrztIdx, int vtcIdx);
-		/// <summary>
-		/// 检测合法性，进入index或point索引的节点
-		/// </summary>
-		/// <param name="targetPoint"></param>
-		public void EnterNode(string targetPoint);
+		public void EnterNode(int terrainIdx, int hrztIdx, int vtcIdx);
 
-		/// <summary>
-		/// 检测合法性，进入下一层terrain
-		/// </summary>
-		public void EnterNextTerrain();
+		public void Exit();
 	}
 
 
@@ -77,8 +66,6 @@ namespace InputHandler
 		/// <param name="dstPos"></param>
 		public void Move(int resLineIdx, int resIdx, int dstLineIdx, int dstPos);
 
-		//public void VerticalMove(int resLineIdx, int resIdx, int dstPos);
-
 		/// <summary>
 		/// 从战场指定战线指定位置撤退单位卡
 		/// </summary>
@@ -94,11 +81,6 @@ namespace InputHandler
 
 
 		public void Exit();
-
-
-
-		//ML interface
-		//TODO
 	}
 
 

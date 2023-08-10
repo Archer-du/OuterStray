@@ -5,8 +5,10 @@ using SceneState;
 using UnityEngine.UI;
 using InputHandler;
 using LogicCore;
+using DisplayInterface;
 
-public class CultivateSceneManager : MonoBehaviour
+public class CultivateSceneManager : MonoBehaviour,
+    ICultivateSceneController
 {
     ICultivationSystemInput cultivateSystem;
 

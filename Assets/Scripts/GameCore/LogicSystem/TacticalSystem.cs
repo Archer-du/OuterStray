@@ -16,146 +16,126 @@ namespace LogicCore
 	{
 		IGameManagement gameManagement;
 
-		internal static event UnlockHandler ProgressEvent;
-		internal static event BattleStartHandler EnterBattleEvent;
+		public ITacticalSceneController controller;
 
-		//
+		private BattleSystem battleSystem;
+
 		private List<Terrain> terrains;
-		private string currentPoint;
-		private int currentTerrain;
 
-		private Deck deck;
+		private Node currentNode;
+		private Terrain currentTerrain
+		{
+			get => currentNode.terrain;
+		}
 
+		internal static bool isInNode;
+
+
+		private Deck playerDeck;
+		private Deck enemyDeck;
+
+		internal int baseHealth;
+		internal int gasMineToken;
+
+		public int battleNodeNum;
+
+		//data access (test)
+		internal Pool playerPool;
 		//Enemy config TODO
 		private Pool enemyPool;
 
-		public TacticalSystem()
+		public TacticalSystem(ITacticalSceneController controller, BattleSystem system)
 		{
-			//register
-			//CultivationSystem.PackExportEvent += new DeckImportHandler(ImportDeck);
-			//CultivationSystem.StartExpeditionEvent += new TacticalInitHandler(RebuildTerrains);
-
 			//display
-			//gameManagement = gmdspl;
+			this.controller = controller;
+			
+			//connection
+			this.battleSystem = system;
 
 			//init
-			terrains = new List<Terrain>(SystemConfig.terrainNum);
-			//deck = new Deck();
-			//testDeck = new Deck();
+			isInNode = false;
 
-			//test TODO
+			//TODO test
+			battleNodeNum = 5;
 
+			terrains = new List<Terrain>(battleNodeNum);
+
+			//TODO remove
+			playerPool = new Pool();
+
+			playerDeck = new Deck(system);
+			enemyDeck = new Deck(system);
+
+			controller.TerrrainsInitialize(this, battleNodeNum);
+
+			//TODO
+			BuildTerrains();
 		}
 
 
-		public void RebuildTerrains()
+		public void BuildTerrains()
 		{
-			terrains.Clear();
-			for (int i = 0; i < SystemConfig.terrainNum; i++)
+			for(int i = 0; i < battleNodeNum; i++)
 			{
-				terrains.Add(new Terrain());
-				if(i == 0)
-				{
-					terrains[i].GenerateNodeRes();
-				}
-				else if (i == SystemConfig.terrainNum - 1)
-				{
-					terrains[i].GenerateNodeDst();
-				}
-				else
-				{
-					terrains[i].GenerateNodeNormal();
-				}
+				Terrain t = new Terrain(i, this, battleSystem);
+				t.controller = controller.InstantiateTerrain(i);
+				t.Init();
+				terrains.Add(t);
 			}
-			currentTerrain = 0;
-			currentPoint = "00";
+			//连接各terrain
+			for(int i = 0; i < battleNodeNum - 1; i++)
+			{
+				terrains[i + 1].prevTerrain = terrains[i];
+			}
+
+			foreach(Terrain terrain in terrains)
+			{
+				terrain.GenerateNodes();
+			}
+
+			currentNode = terrains[0].resNode;
+
+			controller.UpdateCurrentNode(currentNode.controller);
+
+			currentTerrain.controller.GenerateLineNetFromSource();
 		}
 
 
-
-		public void EnterNode(int hrztIdx, int vtcIdx)
+		public void EnterNode(int terrainIdx, int hrztIdx, int vtcIdx)
 		{
-			string targetPoint = hrztIdx.ToString() + vtcIdx.ToString();
-			if (!terrains[currentTerrain].Reachable(currentPoint, targetPoint))
+			if(isInNode)
+			{
+				return;
+			}
+			Node targetNode = terrains[terrainIdx][hrztIdx][vtcIdx];
+			if (!currentNode.IsReachable(targetNode))
 			{
 				throw new InvalidOperationException();
 			}
-			else
-			{
-				currentPoint = targetPoint;
-				Node node = terrains[currentTerrain].GetNode(targetPoint);
-				if (node != null)
-				{
-					if (node is ResNode)
-					{
 
-					}
-					else if(node is DstNode)
-					{
-
-					}
-					else if(node is BattleNode)
-					{
-						//EnterBattleEvent?.Invoke(deck, testDeck);
-					}
-				}
-			}
+			targetNode.CastNodeEvent();
+			isInNode = true;
+			currentNode = targetNode;
 		}
-		public void EnterNode(string targetPoint)
+
+		public void CampaignCompleted()
 		{
-			if (!terrains[currentTerrain].Reachable(currentPoint, targetPoint))
+			isInNode = false;
+			if (currentNode.IsDstNodeCurTerrain())
 			{
-				throw new InvalidOperationException();
-			}
-			else
-			{
-				currentPoint = targetPoint;
-				Node node = terrains[currentTerrain].GetNode(targetPoint);
-				if (node != null)
-				{
-					if (node is ResNode)
-					{
-
-					}
-					else if (node is DstNode)
-					{
-
-					}
-					else if (node is BattleNode)
-					{
-						//EnterBattleEvent?.Invoke(deck, testDeck);
-					}
-					//TODO
-				}
+				controller.EnterNextTerrain();
 			}
 		}
 
-		public void EnterNextTerrain()
+		public void CampaignFailed()
 		{
-			if (!terrains[currentTerrain].IsDstNode(currentPoint))
-			{
-				throw new InvalidOperationException();
-			}
-			else
-			{
-				if(currentTerrain == SystemConfig.terrainNum - 1)
-				{
-					//expedition completed
-					return;
-				}
-				currentTerrain++;
-				currentPoint = "00";
-			}
+			isInNode = false;
+			//向上通知
 		}
 
-		/// <summary>
-		/// PackExportEvent registered function
-		/// </summary>
-		/// <param name="pack"></param>
-		internal void ImportDeck(Pack pack)
+		public void Exit()
 		{
-			//this.deck.AddPack(pack, 1);
-			//this.testDeck.AddPack(pack, -1);
+			throw new NotImplementedException();
 		}
 	}
 }

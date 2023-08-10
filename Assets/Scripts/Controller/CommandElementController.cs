@@ -97,6 +97,8 @@ public class CommandElementController : BattleElementController,
 
 
 
+
+
 	public override void OnBeginDrag(PointerEventData eventData)
 	{
 		base.OnBeginDrag(eventData);

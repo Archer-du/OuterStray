@@ -1,6 +1,7 @@
 using DataCore.BattleElements;
 using DataCore.Cards;
 using DataCore.CultivateItems;
+using DisplayInterface;
 using LogicCore;
 using System;
 using System.Collections;
@@ -124,55 +125,6 @@ namespace DataCore.TacticalItems
 				}
 			}
 		}
-
-		//test TODO remove
-		//internal int LoadDeck(int ownerShip, List<IUnitElementDisplay> csdspl)
-		//{
-		//	StreamReader reader = File.OpenText("Assets\\Config\\Test.csv");
-		//	string[] data;
-		//	int num = 0;
-		//	string line = reader.ReadLine();
-		//	int index = 0;
-		//	while (line != null)
-		//	{
-		//		data = line.Split(",");
-		//		if (data[0] == "#")
-		//		{
-		//			line = reader.ReadLine();
-		//			continue;
-		//		}
-		//		UnitElement element = null;
-		//		UnitCard card = null;
-		//		//TODO
-		//		switch (data[2])
-		//		{
-		//			case "Infantry":
-		//				card = new InfantryCard(int.Parse(data[0]), data[1], data[7], int.Parse(data[3]), int.Parse(data[4]), int.Parse(data[5]), int.Parse(data[6]));
-		//				element = new UnitElement(card, ownerShip, csdspl[index]);
-		//				deck.Add(element);
-		//				break;
-		//			case "Cavalry":
-		//				card = new CavalryCard(int.Parse(data[0]), data[1], data[7], int.Parse(data[3]), int.Parse(data[4]), int.Parse(data[5]), int.Parse(data[6]));
-		//				element = new UnitElement(card, ownerShip, csdspl[index]);
-		//				deck.Add(element);
-		//				break;
-		//			case "Artillery":
-		//				card = new ArtilleryCard(int.Parse(data[0]), data[1], data[7], int.Parse(data[3]), int.Parse(data[4]), int.Parse(data[5]), int.Parse(data[6]));
-		//				element = new UnitElement(card, ownerShip, csdspl[index]);
-		//				break;
-		//		}
-		//		//if (data[8] == "U")
-		//		//	unlocked.Add(card);
-		//		//else
-		//		//	locked.Add(card);
-
-		//		line = reader.ReadLine();
-		//		num++;
-		//		index++;
-		//	}
-		//	reader.Close();
-		//	return num;
-		//}
 		internal void Clear()
 		{
 			deck.Clear();
@@ -180,232 +132,356 @@ namespace DataCore.TacticalItems
 	}
 
 
-
 	internal class Terrain
 	{
-		//internal TerrainCategories category { get; set; }
+		internal ITerrainController controller;
 
-		internal string resPoint;
-		internal string dstPoint;
+		internal TacticalSystem tacticalSystem;
+		internal BattleSystem battleSystem;
+
+		internal int index;
+		internal Terrain prevTerrain;
+
+		internal List<List<Node>> nodeList;
+
+		internal Node resNode
+		{
+			get => nodeList[0][0];
+		}
+		internal Node dstNode
+		{
+			get => nodeList[length - 1][0];
+		}
+
+
+		public int lengthUpperBound;
+		public int lengthLowerBound;
+		public int widthUpperBound;
+		public int widthLowerBound;
+
 
 		private int length;
 		private List<int> width;
 
-		internal Hashtable nodesTable;
-		internal Terrain()//TODO config: TerrainCategories category
-		{
-			//this.category = category;
-			nodesTable = new Hashtable();
+		internal int totalNodeNum;
 
+		internal int interactNodeNum;
+		internal int supplyNodeNum;
+
+		internal List<Node> this[int index]
+		{
+			get => nodeList[index];
+			set => nodeList[index] = value;
+		}
+
+		internal Terrain(int index, TacticalSystem tacticalSystem, BattleSystem battleSystem)
+		{
+			this.tacticalSystem = tacticalSystem;
+			this.battleSystem = battleSystem;
+
+			prevTerrain = null;
+			//TODO config
+			lengthLowerBound = 4;
+			lengthUpperBound = 4;
+			widthLowerBound = 2;
+			widthUpperBound = 3;
+
+			nodeList = new List<List<Node>>();
+
+			this.index = index;
 		}
 		/// <summary>
 		/// generate node and path data in a terrain
 		/// </summary>
-		internal void GenerateNodeNormal()
+		internal void GenerateNodes()
 		{
 			Random random = new Random();
-			length = random.Next(SystemConfig.minTerrainLength, SystemConfig.maxTerrainLength + 1);
+			length = random.Next(lengthLowerBound, lengthUpperBound + 1);
 
 			width = new List<int>(length);
-			width[0] = 1;
-			width[length - 1] = 1;
-
+			width.Add(1);
 			for (int i = 1; i < length - 1; i++)
 			{
-				width[i] = random.Next(SystemConfig.minTerrainLength, SystemConfig.maxTerrainLength + 1);
+				width.Add(random.Next(widthLowerBound, widthUpperBound + 1));
+			}
+			width.Add(1);
+			totalNodeNum = 0;
+			for(int i = 0; i < length; i++)
+			{
+				totalNodeNum += width[i];
 			}
 
-			nodesTable.Clear();
+			//TODO
+			interactNodeNum = 2;
+			supplyNodeNum = totalNodeNum - interactNodeNum - 2 + 1;
+
+
+
+			//生成节点
+			int itNodeCounter = interactNodeNum;
+			int SplNodeCounter = supplyNodeNum;
+
 			for (int i = 0; i < length; i++)
 			{
+				nodeList.Add(new List<Node>(width[i]));
+
 				for (int j = 0; j < width[i]; j++)
 				{
 					if (i == 0)
 					{
-						//TODO
-						int connects = random.Next(1, width[i + 1]);
-						resPoint = i.ToString() + j.ToString();
-						nodesTable.Add(resPoint, new ResNode(i, j));
+						//如果是源terrain
+						if(prevTerrain == null)
+						{
+							SourceNode s = new SourceNode(i, j, this);
+							s.controller = controller.InstantiateNode(length, width[i], i, j, "source");
+							nodeList[i].Add(s);
+						}
+						//否则源节点是上一terrain的目的节点
+						else
+						{
+							nodeList[i].Add(prevTerrain.dstNode);
+						}
 					}
+					//每一个terrain的目的节点一定是战斗节点
 					else if (i == length - 1)
 					{
-						dstPoint = i.ToString() + j.ToString();
-						nodesTable.Add(dstPoint, new DstNode(i, j));
+						BattleNode bn = new BattleNode(i, j, this, battleSystem);
+						bn.controller = controller.InstantiateNode(length, width[i], i, j, "battle");
+						nodeList[i].Add(bn);
 					}
+					//以一定权重随机生成 TODO
 					else
 					{
-						int randomEnum = random.Next(0, 5);
-						switch (randomEnum)
+						int randomEnum = random.Next(0, itNodeCounter + SplNodeCounter);
+						//确定生成互动类节点
+						if(randomEnum < itNodeCounter)
 						{
-							case 0:
-								nodesTable.Add(i.ToString() + j.ToString(), new BattleNode(i, j));
-								break;
-							case 1:
-								nodesTable.Add(i.ToString() + j.ToString(), new OutPostNode(i, j));
-								break;
-							case 2:
-								nodesTable.Add(i.ToString() + j.ToString(), new AirdropNode(i, j));
-								break;
-							case 3:
-								nodesTable.Add(i.ToString() + j.ToString(), new LegacyNode(i, j));
-								break;
-							case 4:
-								nodesTable.Add(i.ToString() + j.ToString(), new MedicalNode(i, j));
-								break;
+							int randSeed = random.Next(0, 10);
+							if(randSeed >= 0 && randSeed < 3)
+							{
+								PromoteNode pn = new PromoteNode(i, j, this);
+								pn.controller = controller.InstantiateNode(length, width[i], i, j, "promote");
+								nodeList[i].Add(pn);
+							}
+							if(randSeed >= 3 && randSeed < 6)
+							{
+								LegacyNode ln = new LegacyNode(i, j, this);
+								ln.controller = controller.InstantiateNode(length, width[i], i, j, "legacy");
+								nodeList[i].Add(ln);
+							}
+							if(randSeed >= 6 && randSeed < 8)
+							{
+								OutPostNode on = new OutPostNode(i, j, this);
+								on.controller = controller.InstantiateNode(length, width[i], i, j, "outpost");
+								nodeList[i].Add(on);
+							}
+							if(randSeed >= 8 && randSeed < 10)
+							{
+								MedicalNode mn = new MedicalNode(i, j, this);
+								mn.controller = controller.InstantiateNode(length, width[i], i, j, "medical");
+								nodeList[i].Add(mn);
+							}
+							itNodeCounter--;
+						}
+						//确定生成补给类节点
+						else
+						{
+							int randSeed = random.Next(0, 6);
+							SupplyNode sn = new SupplyNode(i, j, this);
+							sn.controller = controller.InstantiateNode(length, width[i], i, j, "supply");
+							nodeList[i].Add(sn);
+							switch (randSeed)
+							{
+								case 0:
+									sn.category = "LightArmor";
+									break;
+								case 1:
+									sn.category = "Motorized";
+									break;
+								case 2:
+									sn.category = "Artillery";
+									break;
+								case 3:
+									sn.category = "Guardian";
+									break;
+								case 4:
+									sn.category = "Construction";
+									break;
+								case 5:
+									sn.category = "Command";
+									break;
+							}
+							SplNodeCounter--;
 						}
 					}
 				}
 			}
-		}
-
-		internal void GenerateNodeRes()
-		{
-
-		}
-		internal void GenerateNodeDst()
-		{
-
-		}
-		private void ReBuildPath()
-		{
-			throw new NotImplementedException();
-		}
-
-		/// <summary>
-		/// 返回index或point标识的节点
-		/// </summary>
-		/// <param name="hrztIdx"></param>
-		/// <param name="vtcIdx"></param>
-		/// <returns></returns>
-		internal Node GetNode(int hrztIdx, int vtcIdx)
-		{
-			string key = hrztIdx.ToString() + vtcIdx.ToString();
-			if (nodesTable.ContainsKey(key))
+			//生成边
+			for(int i = 0; i < length - 1; i++)
 			{
-				return nodesTable[key] as Node;
+				for(int j = 0; j < width[i]; j++)
+				{
+					//源节点与下一层节点全部连通
+					if(i == 0)
+					{
+						//TODO
+						for(int k = 0; k < width[i + 1]; k++)
+						{
+							nodeList[i][j].adjNode[k] = nodeList[i + 1][k];
+						}
+						nodeList[i][j].SetAdjacentNode();
+						break;
+					}
+					//其余节点最多与其他两个节点连通
+					int nodeIdx1 = random.Next(0, width[i + 1]);
+					int nodeIdx2 = random.Next(0, width[i + 1]);
+					if(nodeIdx1 == nodeIdx2)
+					{
+						nodeList[i][j].adjNode[0] = nodeList[i + 1][nodeIdx1];
+						nodeList[i][j].adjNode[1] = null;
+					}
+					else
+					{
+						nodeList[i][j].adjNode[0] = nodeList[i + 1][nodeIdx1];
+						nodeList[i][j].adjNode[1] = nodeList[i + 1][nodeIdx2];
+					}
+					nodeList[i][j].SetAdjacentNode();
+				}
 			}
-			else return null;
 		}
-		/// <summary>
-		/// 返回index或point标识的节点
-		/// </summary>
-		/// <param name="point"></param>
-		/// <returns></returns>
-		internal Node GetNode(string point)
+		internal void Init()
 		{
-			if (nodesTable.ContainsKey(point))
-			{
-				return nodesTable[point] as Node;
-			}
-			else return null;
-		}
-		internal Type GetNodeType(int hrztIdx, int vtcIdx)
-		{
-			string key = hrztIdx.ToString() + vtcIdx.ToString();
-			if (nodesTable.ContainsKey(key))
-			{
-				return nodesTable[key].GetType();
-			}
-			else return null;
-		}
-		internal Type GetNodeType(string point)
-		{
-			if (nodesTable.ContainsKey(point))
-			{
-				return nodesTable[point].GetType();
-			}
-			else return null;
-		}
-		internal bool IsResNode(string point)
-		{
-			return point == resPoint;
-		}
-		internal bool IsDstNode(string point)
-		{
-			return point == dstPoint;
-		}
-		internal bool Reachable(string res, string dst)
-		{
-			Node resNode = GetNode(res);
-			Node dstNode = GetNode(dst);
-			if (IsResNode(dst))
-			{
-				return true;
-				//TODO
-			}
-			else if (dstNode.horizontalIdx == resNode.horizontalIdx + 1)
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			controller.Init();
 		}
 	}
+
+
+
+
 
 
 	internal class Node
 	{
-		//internal NodeCategories category;
+		internal INodeController controller;
+
+		internal Terrain terrain;
+
 		internal int horizontalIdx;
 		internal int verticalIdx;
 
-		internal List<int> reachableIdx;
-		internal Node(int horizontalIdx, int verticalIdx)
+		internal Node[] adjNode;
+
+		internal Node(int horizontalIdx, int verticalIdx, Terrain terrain)
 		{
 			this.horizontalIdx = horizontalIdx;
 			this.verticalIdx = verticalIdx;
 
-			reachableIdx = new List<int>();
+			//TODO length
+			adjNode = new Node[3] { null, null, null };
+			this.terrain = terrain;
+		}
+
+
+		internal bool IsReachable(Node node)
+		{
+			foreach(Node n in adjNode)
+			{
+				if(n == node)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+		internal bool IsDstNodeCurTerrain()
+		{
+			return this == terrain.dstNode;
+		}
+
+		internal virtual void CastNodeEvent() { }
+		internal void SetAdjacentNode()
+		{
+			List<INodeController> adjList = new List<INodeController>();
+			//TODO
+			for(int i = 0; i < 3; i++)
+			{
+				if (adjNode[i] != null)
+				{
+					adjList.Add(adjNode[i].controller);
+				}
+			}
+			controller.SetAdjacentNode(adjList);
 		}
 	}
-	internal sealed class ResNode : Node
-	{
-		internal ResNode(int horizontalIdx, int verticalIdx) : base(horizontalIdx, verticalIdx)
-		{
 
-		}
-	}
-	internal sealed class DstNode : Node
-	{
-		internal DstNode(int horizontalIdx, int verticalIdx) : base(horizontalIdx, verticalIdx)
-		{
 
-		}
+	internal sealed class SourceNode : Node
+	{
+		internal SourceNode(int horizontalIdx, int verticalIdx, Terrain terrain) : base(horizontalIdx, verticalIdx, terrain) { }
 	}
 	internal sealed class BattleNode : Node
 	{
-		internal BattleNode(int horizontalIdx, int verticalIdx) : base(horizontalIdx, verticalIdx)
+		internal BattleSystem system;
+
+		internal string[] battleConfig;
+
+		internal string plots;
+		internal string enemyConfig;
+
+		internal int fieldCapacity;
+		internal int[] battleLinesLength;
+		internal int[] initialEnergy;
+
+		internal BattleNode(int horizontalIdx, int verticalIdx, Terrain terrain, BattleSystem system)
+			: base(horizontalIdx, verticalIdx, terrain)
 		{
+			this.system = system;
+		}
+
+		internal override void CastNodeEvent()
+		{
+			//system.BuildBattleField();
+
+			//system.FieldPreset();
 		}
 	}
 	internal sealed class OutPostNode : Node
 	{
-		internal OutPostNode(int horizontalIdx, int verticalIdx) : base(horizontalIdx, verticalIdx)
-		{
-
-		}
-	}
-	internal sealed class AirdropNode : Node
-	{
-		internal AirdropNode(int horizontalIdx, int verticalIdx) : base(horizontalIdx, verticalIdx)
+		internal OutPostNode(int horizontalIdx, int verticalIdx, Terrain terrain) : base(horizontalIdx, verticalIdx, terrain)
 		{
 
 		}
 	}
 	internal sealed class LegacyNode : Node
 	{
-		internal LegacyNode(int horizontalIdx, int verticalIdx) : base(horizontalIdx, verticalIdx)
+		internal int legacy;
+		internal LegacyNode(int horizontalIdx, int verticalIdx, Terrain terrain) : base(horizontalIdx, verticalIdx, terrain)
 		{
 
 		}
 	}
 	internal sealed class MedicalNode : Node
 	{
-		internal MedicalNode(int horizontalIdx, int verticalIdx) : base(horizontalIdx, verticalIdx)
+		internal int cost;
+		internal MedicalNode(int horizontalIdx, int verticalIdx, Terrain terrain) : base(horizontalIdx, verticalIdx, terrain)
 		{
 
+		}
+	}
+	internal sealed class PromoteNode : Node
+	{
+		internal PromoteNode(int horizontalIdx, int verticalIdx, Terrain terrain) : base(horizontalIdx, verticalIdx, terrain)
+		{
+		}
+	}
+	internal sealed class SupplyNode : Node
+	{
+		internal string category;
+		internal List<BattleElement> supply;
+		internal SupplyNode(int horizontalIdx, int verticalIdx, Terrain terrain) : base(horizontalIdx, verticalIdx, terrain)
+		{
+			supply = new List<BattleElement>();
 		}
 	}
 }

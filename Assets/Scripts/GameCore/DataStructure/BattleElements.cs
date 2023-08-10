@@ -770,6 +770,7 @@ namespace DataCore.BattleElements
 			eventTable.RaiseEvent("BeforeTerminate", this, battleSystem);
 			battleSystem.eventTable[ownership].RaiseEvent("UnitTerminated", this, battleSystem);
 
+
 			//由自己修改的状态
 			this.state = ElementState.destroyed;
 			UnloadEffects();
@@ -778,6 +779,9 @@ namespace DataCore.BattleElements
 			battleLine.ElementRemove(inlineIdx);
 			controller.TerminateAnimationEvent(method);
 
+			if (this == battleSystem.bases[ownership])
+			{
+			}
 
 			//not likely
 			eventTable.RaiseEvent("AfterTerminate", this, battleSystem);
@@ -787,6 +791,11 @@ namespace DataCore.BattleElements
 		/// </summary>
 		internal void Retreat(string method)
 		{
+			if (this == battleSystem.bases[ownership])
+			{
+				return;
+			}
+
 			eventTable.RaiseEvent("BeforeRetreat", this, battleSystem);
 			battleSystem.eventTable[ownership].RaiseEvent("UnitRetreated", this, battleSystem);
 

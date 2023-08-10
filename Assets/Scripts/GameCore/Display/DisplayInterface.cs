@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using DataCore.BattleElements;
 using DataCore.Cards;
 using InputHandler;
+using Unity.Plastic.Antlr3.Runtime.Tree;
 
 namespace DisplayInterface
 {
@@ -32,6 +33,35 @@ namespace DisplayInterface
 
 
 
+
+	public interface ICultivateSceneController
+	{
+
+	}
+
+
+
+
+
+	public interface ITacticalSceneController
+	{
+		public void TerrrainsInitialize(ITacticalSystemInput handler, int terrainsLength);
+		public ITerrainController InstantiateTerrain(int idx);
+		public void EnterNextTerrain();
+		public void UpdateCurrentNode(INodeController controller);
+	}
+	public interface ITerrainController
+	{
+		public INodeController InstantiateNode(int length, int width, int hrztIdx, int vtcIdx, string category);
+		public void Init();
+
+		public void GenerateLineNetFromSource();
+	}
+	public interface INodeController
+	{
+		public void SetAdjacentNode(List<INodeController> adjList);
+		public void CastEvent();
+	}
 
 
 
@@ -76,7 +106,9 @@ namespace DisplayInterface
 		public void Init(int capacity, int ownership);
 
 		public void Receive(IUnitElementController element, int dstPos);
+
 		public IUnitElementController Send(int idx);
+
 		public void UpdateInfo(int curlength, int ownership);
 
 		public void UpdateElementLogicPosition(List<IUnitElementController> list);
@@ -84,9 +116,9 @@ namespace DisplayInterface
 
 	public interface ICardStackController
 	{
-		public IUnitElementController InstantiateUnitElement();
 		public IUnitElementController InstantiateUnitElementInBattle();
 		public ICommandElementController InstantiateCommandElementInBattle();
+		public IUnitElementController InstantiateUnitElement();
 		public ICommandElementController InstantiateCommandElement();
 	}
 
@@ -123,6 +155,7 @@ namespace DisplayInterface
 		public void UpdateTarget(IUnitElementController target, int targetIdx, bool mocking, bool cleave);
 
 		public void DeployAnimationEvent();
+
 		public void MoveAnimationEvent();
 
 		public void AttackAnimationEvent(int resIdx, int count);
@@ -144,6 +177,7 @@ namespace DisplayInterface
 		public void CommandInit(string ID, int ownership, string name, string type, int cost, string description);
 
 		public void UpdateInfo(int cost, int durability, ElementState state);
+
 		public void CastAnimationEvent(string method);
 	}
 }
