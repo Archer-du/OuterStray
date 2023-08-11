@@ -1,11 +1,12 @@
 using DG.Tweening;
 using DisplayInterface;
 using InputHandler;
+using SceneState;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.XR;
 
 public class TacticalSceneManager : MonoBehaviour,
     ITacticalSceneController
@@ -13,6 +14,9 @@ public class TacticalSceneManager : MonoBehaviour,
     ITacticalSystemInput tacticalSystem;
 
     public GameManager gameManager;
+
+    public GameObject Map;
+    public GameObject UI;
 
 	public GameObject arrowPrototype;
     public NodeController currentNode;
@@ -39,15 +43,33 @@ public class TacticalSceneManager : MonoBehaviour,
 
 	public GameObject terrainPrototype;
 
-    public float switchDuration = 0.8f;
+    public float switchDuration = 1f;
 
+
+
+    public Color originOrange;
+
+
+
+    public void OnGameStateChanged(GameState state)
+    {
+        switch (state)
+        {
+            case GameState.Battle:
+                DontDestroyOnLoad(Map);
+                DontDestroyOnLoad(UI);
+                break;
+        }
+    }
 	public void TerrrainsInitialize(ITacticalSystemInput handler, int terrainsLength)
 	{
-        tacticalSystem = handler;
+        GameManager.OnGameStateChanged += OnGameStateChanged;
+        DontDestroyOnLoad(gameObject);
+
+		ColorUtility.TryParseHtmlString("#F6921E", out originOrange);
+		tacticalSystem = handler;
 
         terrains = new List<TerrainController>();
-
-        DontDestroyOnLoad(this);
 	}
 
     public ITerrainController InstantiateTerrain(int idx)
@@ -65,6 +87,11 @@ public class TacticalSceneManager : MonoBehaviour,
 
 	public void EnterNextTerrain()
 	{
+		GameObject[] mapArrow = GameObject.FindGameObjectsWithTag("MapArrow");
+		foreach (GameObject obj in mapArrow)
+		{
+			obj.SetActive(false);
+		}
 		terrains[currentTerrain.index - 1].ClearNodes();
 
         currentTerrain.nodes.Insert(0, terrains[currentTerrain.index - 1].dstNode);
@@ -76,38 +103,48 @@ public class TacticalSceneManager : MonoBehaviour,
 	public void UpdateCurrentNode(INodeController controller)
 	{
         StopAllCoroutines();
+		GameObject[] mapArrow = GameObject.FindGameObjectsWithTag("MapArrow");
+		foreach (GameObject obj in mapArrow)
+		{
+			obj.SetActive(false);
+		}
+
 		currentNode = controller as NodeController;
 
         UpdateNodesDisplay();
 
         foreach(NodeController adjNode in currentNode.adjNodes)
         {
+
             StartCoroutine(ArrowCaster(adjNode));
         }
 	}
+
+
     IEnumerator ArrowCaster(NodeController adjNode)
     {
         yield return new WaitForSeconds(switchDuration);
 
         NodeController curNode = currentNode;
-        int arrowNum = 20;
-        GameObject[] arrows = new GameObject[arrowNum];
-        for(int i = 0; i < arrowNum; i++)
-        {
-            arrows[i] = Instantiate(arrowPrototype, currentTerrain.transform);
-            arrows[i].transform.position = curNode.transform.position;
-            arrows[i].transform.rotation = Quaternion.Euler(TerrainController.GetDegreeEuler(curNode.transform.position, adjNode.transform.position));
-            arrows[i].gameObject.SetActive(false);
-        }
 
-        float duration = 6f;
-        float waitTime = 2f;
+		int arrowNum = 10;
+		GameObject[] arrows = new GameObject[arrowNum];
+
+		for (int i = 0; i < arrowNum; i++)
+		{
+			arrows[i] = Instantiate(arrowPrototype, currentTerrain.transform);
+			arrows[i].transform.position = curNode.transform.position;
+			arrows[i].transform.rotation = Quaternion.Euler(TerrainController.GetDegreeEuler(curNode.transform.position, adjNode.transform.position));
+			arrows[i].gameObject.SetActive(false);
+		}
+
+		float duration = 4f;
+        float waitTime = 1f;
         //float interval = 2f;
         while (true)
         {
             for(int i = 0; i < arrowNum; i++)
             {
-                yield return new WaitForSeconds(waitTime);
                 arrows[i].gameObject.SetActive(true);
                 int temp = i;
                 arrows[i].transform.DOMove(adjNode.transform.position, duration).SetEase(Ease.Linear)
@@ -117,6 +154,7 @@ public class TacticalSceneManager : MonoBehaviour,
                             arrows[temp].gameObject.SetActive(false);
                         }
                     );
+                yield return new WaitForSeconds(waitTime);
             }
             //yield return new WaitForSeconds(interval);
         }
@@ -137,7 +175,7 @@ public class TacticalSceneManager : MonoBehaviour,
 	{
         //displaycurrentNode TODO
         currentNode.castButton.enabled = false;
-        currentNode.Icon.color = Color.red;
+        currentNode.Icon.DOColor(originOrange, fadeDuration);
 
         foreach(NodeController node in currentTerrain.nodes)
         {
@@ -152,6 +190,8 @@ public class TacticalSceneManager : MonoBehaviour,
             }
         }
 	}
+
+    public float fadeDuration = 0.3f;
     public void DisableNode(NodeController node)
     {
         if(node != currentNode && node.castButton.enabled)
@@ -160,7 +200,7 @@ public class TacticalSceneManager : MonoBehaviour,
 		    if (node.inDegree - node.disabledInd <= 0)
 		    {
 			    node.castButton.enabled = false;
-			    node.Icon.color = Color.gray;
+                node.Icon.DOColor(Color.gray, fadeDuration);
                 node.DisableLines();
 
                 foreach(NodeController adj in node.adjNodes)

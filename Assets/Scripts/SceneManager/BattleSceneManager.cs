@@ -94,6 +94,8 @@ public class BattleSceneManager : MonoBehaviour,
 
     public void FieldInitialize(IBattleSystemInput handler)
 	{
+		DontDestroyOnLoad(gameObject);
+
 		battleSystem = handler;
 		turnNum = 0;
 

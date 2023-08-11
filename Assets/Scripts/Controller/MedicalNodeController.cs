@@ -4,15 +4,18 @@ using UnityEngine;
 
 public class MedicalNodeController : NodeController
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+	public override void Init()
+	{
+		base.Init();
+		LoadResource();
+	}
+	public override void LoadResource()
+	{
+		Icon.sprite = Resources.LoadAll<Sprite>("Map-icon")[5];
+		descriptionText.text = "医疗节点";
+	}
+	public override void CastEvent()
+	{
+		base.CastEvent();
+	}
 }

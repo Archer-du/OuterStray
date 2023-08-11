@@ -97,7 +97,6 @@ namespace LogicCore
 
 
 
-		//data access (test)
 		internal Pool pool;
 
 
@@ -105,8 +104,6 @@ namespace LogicCore
 		{
 			//系统层渲染接口
 			controller = bsdspl;
-			//返回输入句柄
-			controller.FieldInitialize(this);
 			//TODO 之后由战术层参数化
 			eventTable = new EventTable[2] { new EventTable(), new EventTable() };
 
@@ -125,10 +122,26 @@ namespace LogicCore
 			deployQueue = new List<UnitElement>();
 			UnitIDDic = new Dictionary<string, List<UnitElement>>();
 
-			//TODO remove
-			BuildBattleField(null, null, 4);
 		}
+		public BattleSystem()
+		{
+			eventTable = new EventTable[2] { new EventTable(), new EventTable() };
 
+			bases = new UnitElement[2];
+
+			//test segment TODO------
+			pool = new Pool();
+			pool.LoadCardPool();
+			//-----------------------
+
+			deployQueue = new List<UnitElement>();
+			UnitIDDic = new Dictionary<string, List<UnitElement>>();
+		}
+		public void SetSceneController(IBattleSceneController bsdspl)
+		{
+			controller = bsdspl;
+			controller.FieldInitialize(this);
+		}
 
 
 
@@ -302,7 +315,7 @@ namespace LogicCore
 
 		internal void FieldPreset()
 		{
-
+			TutorialInit();
 		}
 		//tutorial temp function
 		private void TutorialInit()

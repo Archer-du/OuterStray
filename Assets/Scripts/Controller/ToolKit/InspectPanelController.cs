@@ -10,7 +10,7 @@ public class InspectPanelController : MonoBehaviour,
 {
 	public float timeValve = 0.6f;
 	public float duration = 0.2f;
-	public float displayOffset = 400f;
+	public Vector3 displayOffset;
 	public CanvasGroup inspectPanel;
 
 	private float timer;
@@ -37,7 +37,7 @@ public class InspectPanelController : MonoBehaviour,
 			timer -= Time.deltaTime;
 			if(timer <= 0)
 			{
-				inspectPanel.transform.position = gameObject.transform.position + displayOffset * Vector3.right;
+				inspectPanel.transform.position = gameObject.transform.position + displayOffset;
 				inspectPanel.DOFade(1f, duration);
 			}
 		}

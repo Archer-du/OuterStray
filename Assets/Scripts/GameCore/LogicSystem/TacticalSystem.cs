@@ -42,8 +42,8 @@ namespace LogicCore
 		internal static bool isInNode;
 
 
-		private Deck playerDeck;
-		private Deck enemyDeck;
+		internal Deck playerDeck;
+		internal Deck enemyDeck;
 
 		internal int baseHealth;
 		internal int gasMineToken;
@@ -73,9 +73,12 @@ namespace LogicCore
 
 			//TODO remove
 			playerPool = new Pool();
+			playerPool.LoadCardPool();
 
 			playerDeck = new Deck(system);
+			playerDeck.LoadDeckFromPool(playerPool, "ally");
 			enemyDeck = new Deck(system);
+			enemyDeck.LoadDeckFromPool(playerPool, "enemy");
 
 
 			//TODO
@@ -135,7 +138,10 @@ namespace LogicCore
 
 
 			//TODO test
-			CampaignCompleted();
+			if(currentNode is not BattleNode)
+			{
+				CampaignCompleted();
+			}
 		}
 
 		public void CampaignCompleted()

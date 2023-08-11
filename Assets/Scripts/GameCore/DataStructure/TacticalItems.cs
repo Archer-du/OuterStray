@@ -388,6 +388,7 @@ namespace DataCore.TacticalItems
 
 	internal class Node
 	{
+		internal TacticalSystem tacticalSystem;
 		internal INodeController controller;
 
 		internal Terrain terrain;
@@ -410,6 +411,7 @@ namespace DataCore.TacticalItems
 			//TODO length
 			adjNode = new Node[3] { null, null, null };
 			this.terrain = terrain;
+			this.tacticalSystem = terrain.tacticalSystem;
 		}
 
 
@@ -479,7 +481,7 @@ namespace DataCore.TacticalItems
 
 		internal override void CastNodeEvent()
 		{
-			//system.BuildBattleField();
+			system.BuildBattleField(tacticalSystem.playerDeck, tacticalSystem.enemyDeck, 4);
 
 			//system.FieldPreset();
 		}

@@ -415,7 +415,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.45686483, g: 0.5283019, b: 0.5283019, a: 1}
+  m_Color: {r: 0.18867922, g: 0.18867922, b: 0.18867922, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -591,10 +591,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5f3b089780149e4c9ba55e0e0efc34e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  element: []
-  elementPrototype: {fileID: 3101474757159877351, guid: 5948c602c46e4f0439f7b4bc3ff718f3, type: 3}
-  battleLines: []
-  battleLinePrototype: {fileID: 2340474308455216108, guid: 7b939ba0262265043a03416231a1d081, type: 3}
+  startSceneManager: {fileID: 0}
+  cultivateSceneManager: {fileID: 0}
+  tacticalSceneManager: {fileID: 0}
+  battleSceneManager: {fileID: 0}
+  SceneLoader: {fileID: 0}
+  progressText: {fileID: 0}
 --- !u!4 &1264406761
 Transform:
   m_ObjectHideFlags: 0

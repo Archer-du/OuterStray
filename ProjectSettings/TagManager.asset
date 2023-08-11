@@ -6,6 +6,7 @@ TagManager:
   tags:
   - closeButton
   - DropZone
+  - MapArrow
   layers:
   - Default
   - TransparentFX
@@ -43,7 +44,19 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: BackGround
+  - name: Terrains
+    uniqueID: 2555476301
+    locked: 0
+  - name: Nodes
+    uniqueID: 3544831395
+    locked: 0
+  - name: TacticalUI
+    uniqueID: 2868453369
+    locked: 0
+  - name: Loader
+    uniqueID: 2898645981
+    locked: 0
+  - name: BattleGround
     uniqueID: 2919876391
     locked: 0
   - name: BattleField
@@ -58,12 +71,6 @@ TagManager:
   - name: Buffer
     uniqueID: 733435775
     locked: 0
-  - name: Terrains
-    uniqueID: 2555476301
-    locked: 0
-  - name: Nodes
-    uniqueID: 3544831395
-    locked: 0
-  - name: UI
-    uniqueID: 2868453369
+  - name: BattleUI
+    uniqueID: 2994034489
     locked: 0

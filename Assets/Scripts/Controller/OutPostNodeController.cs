@@ -4,15 +4,18 @@ using UnityEngine;
 
 public class OutPostNodeController : NodeController
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+	public override void Init()
+	{
+		base.Init();
+		LoadResource();
+	}
+	public override void LoadResource()
+	{
+		Icon.sprite = Resources.LoadAll<Sprite>("Map-icon")[4];
+		descriptionText.text = "前哨站";
+	}
+	public override void CastEvent()
+	{
+		base.CastEvent();
+	}
 }

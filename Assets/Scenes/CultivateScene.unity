@@ -715,7 +715,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.45686483, g: 0.5283019, b: 0.5283019, a: 1}
+  m_Color: {r: 0.3018868, g: 0.3018868, b: 0.3018868, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -3027,14 +3027,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bf33f12935ad3e46ac851a9a53ff147, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Armory: {fileID: 0}
-  CloningLab: {fileID: 0}
-  Workshop: {fileID: 0}
-  buildingButtons: []
-  ArmoryPanel: {fileID: 0}
-  CloningLabPanel: {fileID: 0}
-  WorkshopPanel: {fileID: 0}
-  closePanel: {fileID: 0}
+  manager: {fileID: 0}
+  departmentButtons: []
+  panel: {fileID: 0}
+  panelButtons: []
+  closePanelButton: {fileID: 0}
+  departmentIdx: 0
+  packIdx: 0
 --- !u!1001 &2127969047
 PrefabInstance:
   m_ObjectHideFlags: 0

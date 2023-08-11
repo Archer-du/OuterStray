@@ -7,7 +7,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using SceneState;
-
+using TMPro;
+using UnityEngine.UI;
+using DG.Tweening;
 
 public class GameManager : MonoBehaviour, IGameManagement
 {
@@ -32,8 +34,8 @@ public class GameManager : MonoBehaviour, IGameManagement
 
 
 	public static event System.Action<GameState> OnGameStateChanged;
-	private GameState privateGameState;
 
+	private GameState privateGameState;
 	public GameState gameState
 	{
 		get { return privateGameState; }
@@ -56,9 +58,11 @@ public class GameManager : MonoBehaviour, IGameManagement
 	public TacticalSceneManager tacticalSceneManager;
 	public BattleSceneManager battleSceneManager;
 
+
 	//定义一个公共方法，用于更新游戏状态，并根据不同的状态执行不同的逻辑
-	public void UpdateGameState(GameState state)
+	public AsyncOperation UpdateGameState(GameState state)
 	{
+		gameState = state;
 		switch (state)
 		{
 			case GameState.Start:
@@ -75,17 +79,42 @@ public class GameManager : MonoBehaviour, IGameManagement
 				break;
 
 			case GameState.Battle:
-				SceneManager.LoadScene("BattleScene");
-				battleSceneManager = GameObject.Find("BattleSceneManager").GetComponent<BattleSceneManager>();
-				break;
+				AsyncOperation async = SceneManager.LoadSceneAsync("BattleScene");
+				StartCoroutine(LoadingNewScene(async));
+				return async;
 
 			case GameState.End://TODO
 				break;
 		}
-		// Unload all unused assets
-		//Resources.UnloadUnusedAssets();
+		return null;
+	}
 
-		gameState = state;
+
+	public CanvasGroup SceneLoader;
+	public TMP_Text progressText;
+	IEnumerator LoadingNewScene(AsyncOperation async)
+	{
+		SceneLoader.alpha = 1.0f;
+		SceneLoader.blocksRaycasts = true;
+		// 获取加载进度并更新 UI 文本或滑动条的值
+		while (!async.isDone)
+		{
+			float progress = async.progress;
+			progressText.text = "Loading... " + (progress * 100) + "%";
+			// 或者 progressBar.value = progress;
+			// 等待一帧
+			yield return null;
+		}
+		//SceneLoader.DOFade(1f, 0.6f);
+		//SceneLoader.blocksRaycasts = false;
+		battleSceneManager = GameObject.Find("BattleSceneManager").GetComponent<BattleSceneManager>();
+		battleSystem.SetSceneController(battleSceneManager);
+		//DOFade
+		//TODO
+		//yield return new WaitForSeconds(0.6f);
+
+		// 或者 progressBar.gameObject.SetActive(false);
+		// 或者 AudioSource.PlayClipAtPoint(loadSound, transform.position);
 	}
 
 	private void Start()
@@ -95,23 +124,26 @@ public class GameManager : MonoBehaviour, IGameManagement
 		gameState = GameState.Battle;
 
 
-		//battleSceneManager = GameObject.Find("BattleSceneManager").GetComponent<BattleSceneManager>();
 		tacticalSceneManager = GameObject.Find("TacticalSceneManager").GetComponent<TacticalSceneManager>();
 		//EXTEND
 
-		//battleSystem = new BattleSystem(battleSceneManager);
+		battleSystem = new BattleSystem(battleSceneManager);
 		tacticalSystem = new TacticalSystem(tacticalSceneManager, battleSystem as BattleSystem);
 		cultivationSystem = new CultivationSystem(cultivateSceneManager, tacticalSystem as TacticalSystem);
 
 	}
 
+
+
+
+
 	private void OnDisable()
 	{
-		enabled = true; // 取消禁用组件
+		enabled = true;
 	}
 
 	private void OnDestroy()
 	{
-		DontDestroyOnLoad(gameObject); // 取消销毁游戏对象
+		DontDestroyOnLoad(gameObject);
 	}
 }

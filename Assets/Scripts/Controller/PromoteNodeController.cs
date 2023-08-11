@@ -4,15 +4,18 @@ using UnityEngine;
 
 public class PromoteNodeController : NodeController
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+	public override void Init()
+	{
+		base.Init();
+		LoadResource();
+	}
+	public override void LoadResource()
+	{
+		Icon.sprite = Resources.LoadAll<Sprite>("Map-icon")[2];
+		descriptionText.text = "晋升节点";
+	}
+	public override void CastEvent()
+	{
+		base.CastEvent();
+	}
 }
