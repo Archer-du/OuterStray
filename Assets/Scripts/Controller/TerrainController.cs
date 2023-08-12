@@ -15,6 +15,9 @@ public class TerrainController : MonoBehaviour,
 
     public GameObject nodePrototype;
 	public List<NodeController> nodes;
+	/// <summary>
+	/// 第二层terrain的src需要后续维护
+	/// </summary>
 	public NodeController srcNode;
 	public NodeController dstNode;
 
@@ -106,6 +109,9 @@ public class TerrainController : MonoBehaviour,
 			GenerateLineNet(adj);
 		}
 	}
+	/// <summary>
+	/// 清楚节点及节点内部线网
+	/// </summary>
 	public void ClearNodes()
 	{
 		foreach(NodeController node in nodes)
@@ -133,6 +139,8 @@ public class TerrainController : MonoBehaviour,
 		line.GetComponent<RectTransform>().sizeDelta = new Vector2(vector.magnitude, 10);
 	}
 
+
+
 	public static Vector3 GetDegreeEuler(Vector3 src, Vector3 dst)
 	{
 		Vector3 vector = dst - src;
@@ -142,7 +150,4 @@ public class TerrainController : MonoBehaviour,
 		Vector3 euler = new Vector3(0, 0, deg);
 		return euler;
 	}
-
-
-
 }

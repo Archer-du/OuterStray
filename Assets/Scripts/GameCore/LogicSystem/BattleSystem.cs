@@ -113,10 +113,6 @@ namespace LogicCore
 			//test segment TODO------
 			pool = new Pool();
 			pool.LoadCardPool();
-			//humanDeck = new Deck(this);
-			//plantDeck = new Deck(this);
-			//humanDeck.LoadDeckFromPool(pool, "ally");
-			//plantDeck.LoadDeckFromPool(pool, "enemy");
 			//-----------------------
 
 			deployQueue = new List<UnitElement>();
@@ -140,7 +136,7 @@ namespace LogicCore
 		public void SetSceneController(IBattleSceneController bsdspl)
 		{
 			controller = bsdspl;
-			controller.FieldInitialize(this);
+			controller.FieldInitialize(this, linesCapacity);
 		}
 
 
@@ -152,24 +148,29 @@ namespace LogicCore
 		/// </summary>
 		/// <param name="deck"></param>
 		/// <param name="enemyDeck"></param>
-		internal void BuildBattleField(Deck deck, Deck enemyDeck, int lineCapacity)
+		internal void BuildBattleField(Deck deck, Deck enemyDeck, int fieldCapacity, int initialTurn, int initialHumanEnergy, int initialPlantEnergy)
 		{
-			//初始回合为玩家
-			TURN = 0;
-			controller.UpdateTurn(TURN);
-
-			//数据层初始化
-			linesCapacity = 4;
-			battleLines = new List<BattleLine>(linesCapacity);
-
-			supportLines = new int[2] { 0, linesCapacity - 1 };
 			stacks = new RandomCardStack[2];
 			handicaps = new RedemptionZone[2];
 
-			frontLines = new int[2] { 0, 1 };
 
-			energy = new int[2] { 0, 0 };
+			//数据层初始化
+			TURN = initialTurn;
+			controller.UpdateTurn(TURN);
+
+			linesCapacity = fieldCapacity;
+			if(fieldCapacity != 4)
+			{
+				throw new InvalidOperationException("暂不支持除4之外的战场容量");
+			}
+			battleLines = new List<BattleLine>(linesCapacity);
+
+			supportLines = new int[2] { 0, linesCapacity - 1 };
+
+			energy = new int[2] { initialHumanEnergy, initialPlantEnergy };
 			energySupply = new int[2] { 1, 1 };
+
+			frontLines = new int[2] { 0, 1 };
 
 			//渲染控件初始化
 			controller.UpdateEnergy(0, energy[0]);
@@ -178,7 +179,7 @@ namespace LogicCore
 			controller.UpdateEnergySupply(0, energySupply[0]);
 			controller.UpdateEnergySupply(1, energySupply[1]);
 
-			BuildBattleLine(lineCapacity);
+			BuildBattleLine(fieldCapacity);
 
 			BuildHumanStack(deck);
 			BuildPlantStack(enemyDeck);
@@ -313,7 +314,7 @@ namespace LogicCore
 
 
 
-		internal void FieldPreset()
+		internal void FieldPreset(List<BattleNode.FieldPreset> fieldPresets)
 		{
 			TutorialInit();
 		}

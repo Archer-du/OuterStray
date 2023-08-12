@@ -8,7 +8,6 @@ using InputHandler;
 using DisplayInterface;
 using SystemEventHandler;
 using System;
-using System.Diagnostics;
 
 namespace LogicCore
 {
@@ -43,7 +42,6 @@ namespace LogicCore
 
 
 		internal Deck playerDeck;
-		internal Deck enemyDeck;
 
 		internal int baseHealth;
 		internal int gasMineToken;
@@ -51,9 +49,7 @@ namespace LogicCore
 		public int battleNodeNum;
 
 		//data access (test)
-		internal Pool playerPool;
-		//Enemy config TODO
-		private Pool enemyPool;
+		internal Pool pool;
 
 		public TacticalSystem(ITacticalSceneController controller, BattleSystem system)
 		{
@@ -68,32 +64,30 @@ namespace LogicCore
 
 			//TODO test
 			battleNodeNum = 5;
-
 			terrains = new List<Terrain>(battleNodeNum);
 
 			//TODO remove
-			playerPool = new Pool();
-			playerPool.LoadCardPool();
+			pool = new Pool();
+			pool.LoadCardPool();
 
 			playerDeck = new Deck(system);
-			playerDeck.LoadDeckFromPool(playerPool, "ally");
-			enemyDeck = new Deck(system);
-			enemyDeck.LoadDeckFromPool(playerPool, "enemy");
+			//TODO remove
+			playerDeck.LoadDeckByPath("Assets\\Config\\HumanDeckTest.csv");
 
 
 			//TODO
 			controller.TerrrainsInitialize(this, battleNodeNum);
+
 			BuildTerrains();
 		}
 
 
 		public void BuildTerrains()
 		{
+			//构建terrain
 			for(int i = 0; i < battleNodeNum; i++)
 			{
-				Terrain t = new Terrain(i, this, battleSystem);
-				t.controller = controller.InstantiateTerrain(i);
-				t.Init();
+				Terrain t = new(i, this, battleSystem, controller.InstantiateTerrain(i));
 				terrains.Add(t);
 			}
 			//连接各terrain
@@ -102,6 +96,7 @@ namespace LogicCore
 				terrains[i + 1].prevTerrain = terrains[i];
 			}
 
+			//各terrain生成节点
 			foreach(Terrain terrain in terrains)
 			{
 				terrain.GenerateNodes();
@@ -111,20 +106,28 @@ namespace LogicCore
 				terrains[i].dstNode.nextTerrain = terrains[i + 1];
 			}
 
+			//全局唯一source节点
 			currentNode = terrains[0].resNode;
-			currentNode.CastNodeEvent();
 
+			//显示层：当前节点更新
 			controller.UpdateCurrentNode(currentNode.controller);
 
+			//显示层：当前terrain生成线网
 			currentTerrain.controller.GenerateLineNetFromSource();
 		}
 
-
+		/// <summary>
+		/// 进入节点
+		/// </summary>
+		/// <param name="terrainIdx"></param>
+		/// <param name="hrztIdx"></param>
+		/// <param name="vtcIdx"></param>
+		/// <exception cref="InvalidOperationException"></exception>
 		public void EnterNode(int terrainIdx, int hrztIdx, int vtcIdx)
 		{
 			if(isInNode)
 			{
-				return;
+				throw new InvalidOperationException();
 			}
 			Node targetNode = terrains[terrainIdx][hrztIdx][vtcIdx];
 			if (!currentNode.IsReachable(targetNode))
@@ -148,17 +151,21 @@ namespace LogicCore
 		{
 			isInNode = false;
 			controller.UpdateCurrentNode(currentNode.controller);
+
+			//显示层更新
 			if (currentNode.IsDstNodeCurTerrain())
 			{
 				controller.EnterNextTerrain();
 				currentTerrain.controller.GenerateLineNetFromSource();
 			}
+			controller.CampaignCompleted();
 		}
 
 		public void CampaignFailed()
 		{
 			isInNode = false;
 			//向上通知
+			controller.CampaignFailed();
 		}
 
 		public void Exit()

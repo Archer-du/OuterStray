@@ -1,0 +1,19 @@
+{
+    "pool" : [
+        {
+            "backendID": "mush_00",
+            "ownership": 1,
+            "name": "亮顶孢子",
+            "category": "LightArmor",
+            "cost": 0,
+            "attack": 1,
+            "health": 1,
+            "attackCounter": 1,
+            "description": "",
+            "effects": "none"
+        },
+        {
+            
+        }
+    ]
+}

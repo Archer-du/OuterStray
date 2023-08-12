@@ -14,7 +14,7 @@ public class BattleNodeController : NodeController
 	public override void LoadResource()
 	{
 		Icon.sprite = Resources.LoadAll<Sprite>("Map-icon")[1];
-		descriptionText.text = "战斗节点";
+		descriptionText.text = "battle";
 	}
 	public override void CastEvent()
 	{
@@ -27,6 +27,8 @@ public class BattleNodeController : NodeController
 		{
 			yield return null;
 		}
-		base.CastEvent();
+
+		casted = true;
+		tacticalManager.EnterNode(terrain.index, hrztIdx, vtcIdx);
 	}
 }

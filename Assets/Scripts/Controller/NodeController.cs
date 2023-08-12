@@ -26,26 +26,33 @@ public class NodeController : MonoBehaviour,
 	public int disabledInd;
 
 	public string description;
+	public List<NodeController> adjNodes;
 
+
+	[Header("Event")]
+	public Button castButton;
+	public Button exitButton;
 
 	[Header("Display")]
-	public Button castButton;
 	public Image Icon;
 
 	public CanvasGroup InspectPanel;
 	public TMP_Text descriptionText;
 
-	public List<NodeController> adjNodes;
 	public List<Image> lines;
 	public Vector3 largeScale;
 	public Vector3 originScale;
+
+	[Header("Components")]
+	public TacticalPanelDisplay panelDisplay;
 
 
 	public virtual void CastEvent()
 	{
 		casted = true;
-		//TODO test virtual segment
+
 		tacticalManager.EnterNode(terrain.index ,hrztIdx, vtcIdx);
+		tacticalManager.EnableInputMask();
 	}
 
 	public virtual void Init()
@@ -57,14 +64,18 @@ public class NodeController : MonoBehaviour,
 		lines = new List<Image>();
 
 		castButton = GetComponent<Button>();
+		panelDisplay = GetComponent<TacticalPanelDisplay>();
+
 		Icon = transform.Find("Image/Icon").GetComponent<Image>();
-		descriptionText = transform.Find("InspectPanel/Inspector/DescriptionText").GetComponent <TMP_Text>();
+		descriptionText = transform.Find("InspectPanel/Inspector/DescriptionText").GetComponent<TMP_Text>();
 
 		castButton.onClick.AddListener(CastEvent);
 
 		originScale = transform.localScale;
 		largeScale = transform.localScale * 1.5f;
 	}
+
+
 	public virtual void LoadResource() { }
 	public void SetAdjacentNode(List<INodeController> adjList)
 	{

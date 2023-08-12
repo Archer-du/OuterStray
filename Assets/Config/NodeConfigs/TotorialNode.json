@@ -1,0 +1,36 @@
+{
+    "initialTurn": 0,
+    "fieldCapacity": 4,
+    "plantDeckPath": "Assets\\Config\\DeckConfigs\\mush99.csv",
+    "initialHumanEnergy": 1,
+    "initialPlantEnergy": 1,
+    "fieldPreset": [
+        {
+            "cardPreset" : {
+                "backendID": "mush_00",
+                "attack": 1,
+                "health": 1,
+                "attackCounter": 1
+            },
+            "position": 2
+        },
+        {
+            "cardPreset" : {
+                "backendID": "mush_00",
+                "attack": 1,
+                "health": 1,
+                "attackCounter": 1
+            },
+            "position": 2
+        },
+        {
+            "card" : {
+                "backendID": "mush_99_01",
+                "attack": 1,
+                "health": 1,
+                "attackCounter": 1
+            },
+            "position" : 0
+        }
+    ]
+}

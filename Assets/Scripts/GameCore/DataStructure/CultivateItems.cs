@@ -7,28 +7,35 @@ using Codice.CM.Common;
 using DataCore.Cards;
 
 using DisplayInterface;
+using Unity.Plastic.Newtonsoft.Json;
 
 namespace DataCore.CultivateItems
 {
 	/// <summary>
 	/// cards unlocked
 	/// </summary>
+	[Serializable]
 	internal class Pool
 	{
 		//之后换成hash
-		internal List<Card> cardPool { get; private set; }
+		[JsonProperty("pool")]
+		internal List<Card> cardPool { get; set; }
 
+		[JsonIgnore]
 		internal Hashtable hashPool;
+		[JsonIgnore]
 		internal Hashtable humanCardPool;
+		[JsonIgnore]
 		internal Hashtable plantCardPool;
 
+		[JsonIgnore]
 		internal List<Card> allyCards;
+		[JsonIgnore]
 		internal List<Card> enemyCards;
 
 
 		internal Pool()
 		{
-			cardPool = new List<Card>(SystemConfig.poolCapacity);
 			hashPool = new Hashtable();
 
 			humanCardPool = new Hashtable();
@@ -40,7 +47,10 @@ namespace DataCore.CultivateItems
 			set => cardPool[index] = value;
 		}
 
+		internal void LoadCardPoolJson()
+		{
 
+		}
 		/// <summary>
 		/// non-console version: read card info from specific media
 		/// </summary>
@@ -48,7 +58,7 @@ namespace DataCore.CultivateItems
 		/// <returns></returns>
 		internal int LoadCardPool()
 		{
-			StreamReader reader = File.OpenText("\\UnityProject\\AIGC\\OuterStray\\Assets\\Config\\TutorialData.csv");
+			StreamReader reader = File.OpenText("Assets\\Config\\Pool.csv");
 
 			string[] data;
 			int num = 0;
@@ -66,68 +76,27 @@ namespace DataCore.CultivateItems
 				}
 				Card card = null;
 
-				string id		= data[0];
-
-				int ownership = data[1] == "human" ? 0 : 1;
-
-				string name = data[2];
-
-				if (id.Contains("comm"))
-				{
-					string type = data[3];
-					int cost = int.Parse(data[4]);
-
-					int durability = int.Parse(data[5]);
-
-					int department = int.Parse(data[9]);
-					int pack = int.Parse(data[10]);
-
-					string effects = data[11];
-
-					string description = data[8];
-
-					card = new CommandCard(id, ownership, name, type, description, cost, durability, department, pack, effects);
-				}
-				else
-				{
-					string category = data[3];
-
-					int cost		= int.Parse(data[4]);
-					int atk			= int.Parse(data[5]);
-					int hp			= int.Parse(data[6]);
-					//理解鹰角程序员，成为鹰角程序员//TODO
-					int atkc		= data[7] == "NA" ? 100000 : int.Parse(data[7]);
-
-					int department	= int.Parse(data[9]);
-					int pack		= int.Parse(data[10]);
-				
-					string effects	= data[11];
-
-					string description = data[8];
-
-
-					card = new UnitCard(id, ownership, name, category, cost, atk, hp, atkc, description, department, pack, effects);
-				}
+				DeserializeMethods.CardDeserialize(out card, data);
 
 				//TODO
 				cardPool.Add(card);
-				if (!hashPool.ContainsKey(id))
+				if (!hashPool.ContainsKey(card.backendID))
 				{
-					hashPool.Add(id, card);
+					hashPool.Add(card.backendID, card);
 				}
 
-				if(ownership == 0)
+				if(card.ownership == 0)
 				{
-					if(!humanCardPool.ContainsKey(id))
+					if(!humanCardPool.ContainsKey(card.backendID))
 					{
-						humanCardPool.Add(id, card);
+						humanCardPool.Add(card.backendID, card);
 					}
 				}
 				else
 				{
-					if(!plantCardPool.ContainsKey(id))
+					if(!plantCardPool.ContainsKey(card.backendID))
 					{
-						plantCardPool.Add(id, card);
+						plantCardPool.Add(card.backendID, card);
 					}
 				}
 
@@ -158,54 +127,14 @@ namespace DataCore.CultivateItems
 				}
 				Card card = null;
 
-				string id = data[0];
-
-				int ownership = data[1] == "human" ? 0 : 1;
-
-				string name = data[2];
-
-				if (id.Contains("comm"))
-				{
-					string type = data[3];
-					int cost = int.Parse(data[4]);
-
-					int durability = int.Parse(data[5]);
-
-					int department = int.Parse(data[9]);
-					int pack = int.Parse(data[10]);
-
-					string effects = data[11];
-
-					string description = data[8];
-
-					card = new CommandCard(id, ownership, name, type, description, cost, durability, department, pack, effects);
-				}
-				else
-				{
-					string category = data[3];
-
-					int cost = int.Parse(data[4]);
-					int atk = int.Parse(data[5]);
-					int hp = int.Parse(data[6]);
-					//理解鹰角程序员，成为鹰角程序员//TODO
-					int atkc = data[7] == "NA" ? 100000 : int.Parse(data[7]);
-
-					int department = int.Parse(data[9]);
-					int pack = int.Parse(data[10]);
-
-					string effects = data[11];
-
-					string description = data[8];
-
-
-					card = new UnitCard(id, ownership, name, category, cost, atk, hp, atkc, description, department, pack, effects);
-				}
+				DeserializeMethods.CardDeserialize(out card, data);
 
 				//TODO
 				cardPool.Add(card);
-				if (!hashPool.ContainsKey(id))
+
+				if (!hashPool.ContainsKey(card.backendID))
 				{
-					hashPool.Add(id, card);
+					hashPool.Add(card.backendID, card);
 				}
 
 				line = reader.ReadLine();

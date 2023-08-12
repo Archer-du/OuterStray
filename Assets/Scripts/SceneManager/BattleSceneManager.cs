@@ -11,52 +11,65 @@ using System.Xml.Linq;
 using System.Data;
 using System.IO;
 
-//public class AnimationQueue
-//{
-//	public Sequence sequence;
-//	public int eventNum;
-//	public float sequenceTime;
 
-//}
 public class BattleSceneManager : MonoBehaviour,
 	IBattleSceneController
 {
-	/// <summary>
-	/// 系统输入接口
-	/// </summary>
-	IBattleSystemInput battleSystem;
 	/// <summary>
 	/// GameManager单例
 	/// </summary>
 	public GameManager gameManager;
 
+	[Header("Input")]
+	/// <summary>
+	/// 系统输入接口
+	/// </summary>
+	IBattleSystemInput battleSystem;
 
+
+
+
+
+	[Header("Prototype")]
+	public GameObject battleLinePrototype;
+	public GameObject cardStackPrototype;
+	public GameObject handicapPrototype;
+
+	public GameObject unitPrototype;
+	public GameObject commandPrototype;
+
+	[Header("SubControllers")]
+	public BattleLineController[] battleLineControllers;
+
+	public CardStackController[] cardStackController;
+
+	public HandicapController[] handicapController;
+
+	public TurnMappedDialogger dialogController;
+	public TMP_Text[] energyText;
+	public TMP_Text[] energySupplyText;
+
+	public AIBehavior behavior;
+
+	[Header("Data")]
 	/// <summary>
 	/// 渲染层TURN备份
 	/// </summary>
 	public static int Turn;
-	public int turnNum;
-
-
-
-	public GameObject battleLinePrototype;
-	public BattleLineController[] battleLineControllers;
-
+	/// <summary>
+	/// dialog trigger & counter
+	/// </summary>
+	public int turnNum
+	{
+		get => turnNum;
+		set
+		{
+			turnNum = value;
+			dialogController.UpdateDialog();
+		}
+	}
 	public int[] energy;
 	public int[] energySupply;
-	public TMP_Text[] energyText;
-	public TMP_Text[] energySupplyText;
-
-	public GameObject cardStackPrototype;
-	public CardStackController[] cardStackController;
-
-
-	public GameObject handicapPrototype;
-	public HandicapController[] handicapController;
-
-
-	public GameObject unitPrototype;
-	public GameObject commandPrototype;
 
 	/// <summary>
 	/// 战场战线容量
@@ -84,23 +97,18 @@ public class BattleSceneManager : MonoBehaviour,
 	public static bool settlement = false;
 	public bool check = false;
 
-	//对话框
-	public GameObject dialogFrame;
-    public TMP_Text dialogText;
-	public string dialogs;
-
-	StreamReader dialogReader;
 
 
-    public void FieldInitialize(IBattleSystemInput handler)
+    public void FieldInitialize(IBattleSystemInput handler, int fieldCapacity)
 	{
 		DontDestroyOnLoad(gameObject);
 
 		battleSystem = handler;
+		//TODO trigger
 		turnNum = 0;
 
 		//TODO config
-		fieldCapacity = 4;
+		this.fieldCapacity = fieldCapacity;
 		battleLineControllers = new BattleLineController[fieldCapacity];
 
 		energy = new int[2];
@@ -116,14 +124,8 @@ public class BattleSceneManager : MonoBehaviour,
 		fieldWidth = GameObject.Find("BattleField").GetComponent<RectTransform>().rect.width;
 		fieldHeight = GameObject.Find("BattleField").GetComponent<RectTransform>().rect.height;
 		
-		
-		dialogFrame = GameObject.Find("Dialog");
-        dialogText = dialogFrame.transform.Find("Text(TMP)").GetComponent<TMP_Text>();
-        dialogFrame.SetActive(false);
-
-        dialogReader = File.OpenText("\\UnityProject\\AIGC\\OuterStray\\Assets\\Tutorial\\TutorialDialog.txt");
-
-        
+		dialogController = GetComponent<TurnMappedDialogger>();
+		behavior = GetComponent<AIBehavior>();
 
         for (int i = 0; i < 5; i++)
 		{
@@ -138,33 +140,33 @@ public class BattleSceneManager : MonoBehaviour,
 	}
 
 
-    private void DisplayDialog()
-    {
-        if (turnNum % 2 == 1)
-        {
-            dialogs = dialogReader.ReadLine();
-			if (dialogs == null) return;
-            dialogFrame.SetActive(true);
-			DOTween.To(
-				() => "",
-				value => dialogText.text = value, // setter设置costText的内容
-				dialogs,
-				0.8f
-			).SetEase(Ease.Linear);
-        }
-    }
+   // private void DisplayDialog()
+   // {
+   //     if (turnNum % 2 == 1)
+   //     {
+   //         dialogs = dialogReader.ReadLine();
+			//if (dialogs == null) return;
+   //         dialogFrame.SetActive(true);
+			//DOTween.To(
+			//	() => "",
+			//	value => dialogText.text = value, // setter设置costText的内容
+			//	dialogs,
+			//	0.8f
+			//).SetEase(Ease.Linear);
+   //     }
+   // }
 
-    private void UpdateDialog()
-    {
-        if (turnNum % 2 == 1)
-        {
-            DisplayDialog();
-        }
-        if (turnNum % 2 == 0)
-        {
-            dialogFrame.SetActive(false);
-        }
-    }
+   // private void UpdateDialog()
+   // {
+   //     if (turnNum % 2 == 1)
+   //     {
+   //         DisplayDialog();
+   //     }
+   //     if (turnNum % 2 == 0)
+   //     {
+   //         dialogFrame.SetActive(false);
+   //     }
+   // }
 
     /// <summary>
     /// 
@@ -189,10 +191,10 @@ public class BattleSceneManager : MonoBehaviour,
 	{
 		Turn = TURN;
 		turnNum++;
-		UpdateDialog();
 		if(Turn == 0)
 		{
 			buttonImage.color = Color.white;
+			skipButton.enabled = true;
 		}
 		//如果是敌方回合，启动行为树
 		else
@@ -200,22 +202,23 @@ public class BattleSceneManager : MonoBehaviour,
 			buttonImage.color = Color.gray;
 
 			StartCoroutine(AIBehavior());
+			skipButton.enabled = false;
 		}
-    }
+	}
 	private void UpdateTurn()
 	{
 		Turn = (Turn + 1) % 2;
 		turnNum++;
-		Debug.Log("next turn: " + Turn);
-		UpdateDialog();
 		if (Turn == 0)
 		{
 			buttonImage.color = Color.white;
-        }
-        //如果是敌方回合，启动行为树
-        else
+			skipButton.enabled = true;
+		}
+		//如果是敌方回合，启动行为树
+		else
 		{
 			buttonImage.color = Color.gray;
+			skipButton.enabled = false;
 
 			StartCoroutine(AIBehavior());
 		}

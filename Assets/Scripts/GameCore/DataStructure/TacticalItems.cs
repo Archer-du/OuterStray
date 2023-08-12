@@ -7,6 +7,8 @@ using Serilog.Formatting.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using Unity.Plastic.Newtonsoft.Json;
 
 namespace DataCore.TacticalItems
 {
@@ -15,10 +17,7 @@ namespace DataCore.TacticalItems
 		BattleSystem battleSystem;
 		private List<BattleElement> deck;
 		internal int count { get => deck.Count; }
-		//internal Deck()
-		//{
-		//	deck = new List<BattleElement>();
-		//}
+
 		//TODO remove
 		internal Deck(BattleSystem system)
 		{
@@ -31,8 +30,6 @@ namespace DataCore.TacticalItems
 			set => deck[index] = value;
 		}
 
-
-
 		/// <summary>
 		/// 根据pack内容创建element对象加入到Deck中
 		/// </summary>
@@ -41,8 +38,69 @@ namespace DataCore.TacticalItems
 		{
 			throw new NotImplementedException();
 		}
+		//TODO
+		internal void LoadDeckByPath(string path)
+		{
+			StreamReader reader = File.OpenText("Assets\\Config\\TacticalDeckTest.csv");
+
+			string[] data;
+			string line = reader.ReadLine();
+
+			while (line != null)
+			{
+				data = line.Split(',');
+				if (data[1] == "#")
+				{
+					line = reader.ReadLine();
+					continue;
+				}
+				Card card;
+				DeserializeMethods.CardDeserialize(out card, data);
+
+
+				if (card is UnitCard)
+				{
+					string category = (card as UnitCard).category;
+					switch (category)
+					{
+						case "LightArmor":
+							deck.Add(new LightArmorElement(card as UnitCard, battleSystem));
+							break;
+						case "Motorized":
+							deck.Add(new MotorizedElement(card as UnitCard, battleSystem));
+							break;
+						case "Artillery":
+							deck.Add(new ArtilleryElement(card as UnitCard, battleSystem));
+							break;
+						case "Guardian":
+							deck.Add(new GuardianElement(card as UnitCard, battleSystem));
+							break;
+						case "Construction":
+							deck.Add(new ConstructionElement(card as UnitCard, battleSystem));
+							break;
+					}
+				}
+				else
+				{
+					deck.Add(new CommandElement(card as CommandCard, battleSystem));
+				}
+				line = reader.ReadLine();
+			}
+			reader.Close();
+
+			//CRITICAL
+			UpdateBattleID();
+		}
+		private void UpdateBattleID()
+		{
+			for (int i = 0; i < count; i++)
+			{
+				deck[i].battleID = deck[i].ownership == 0 ? i : -1 - i;
+			}
+		}
 
 		//TODO test function remove
+		[Obsolete("use LoadDeckByPath instead")]
 		internal void LoadDeckFromPool(Pool pool, string ownership)
 		{
 			if(ownership == "ally")
@@ -135,7 +193,19 @@ namespace DataCore.TacticalItems
 
 	internal class Terrain
 	{
-		internal ITerrainController controller;
+		internal ITerrainController controller
+		{
+			get => controller;
+			set
+			{
+				if (value != null)
+				{
+					controller = value;
+					controller.Init();
+				}
+				else { controller = null; }
+			}
+		}
 
 		internal TacticalSystem tacticalSystem;
 		internal BattleSystem battleSystem;
@@ -166,8 +236,15 @@ namespace DataCore.TacticalItems
 
 		internal int totalNodeNum;
 
-		internal int interactNodeNum;
-		internal int supplyNodeNum;
+		internal int interactNodeNum
+		{
+			//TODO config
+			get => 2;
+		}
+		internal int supplyNodeNum
+		{
+			get => totalNodeNum - interactNodeNum - 2 + 1;
+		}
 
 		internal List<Node> this[int index]
 		{
@@ -175,27 +252,30 @@ namespace DataCore.TacticalItems
 			set => nodeList[index] = value;
 		}
 
-		internal Terrain(int index, TacticalSystem tacticalSystem, BattleSystem battleSystem)
+		internal Terrain(int index, TacticalSystem tacticalSystem, BattleSystem battleSystem, ITerrainController controller)
 		{
 			this.tacticalSystem = tacticalSystem;
 			this.battleSystem = battleSystem;
 
 			prevTerrain = null;
+
+			this.index = index;
+
+			InitializeBasicConfig();
+
+			//display
+			this.controller = controller;
+		}
+		internal void InitializeBasicConfig()
+		{
+			nodeList = new List<List<Node>>();
+
 			//TODO config
 			lengthLowerBound = 4;
 			lengthUpperBound = 4;
 			widthLowerBound = 2;
 			widthUpperBound = 3;
 
-			nodeList = new List<List<Node>>();
-
-			this.index = index;
-		}
-		/// <summary>
-		/// generate node and path data in a terrain
-		/// </summary>
-		internal void GenerateNodes()
-		{
 			Random random = new Random();
 			length = random.Next(lengthLowerBound, lengthUpperBound + 1);
 
@@ -207,16 +287,17 @@ namespace DataCore.TacticalItems
 			}
 			width.Add(1);
 			totalNodeNum = 0;
-			for(int i = 0; i < length; i++)
+			for (int i = 0; i < length; i++)
 			{
 				totalNodeNum += width[i];
 			}
-
-			//TODO
-			interactNodeNum = 2;
-			supplyNodeNum = totalNodeNum - interactNodeNum - 2 + 1;
-
-
+		}
+		/// <summary>
+		/// generate node and path data in a terrain
+		/// </summary>
+		internal void GenerateNodes()
+		{
+			Random random = new Random();
 
 			//生成节点
 			int itNodeCounter = interactNodeNum;
@@ -234,9 +315,9 @@ namespace DataCore.TacticalItems
 						if(prevTerrain == null)
 						{
 							//SourceNode 全局唯一
-							SourceNode s = new SourceNode(i, j, this);
+							SourceNode s = new(i, j, this, 
+								controller.InstantiateNode(length, width[i], i, j, "source"));
 							s.controller = controller.InstantiateNode(length, width[i], i, j, "source");
-							s.controller.Init();
 							nodeList[i].Add(s);
 						}
 						//否则源节点是上一terrain的目的节点
@@ -248,9 +329,9 @@ namespace DataCore.TacticalItems
 					//每一个terrain的目的节点一定是战斗节点
 					else if (i == length - 1)
 					{
-						BattleNode bn = new BattleNode(i, j, this, battleSystem);
-						bn.controller = controller.InstantiateNode(length, width[i], i, j, "battle");
-						bn.controller.Init();
+						BattleNode bn = new(i, j, this,
+							controller.InstantiateNode(length, width[i], i, j, "battle"),
+							battleSystem);
 						nodeList[i].Add(bn);
 					}
 					//以一定权重随机生成 TODO
@@ -263,30 +344,26 @@ namespace DataCore.TacticalItems
 							int randSeed = random.Next(0, 10);
 							if(randSeed >= 0 && randSeed < 3)
 							{
-								PromoteNode pn = new PromoteNode(i, j, this);
-								pn.controller = controller.InstantiateNode(length, width[i], i, j, "promote");
-								pn.controller.Init();
+								PromoteNode pn = new PromoteNode(i, j, this,
+									controller.InstantiateNode(length, width[i], i, j, "promote"));
 								nodeList[i].Add(pn);
 							}
 							if(randSeed >= 3 && randSeed < 6)
 							{
-								LegacyNode ln = new LegacyNode(i, j, this);
-								ln.controller = controller.InstantiateNode(length, width[i], i, j, "legacy");
-								ln.controller.Init();
+								LegacyNode ln = new LegacyNode(i, j, this,
+									controller.InstantiateNode(length, width[i], i, j, "legacy"));
 								nodeList[i].Add(ln);
 							}
 							if(randSeed >= 6 && randSeed < 8)
 							{
-								OutPostNode on = new OutPostNode(i, j, this);
-								on.controller = controller.InstantiateNode(length, width[i], i, j, "outpost");
-								on.controller.Init();
+								OutPostNode on = new OutPostNode(i, j, this,
+									controller.InstantiateNode(length, width[i], i, j, "outpost"));
 								nodeList[i].Add(on);
 							}
 							if(randSeed >= 8 && randSeed < 10)
 							{
-								MedicalNode mn = new MedicalNode(i, j, this);
-								mn.controller = controller.InstantiateNode(length, width[i], i, j, "medical");
-								mn.controller.Init();
+								MedicalNode mn = new MedicalNode(i, j, this,
+									controller.InstantiateNode(length, width[i], i, j, "medical"));
 								nodeList[i].Add(mn);
 							}
 							itNodeCounter--;
@@ -295,9 +372,8 @@ namespace DataCore.TacticalItems
 						else
 						{
 							int randSeed = random.Next(0, 6);
-							SupplyNode sn = new SupplyNode(i, j, this);
-							sn.controller = controller.InstantiateNode(length, width[i], i, j, "supply");
-							sn.controller.Init();
+							SupplyNode sn = new SupplyNode(i, j, this,
+								controller.InstantiateNode(length, width[i], i, j, "supply"));
 							nodeList[i].Add(sn);
 							switch (randSeed)
 							{
@@ -375,10 +451,6 @@ namespace DataCore.TacticalItems
 				}
 			}
 		}
-		internal void Init()
-		{
-			controller.Init();
-		}
 	}
 
 
@@ -389,7 +461,19 @@ namespace DataCore.TacticalItems
 	internal class Node
 	{
 		internal TacticalSystem tacticalSystem;
-		internal INodeController controller;
+		internal INodeController controller
+		{
+			get => controller;
+			set
+			{
+				if (value != null)
+				{
+					controller = value;
+					controller.Init();
+				}
+				else { controller = null; }
+			}
+		}
 
 		internal Terrain terrain;
 
@@ -401,7 +485,7 @@ namespace DataCore.TacticalItems
 
 		internal bool casted;
 
-		internal Node(int horizontalIdx, int verticalIdx, Terrain terrain)
+		internal Node(int horizontalIdx, int verticalIdx, Terrain terrain, INodeController controller)
 		{
 			inDegree = 0;
 			casted = false;
@@ -412,6 +496,8 @@ namespace DataCore.TacticalItems
 			adjNode = new Node[3] { null, null, null };
 			this.terrain = terrain;
 			this.tacticalSystem = terrain.tacticalSystem;
+
+			this.controller = controller;
 		}
 
 
@@ -436,6 +522,10 @@ namespace DataCore.TacticalItems
 		{
 			casted = true;
 		}
+
+		/// <summary>
+		/// 设置邻接节点，更新控件逻辑节点
+		/// </summary>
 		internal void SetAdjacentNode()
 		{
 			List<INodeController> adjList = new List<INodeController>();
@@ -447,48 +537,134 @@ namespace DataCore.TacticalItems
 					adjList.Add(adjNode[i].controller);
 				}
 			}
-			if (adjList.Count == 0) throw new Exception("adj");
 			controller.SetAdjacentNode(adjList);
 		}
 	}
 
 
+
+
 	internal sealed class SourceNode : Node
 	{
-		internal SourceNode(int horizontalIdx, int verticalIdx, Terrain terrain) : base(horizontalIdx, verticalIdx, terrain) { }
+		internal SourceNode(int horizontalIdx, int verticalIdx, Terrain terrain, INodeController controller) 
+			: base(horizontalIdx, verticalIdx, terrain, controller)
+		{
+			casted = true;
+		}
 	}
+
+
+
 	internal sealed class BattleNode : Node
 	{
-		internal BattleSystem system;
+		internal BattleSystem battleSystem;
 
 		internal Terrain nextTerrain;
 
-		internal string[] battleConfig;
+		internal string battleConfigPath;
+		internal BattleConfigJson battleConfig;
 
-		internal string plots;
-		internal string enemyConfig;
-
-		internal int fieldCapacity;
-		internal int[] battleLinesLength;
-		internal int[] initialEnergy;
-
-		internal BattleNode(int horizontalIdx, int verticalIdx, Terrain terrain, BattleSystem system)
-			: base(horizontalIdx, verticalIdx, terrain)
+		internal BattleNode(int horizontalIdx, int verticalIdx, Terrain terrain, INodeController controller,
+			BattleSystem system)
+			: base(horizontalIdx, verticalIdx, terrain, controller)
 		{
 			nextTerrain = null;
-			this.system = system;
-		}
+			battleSystem = system;
+			//TODO config
+			battleConfigPath = "Assets\\Config\\NodeConfigs\\TotorialNode.json";
 
+			string jsonString = File.ReadAllText(battleConfigPath);
+			battleConfig = JsonConvert.DeserializeObject<BattleConfigJson>(jsonString);
+
+			plantDeck.LoadDeckByPath(battleConfig.plantDeckPath);
+		}
 		internal override void CastNodeEvent()
 		{
-			system.BuildBattleField(tacticalSystem.playerDeck, tacticalSystem.enemyDeck, 4);
+			battleSystem.BuildBattleField(playerDeck, plantDeck, fieldCapacity, initialTurn, initialHumanEnergy, initialPlantEnergy);
 
-			//system.FieldPreset();
+			battleSystem.FieldPreset(battleConfig.fieldPreset);
+		}
+
+
+
+		internal int initialTurn
+		{
+			get => battleConfig.initialTurn;
+		}
+		internal int fieldCapacity
+		{
+			get => battleConfig.fieldCapacity;
+		}
+		internal int initialHumanEnergy
+		{
+			get => battleConfig.initialHumanEnergy;
+		}
+		internal int initialPlantEnergy
+		{
+			get => battleConfig.initialPlantEnergy;
+		}
+
+		internal Deck playerDeck
+		{
+			get => tacticalSystem.playerDeck;
+		}
+		internal Deck plantDeck;
+
+		[Serializable]
+		internal class BattleConfigJson
+		{
+			[JsonProperty("initialTurn")]
+			internal int initialTurn;
+
+			[JsonProperty("fieldCapacity")]
+			internal int fieldCapacity;
+
+			[JsonProperty("plantDeckPath")]
+			internal string plantDeckPath;
+
+			[JsonProperty("initialHumanEnergy")]
+			internal int initialHumanEnergy;
+
+			[JsonProperty("initialPlantEnergy")]
+			internal int initialPlantEnergy;
+
+			[JsonProperty("fieldPreset")]
+			internal List<FieldPreset> fieldPreset;
+		}
+		[Serializable]
+		internal class FieldPreset
+		{
+			[JsonProperty("cardPreset")]
+			public CardPreset cardPreset;
+
+			[JsonProperty("position")]
+			public int position;
+		}
+		[Serializable]
+		internal class CardPreset
+		{
+			[JsonProperty("backendID")]
+			public string ID;
+
+			[JsonProperty("attack")]
+			public int attackPreset;
+
+			[JsonProperty("health")]
+			public int healthPreset;
+
+			[JsonProperty("attackCounter")]
+			public int attackCounterPreset;
 		}
 	}
+
+
+
+
+
 	internal sealed class OutPostNode : Node
 	{
-		internal OutPostNode(int horizontalIdx, int verticalIdx, Terrain terrain) : base(horizontalIdx, verticalIdx, terrain)
+		internal OutPostNode(int horizontalIdx, int verticalIdx, Terrain terrain, INodeController controller) 
+			: base(horizontalIdx, verticalIdx, terrain, controller)
 		{
 
 		}
@@ -496,7 +672,8 @@ namespace DataCore.TacticalItems
 	internal sealed class LegacyNode : Node
 	{
 		internal int legacy;
-		internal LegacyNode(int horizontalIdx, int verticalIdx, Terrain terrain) : base(horizontalIdx, verticalIdx, terrain)
+		internal LegacyNode(int horizontalIdx, int verticalIdx, Terrain terrain, INodeController controller) 
+			: base(horizontalIdx, verticalIdx, terrain, controller)
 		{
 
 		}
@@ -504,14 +681,16 @@ namespace DataCore.TacticalItems
 	internal sealed class MedicalNode : Node
 	{
 		internal int cost;
-		internal MedicalNode(int horizontalIdx, int verticalIdx, Terrain terrain) : base(horizontalIdx, verticalIdx, terrain)
+		internal MedicalNode(int horizontalIdx, int verticalIdx, Terrain terrain, INodeController controller) 
+			: base(horizontalIdx, verticalIdx, terrain, controller)
 		{
 
 		}
 	}
 	internal sealed class PromoteNode : Node
 	{
-		internal PromoteNode(int horizontalIdx, int verticalIdx, Terrain terrain) : base(horizontalIdx, verticalIdx, terrain)
+		internal PromoteNode(int horizontalIdx, int verticalIdx, Terrain terrain, INodeController controller) 
+			: base(horizontalIdx, verticalIdx, terrain, controller)
 		{
 		}
 	}
@@ -519,7 +698,8 @@ namespace DataCore.TacticalItems
 	{
 		internal string category;
 		internal List<BattleElement> supply;
-		internal SupplyNode(int horizontalIdx, int verticalIdx, Terrain terrain) : base(horizontalIdx, verticalIdx, terrain)
+		internal SupplyNode(int horizontalIdx, int verticalIdx, Terrain terrain, INodeController controller) 
+			: base(horizontalIdx, verticalIdx, terrain, controller)
 		{
 			supply = new List<BattleElement>();
 		}

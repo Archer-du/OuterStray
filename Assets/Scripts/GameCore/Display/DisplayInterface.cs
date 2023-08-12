@@ -49,6 +49,9 @@ namespace DisplayInterface
 		public ITerrainController InstantiateTerrain(int idx);
 		public void EnterNextTerrain();
 		public void UpdateCurrentNode(INodeController controller);
+
+		public void CampaignCompleted();
+		public void CampaignFailed();
 	}
 	public interface ITerrainController
 	{
@@ -74,7 +77,7 @@ namespace DisplayInterface
 		/// 战斗系统渲染层初始化
 		/// </summary>
 		/// <param name="handler"></param>
-		public void FieldInitialize(IBattleSystemInput handler);
+		public void FieldInitialize(IBattleSystemInput handler, int fieldCapacity);
 
 		public IBattleLineController InstantiateBattleLine(int idx, int capacity);
 		public IHandicapController InstantiateHandicap(int turn);
@@ -97,9 +100,6 @@ namespace DisplayInterface
 
 		public IUnitElementController InstantiateUnitInStack(int turn);
 
-
-		//public void PushElementIntoHandicap(IUnitElementController element);
-		//public void PushElementIntoHandicap(int turn, IUnitElementController element);
 
 	}
 	public interface IBattleLineController

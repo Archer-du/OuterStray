@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class OutPostNodeController : NodeController
 {
@@ -8,6 +9,11 @@ public class OutPostNodeController : NodeController
 	{
 		base.Init();
 		LoadResource();
+
+		exitButton = transform.Find("UI/Panels/OutPostPanel/Mask/PanelComponent/ExitButton").GetComponent<Button>();
+		exitButton.onClick.AddListener(tacticalManager.CampaignCompleted);
+
+		panelDisplay.Init("OutPost");
 	}
 	public override void LoadResource()
 	{

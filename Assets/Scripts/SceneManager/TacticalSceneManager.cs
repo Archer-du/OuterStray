@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.XR;
 
 public class TacticalSceneManager : MonoBehaviour,
@@ -18,6 +19,8 @@ public class TacticalSceneManager : MonoBehaviour,
     public GameObject Map;
     public GameObject UI;
 
+    public Image InputMask;
+
 	public GameObject arrowPrototype;
     public NodeController currentNode;
 
@@ -28,9 +31,7 @@ public class TacticalSceneManager : MonoBehaviour,
         {
 			if (currentNode is BattleNodeController)
 			{
-				BattleNodeController node = currentNode as BattleNodeController;
-                //TODO
-                return terrains[node.terrain.index + 1];
+                return terrains[currentNode.terrain.index + 1];
 			}
 			else
 			{
@@ -38,8 +39,13 @@ public class TacticalSceneManager : MonoBehaviour,
 			}
 		}
     }
+    public TerrainController prevTerrain
+    {
+        get => terrains[currentTerrain.index - 1];
+    }
 
     public Transform terrainsGroup;
+    public float terrainLength = 2700f;
 
 	public GameObject terrainPrototype;
 
@@ -50,29 +56,58 @@ public class TacticalSceneManager : MonoBehaviour,
     public Color originOrange;
 
 
-
-    public void OnGameStateChanged(GameState state)
+	public void OnGameStateChanged(GameState state)
     {
         switch (state)
         {
             case GameState.Battle:
-                DontDestroyOnLoad(Map);
+				DontDestroyOnLoad(gameObject);
+
+				DontDestroyOnLoad(Map);
                 DontDestroyOnLoad(UI);
                 break;
+            //TODO
         }
     }
-	public void TerrrainsInitialize(ITacticalSystemInput handler, int terrainsLength)
-	{
-        GameManager.OnGameStateChanged += OnGameStateChanged;
-        DontDestroyOnLoad(gameObject);
+    public void Init()
+    {
+		GameManager.OnGameStateChanged += OnGameStateChanged;
 
 		ColorUtility.TryParseHtmlString("#F6921E", out originOrange);
+		terrains = new List<TerrainController>();
+	}
+	public void TerrrainsInitialize(ITacticalSystemInput handler, int terrainsLength)
+	{
+        Init();
 		tacticalSystem = handler;
-
-        terrains = new List<TerrainController>();
 	}
 
-    public ITerrainController InstantiateTerrain(int idx)
+
+    public void EnableInputMask()
+    {
+        InputMask.raycastTarget = true;
+    }
+    public void DisableInputMask()
+    {
+        InputMask.raycastTarget = false;
+    }
+	public void CampaignCompleted()
+	{
+		DisableInputMask();
+	}
+
+	public void CampaignFailed()
+	{
+        DisableInputMask();
+	}
+
+
+	/// <summary>
+	/// 生成Terrain控件，返回句柄
+	/// </summary>
+	/// <param name="idx"></param>
+	/// <returns></returns>
+	public ITerrainController InstantiateTerrain(int idx)
     {
         GameObject terrain = Instantiate(terrainPrototype, terrainsGroup);
         TerrainController controller = terrain.GetComponent<TerrainController>();
@@ -85,29 +120,27 @@ public class TacticalSceneManager : MonoBehaviour,
     }
 
 
+    /// <summary>
+    /// 进入下一层（此时当前节点已更新）
+    /// </summary>
 	public void EnterNextTerrain()
 	{
-		GameObject[] mapArrow = GameObject.FindGameObjectsWithTag("MapArrow");
-		foreach (GameObject obj in mapArrow)
-		{
-			obj.SetActive(false);
-		}
+        DisableArrowCaster();
+
 		terrains[currentTerrain.index - 1].ClearNodes();
 
-        currentTerrain.nodes.Insert(0, terrains[currentTerrain.index - 1].dstNode);
-		currentTerrain.srcNode = terrains[currentTerrain.index - 1].dstNode;
+        currentTerrain.nodes.Insert(0, prevTerrain.dstNode);
+		currentTerrain.srcNode = prevTerrain.dstNode;
         //TODO
-        terrainsGroup.DOBlendableMoveBy(2700 * Vector3.left, switchDuration);
+        terrainsGroup.DOBlendableMoveBy(terrainLength * Vector3.left, switchDuration);
 	}
-
+    /// <summary>
+    /// 更新当前节点
+    /// </summary>
+    /// <param name="controller"></param>
 	public void UpdateCurrentNode(INodeController controller)
 	{
-        StopAllCoroutines();
-		GameObject[] mapArrow = GameObject.FindGameObjectsWithTag("MapArrow");
-		foreach (GameObject obj in mapArrow)
-		{
-			obj.SetActive(false);
-		}
+        DisableArrowCaster();
 
 		currentNode = controller as NodeController;
 
@@ -115,12 +148,24 @@ public class TacticalSceneManager : MonoBehaviour,
 
         foreach(NodeController adjNode in currentNode.adjNodes)
         {
-
             StartCoroutine(ArrowCaster(adjNode));
         }
 	}
+    private void DisableArrowCaster()
+    {
+		StopAllCoroutines();
+		GameObject[] mapArrow = GameObject.FindGameObjectsWithTag("MapArrow");
+		foreach (GameObject obj in mapArrow)
+		{
+			obj.SetActive(false);
+		}
+	}
 
-
+    /// <summary>
+    /// 从当前节点发射箭头的动画协程
+    /// </summary>
+    /// <param name="adjNode"></param>
+    /// <returns></returns>
     IEnumerator ArrowCaster(NodeController adjNode)
     {
         yield return new WaitForSeconds(switchDuration);
@@ -190,7 +235,6 @@ public class TacticalSceneManager : MonoBehaviour,
             }
         }
 	}
-
     public float fadeDuration = 0.3f;
     public void DisableNode(NodeController node)
     {
@@ -221,4 +265,6 @@ public class TacticalSceneManager : MonoBehaviour,
         }
         return false;
     }
+
+
 }
