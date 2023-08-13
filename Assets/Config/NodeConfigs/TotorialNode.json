@@ -1,12 +1,18 @@
 {
     "initialTurn": 0,
     "fieldCapacity": 4,
+    "battleLinesCapacity":[
+        5, 4, 3, 5
+    ],
     "plantDeckPath": "Assets\\Config\\DeckConfigs\\mush99.csv",
     "initialHumanEnergy": 1,
     "initialPlantEnergy": 1,
+    "initialHumanHandicaps": 1,
+    "initialPlantHandicaps": 3,
     "fieldPreset": [
         {
             "cardPreset" : {
+                "boss": false,
                 "backendID": "mush_00",
                 "attack": 1,
                 "health": 1,
@@ -16,6 +22,7 @@
         },
         {
             "cardPreset" : {
+                "boss": false,
                 "backendID": "mush_00",
                 "attack": 1,
                 "health": 1,
@@ -24,7 +31,8 @@
             "position": 2
         },
         {
-            "card" : {
+            "cardPreset" : {
+                "boss": true,
                 "backendID": "mush_99_01",
                 "attack": 1,
                 "health": 1,

@@ -15,7 +15,7 @@ namespace DataCore.CultivateItems
 	/// cards unlocked
 	/// </summary>
 	[Serializable]
-	internal class Pool
+	public class Pool
 	{
 		//之后换成hash
 		[JsonProperty("pool")]
@@ -34,8 +34,9 @@ namespace DataCore.CultivateItems
 		internal List<Card> enemyCards;
 
 
-		internal Pool()
+		public Pool()
 		{
+			cardPool = new List<Card>();
 			hashPool = new Hashtable();
 
 			humanCardPool = new Hashtable();
@@ -56,7 +57,7 @@ namespace DataCore.CultivateItems
 		/// </summary>
 		/// <param name="__icdspl"></param>
 		/// <returns></returns>
-		internal int LoadCardPool()
+		public int LoadCardPool()
 		{
 			StreamReader reader = File.OpenText("Assets\\Config\\Pool.csv");
 

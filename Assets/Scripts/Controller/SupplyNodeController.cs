@@ -9,6 +9,11 @@ public class SupplyNodeController : NodeController
 	{
 		base.Init();
 		LoadResource();
+		panelDisplay.Init("Supply");
+
+		exitButton = panelDisplay.exitButton;
+
+		exitButton.onClick.AddListener(tacticalManager.CampaignCompleted);
 	}
 	public override void LoadResource()
 	{

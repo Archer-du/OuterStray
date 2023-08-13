@@ -42,6 +42,7 @@ namespace InputHandler
 	public interface IBattleSystemInput
 	{
 		public void SetSceneController(IBattleSceneController controller);
+		public void SetTacticalSystem(ITacticalSystemInput tacticalSystem);
 		/// <summary>
 		/// 从手牌部署单位到指定战线指定位置，合法性判定
 		/// </summary>

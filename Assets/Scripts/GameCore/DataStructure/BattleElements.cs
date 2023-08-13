@@ -8,10 +8,6 @@ using DisplayInterface;
 using LogicCore;
 using EventEffectModels;
 using InputHandler;
-using Codice.CM.Common;
-using CodiceApp.EventTracking.Plastic;
-using System.Runtime.CompilerServices;
-using System.Xml.Linq;
 
 namespace DataCore.BattleElements
 {
@@ -20,8 +16,6 @@ namespace DataCore.BattleElements
 	/// </summary>
 	internal abstract class BattleElement
 	{
-
-
 		/// <summary>
 		/// 指向作战系统，获取全局信息
 		/// </summary>
@@ -36,8 +30,16 @@ namespace DataCore.BattleElements
 		protected EffectsTable effectsTable;
 
 
-
-		internal ElementState state;
+		private ElementState State;
+		internal ElementState state
+		{
+			get => state;
+			set
+			{
+				State = value;
+				UpdateState();
+			}
+		}
 		/// <summary>
 		/// 加载的静态卡牌信息
 		/// </summary>
@@ -87,10 +89,14 @@ namespace DataCore.BattleElements
 			//TODO 维护
 			this.stackIdx = -1;
 
-
 			EffectsParse(__card.effects);
 		}
 
+		/// <summary>
+		/// 将效果解析并加载到单位
+		/// </summary>
+		/// <param name="effects"></param>
+		/// <exception cref="Exception"></exception>
 		protected void EffectsParse(string effects)
 		{
 			if (effects != "none")
@@ -194,6 +200,9 @@ namespace DataCore.BattleElements
 				}
 			}
 		}
+
+		internal virtual void UpdateInfo() { }
+		internal virtual void UpdateState() { }
 	}
 
 
@@ -206,7 +215,20 @@ namespace DataCore.BattleElements
 		/// <summary>
 		/// 渲染层控件
 		/// </summary>
-		internal IUnitElementController controller;
+		private IUnitElementController Controller;
+		internal IUnitElementController controller
+		{
+			get => Controller;
+			set
+			{
+				if (value != null)
+				{
+					Controller = value;
+					Init();
+				}
+				else { Controller = null; }
+			}
+		}
 
 
 		/// <summary>
@@ -420,7 +442,7 @@ namespace DataCore.BattleElements
 
 
 
-		internal UnitElement(UnitCard __card, BattleSystem system) : base(__card, system)
+		internal UnitElement(UnitCard __card, BattleSystem system, IUnitElementController controller) : base(__card, system)
 		{
 			//初始状态在卡组中
 			state = ElementState.inDeck;
@@ -451,7 +473,6 @@ namespace DataCore.BattleElements
 			this.damage = 0;
 
 
-
 			//std attribute & status
 			//内嵌逻辑特性
 			this.mocking = false;
@@ -464,6 +485,8 @@ namespace DataCore.BattleElements
 			aura = false;
 
 			eventTable.RaiseEvent("Initialize", this, null);
+
+			this.controller = controller;
 		}
 
 
@@ -609,7 +632,7 @@ namespace DataCore.BattleElements
 		/// 
 		/// </summary>
 		/// <param name="battleSystem"></param>
-		internal void Deploy(BattleSystem battleSystem, BattleLine dstLine, int dstPos)
+		internal void Deploy(BattleLine dstLine, int dstPos)
 		{
 			eventTable.RaiseEvent("BeforeDeploy", this, battleSystem);
 
@@ -863,15 +886,19 @@ namespace DataCore.BattleElements
 		/// <summary>
 		/// 由手牌区初始化
 		/// </summary>
-		internal void UnitInit()
+		internal void Init()
 		{
 			UpdateInfo();
 			controller.UnitInit(backendID, ownership, name, category, cost, description, this);
 		}
-		internal void UpdateInfo()
+		internal override void UpdateInfo()
 		{
 			controller.UpdateInfo(cost, dynAttackReader, maxHealthReader, dynAttackCounter, operateCounter, 
 				state, moveRange, aura, dynAttackReader - oriAttack, maxHealthReader - oriHealth);
+		}
+		internal override void UpdateState()
+		{
+			controller.UpdateState(state);
 		}
 		internal void UpdateHealth()
 		{
@@ -902,11 +929,13 @@ namespace DataCore.BattleElements
 
 	internal sealed class LightArmorElement : UnitElement
 	{
-		internal LightArmorElement(UnitCard __card, BattleSystem system) : base(__card, system) { }
+		internal LightArmorElement(UnitCard __card, BattleSystem system, IUnitElementController controller) 
+			: base(__card, system, controller) { }
 	}
 	internal sealed class MotorizedElement : UnitElement
 	{
-		internal MotorizedElement(UnitCard __card, BattleSystem system) : base(__card, system) { }
+		internal MotorizedElement(UnitCard __card, BattleSystem system, IUnitElementController controller) 
+			: base(__card, system, controller) { }
 		internal override void Move(BattleLine resLine, BattleLine dstLine, int resIdx, int dstPos)
 		{
 			eventTable.RaiseEvent("BeforeMove", this, battleSystem);
@@ -925,7 +954,8 @@ namespace DataCore.BattleElements
 	internal sealed class ArtilleryElement : UnitElement
 	{
 		internal UnitElement tmpTarget;
-		internal ArtilleryElement(UnitCard __card, BattleSystem system) : base(__card, system) { }
+		internal ArtilleryElement(UnitCard __card, BattleSystem system, IUnitElementController controller) 
+			: base(__card, system, controller) { }
 		internal override void SetAttackRange(UnitElement t1, UnitElement t2, UnitElement t3)
 		{
 			attackRange[0] = null;
@@ -966,11 +996,13 @@ namespace DataCore.BattleElements
 	}
 	internal sealed class GuardianElement : UnitElement
 	{
-		internal GuardianElement(UnitCard __card, BattleSystem system) : base(__card, system) { }
+		internal GuardianElement(UnitCard __card, BattleSystem system, IUnitElementController controller) 
+			: base(__card, system, controller) { }
 	}
 	internal sealed class ConstructionElement : UnitElement
 	{
-		internal ConstructionElement(UnitCard __card, BattleSystem system) : base(__card, system) { }
+		internal ConstructionElement(UnitCard __card, BattleSystem system, IUnitElementController controller) 
+			: base(__card, system, controller) { }
 		internal override void Move(BattleLine resLine, BattleLine dstLine, int resIdx, int dstPos)
 		{
 			return;
@@ -979,7 +1011,8 @@ namespace DataCore.BattleElements
 	//legacy
 	internal sealed class BehemothsElement : UnitElement
 	{
-		internal BehemothsElement(UnitCard __card, BattleSystem system) : base(__card, system)
+		internal BehemothsElement(UnitCard __card, BattleSystem system, IUnitElementController controller) 
+			: base(__card, system, controller)
 		{
 		}
 	}
@@ -993,7 +1026,20 @@ namespace DataCore.BattleElements
 
 	internal sealed class CommandElement : BattleElement
 	{
-		internal ICommandElementController controller;
+		private ICommandElementController Controller;
+		internal ICommandElementController controller
+		{
+			get => Controller;
+			set
+			{
+				if (value != null)
+				{
+					Controller = value;
+					Init();
+				}
+				else { Controller = null; }
+			}
+		}
 
 		internal string type;
 		internal int oriDurability { get; set; }
@@ -1044,17 +1090,20 @@ namespace DataCore.BattleElements
 		{
 			//由自己修改的状态
 			this.state = ElementState.destroyed;
+
+			//Unload
+			tempBufferForCommMush07 = 0;
 		}
 
 		/// <summary>
 		/// 由手牌区初始化
 		/// </summary>
-		internal void CommandInit()
+		internal void Init()
 		{
 			UpdateInfo();
 			controller.CommandInit(backendID, ownership, name, type, cost, description);
 		}
-		internal void UpdateInfo()
+		internal override void UpdateInfo()
 		{
 			controller.UpdateInfo(cost, dynDurability, state);
 		}

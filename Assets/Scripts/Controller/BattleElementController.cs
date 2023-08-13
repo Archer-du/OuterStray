@@ -17,14 +17,49 @@ public class BattleElementController : MonoBehaviour,
 	    IDragHandler,
 	    IBeginDragHandler, IEndDragHandler
 {
+	public event System.Action<ElementState> OnElementStateChanged;
+
+	[Header("BasicInfo")]
+	public static int cardWidth = 360;
+
+	[Header("Connections")]
 	public BattleSceneManager battleSceneManager;
 	public Transform stack;
 	protected Transform buffer;
 	public Canvas canvas;
 
-	public static int cardWidth = 360;
-
 	public HandicapController handicap;
+
+	[Header("Data")]
+	private ElementState DataState;
+	public ElementState dataState
+	{
+		get => DataState;
+		set
+		{
+			DataState = value;
+			OnElementStateChanged?.Invoke(DataState);
+			//switch (DataState)
+			//{
+			//	case ElementState.inStack:
+			//		handicapInspect.active = false;
+			//		battleLineInspect.active = false;
+			//		break;
+			//	case ElementState.inHandicap:
+			//		handicapInspect.active = true;
+			//		battleLineInspect.active = false;
+			//		break;
+			//	case ElementState.inBattleLine:
+			//		handicapInspect.active = false;
+			//		battleLineInspect.active = true;
+			//		break;
+			//	case ElementState.destroyed:
+			//		handicapInspect.active = false;
+			//		battleLineInspect.active = false;
+			//		break;
+			//}
+		}
+	}
 	public int handicapIdx;
 
 	public string ID;
@@ -33,10 +68,8 @@ public class BattleElementController : MonoBehaviour,
 	public string category;
 	public string description;
 	public int cost;
-	public ElementState dataState;
 
-	public int preprocessed;//TODO 敌方特有，之后会改
-
+	[Header("Image")]
 	public Image CardImage;
 	public Image InspectorImage;
 
@@ -46,9 +79,11 @@ public class BattleElementController : MonoBehaviour,
 	public Image NameTag;
 	public Image costTag;
 
+	[Header("Text")]
 	public TMP_Text nameText;
 	public TMP_Text costText;
 
+	[Header("Inspector")]
 	public CanvasGroup InspectPanel;
 	public GameObject Inspector;
 
@@ -103,7 +138,11 @@ public class BattleElementController : MonoBehaviour,
 
 	public bool animeLock;
 
-	public void OnEnable()
+	[Header("Components")]
+	public TransformInspector handicapInspect;
+	public InspectPanelController battleLineInspect;
+
+	public void BasicInfoInit()
 	{
 		animeLock = false;
 		//输入偏移量
@@ -140,7 +179,7 @@ public class BattleElementController : MonoBehaviour,
 		this.category = categories;
 		this.description = description;
 
-		OnEnable();
+		BasicInfoInit();
 
 		nameText.text = name;
 		costText.text = cost.ToString();
@@ -148,11 +187,11 @@ public class BattleElementController : MonoBehaviour,
 
 		LoadCardResources(ID);
 
-		preprocessed = ownership;
-
 		battleFieldScale = transform.localScale;
 		handicapScale = 1.35f * battleFieldScale;
 		inspectScale = 1.2f * handicapScale;
+
+		handicapInspect.Init(battleFieldScale);
 	}
 
 
@@ -236,13 +275,6 @@ public class BattleElementController : MonoBehaviour,
 				break;
 		}
 	}
-
-
-
-
-
-
-
 
 
 	public virtual void OnDrag(PointerEventData eventData)

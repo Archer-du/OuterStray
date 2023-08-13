@@ -10,6 +10,7 @@ using SceneState;
 using TMPro;
 using UnityEngine.UI;
 using DG.Tweening;
+using DataCore.CultivateItems;
 
 public class GameManager : MonoBehaviour, IGameManagement
 {
@@ -35,23 +36,21 @@ public class GameManager : MonoBehaviour, IGameManagement
 
 	public static event System.Action<GameState> OnGameStateChanged;
 
-	private GameState privateGameState;
+	private GameState GameState;
 	public GameState gameState
 	{
-		get { return privateGameState; }
+		get { return GameState; }
 		set
 		{
-			privateGameState = value;
-			if (OnGameStateChanged != null)
-			{
-				OnGameStateChanged(privateGameState);
-			}
+			GameState = value;
+			OnGameStateChanged?.Invoke(GameState);
 		}
 	}
 
 	public ICultivationSystemInput cultivationSystem;
 	public ITacticalSystemInput tacticalSystem;
 	public IBattleSystemInput battleSystem;
+	public Pool pool;
 
 	public StartSceneManager startSceneManager;
 	public CultivateSceneManager cultivateSceneManager;
@@ -105,11 +104,15 @@ public class GameManager : MonoBehaviour, IGameManagement
 			// 等待一帧
 			yield return null;
 		}
-		//SceneLoader.DOFade(1f, 0.6f);
-		//SceneLoader.blocksRaycasts = false;
 		battleSceneManager = GameObject.Find("BattleSceneManager").GetComponent<BattleSceneManager>();
 		battleSystem.SetSceneController(battleSceneManager);
-		//DOFade
+
+		SceneLoader.blocksRaycasts = false;
+		SceneLoader.DOFade(0f, 0.4f)
+			.OnComplete(() =>
+			{
+				SceneLoader.GetComponentInChildren<TMP_Text>().gameObject.SetActive(false);
+			});
 		//TODO
 		//yield return new WaitForSeconds(0.6f);
 
@@ -126,9 +129,12 @@ public class GameManager : MonoBehaviour, IGameManagement
 
 		tacticalSceneManager = GameObject.Find("TacticalSceneManager").GetComponent<TacticalSceneManager>();
 		//EXTEND
+		pool = new Pool();
+		pool.LoadCardPool();
 
-		battleSystem = new BattleSystem(battleSceneManager);
-		tacticalSystem = new TacticalSystem(tacticalSceneManager, battleSystem as BattleSystem);
+		battleSystem = new BattleSystem(pool, battleSceneManager);
+		tacticalSystem = new TacticalSystem(pool, tacticalSceneManager, battleSystem as BattleSystem);
+		battleSystem.SetTacticalSystem(tacticalSystem);
 		cultivationSystem = new CultivationSystem(cultivateSceneManager, tacticalSystem as TacticalSystem);
 
 	}

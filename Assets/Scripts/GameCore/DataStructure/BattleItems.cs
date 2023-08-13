@@ -21,7 +21,20 @@ namespace DataCore.BattleItems
 	internal class BattleLine
 	{
 		//display
-		internal IBattleLineController controller;
+		private IBattleLineController Controller;
+		internal IBattleLineController controller
+		{
+			get => Controller;
+			set
+			{
+				if (value != null)
+				{
+					Controller = value;
+					Init();
+				}
+				else { Controller = null; }
+			}
+		}
 
 
 		//data
@@ -48,12 +61,14 @@ namespace DataCore.BattleItems
 
 
 
-		internal BattleLine(int maxElementNum)
+		internal BattleLine(int maxElementNum, IBattleLineController controller)
 		{
 			this.capacity = maxElementNum;
 			this.elementList = new List<UnitElement>(maxElementNum);
 			//默认敌方
 			this.ownerShip = 1;
+
+			this.controller = controller;
 		}
 		internal UnitElement this[int index]
 		{
@@ -132,7 +147,7 @@ namespace DataCore.BattleItems
 				//display
 				UnitElement unit = elementList[i];
 				controllerList.Add(unit.controller);
-				unit.UnitInit();
+				//unit.Init();
 			}
 			controller.UpdateElementLogicPosition(controllerList);
 		}
@@ -155,7 +170,20 @@ namespace DataCore.BattleItems
 
 	internal class RandomCardStack
 	{
-		public ICardStackController controller;
+		private ICardStackController Controller;
+		internal ICardStackController controller
+		{
+			get => Controller;
+			set
+			{
+				if (value != null)
+				{
+					Controller = value;
+					Init();
+				}
+				else { Controller = null; }
+			}
+		}
 
 		/// <summary>
 		/// 
@@ -178,8 +206,10 @@ namespace DataCore.BattleItems
 		/// </summary>
 		internal int count { get => stack.Count; }
 
+		internal int ownership;
 
-		internal RandomCardStack()
+
+		internal RandomCardStack(int ownership, ICardStackController controller)
 		{
 			stack = new List<BattleElement>(SystemConfig.stackCapacity);
 
@@ -192,6 +222,10 @@ namespace DataCore.BattleItems
 			artillerys = new List<ArtilleryElement>();
 			guardians = new List<GuardianElement>();
 			constructions = new List<ConstructionElement>();
+
+			this.ownership = ownership;
+
+			this.controller = controller;
 		}
 
 		/// <summary>
@@ -325,6 +359,7 @@ namespace DataCore.BattleItems
 			stack.Clear();
 			UnitIDDic.Clear();
 		}
+		
 
 
 
@@ -416,6 +451,11 @@ namespace DataCore.BattleItems
 			//}
 			//return null;
 		}
+
+		internal void Init()
+		{
+			controller.Init(ownership);
+		}
 	}
 
 
@@ -440,6 +480,11 @@ namespace DataCore.BattleItems
 			get => handicap[index];
 			set => handicap[index] = value;
 		}
+		/// <summary>
+		/// 初始化手牌
+		/// </summary>
+		/// <param name="list"></param>
+		/// <exception cref="Exception"></exception>
 		internal void Fill(List<BattleElement> list)
 		{
 			List<IBattleElementController> controllerList = new List<IBattleElementController>();
@@ -454,13 +499,13 @@ namespace DataCore.BattleItems
 					//display
 					UnitElement unit = list[i] as UnitElement;
 					controllerList.Add(unit.controller);
-					unit.UnitInit();
+					unit.Init();
 				}
 				else
 				{
 					CommandElement comm = list[i] as CommandElement;
 					controllerList.Add(comm.controller);
-					comm.CommandInit();
+					comm.Init();
 				}
 			}
 			if(controllerList.Count <= 0) { throw new Exception("list"); }
@@ -481,13 +526,13 @@ namespace DataCore.BattleItems
 			{
 				//display
 				UnitElement unit = element as UnitElement;
-				unit.UnitInit();
+				unit.Init();
 				controller.Push(unit.controller);
 			}
 			else
 			{
 				CommandElement comm = element as CommandElement;
-				comm.CommandInit();
+				comm.Init();
 				controller.Push(comm.controller);
 			}
 		}

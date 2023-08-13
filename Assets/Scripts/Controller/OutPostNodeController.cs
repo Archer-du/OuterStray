@@ -9,11 +9,11 @@ public class OutPostNodeController : NodeController
 	{
 		base.Init();
 		LoadResource();
-
-		exitButton = transform.Find("UI/Panels/OutPostPanel/Mask/PanelComponent/ExitButton").GetComponent<Button>();
-		exitButton.onClick.AddListener(tacticalManager.CampaignCompleted);
-
 		panelDisplay.Init("OutPost");
+
+		exitButton = panelDisplay.exitButton;
+
+		exitButton.onClick.AddListener(tacticalManager.CampaignCompleted);
 	}
 	public override void LoadResource()
 	{

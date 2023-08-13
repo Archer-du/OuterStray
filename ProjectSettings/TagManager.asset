@@ -53,8 +53,8 @@ TagManager:
   - name: TacticalUI
     uniqueID: 2868453369
     locked: 0
-  - name: Loader
-    uniqueID: 2898645981
+  - name: TacticalPanels
+    uniqueID: 799262941
     locked: 0
   - name: BattleGround
     uniqueID: 2919876391
@@ -73,4 +73,7 @@ TagManager:
     locked: 0
   - name: BattleUI
     uniqueID: 2994034489
+    locked: 0
+  - name: Loader
+    uniqueID: 2898645981
     locked: 0

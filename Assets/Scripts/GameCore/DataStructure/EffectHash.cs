@@ -348,9 +348,9 @@ namespace EventEffectModels
 				case 0:
 					if (system.battleLines[system.supportLines[this.source.ownership]].Receiveable())
 					{
-						unit.UnitInit();
+						unit.Init();
 						system.stacks[this.source.ownership].PopElementByStackIdx(unit.stackIdx);
-						unit.Deploy(system, system.battleLines[system.supportLines[this.source.ownership]], 0);
+						unit.Deploy(system.battleLines[system.supportLines[this.source.ownership]], 0);
 					}
 					break;
 				//1：当前战线
@@ -358,17 +358,17 @@ namespace EventEffectModels
 					UnitElement element = this.source as UnitElement;
 					if (element.battleLine.Receiveable())
 					{
-						unit.UnitInit();
+						unit.Init();
 						system.stacks[this.source.ownership].PopElementByStackIdx(unit.stackIdx);
-						unit.Deploy(system, element.battleLine, 0);
+						unit.Deploy(element.battleLine, 0);
 					}
 					break;
 				case 2:
 					if (system.battleLines[system.frontLines[this.source.ownership]].Receiveable())
 					{
-						unit.UnitInit();
+						unit.Init();
 						system.stacks[this.source.ownership].PopElementByStackIdx(unit.stackIdx);
-						unit.Deploy(system, system.battleLines[system.frontLines[this.source.ownership]], 0);
+						unit.Deploy(system.battleLines[system.frontLines[this.source.ownership]], 0);
 					}
 					break;
 			}
@@ -462,38 +462,37 @@ namespace EventEffectModels
 
 
 
-		private void SummonToPosition(UnitElement element, BattleSystem system, int position, UnitElement unit)
+		private UnitElement SummonToPosition(UnitElement element, BattleSystem system, int position, UnitCard card)
 		{
+			UnitElement unit = new UnitElement(card, system,
+							system.controller.InstantiateUnitInStack(element.ownership));
+
 			switch (position)
 			{
 				//0：支援战线
 				case 0:
 					if (system.battleLines[system.supportLines[element.ownership]].Receiveable())
 					{
-						unit.controller = system.controller.InstantiateUnitInStack(element.ownership);
-						unit.UnitInit();
-						unit.Deploy(system, system.battleLines[system.supportLines[element.ownership]], 0);
+						unit.Deploy(system.battleLines[system.supportLines[element.ownership]], 0);
 					}
 					break;
 				//1：当前战线
 				case 1:
 					if (element.battleLine.Receiveable())
 					{
-						unit.controller = system.controller.InstantiateUnitInStack(element.ownership);
-						unit.UnitInit();
-						unit.Deploy(system, element.battleLine, 0);
+						unit.Deploy(element.battleLine, 0);
 					}
 					break;
 				//2: 前线
 				case 2:
 					if (system.battleLines[system.frontLines[element.ownership]].Receiveable())
 					{
-						unit.controller = system.controller.InstantiateUnitInStack(element.ownership);
-						unit.UnitInit();
-						unit.Deploy(system, system.battleLines[system.frontLines[element.ownership]], 0);
+						unit.Deploy(system.battleLines[system.frontLines[element.ownership]], 0);
 					}
 					break;
 			}
+
+			return unit;
 		}
 		/// <summary>
 		/// 根据参数在指定位置召唤指定类型的Token(事件必须有源)
@@ -536,10 +535,7 @@ namespace EventEffectModels
 					default:
 						break;
 				}
-				UnitElement unit = new UnitElement(card, system);
-
-
-				SummonToPosition(element, system, position, unit);
+				SummonToPosition(element, system, position, card);
 			}
 		}
 
@@ -853,7 +849,8 @@ namespace EventEffectModels
 					default:
 						break;
 				}
-				UnitElement unit = new UnitElement(card, system);
+				UnitElement unit = new UnitElement(card, system,
+					system.stacks[1].controller.InstantiateUnitElementInBattle());
 
 				if (system.handicaps[BattleSystem.TURN].count < system.handicaps[BattleSystem.TURN].capacity)
 				{
@@ -900,13 +897,13 @@ namespace EventEffectModels
 			UnitCard card = null;
 			card = system.pool.GetCardByID("mush_00") as UnitCard;
 
-			UnitElement unit = new UnitElement(card, system);
+			UnitElement unit = SummonToPosition(element, system, 2, card);
 
 			unit.dynAttackWriter = system.handicaps[element.ownership].count > 0 ? system.handicaps[element.ownership].count : 1;
 			unit.maxHealthWriter = system.handicaps[element.ownership].count > 0 ? system.handicaps[element.ownership].count : 1;
-			unit.UpdateHealth();
 
-			SummonToPosition(element, system, 2, unit);
+			unit.UpdateInfo();
+			unit.UpdateHealth();
 		}
 		internal void Comm_Mush_18(BattleElement source, BattleSystem system)
 		{
@@ -938,10 +935,9 @@ namespace EventEffectModels
 				int resIdx = publisher.inlineIdx;
 				publisher.Terminate("immediate");
 				UnitCard card = system.pool.GetCardByID("mush_99_00") as UnitCard;
-				UnitElement unit = new GuardianElement(card, system);
-				unit.controller = system.controller.InstantiateUnitInBattleField(element.ownership, line.index, resIdx);
-				unit.UnitInit();
-				unit.Deploy(system, line, resIdx);
+				UnitElement unit = new GuardianElement(card, system,
+					system.controller.InstantiateUnitInBattleField(element.ownership, line.index, resIdx));
+				unit.Deploy(line, resIdx);
 			}
 		}
 

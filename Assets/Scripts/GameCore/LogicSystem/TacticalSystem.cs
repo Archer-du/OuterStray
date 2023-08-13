@@ -51,8 +51,10 @@ namespace LogicCore
 		//data access (test)
 		internal Pool pool;
 
-		public TacticalSystem(ITacticalSceneController controller, BattleSystem system)
+		public TacticalSystem(Pool pool, ITacticalSceneController controller, BattleSystem system)
 		{
+			this.pool = pool;
+
 			//display
 			this.controller = controller;
 			
@@ -66,14 +68,13 @@ namespace LogicCore
 			battleNodeNum = 5;
 			terrains = new List<Terrain>(battleNodeNum);
 
-			//TODO remove
-			pool = new Pool();
-			pool.LoadCardPool();
+			//TODO
+			baseHealth = 30;
+			gasMineToken = 30;
 
-			playerDeck = new Deck(system);
+			playerDeck = new Deck(system, this);
 			//TODO remove
 			playerDeck.LoadDeckByPath("Assets\\Config\\HumanDeckTest.csv");
-
 
 			//TODO
 			controller.TerrrainsInitialize(this, battleNodeNum);
@@ -158,14 +159,14 @@ namespace LogicCore
 				controller.EnterNextTerrain();
 				currentTerrain.controller.GenerateLineNetFromSource();
 			}
-			controller.CampaignCompleted();
+			//controller.CampaignCompleted();
 		}
 
 		public void CampaignFailed()
 		{
 			isInNode = false;
 			//向上通知
-			controller.CampaignFailed();
+			//controller.CampaignFailed();
 		}
 
 		public void Exit()

@@ -2316,11 +2316,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2380469442781658781}
-  - component: {fileID: -6681870225697412084}
   - component: {fileID: 3680882019810687554}
   - component: {fileID: 483946251807401289}
   - component: {fileID: 906330341725927732}
   - component: {fileID: 8044690023980399780}
+  - component: {fileID: -6681870225697412084}
+  - component: {fileID: 4267143697029492169}
+  - component: {fileID: 4717429504215175894}
   m_Layer: 0
   m_Name: UnitElement
   m_TagString: Untagged
@@ -2364,106 +2366,6 @@ RectTransform:
   m_AnchoredPosition: {x: -180, y: -545}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &-6681870225697412084
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5613162459952636112}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1aceaa0220f961a42adca75c75c14ae2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  battleSceneManager: {fileID: 0}
-  stack: {fileID: 0}
-  canvas: {fileID: 0}
-  handicap: {fileID: 0}
-  handicapIdx: 0
-  ID: 
-  ownership: 0
-  nameContent: 
-  category: 
-  description: 
-  cost: 0
-  dataState: 0
-  preprocessed: 0
-  CardImage: {fileID: 3209482883967444717}
-  InspectorImage: {fileID: 8845388299200831553}
-  elementGround: {fileID: 2329766583533950487}
-  elementShell: {fileID: 1966873251758401995}
-  elementFrame: {fileID: 2713689815567481982}
-  NameTag: {fileID: 8028923749651894899}
-  costTag: {fileID: 2160217349511680626}
-  nameText: {fileID: 2424463536136595778}
-  costText: {fileID: 7144249241073310118}
-  InspectPanel: {fileID: 1081078476183036799}
-  Inspector: {fileID: 6160782109465476777}
-  InspectorGround: {fileID: 4449031424668006893}
-  InspectorShell: {fileID: 4622662147442984837}
-  InspectorFrame: {fileID: 2171970066447964023}
-  InspectorCategoryIcon: {fileID: 4673946396871016430}
-  InspectorNameTag: {fileID: 4141254770251943601}
-  InspectorCostTag: {fileID: 7954299554913736889}
-  InspectorName: {fileID: 4557809007570126928}
-  InspectorCost: {fileID: 1052886314582921976}
-  InspectorAttack: {fileID: 2001379295579835549}
-  InspectorMaxHealth: {fileID: 8572360533996036972}
-  InspectorAttackCounter: {fileID: 3874294150110935355}
-  InspectorDescription: {fileID: 9168383860328314555}
-  counterIcon: {fileID: 8300026389707398809}
-  InspectComponent: {fileID: 7394300940719062393}
-  componentFrame: {fileID: 2786778859647393327}
-  componentCategoryIcon: {fileID: 163612354569155639}
-  componentDescriptionText: {fileID: 8775440569564989518}
-  componentPosition: {x: 0, y: 0, z: 0}
-  handicapScale: {x: 0, y: 0, z: 0}
-  inspectScale: {x: 0, y: 0, z: 0}
-  battleFieldScale: {x: 0, y: 0, z: 0}
-  battleFieldPosition: {x: 0, y: 0, z: 0}
-  targetTextScale: {x: 0, y: 0, z: 0}
-  originTextScale: {x: 0, y: 0, z: 0}
-  counterScaleOrigin: {x: 0, y: 0, z: 0}
-  counterScaleEnlarge: {x: 0, y: 0, z: 0}
-  counterfontSizeOrigin: 0
-  counterfontSizeEnlarge: 0
-  normalFontSizeOrigin: 0
-  normalFontSizeEnlarge: 0
-  scaleTime: 0.3
-  moveTime: 0.2
-  upperOrder: 100
-  lowerOrder: 0
-  inputOffset: {x: 0, y: 0}
-  animeLock: 0
-  attackText: {fileID: 332679753968886912}
-  healthText: {fileID: 4824679670394117744}
-  attackCounterText: {fileID: 90673242082958544}
-  descriptionText: {fileID: 8775440569564989518}
-  operateMask: {fileID: 2259931645454541102}
-  Arrows: {fileID: 1051858507224367915}
-  arrowsGroup: {fileID: 0}
-  leftArrow: {fileID: 4374081778183381601}
-  rightArrow: {fileID: 4604591679549227896}
-  midArrow: {fileID: 8715966167778204923}
-  leftArrowMocked: {fileID: 3258223755577703646}
-  rightArrowMocked: {fileID: 2746271527344825118}
-  midArrowMocked: {fileID: 3486708091901537818}
-  battleLine: {fileID: 0}
-  resIdx: 0
-  target: {fileID: 0}
-  attackBuff: {fileID: 3249559099635546364}
-  maxHealthBuff: {fileID: 1098607654159448757}
-  attackPoint: 0
-  healthPoint: 0
-  maxHealthPoint: 0
-  attackCounter: 0
-  operateCounter: 0
-  moveRange: 0
-  logicPosition: {x: 0, y: 0, z: 0}
-  duration: 0.2
-  attackOrder: 0
-  oriOrder: -100
 --- !u!222 &3680882019810687554
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2534,7 +2436,139 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_PresetInfoIsWorld: 0
+--- !u!114 &-6681870225697412084
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5613162459952636112}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1aceaa0220f961a42adca75c75c14ae2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  battleSceneManager: {fileID: 0}
+  stack: {fileID: 0}
+  canvas: {fileID: 0}
+  handicap: {fileID: 0}
+  handicapIdx: 0
+  ID: 
+  ownership: 0
+  nameContent: 
+  category: 
+  description: 
+  cost: 0
+  CardImage: {fileID: 3209482883967444717}
+  InspectorImage: {fileID: 8845388299200831553}
+  elementGround: {fileID: 2329766583533950487}
+  elementShell: {fileID: 1966873251758401995}
+  elementFrame: {fileID: 2713689815567481982}
+  NameTag: {fileID: 8028923749651894899}
+  costTag: {fileID: 2160217349511680626}
+  nameText: {fileID: 2424463536136595778}
+  costText: {fileID: 7144249241073310118}
+  InspectPanel: {fileID: 1081078476183036799}
+  Inspector: {fileID: 6160782109465476777}
+  InspectorGround: {fileID: 4449031424668006893}
+  InspectorShell: {fileID: 4622662147442984837}
+  InspectorFrame: {fileID: 2171970066447964023}
+  InspectorCategoryIcon: {fileID: 4673946396871016430}
+  InspectorNameTag: {fileID: 4141254770251943601}
+  InspectorCostTag: {fileID: 7954299554913736889}
+  InspectorName: {fileID: 4557809007570126928}
+  InspectorCost: {fileID: 1052886314582921976}
+  InspectorAttack: {fileID: 2001379295579835549}
+  InspectorMaxHealth: {fileID: 8572360533996036972}
+  InspectorAttackCounter: {fileID: 3874294150110935355}
+  InspectorDescription: {fileID: 9168383860328314555}
+  counterIcon: {fileID: 8300026389707398809}
+  InspectComponent: {fileID: 7394300940719062393}
+  componentFrame: {fileID: 2786778859647393327}
+  componentCategoryIcon: {fileID: 163612354569155639}
+  componentDescriptionText: {fileID: 8775440569564989518}
+  componentPosition: {x: 0, y: 0, z: 0}
+  handicapScale: {x: 0, y: 0, z: 0}
+  inspectScale: {x: 0, y: 0, z: 0}
+  battleFieldScale: {x: 0, y: 0, z: 0}
+  battleFieldPosition: {x: 0, y: 0, z: 0}
+  targetTextScale: {x: 0, y: 0, z: 0}
+  originTextScale: {x: 0, y: 0, z: 0}
+  counterScaleOrigin: {x: 0, y: 0, z: 0}
+  counterScaleEnlarge: {x: 0, y: 0, z: 0}
+  counterfontSizeOrigin: 0
+  counterfontSizeEnlarge: 0
+  normalFontSizeOrigin: 0
+  normalFontSizeEnlarge: 0
+  scaleTime: 0.3
+  moveTime: 0.2
+  upperOrder: 100
+  lowerOrder: 0
+  inputOffset: {x: 0, y: 0}
+  animeLock: 0
+  handicapInspect: {fileID: 0}
+  attackText: {fileID: 332679753968886912}
+  healthText: {fileID: 4824679670394117744}
+  attackCounterText: {fileID: 90673242082958544}
+  descriptionText: {fileID: 8775440569564989518}
+  operateMask: {fileID: 2259931645454541102}
+  Arrows: {fileID: 1051858507224367915}
+  arrowsGroup: {fileID: 0}
+  leftArrow: {fileID: 4374081778183381601}
+  rightArrow: {fileID: 4604591679549227896}
+  midArrow: {fileID: 8715966167778204923}
+  leftArrowMocked: {fileID: 3258223755577703646}
+  rightArrowMocked: {fileID: 2746271527344825118}
+  midArrowMocked: {fileID: 3486708091901537818}
+  battleLine: {fileID: 0}
+  resIdx: 0
+  target: {fileID: 0}
+  attackBuff: {fileID: 3249559099635546364}
+  maxHealthBuff: {fileID: 1098607654159448757}
+  attackPoint: 0
+  healthPoint: 0
+  maxHealthPoint: 0
+  attackCounter: 0
+  operateCounter: 0
+  moveRange: 0
+  logicPosition: {x: 0, y: 0, z: 0}
+  duration: 0.2
+  attackOrder: 0
+  oriOrder: -100
+--- !u!114 &4267143697029492169
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5613162459952636112}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83fdc1a816b4da54ba087ee1a59de6d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  active: 0
+  timerValve: 0.6
+  duration: 0.2
+  displayOffset: {x: 400, y: 0, z: 0}
+  inspectPanel: {fileID: 1081078476183036799}
+--- !u!114 &4717429504215175894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5613162459952636112}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 815ee7d460c77954f80337857a7bfd51, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inspectee: {fileID: 2380469442781658781}
+  inspectFactor: 0
+  offset: {x: 0, y: 0, z: 0}
+  duration: 0
 --- !u!1 &6061913691003278847
 GameObject:
   m_ObjectHideFlags: 0
@@ -2646,7 +2680,7 @@ Canvas:
   m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
-  m_SortingLayerID: -1426513927
+  m_SortingLayerID: -1300932807
   m_SortingOrder: 1000
   m_TargetDisplay: 0
 --- !u!1 &6086894628411140953

@@ -13,6 +13,7 @@ namespace DataCore.Cards
 	/// <summary> 
 	/// static information about cards
 	/// </summary>
+	[Serializable]
 	internal abstract class Card
 	{
 		internal string backendID { get; set; }
@@ -54,6 +55,7 @@ namespace DataCore.Cards
 	/// <summary>
 	/// Card class: Unit
 	/// </summary>
+	[Serializable]
 	internal sealed class UnitCard : Card
 	{
 
@@ -127,6 +129,7 @@ namespace DataCore.Cards
 	/// <summary>
 	/// Card class: Command
 	/// </summary>
+	[Serializable]
 	internal sealed class CommandCard : Card
 	{
 		internal string type;

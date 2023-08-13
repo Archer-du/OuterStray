@@ -8,6 +8,11 @@ public class PromoteNodeController : NodeController
 	{
 		base.Init();
 		LoadResource();
+		panelDisplay.Init("Promote");
+
+		exitButton = panelDisplay.exitButton;
+
+		exitButton.onClick.AddListener(tacticalManager.CampaignCompleted);
 	}
 	public override void LoadResource()
 	{

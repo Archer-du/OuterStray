@@ -58,22 +58,24 @@
     <Analyzer Include="D:\Unity3D\2022.3.4f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\Controller\ToolKit\EnlargedInspect.cs" />
     <Compile Include="Assets\Scripts\Controller\UnitElementController.cs" />
     <Compile Include="Assets\Scripts\Controller\ToolKit\TurnMappedDialogger.cs" />
     <Compile Include="Assets\Scripts\Controller\CommandElementController.cs" />
     <Compile Include="Assets\Scripts\Controller\SupplyNodeController.cs" />
+    <Compile Include="Assets\Scripts\Controller\ToolKit\InputMask.cs" />
     <Compile Include="Assets\Scripts\Controller\ToolKit\InspectPanelController.cs" />
     <Compile Include="Assets\Scripts\Controller\BattleElementController.cs" />
     <Compile Include="Assets\Scripts\SceneManager\StartSceneManager.cs" />
     <Compile Include="Assets\Scripts\Controller\BattleNodeController.cs" />
     <Compile Include="Assets\Scripts\Controller\NodeController.cs" />
     <Compile Include="Assets\Scripts\SceneManager\CultivateSceneManager.cs" />
+    <Compile Include="Assets\Scripts\Controller\ToolKit\PointerDragInput.cs" />
     <Compile Include="Assets\Scripts\Controller\LegacyNodeController.cs" />
     <Compile Include="Assets\Scripts\Controller\AIBehavior.cs" />
     <Compile Include="Assets\CustomRenderPassFeature.cs" />
     <Compile Include="Assets\Scripts\Controller\DepartmentController.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
+    <Compile Include="Assets\Scripts\Controller\ToolKit\TransformInspector.cs" />
     <Compile Include="Assets\Scripts\Controller\SourceNodeController.cs" />
     <Compile Include="Assets\Scripts\Controller\MedicalNodeController.cs" />
     <Compile Include="Assets\Scripts\SceneManager\BattleSceneManager.cs" />

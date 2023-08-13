@@ -55,8 +55,8 @@ internal class DeserializeMethods
 		}
 	}
 
-	internal static void EffectsDeserialize(out BattleElement element, string effects)
-	{
+	//internal static void EffectsDeserialize(out BattleElement element, string effects)
+	//{
 
-	}
+	//}
 }

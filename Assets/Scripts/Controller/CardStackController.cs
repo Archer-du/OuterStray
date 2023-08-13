@@ -16,11 +16,9 @@ public class CardStackController : MonoBehaviour,
 
 
 
-	public bool awaked = false;
-	public void Init()
+	public void Init(int ownership)
 	{
-		ownership = 1 - transform.GetSiblingIndex();
-		awaked = true;
+		this.ownership = ownership;
 	}
 	/// <summary>
 	/// 重载的方法，用于初始化Fill
@@ -29,8 +27,6 @@ public class CardStackController : MonoBehaviour,
 	/// <returns></returns>
 	public IUnitElementController InstantiateUnitElementInBattle()
 	{
-		if (awaked == false) Init();
-
 		Transform stacks = GameObject.Find("UI/Stacks").transform;
 		Quaternion initRotation = Quaternion.Euler(new Vector3(0, 0, -90));
 
@@ -43,8 +39,6 @@ public class CardStackController : MonoBehaviour,
 	}
 	public ICommandElementController InstantiateCommandElementInBattle()
 	{
-		if (awaked == false) Init();
-
 		Transform stacks = GameObject.Find("UI/Stacks").transform;
 		Quaternion initRotation = Quaternion.Euler(new Vector3(0, 0, -90));
 
@@ -55,19 +49,4 @@ public class CardStackController : MonoBehaviour,
 
 		return comm.GetComponent<CommandElementController>();
 	}
-	/// <summary>
-	/// 用于pop
-	/// </summary>
-	/// <returns></returns>
-	/// <exception cref="System.NotImplementedException"></exception>
-	public IUnitElementController InstantiateUnitElement()
-	{
-		throw new System.NotImplementedException();
-	}
-
-	public ICommandElementController InstantiateCommandElement()
-	{
-		throw new System.NotImplementedException();
-	}
-
 }

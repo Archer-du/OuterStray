@@ -8,7 +8,8 @@ using UnityEngine.EventSystems;
 public class InspectPanelController : MonoBehaviour,
     IPointerEnterHandler, IPointerExitHandler
 {
-	public float timeValve = 0.6f;
+	public bool active;
+	public float timerValve = 0.6f;
 	public float duration = 0.2f;
 	public Vector3 displayOffset;
 	public CanvasGroup inspectPanel;
@@ -17,7 +18,10 @@ public class InspectPanelController : MonoBehaviour,
 
 	public void OnPointerEnter(PointerEventData eventData)
 	{
-		timer = timeValve;
+		if(active)
+		{
+			timer = timerValve;
+		}
 	}
 
 	public void OnPointerExit(PointerEventData eventData)
@@ -28,6 +32,7 @@ public class InspectPanelController : MonoBehaviour,
 
 	void Start()
 	{
+		active = false;
 		inspectPanel.alpha = 0f;
 	}
     void Update()

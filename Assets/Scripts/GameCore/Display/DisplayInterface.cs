@@ -117,10 +117,9 @@ namespace DisplayInterface
 
 	public interface ICardStackController
 	{
+		public void Init(int ownership);
 		public IUnitElementController InstantiateUnitElementInBattle();
 		public ICommandElementController InstantiateCommandElementInBattle();
-		public IUnitElementController InstantiateUnitElement();
-		public ICommandElementController InstantiateCommandElement();
 	}
 
 
@@ -142,7 +141,7 @@ namespace DisplayInterface
 
 	public interface IBattleElementController
 	{
-
+		public void Init(string ID, int ownership, string name, string categories, int cost, string description);
 	}
 	public interface IUnitElementController : IBattleElementController
 	{
@@ -151,6 +150,7 @@ namespace DisplayInterface
 		public void UpdateInfo(int cost, int attackPoint, int maxHealthPoint, int attackCounter, int operateCounter,
 			ElementState state, int moveRange, bool aura, int attackBuff, int maxHealthBuff);
 
+		public void UpdateState(ElementState state);
 		public void UpdateHealth(int dynHealth);
 
 		public void UpdateTarget(IUnitElementController target, int targetIdx, bool mocking, bool cleave);

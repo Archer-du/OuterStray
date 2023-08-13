@@ -507,7 +507,10 @@ public class UnitElementController : BattleElementController,
 	{
 
 	}
-
+	public void UpdateState(ElementState state)
+	{
+		dataState = state;
+	}
 
 
 
@@ -653,5 +656,6 @@ public class UnitElementController : BattleElementController,
 			return;
 		}
 	}
+
 
 }

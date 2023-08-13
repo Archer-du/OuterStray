@@ -59,12 +59,13 @@ public class BattleSceneManager : MonoBehaviour,
 	/// <summary>
 	/// dialog trigger & counter
 	/// </summary>
+	private int TurnNum;
 	public int turnNum
 	{
-		get => turnNum;
+		get => TurnNum;
 		set
 		{
-			turnNum = value;
+			TurnNum = value;
 			dialogController.UpdateDialog();
 		}
 	}
@@ -104,8 +105,6 @@ public class BattleSceneManager : MonoBehaviour,
 		DontDestroyOnLoad(gameObject);
 
 		battleSystem = handler;
-		//TODO trigger
-		turnNum = 0;
 
 		//TODO config
 		this.fieldCapacity = fieldCapacity;
@@ -125,6 +124,8 @@ public class BattleSceneManager : MonoBehaviour,
 		fieldHeight = GameObject.Find("BattleField").GetComponent<RectTransform>().rect.height;
 		
 		dialogController = GetComponent<TurnMappedDialogger>();
+		//TODO trigger
+		turnNum = 0;
 		behavior = GetComponent<AIBehavior>();
 
         for (int i = 0; i < 5; i++)
@@ -140,33 +141,7 @@ public class BattleSceneManager : MonoBehaviour,
 	}
 
 
-   // private void DisplayDialog()
-   // {
-   //     if (turnNum % 2 == 1)
-   //     {
-   //         dialogs = dialogReader.ReadLine();
-			//if (dialogs == null) return;
-   //         dialogFrame.SetActive(true);
-			//DOTween.To(
-			//	() => "",
-			//	value => dialogText.text = value, // setter设置costText的内容
-			//	dialogs,
-			//	0.8f
-			//).SetEase(Ease.Linear);
-   //     }
-   // }
 
-   // private void UpdateDialog()
-   // {
-   //     if (turnNum % 2 == 1)
-   //     {
-   //         DisplayDialog();
-   //     }
-   //     if (turnNum % 2 == 0)
-   //     {
-   //         dialogFrame.SetActive(false);
-   //     }
-   // }
 
     /// <summary>
     /// 

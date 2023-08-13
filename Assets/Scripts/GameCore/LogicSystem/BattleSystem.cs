@@ -32,7 +32,7 @@ namespace LogicCore
 		public IBattleSceneController controller;
 		//display-----------------------------------
 
-		internal TacticalSystem system;
+		internal TacticalSystem tacticalSystem;
 
 		//global
 		/// <summary>
@@ -99,9 +99,9 @@ namespace LogicCore
 
 		internal Pool pool;
 
-
-		public BattleSystem(IBattleSceneController bsdspl)
+		public BattleSystem(Pool pool, IBattleSceneController bsdspl)
 		{
+			this.pool = pool;
 			//系统层渲染接口
 			controller = bsdspl;
 			//TODO 之后由战术层参数化
@@ -109,37 +109,20 @@ namespace LogicCore
 
 			bases = new UnitElement[2];
 
-
-			//test segment TODO------
-			pool = new Pool();
-			pool.LoadCardPool();
 			//-----------------------
 
 			deployQueue = new List<UnitElement>();
 			UnitIDDic = new Dictionary<string, List<UnitElement>>();
 
-		}
-		public BattleSystem()
-		{
-			eventTable = new EventTable[2] { new EventTable(), new EventTable() };
-
-			bases = new UnitElement[2];
-
-			//test segment TODO------
-			pool = new Pool();
-			pool.LoadCardPool();
-			//-----------------------
-
-			deployQueue = new List<UnitElement>();
-			UnitIDDic = new Dictionary<string, List<UnitElement>>();
 		}
 		public void SetSceneController(IBattleSceneController bsdspl)
 		{
 			controller = bsdspl;
-			controller.FieldInitialize(this, linesCapacity);
 		}
-
-
+		public void SetTacticalSystem(ITacticalSystemInput tacticalSystem)
+		{
+			this.tacticalSystem = tacticalSystem as TacticalSystem;
+		}
 
 
 		//TODO
@@ -148,18 +131,23 @@ namespace LogicCore
 		/// </summary>
 		/// <param name="deck"></param>
 		/// <param name="enemyDeck"></param>
-		internal void BuildBattleField(Deck deck, Deck enemyDeck, int fieldCapacity, int initialTurn, int initialHumanEnergy, int initialPlantEnergy)
+		internal void BuildBattleField(Deck deck, Deck enemyDeck, int fieldCapacity, int[] battleLinesCapacity,
+			int initialTurn, int initialHumanEnergy, int initialPlantEnergy, int initialHumanHandicaps, int initialPlantHandicaps,
+			List<BattleNode.FieldPreset> fieldPresets)
 		{
 			stacks = new RandomCardStack[2];
 			handicaps = new RedemptionZone[2];
 
+			linesCapacity = fieldCapacity;
+
+			controller.FieldInitialize(this, linesCapacity);
 
 			//数据层初始化
 			TURN = initialTurn;
 			controller.UpdateTurn(TURN);
 
-			linesCapacity = fieldCapacity;
-			if(fieldCapacity != 4)
+
+			if (fieldCapacity != 4)
 			{
 				throw new InvalidOperationException("暂不支持除4之外的战场容量");
 			}
@@ -172,21 +160,21 @@ namespace LogicCore
 
 			frontLines = new int[2] { 0, 1 };
 
+			BuildBattleLine(fieldCapacity, battleLinesCapacity);
+
+			BuildHumanStack(deck);
+			BuildPlantStack(enemyDeck);
+
+			InitializeHandicaps(initialHumanHandicaps, initialPlantHandicaps);
+
+			FieldPreset(fieldPresets);
+
 			//渲染控件初始化
 			controller.UpdateEnergy(0, energy[0]);
 			controller.UpdateEnergy(1, energy[1]);
 
 			controller.UpdateEnergySupply(0, energySupply[0]);
 			controller.UpdateEnergySupply(1, energySupply[1]);
-
-			BuildBattleLine(fieldCapacity);
-
-			BuildHumanStack(deck);
-			BuildPlantStack(enemyDeck);
-
-			InitializeHandicaps();
-
-			TutorialInit();
 
 			energy[TURN] += energySupply[TURN];
 			controller.UpdateEnergy(energy[TURN]);
@@ -199,46 +187,21 @@ namespace LogicCore
 		/// <summary>
 		/// 构建战线
 		/// </summary>
-		private void BuildBattleLine(int capacity)
+		private void BuildBattleLine(int capacity, int[] battleLinesCapacity)
 		{
 			linesCapacity = capacity;
+			if(battleLinesCapacity.Length != linesCapacity)
+			{
+				throw new InvalidOperationException("linesCapacity inconsistance");
+			}
 
 			for (int i = 0; i < linesCapacity; i++)
 			{
-				Random random = new Random();
-				if (i == supportLines[TURN])
-				{
-					battleLines.Add(new BattleLine(5));//TODO config
-					battleLines[i].ownerShip = 0;
+				battleLines.Add(new BattleLine(battleLinesCapacity[i], 
+					controller.InstantiateBattleLine(i, battleLinesCapacity[i])));
 
-					battleLines[i].controller = controller.InstantiateBattleLine(i, 5);
-				}
-				else if (i == supportLines[(TURN + 1)%2])
-				{
-					battleLines.Add(new BattleLine(5));
-					battleLines[i].controller = controller.InstantiateBattleLine(i, 5);
-				}
-				else
-				{
-					//TODO temp
-					switch (i)
-					{
-						case 1: 
-							battleLines.Add(new BattleLine(4));
-							battleLines[i].controller = controller.InstantiateBattleLine(i, 4);
-							break;
-						case 2:
-							battleLines.Add(new BattleLine(3));
-							battleLines[i].controller = controller.InstantiateBattleLine(i, 3);
-							break;
-					}
-					//int len = random.Next(2, 7);
-					//battleLines.Add(new BattleLine(len));
-					//battleLines[i].controller = controller.InstantiateBattleLine(i,	len);
-				}
 				battleLines[i].index = i;
 
-				battleLines[i].Init();
 			}
 			//初始只有自己的支援战线归属权为自己
 		}
@@ -251,8 +214,7 @@ namespace LogicCore
 
 		private void BuildHumanStack(Deck deck)
 		{
-			stacks[0] = new RandomCardStack();
-			stacks[0].controller = controller.InstantiateCardStack(0);
+			stacks[0] = new RandomCardStack(0, controller.InstantiateCardStack(0));
 
 			stacks[0].Fill(deck);
 		}
@@ -266,8 +228,7 @@ namespace LogicCore
 		//TODO 导入方式与human不同
 		private void BuildPlantStack(Deck deck)
 		{
-			stacks[1] = new RandomCardStack();
-			stacks[1].controller = controller.InstantiateCardStack(1);
+			stacks[1] = new RandomCardStack(1, controller.InstantiateCardStack(1));
 
 			stacks[1].Fill(deck);
 		}
@@ -278,7 +239,7 @@ namespace LogicCore
 
 
 
-		private void InitializeHandicaps()
+		private void InitializeHandicaps(int initialHumanHandicaps, int initialPlantHandicaps)
 		{
 			handicaps[0] = new RedemptionZone();
 			handicaps[1] = new RedemptionZone();
@@ -292,13 +253,13 @@ namespace LogicCore
 			list[0] = new List<BattleElement>();
 			list[1] = new List<BattleElement>();
 			//初始化手牌
-			for (int i = 0; i < 3; i++)
-			{
-				list[1].Add(stacks[1].Pop());
-			}
-			for(int i = 0; i < 1; i++)
+			for(int i = 0; i < initialHumanHandicaps; i++)
 			{
 				list[0].Add(stacks[0].Pop());
+			}
+			for (int i = 0; i < initialPlantHandicaps; i++)
+			{
+				list[1].Add(stacks[1].Pop());
 			}
 			handicaps[0].Fill(list[0]);
 			handicaps[1].Fill(list[1]);
@@ -316,59 +277,96 @@ namespace LogicCore
 
 		internal void FieldPreset(List<BattleNode.FieldPreset> fieldPresets)
 		{
-			TutorialInit();
+			foreach(BattleNode.FieldPreset fieldPreset in fieldPresets)
+			{
+				UnitCard card = pool.GetCardByID(fieldPreset.cardPreset.ID) as UnitCard;
+				UnitElement element = null;
+				int lineIdx = card.ownership == 0 ? fieldPreset.position : linesCapacity - fieldPreset.position - 1;
+				switch (card.category)
+				{
+					case "LightArmor":
+						element = new LightArmorElement(card, this,
+							controller.InstantiateUnitInBattleField(0, lineIdx, 0));
+						break;
+					case "Motorized":
+						element = new MotorizedElement(card, this,
+							controller.InstantiateUnitInBattleField(0, lineIdx, 0));
+						break;
+					case "Artillery":
+						element = new ArtilleryElement(card, this,
+							controller.InstantiateUnitInBattleField(0, lineIdx, 0));
+						break;
+					case "Guardian":
+						element = new GuardianElement(card, this,
+							controller.InstantiateUnitInBattleField(0, lineIdx, 0));
+						break;
+					case "Construction":
+						element = new ConstructionElement(card, this,
+							controller.InstantiateUnitInBattleField(0, lineIdx, 0));
+						break;
+				}
+				if (fieldPreset.cardPreset.boss)
+				{
+					bases[1] = element;
+				}
+				element.dynHealth = fieldPreset.cardPreset.healthPreset;
+				element.dynAttackWriter = fieldPreset.cardPreset.attackPreset;
+				element.dynAttackCounter = fieldPreset.cardPreset.attackCounterPreset;
+				//TODO
+				element.operateCounter = 1;
+				element.Deploy(battleLines[lineIdx], 0);
+
+				UpdateFrontLine();
+				UpdateAttackRange();
+			}
 		}
 		//tutorial temp function
-		private void TutorialInit()
-		{
-			//TODO
-			UnitCard card = new UnitCard("human_10000", 0, "基地车", "Construction", 0, 0, 30, 100000, "基地", -1, -1, "none");
-			bases[0] = new ConstructionElement(card, this);
-			bases[0].dynHealth = 3;
-			bases[0].controller = controller.InstantiateUnitInBattleField(0, 0, 0);
-			bases[0].UnitInit();
-			bases[0].Deploy(this, battleLines[0], 0);
-			bases[0].operateCounter = 1;
-			bases[0].UpdateInfo();
+		//private void TutorialInit()
+		//{
+		//	//TODO
+		//	UnitCard card = new UnitCard("human_10000", 0, "基地车", "Construction", 0, 0, 30, 100000, "基地", -1, -1, "none");
+		//	bases[0] = new ConstructionElement(card, this);
+		//	bases[0].dynHealth = 3;
+		//	bases[0].controller = controller.InstantiateUnitInBattleField(0, 0, 0);
+		//	bases[0].Init();
+		//	bases[0].Deploy(this, battleLines[0], 0);
+		//	bases[0].operateCounter = 1;
+		//	bases[0].UpdateInfo();
 
-			card = pool.GetCardByID("human_03") as UnitCard;
-			LightArmorElement human03 = new LightArmorElement(card, this);
-			human03.dynAttackCounter = 1;
-            human03.controller = controller.InstantiateUnitInBattleField(0, 0, 0);
-			human03.UnitInit();
-			human03.Deploy(this, battleLines[0], 0);
-			human03.operateCounter = 1;
-			human03.UpdateInfo();
+		//	card = pool.GetCardByID("human_03") as UnitCard;
+		//	LightArmorElement human03 = new LightArmorElement(card, this);
+		//	human03.dynAttackCounter = 1;
+  //          human03.controller = controller.InstantiateUnitInBattleField(0, 0, 0);
+		//	human03.Init();
+		//	human03.Deploy(this, battleLines[0], 0);
+		//	human03.operateCounter = 1;
+		//	human03.UpdateInfo();
 
-			card = pool.GetCardByID("mush_00") as UnitCard;
-			LightArmorElement mush1 = new LightArmorElement(card, this);
-			mush1.controller = controller.InstantiateUnitInBattleField(1, 1, 0);
-			LightArmorElement mush2 = new LightArmorElement(card, this);
-			mush2.controller = controller.InstantiateUnitInBattleField(1, 1, 0);
-            mush1.UnitInit();
-			mush2.UnitInit();
-			mush1.Deploy(this, battleLines[1], 0);
-			mush2.Deploy(this, battleLines[1], 0);
-			mush1.operateCounter = 1;
-			mush2.operateCounter = 1;
-			mush1.UpdateInfo();
-			mush2.UpdateInfo();
+		//	card = pool.GetCardByID("mush_00") as UnitCard;
+		//	LightArmorElement mush1 = new LightArmorElement(card, this);
+		//	mush1.controller = controller.InstantiateUnitInBattleField(1, 1, 0);
+		//	LightArmorElement mush2 = new LightArmorElement(card, this);
+		//	mush2.controller = controller.InstantiateUnitInBattleField(1, 1, 0);
+  //          mush1.Init();
+		//	mush2.Init();
+		//	mush1.Deploy(this, battleLines[1], 0);
+		//	mush2.Deploy(this, battleLines[1], 0);
+		//	mush1.operateCounter = 1;
+		//	mush2.operateCounter = 1;
+		//	mush1.UpdateInfo();
+		//	mush2.UpdateInfo();
 
-			card = pool.GetCardByID("mush_99_01") as UnitCard;
-			ConstructionElement strangeMush = new ConstructionElement(card, this);
-            strangeMush.controller = controller.InstantiateUnitInBattleField(1, 3, 0);
-			strangeMush.UnitInit();
-			strangeMush.Deploy(this, this.battleLines[3], 0);
-			strangeMush.operateCounter = 1;
-			strangeMush.UpdateInfo();
+		//	card = pool.GetCardByID("mush_99_01") as UnitCard;
+		//	ConstructionElement strangeMush = new ConstructionElement(card, this);
+  //          strangeMush.controller = controller.InstantiateUnitInBattleField(1, 3, 0);
+		//	strangeMush.Init();
+		//	strangeMush.Deploy(this, this.battleLines[3], 0);
+		//	strangeMush.operateCounter = 1;
+		//	strangeMush.UpdateInfo();
 
-			UpdateFrontLine();
-			UpdateAttackRange();
-		}
-
-
-
-
+		//	UpdateFrontLine();
+		//	UpdateAttackRange();
+		//}
 
 
 		public void Deploy(int handicapIdx, int dstLineIdx, int dstPos)
@@ -405,7 +403,7 @@ namespace LogicCore
 			//显示层更新
 			controller.UpdateEnergy(energy[TURN]);
 
-			element.Deploy(this, battleLines[dstLineIdx], dstPos);
+			element.Deploy(battleLines[dstLineIdx], dstPos);
 
 
 

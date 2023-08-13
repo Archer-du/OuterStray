@@ -12,8 +12,10 @@ using UnityEngine.XR;
 public class TacticalSceneManager : MonoBehaviour,
     ITacticalSceneController
 {
+    [Header("Input")]
     ITacticalSystemInput tacticalSystem;
 
+    [Header("Connection")]
     public GameManager gameManager;
 
     public GameObject Map;
@@ -21,7 +23,13 @@ public class TacticalSceneManager : MonoBehaviour,
 
     public Image InputMask;
 
+    [Header("Prototype")]
 	public GameObject arrowPrototype;
+	public GameObject terrainPrototype;
+
+    public GameObject deckElementPrototype;
+
+	[Header("Data")]
     public NodeController currentNode;
 
     public List<TerrainController> terrains;
@@ -44,14 +52,12 @@ public class TacticalSceneManager : MonoBehaviour,
         get => terrains[currentTerrain.index - 1];
     }
 
+    [Header("Display")]
     public Transform terrainsGroup;
     public float terrainLength = 2700f;
 
-	public GameObject terrainPrototype;
 
     public float switchDuration = 1f;
-
-
 
     public Color originOrange;
 
@@ -85,21 +91,21 @@ public class TacticalSceneManager : MonoBehaviour,
 
     public void EnableInputMask()
     {
-        InputMask.raycastTarget = true;
+        //InputMask.raycastTarget = true;
     }
     public void DisableInputMask()
     {
-        InputMask.raycastTarget = false;
+        //InputMask.raycastTarget = false;
     }
+    //TODO
 	public void CampaignCompleted()
 	{
-		DisableInputMask();
-	}
-
+        DisableInputMask();
+    }
 	public void CampaignFailed()
 	{
         DisableInputMask();
-	}
+    }
 
 
 	/// <summary>
@@ -118,7 +124,10 @@ public class TacticalSceneManager : MonoBehaviour,
 
         return controller;
     }
+    //public IUnitElementController InstantiateUnitElementInDeck()
+    //{
 
+    //}
 
     /// <summary>
     /// 进入下一层（此时当前节点已更新）
@@ -142,9 +151,10 @@ public class TacticalSceneManager : MonoBehaviour,
 	{
         DisableArrowCaster();
 
+        NodeController prevNode = currentNode;
 		currentNode = controller as NodeController;
 
-        UpdateNodesDisplay();
+        UpdateNodesDisplay(prevNode);
 
         foreach(NodeController adjNode in currentNode.adjNodes)
         {
@@ -215,30 +225,47 @@ public class TacticalSceneManager : MonoBehaviour,
 
 
 
-
-	public void UpdateNodesDisplay()
+    /// <summary>
+    /// 当前节点更新后更新显示层
+    /// </summary>
+	public void UpdateNodesDisplay(NodeController prevNode)
 	{
         //displaycurrentNode TODO
         currentNode.castButton.enabled = false;
         currentNode.Icon.DOColor(originOrange, fadeDuration);
-
-        foreach(NodeController node in currentTerrain.nodes)
+		foreach (NodeController node in currentTerrain.nodes)
         {
-            if(node != currentNode && node.casted)
-            {
-                node.DisableLines();
-
-                foreach(NodeController adj in node.adjNodes)
-                {
-                    DisableNode(adj);
-                }
-            }
+            node.castButton.enabled = false;
         }
+        //只有当前节点的邻接节点可用
+        foreach(NodeController adj in currentNode.adjNodes)
+        {
+            adj.castButton.enabled = true;
+        }
+
+        if(prevNode == null) { return; }
+        prevNode.DisableLines();
+        foreach(NodeController adj in prevNode.adjNodes)
+        {
+            DisableNode(adj);
+        }
+		//foreach (NodeController node in currentTerrain.nodes)
+  //      {
+  //          if(node != currentNode && node.casted)
+  //          {
+  //              node.DisableLines();
+
+  //              foreach(NodeController adj in node.adjNodes)
+  //              {
+  //                  DisableNode(adj);
+  //              }
+  //          }
+  //      }
 	}
     public float fadeDuration = 0.3f;
     public void DisableNode(NodeController node)
     {
-        if(node != currentNode && node.castButton.enabled)
+        if(node != currentNode && !node.casted)
         {
             node.disabledInd++;
 		    if (node.inDegree - node.disabledInd <= 0)

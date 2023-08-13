@@ -15,14 +15,16 @@ namespace DataCore.TacticalItems
 	internal class Deck
 	{
 		BattleSystem battleSystem;
+		TacticalSystem tacticalSystem;
 		private List<BattleElement> deck;
 		internal int count { get => deck.Count; }
 
 		//TODO remove
-		internal Deck(BattleSystem system)
+		internal Deck(BattleSystem system, TacticalSystem tacticalSystem)
 		{
 			deck = new List<BattleElement>();
 			battleSystem = system;
+			this.tacticalSystem = tacticalSystem;
 		}
 		internal BattleElement this[int index]
 		{
@@ -41,22 +43,13 @@ namespace DataCore.TacticalItems
 		//TODO
 		internal void LoadDeckByPath(string path)
 		{
-			StreamReader reader = File.OpenText("Assets\\Config\\TacticalDeckTest.csv");
+			StreamReader reader = File.OpenText("Assets\\Config\\HumanDeckTest.csv");
 
-			string[] data;
-			string line = reader.ReadLine();
+			string ID = reader.ReadLine();
 
-			while (line != null)
+			while (ID != null)
 			{
-				data = line.Split(',');
-				if (data[1] == "#")
-				{
-					line = reader.ReadLine();
-					continue;
-				}
-				Card card;
-				DeserializeMethods.CardDeserialize(out card, data);
-
+				Card card = tacticalSystem.pool.GetCardByID(ID);
 
 				if (card is UnitCard)
 				{
@@ -64,19 +57,19 @@ namespace DataCore.TacticalItems
 					switch (category)
 					{
 						case "LightArmor":
-							deck.Add(new LightArmorElement(card as UnitCard, battleSystem));
+							deck.Add(new LightArmorElement(card as UnitCard, battleSystem, null));
 							break;
 						case "Motorized":
-							deck.Add(new MotorizedElement(card as UnitCard, battleSystem));
+							deck.Add(new MotorizedElement(card as UnitCard, battleSystem, null));
 							break;
 						case "Artillery":
-							deck.Add(new ArtilleryElement(card as UnitCard, battleSystem));
+							deck.Add(new ArtilleryElement(card as UnitCard, battleSystem, null));
 							break;
 						case "Guardian":
-							deck.Add(new GuardianElement(card as UnitCard, battleSystem));
+							deck.Add(new GuardianElement(card as UnitCard, battleSystem, null));
 							break;
 						case "Construction":
-							deck.Add(new ConstructionElement(card as UnitCard, battleSystem));
+							deck.Add(new ConstructionElement(card as UnitCard, battleSystem, null));
 							break;
 					}
 				}
@@ -84,7 +77,7 @@ namespace DataCore.TacticalItems
 				{
 					deck.Add(new CommandElement(card as CommandCard, battleSystem));
 				}
-				line = reader.ReadLine();
+				ID = reader.ReadLine();
 			}
 			reader.Close();
 
@@ -99,91 +92,6 @@ namespace DataCore.TacticalItems
 			}
 		}
 
-		//TODO test function remove
-		[Obsolete("use LoadDeckByPath instead")]
-		internal void LoadDeckFromPool(Pool pool, string ownership)
-		{
-			if(ownership == "ally")
-			{
-				foreach(Card card in pool.cardPool)
-				{
-					if(card.ownership == 0)
-					{
-						if(card is UnitCard)
-						{
-							string category = (card as UnitCard).category;
-							switch (category)
-							{
-								case "LightArmor":
-									deck.Add(new LightArmorElement(card as UnitCard, battleSystem));
-									break;
-								case "Motorized":
-									deck.Add(new MotorizedElement(card as UnitCard, battleSystem));
-									break;
-								case "Artillery":
-									deck.Add(new ArtilleryElement(card as UnitCard, battleSystem));
-									break;
-								case "Guardian":
-									deck.Add(new GuardianElement(card as UnitCard, battleSystem));
-									break;
-								case "Construction":
-									deck.Add(new ConstructionElement(card as UnitCard, battleSystem));
-									break;
-							}
-						}
-						else
-						{
-							deck.Add(new CommandElement(card as CommandCard, battleSystem));
-						}
-					}
-				}
-				//CRITICAL
-				for(int i = 0; i < count; i++)
-				{
-					deck[i].battleID = i;
-				}
-			}
-			else
-			{
-				foreach (Card card in pool.cardPool)
-				{
-					if (card.ownership == 1)
-					{
-						if (card is UnitCard)
-						{
-							string category = (card as UnitCard).category;
-							switch (category)
-							{
-								case "LightArmor":
-									deck.Add(new LightArmorElement(card as UnitCard, battleSystem));
-									break;
-								case "Motorized":
-									deck.Add(new MotorizedElement(card as UnitCard, battleSystem));
-									break;
-								case "Artillery":
-									deck.Add(new ArtilleryElement(card as UnitCard, battleSystem));
-									break;
-								case "Guardian":
-									deck.Add(new GuardianElement(card as UnitCard, battleSystem));
-									break;
-								case "Construction":
-									deck.Add(new ConstructionElement(card as UnitCard, battleSystem));
-									break;
-							}
-						}
-						else
-						{
-							deck.Add(new CommandElement(card as CommandCard, battleSystem));
-						}
-					}
-				}
-				//CRITICAL
-				for(int i = 0; i < count; i++)
-				{
-					deck[i].battleID = -1 - i;
-				}
-			}
-		}
 		internal void Clear()
 		{
 			deck.Clear();
@@ -193,17 +101,18 @@ namespace DataCore.TacticalItems
 
 	internal class Terrain
 	{
+		private ITerrainController Controller;
 		internal ITerrainController controller
 		{
-			get => controller;
+			get => Controller;
 			set
 			{
 				if (value != null)
 				{
-					controller = value;
-					controller.Init();
+					Controller = value;
+					Controller.Init();
 				}
-				else { controller = null; }
+				else { Controller = null; }
 			}
 		}
 
@@ -461,17 +370,19 @@ namespace DataCore.TacticalItems
 	internal class Node
 	{
 		internal TacticalSystem tacticalSystem;
+
+		private INodeController Controller;
 		internal INodeController controller
 		{
-			get => controller;
+			get => Controller;
 			set
 			{
 				if (value != null)
 				{
-					controller = value;
-					controller.Init();
+					Controller = value;
+					Controller.Init();
 				}
-				else { controller = null; }
+				else { Controller = null; }
 			}
 		}
 
@@ -576,13 +487,14 @@ namespace DataCore.TacticalItems
 			string jsonString = File.ReadAllText(battleConfigPath);
 			battleConfig = JsonConvert.DeserializeObject<BattleConfigJson>(jsonString);
 
+			plantDeck = new Deck(battleSystem, tacticalSystem);
 			plantDeck.LoadDeckByPath(battleConfig.plantDeckPath);
 		}
 		internal override void CastNodeEvent()
 		{
-			battleSystem.BuildBattleField(playerDeck, plantDeck, fieldCapacity, initialTurn, initialHumanEnergy, initialPlantEnergy);
-
-			battleSystem.FieldPreset(battleConfig.fieldPreset);
+			battleSystem.BuildBattleField(playerDeck, plantDeck, fieldCapacity, battleLinesCapacity, 
+				initialTurn, initialHumanEnergy, initialPlantEnergy, initialHumanHandicaps, initialPlantHandicaps,
+				fieldPresets);
 		}
 
 
@@ -595,6 +507,10 @@ namespace DataCore.TacticalItems
 		{
 			get => battleConfig.fieldCapacity;
 		}
+		internal int[] battleLinesCapacity
+		{
+			get => battleConfig.battleLinesCapacity;
+		}
 		internal int initialHumanEnergy
 		{
 			get => battleConfig.initialHumanEnergy;
@@ -603,7 +519,18 @@ namespace DataCore.TacticalItems
 		{
 			get => battleConfig.initialPlantEnergy;
 		}
-
+		internal int initialHumanHandicaps
+		{
+			get => battleConfig.initialHumanHandicaps;
+		}
+		internal int initialPlantHandicaps
+		{
+			get => battleConfig.initialPlantHandicaps;
+		}
+		internal List<FieldPreset> fieldPresets
+		{
+			get => battleConfig.fieldPreset;
+		}
 		internal Deck playerDeck
 		{
 			get => tacticalSystem.playerDeck;
@@ -619,6 +546,9 @@ namespace DataCore.TacticalItems
 			[JsonProperty("fieldCapacity")]
 			internal int fieldCapacity;
 
+			[JsonProperty("battleLinesCapacity")]
+			internal int[] battleLinesCapacity;
+
 			[JsonProperty("plantDeckPath")]
 			internal string plantDeckPath;
 
@@ -627,6 +557,12 @@ namespace DataCore.TacticalItems
 
 			[JsonProperty("initialPlantEnergy")]
 			internal int initialPlantEnergy;
+
+			[JsonProperty("initialHumanHandicaps")]
+			internal int initialHumanHandicaps;
+
+			[JsonProperty("initialPlantHandicaps")]
+			internal int initialPlantHandicaps;
 
 			[JsonProperty("fieldPreset")]
 			internal List<FieldPreset> fieldPreset;
@@ -643,6 +579,9 @@ namespace DataCore.TacticalItems
 		[Serializable]
 		internal class CardPreset
 		{
+			[JsonProperty("boss")]
+			public bool boss;
+
 			[JsonProperty("backendID")]
 			public string ID;
 
@@ -663,10 +602,36 @@ namespace DataCore.TacticalItems
 
 	internal sealed class OutPostNode : Node
 	{
+		internal List<Pack> commercials;
 		internal OutPostNode(int horizontalIdx, int verticalIdx, Terrain terrain, INodeController controller) 
 			: base(horizontalIdx, verticalIdx, terrain, controller)
 		{
+			//TODO config
+			commercials = new List<Pack>();
+		}
+		internal void BuildCommercials()
+		{
+			
+		}
 
+		internal class Pack
+		{
+			internal List<BattleElement> pack;
+			internal int packCapacity;
+
+			internal Pack()
+			{
+				packCapacity = 4;
+				pack = new List<BattleElement>();
+			}
+
+			internal void BuildPack()
+			{
+				for(int i = 0; i < packCapacity; i++)
+				{
+					//pack.Add(new BattleElement());
+				}
+			}
 		}
 	}
 	internal sealed class LegacyNode : Node
@@ -693,6 +658,7 @@ namespace DataCore.TacticalItems
 			: base(horizontalIdx, verticalIdx, terrain, controller)
 		{
 		}
+
 	}
 	internal sealed class SupplyNode : Node
 	{
