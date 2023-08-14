@@ -41,8 +41,6 @@ public class BattleLineController : MonoBehaviour,
 		set => elementList[index] = value;
 	}
 
-	public static bool updating;
-
 	public static float fieldLowerBound = 220f;
 	public static float fieldUpperBound = 1970f;
 	public static float lineInterval = 66f;
@@ -54,8 +52,6 @@ public class BattleLineController : MonoBehaviour,
 	/// <param name="ownership"></param>
 	public void Init(int capacity, int ownership)
 	{
-		updating = false;
-
 		battleSceneManager = GameObject.Find("BattleSceneManager").GetComponent<BattleSceneManager>();
 		elementList = new List<UnitElementController>();
 
@@ -81,7 +77,7 @@ public class BattleLineController : MonoBehaviour,
 	public void UpdateInfo(int curlength, int ownerShip)
 	{
 		if (curlength != count)
-		{ throw new System.Exception("Data inconsistencies"); }
+		{ throw new Exception("Data inconsistencies"); }
 
 		UpdateElements();
 		this.ownerShip = ownerShip;
@@ -160,7 +156,8 @@ public class BattleLineController : MonoBehaviour,
 		if(count % 2 == 0)
 		{
 			int start = count / 2;
-			int offset = vtcPos > 0 ? (int)(vtcPos / (BattleElementController.cardWidth + interval)) 
+			int offset = vtcPos > 0 
+				? (int)(vtcPos / (BattleElementController.cardWidth + interval)) 
 				: (int)((vtcPos - BattleElementController.cardWidth - interval) / (BattleElementController.cardWidth + interval));
 			pos = start + offset;
 			if(pos < 0 || pos > count - 1)
@@ -171,7 +168,8 @@ public class BattleLineController : MonoBehaviour,
 		else
 		{
 			int start = count / 2;
-			int offset = vtcPos + (BattleElementController.cardWidth + interval) / 2 > 0 ? (int)((vtcPos - (BattleElementController.cardWidth + interval) / 2) / (BattleElementController.cardWidth + interval))
+			int offset = vtcPos + (BattleElementController.cardWidth + interval) / 2 > 0 
+				? (int)((vtcPos - (BattleElementController.cardWidth + interval) / 2) / (BattleElementController.cardWidth + interval))
 				: (int)((vtcPos - 3 * (BattleElementController.cardWidth + interval) / 2) / (BattleElementController.cardWidth + interval));
 			pos = start + offset;
 			if (pos < 0 || pos > count - 1)
@@ -196,7 +194,6 @@ public class BattleLineController : MonoBehaviour,
 		UnitElementController element = controller as UnitElementController;
 
 		element.transform.SetParent(transform);
-
 		elementList.Insert(dstPos, element);
 
 		UpdateElementPosition();
@@ -209,6 +206,7 @@ public class BattleLineController : MonoBehaviour,
 	public IUnitElementController Send(int idx)
 	{
 		IUnitElementController controller = elementList[idx];
+
 		elementList.RemoveAt(idx);
 
 		UpdateElementPosition();
@@ -229,16 +227,19 @@ public class BattleLineController : MonoBehaviour,
 	/// </summary>
 	public void UpdateElementPosition()
 	{
-		updating = true;
+		//updating = true;
 		UpdateElements();
 
 		for(int i = 0; i < elementList.Count; i++)
 		{
-			Vector3 oriPos = elementList[i].transform.position;
-			Vector3 dstPos = elementList[i].logicPosition;
+			elementList[i].animeLock = true;
 
+			Vector3 oriPos = elementList[i].transform.position;
+			Vector3 dstPos = elementList[i].battleLineLogicPosition;
+
+			int temp = i;
 			elementList[i].transform.DOMove(dstPos, updateTime)
-				.OnComplete(() => updating = false);
+				.OnComplete(() => elementList[temp].animeLock = false);
 		}
 	}
 	private void UpdateElements()
@@ -248,10 +249,13 @@ public class BattleLineController : MonoBehaviour,
 			elementList[i].resIdx = i;
 			elementList[i].battleLine = this;
 			elementList[i].transform.SetSiblingIndex(i + childNum);
-			elementList[i].logicPosition = GetLogicPosition(i);
+			elementList[i].battleLineLogicPosition = GetLogicPosition(i);
 			elementList[i].canvas.sortingOrder = i - 100;
 		}
 	}
+
+
+
 
 
 	public void UpdateElementLogicPosition(List<IUnitElementController> list)
@@ -259,7 +263,7 @@ public class BattleLineController : MonoBehaviour,
 		for(int i = 0; i < list.Count; i++)
 		{
 			UnitElementController unit = list[i] as UnitElementController;
-			unit.logicPosition = GetLogicPosition(i, list.Count);
+			unit.battleLineLogicPosition = GetLogicPosition(i, list.Count);
 		}
 	}
 
@@ -271,10 +275,11 @@ public class BattleLineController : MonoBehaviour,
 	public UnitElementController draggingElement;
 	public void Insert(UnitElementController element)
 	{
-		updating = true;
+		//updating = true;
 		draggingElement = element;
-		draggingElement.transform.DOScale(draggingElement.battleFieldScale, updateTime).OnComplete(() => updating = false);
-		element.transform.DOMove(GetLogicPosition(element.resIdx), returnTime).OnComplete(ResetHierachy);
+		draggingElement.animeLock = true;
+		draggingElement.transform.DOScale(draggingElement.battleFieldScale, returnTime).OnComplete(() => draggingElement.animeLock = false);
+		element.transform.DOMove(element.battleLineLogicPosition, returnTime).OnComplete(ResetHierachy);
 	}
 	private void ResetHierachy()
 	{
@@ -282,7 +287,7 @@ public class BattleLineController : MonoBehaviour,
 		draggingElement.transform.SetSiblingIndex(draggingElement.resIdx + childNum);
 	}
 
-	//TODO
+	//TODO config
 	public Vector3 GetLogicPosition(int pos)
 	{
 		return new Vector3(0, -700 + lineIdx * 466, 0) + new Vector3((pos - count / 2) * BattleElementController.cardWidth + BattleElementController.cardWidth / 2 * ((count + 1) % 2), 0, 0);

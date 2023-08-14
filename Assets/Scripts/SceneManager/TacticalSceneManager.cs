@@ -124,14 +124,14 @@ public class TacticalSceneManager : MonoBehaviour,
 
         return controller;
     }
-    //public IUnitElementController InstantiateUnitElementInDeck()
-    //{
+	public IDeckController InstantiateDeck()
+	{
+        return null;
+	}
 
-    //}
-
-    /// <summary>
-    /// 进入下一层（此时当前节点已更新）
-    /// </summary>
+	/// <summary>
+	/// 进入下一层（此时当前节点已更新）
+	/// </summary>
 	public void EnterNextTerrain()
 	{
         DisableArrowCaster();

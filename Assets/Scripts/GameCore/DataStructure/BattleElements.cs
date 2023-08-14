@@ -33,11 +33,14 @@ namespace DataCore.BattleElements
 		private ElementState State;
 		internal ElementState state
 		{
-			get => state;
+			get => State;
 			set
 			{
 				State = value;
-				UpdateState();
+				if(State != ElementState.inDeck)
+				{
+					UpdateState();
+				}
 			}
 		}
 		/// <summary>
@@ -54,6 +57,10 @@ namespace DataCore.BattleElements
 		/// </summary>
 		internal int battleID;
 		/// <summary>
+		/// 在卡组中同类卡集的编号
+		/// </summary>
+		internal int deckID;
+		/// <summary>
 		/// 卡牌名称
 		/// </summary>
 		internal string name { get; set; }
@@ -65,6 +72,11 @@ namespace DataCore.BattleElements
 		/// 费用
 		/// </summary>
 		internal int cost { get; set; }
+
+		/// <summary>
+		/// 兵种
+		/// </summary>
+		internal string category { get; private set; }
 
 		/// <summary>
 		/// 绝对归属权
@@ -208,6 +220,8 @@ namespace DataCore.BattleElements
 
 
 
+
+
 	//CRITICAL!!
 	internal class UnitElement : BattleElement, IUnitInput
 	{
@@ -229,8 +243,6 @@ namespace DataCore.BattleElements
 				else { Controller = null; }
 			}
 		}
-
-
 		/// <summary>
 		/// 当前所在战线
 		/// </summary>
@@ -239,15 +251,6 @@ namespace DataCore.BattleElements
 		/// 战线内索引值
 		/// </summary>
 		internal int inlineIdx;
-
-
-
-
-		/// <summary>
-		/// 兵种
-		/// </summary>
-		internal string category { get; private set; }
-
 
 
 
@@ -444,11 +447,8 @@ namespace DataCore.BattleElements
 
 		internal UnitElement(UnitCard __card, BattleSystem system, IUnitElementController controller) : base(__card, system)
 		{
-			//初始状态在卡组中
-			state = ElementState.inDeck;
 
 			//从卡牌读取原始数据
-			this.category = __card.category;
 			this.oriAttack = __card.attackPoint;
 			this.oriHealth = __card.healthPoint;
 			this.oriAttackCounter = __card.attackCounter;
@@ -487,6 +487,8 @@ namespace DataCore.BattleElements
 			eventTable.RaiseEvent("Initialize", this, null);
 
 			this.controller = controller;
+			//初始状态在卡组中
+			state = ElementState.inDeck;
 		}
 
 
@@ -804,6 +806,7 @@ namespace DataCore.BattleElements
 
 			if (this == battleSystem.bases[ownership])
 			{
+				battleSystem.BattleFailed();
 			}
 
 			//not likely
@@ -1054,7 +1057,7 @@ namespace DataCore.BattleElements
 			}
 		}
 
-
+		[Obsolete]
 		internal int tempBufferForCommMush07;
 
 		internal CommandElement(CommandCard __card, BattleSystem system) : base(__card, system)
@@ -1111,24 +1114,12 @@ namespace DataCore.BattleElements
 		{
 			UpdateInfo();
 		}
+		internal override void UpdateState()
+		{
+			controller.UpdateState(state);
+		}
 	}
 
-
-
-
-
-	/// <summary>
-	/// realtime status of a battle element
-	/// </summary>
-	//internal class Status : IComparable<Status>
-	//{
-	//	internal double remainTime;
-	//	internal int CompareTo(Status other)
-	//	{
-	//		if (other == null) return 1;
-	//		return this.remainTime.CompareTo(other.remainTime);
-	//	}
-	//}
 
 
 

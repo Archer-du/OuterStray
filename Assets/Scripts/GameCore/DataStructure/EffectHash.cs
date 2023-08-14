@@ -56,6 +56,10 @@ namespace EventEffectModels
 			}
 			else return;
 		}
+		internal void UnloadAllHandler()
+		{
+			eventTable = new Hashtable(); 
+		}
 		/// <summary>
 		/// broadcast method
 		/// </summary>
@@ -464,8 +468,7 @@ namespace EventEffectModels
 
 		private UnitElement SummonToPosition(UnitElement element, BattleSystem system, int position, UnitCard card)
 		{
-			UnitElement unit = new UnitElement(card, system,
-							system.controller.InstantiateUnitInStack(element.ownership));
+			UnitElement unit = null;
 
 			switch (position)
 			{
@@ -473,6 +476,7 @@ namespace EventEffectModels
 				case 0:
 					if (system.battleLines[system.supportLines[element.ownership]].Receiveable())
 					{
+						unit = new UnitElement(card, system, system.controller.InstantiateUnitInStack(element.ownership));
 						unit.Deploy(system.battleLines[system.supportLines[element.ownership]], 0);
 					}
 					break;
@@ -480,6 +484,7 @@ namespace EventEffectModels
 				case 1:
 					if (element.battleLine.Receiveable())
 					{
+						unit = new UnitElement(card, system, system.controller.InstantiateUnitInStack(element.ownership));
 						unit.Deploy(element.battleLine, 0);
 					}
 					break;
@@ -487,6 +492,7 @@ namespace EventEffectModels
 				case 2:
 					if (system.battleLines[system.frontLines[element.ownership]].Receiveable())
 					{
+						unit = new UnitElement(card, system, system.controller.InstantiateUnitInStack(element.ownership));
 						unit.Deploy(system.battleLines[system.frontLines[element.ownership]], 0);
 					}
 					break;
@@ -754,7 +760,7 @@ namespace EventEffectModels
 			for(int i = 0; i < system.deployQueue.Count; i++)
 			{
 				UnitElement element = system.deployQueue[i];
-				if(element.ownership == publisher.ownership && element.state == ElementState.inBattleLine)
+				if(element.ownership == publisher.ownership && element.state == ElementState.inBattleLine && element is not ConstructionElement)
 				{
 					element.attackGain.Add(publisher.battleID, atkGain);
 					element.maxHealthGain.Add(publisher.battleID, mhpGain);
@@ -898,6 +904,7 @@ namespace EventEffectModels
 			card = system.pool.GetCardByID("mush_00") as UnitCard;
 
 			UnitElement unit = SummonToPosition(element, system, 2, card);
+			if (unit == null) return;
 
 			unit.dynAttackWriter = system.handicaps[element.ownership].count > 0 ? system.handicaps[element.ownership].count : 1;
 			unit.maxHealthWriter = system.handicaps[element.ownership].count > 0 ? system.handicaps[element.ownership].count : 1;
@@ -921,6 +928,11 @@ namespace EventEffectModels
 				target.battleLine[i].Damaged(2, "immediate");
 			}
 		}
+		/// <summary>
+		/// boss: mush_99_01特效
+		/// </summary>
+		/// <param name="element"></param>
+		/// <param name="system"></param>
 		internal void StrangeGrowth(BattleElement element, BattleSystem system)
 		{
 			UnitElement publisher = this.source as UnitElement;

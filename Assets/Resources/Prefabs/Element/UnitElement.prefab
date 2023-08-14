@@ -2321,8 +2321,9 @@ GameObject:
   - component: {fileID: 906330341725927732}
   - component: {fileID: 8044690023980399780}
   - component: {fileID: -6681870225697412084}
-  - component: {fileID: 4267143697029492169}
   - component: {fileID: 4717429504215175894}
+  - component: {fileID: 5026614875311150564}
+  - component: {fileID: 4267143697029492169}
   m_Layer: 0
   m_Name: UnitElement
   m_TagString: Untagged
@@ -2449,10 +2450,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1aceaa0220f961a42adca75c75c14ae2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inputLock: 0
+  battleFieldScale: {x: 0, y: 0, z: 0}
+  handicapScale: {x: 0, y: 0, z: 0}
+  targetTextScale: {x: 0, y: 0, z: 0}
+  originTextScale: {x: 0, y: 0, z: 0}
+  counterScaleOrigin: {x: 0, y: 0, z: 0}
+  counterScaleEnlarge: {x: 0, y: 0, z: 0}
+  handicapLogicPosition: {x: 0, y: 0, z: 0}
+  counterfontSizeOrigin: 0
+  counterfontSizeEnlarge: 0
+  normalFontSizeOrigin: 0
+  normalFontSizeEnlarge: 0
   battleSceneManager: {fileID: 0}
-  stack: {fileID: 0}
   canvas: {fileID: 0}
-  handicap: {fileID: 0}
   handicapIdx: 0
   ID: 
   ownership: 0
@@ -2470,9 +2481,7 @@ MonoBehaviour:
   nameText: {fileID: 2424463536136595778}
   costText: {fileID: 7144249241073310118}
   InspectPanel: {fileID: 1081078476183036799}
-  Inspector: {fileID: 6160782109465476777}
   InspectorGround: {fileID: 4449031424668006893}
-  InspectorShell: {fileID: 4622662147442984837}
   InspectorFrame: {fileID: 2171970066447964023}
   InspectorCategoryIcon: {fileID: 4673946396871016430}
   InspectorNameTag: {fileID: 4141254770251943601}
@@ -2489,24 +2498,6 @@ MonoBehaviour:
   componentCategoryIcon: {fileID: 163612354569155639}
   componentDescriptionText: {fileID: 8775440569564989518}
   componentPosition: {x: 0, y: 0, z: 0}
-  handicapScale: {x: 0, y: 0, z: 0}
-  inspectScale: {x: 0, y: 0, z: 0}
-  battleFieldScale: {x: 0, y: 0, z: 0}
-  battleFieldPosition: {x: 0, y: 0, z: 0}
-  targetTextScale: {x: 0, y: 0, z: 0}
-  originTextScale: {x: 0, y: 0, z: 0}
-  counterScaleOrigin: {x: 0, y: 0, z: 0}
-  counterScaleEnlarge: {x: 0, y: 0, z: 0}
-  counterfontSizeOrigin: 0
-  counterfontSizeEnlarge: 0
-  normalFontSizeOrigin: 0
-  normalFontSizeEnlarge: 0
-  scaleTime: 0.3
-  moveTime: 0.2
-  upperOrder: 100
-  lowerOrder: 0
-  inputOffset: {x: 0, y: 0}
-  animeLock: 0
   handicapInspect: {fileID: 0}
   attackText: {fileID: 332679753968886912}
   healthText: {fileID: 4824679670394117744}
@@ -2532,10 +2523,49 @@ MonoBehaviour:
   attackCounter: 0
   operateCounter: 0
   moveRange: 0
-  logicPosition: {x: 0, y: 0, z: 0}
+  battleLineLogicPosition: {x: 0, y: 0, z: 0}
   duration: 0.2
   attackOrder: 0
   oriOrder: -100
+  battleLineInspect: {fileID: 0}
+--- !u!114 &4717429504215175894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5613162459952636112}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 815ee7d460c77954f80337857a7bfd51, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controller: {fileID: -6681870225697412084}
+  inspectFactor: 1.2
+  offset: {x: 0, y: 450, z: 0}
+  duration: 0.2
+  canvas: {fileID: 483946251807401289}
+  upperOrder: 100
+  lowerOrder: 0
+--- !u!114 &5026614875311150564
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5613162459952636112}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db6d013cc9000d94fb4f59fd7a47575c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controller: {fileID: -6681870225697412084}
+  inspector: {fileID: 4267143697029492169}
+  buffer: {fileID: 0}
+  canvas: {fileID: 483946251807401289}
+  upperOrder: 1000
+  lowerOrder: -100
+  duration: 0.2
 --- !u!114 &4267143697029492169
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2549,26 +2579,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   active: 0
+  boundaryCorrection: 0
   timerValve: 0.6
   duration: 0.2
   displayOffset: {x: 400, y: 0, z: 0}
   inspectPanel: {fileID: 1081078476183036799}
---- !u!114 &4717429504215175894
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5613162459952636112}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 815ee7d460c77954f80337857a7bfd51, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  inspectee: {fileID: 2380469442781658781}
-  inspectFactor: 0
-  offset: {x: 0, y: 0, z: 0}
-  duration: 0
 --- !u!1 &6061913691003278847
 GameObject:
   m_ObjectHideFlags: 0
@@ -3596,8 +3611,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.17012894, y: 2.0173016}
-  m_SizeDelta: {x: 18.58581, y: 16.97111}
+  m_AnchoredPosition: {x: -0.17001, y: 2.0416}
+  m_SizeDelta: {x: 18.58581, y: 18.61502}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &202359308391335118
 CanvasRenderer:

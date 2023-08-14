@@ -235,7 +235,8 @@ namespace DataCore.BattleItems
 		internal void Fill(Deck deck)
 		{
 			int num = deck.count;
-			for (int i = 0; i < num; i++)
+			//TODO
+			for (int i = 1; i < num; i++)
 			{
 				stack.Add(deck[i]);
 
@@ -252,36 +253,36 @@ namespace DataCore.BattleItems
 					{
 						LightArmorElement element = deck[i] as LightArmorElement;
 						lightArmors.Add(element);
-						element.state = ElementState.inStack;
 						element.controller = controller.InstantiateUnitElementInBattle();
+						element.state = ElementState.inStack;
 					}
 					if (deck[i] is MotorizedElement)
 					{
 						MotorizedElement element = deck[i] as MotorizedElement;
 						motorizeds.Add(element);
-						element.state = ElementState.inStack;
 						element.controller = controller.InstantiateUnitElementInBattle();
+						element.state = ElementState.inStack;
 					}
 					if (deck[i] is ArtilleryElement)
 					{
 						ArtilleryElement element = deck[i] as ArtilleryElement;
 						artillerys.Add(element);
-						element.state = ElementState.inStack;
 						element.controller = controller.InstantiateUnitElementInBattle();
+						element.state = ElementState.inStack;
 					}
 					if (deck[i] is GuardianElement)
 					{
 						GuardianElement element = deck[i] as GuardianElement;
 						guardians.Add(element);
-						element.state = ElementState.inStack;
 						element.controller = controller.InstantiateUnitElementInBattle();
+						element.state = ElementState.inStack;
 					}
 					if (deck[i] is ConstructionElement)
 					{
 						ConstructionElement element = deck[i] as ConstructionElement;
 						constructions.Add(element);
-						element.state = ElementState.inStack;
 						element.controller = controller.InstantiateUnitElementInBattle();
+						element.state = ElementState.inStack;
 					}
 				}
 				else
@@ -293,8 +294,8 @@ namespace DataCore.BattleItems
 					CommIDDic[deck[i].backendID].Add(deck[i] as CommandElement);
 
 					CommandElement element = deck[i] as CommandElement;
-					element.state = ElementState.inStack;
 					element.controller = controller.InstantiateCommandElementInBattle();
+					element.state = ElementState.inStack;
 				}
 			}
 
@@ -499,13 +500,13 @@ namespace DataCore.BattleItems
 					//display
 					UnitElement unit = list[i] as UnitElement;
 					controllerList.Add(unit.controller);
-					unit.Init();
+					//unit.Init();
 				}
 				else
 				{
 					CommandElement comm = list[i] as CommandElement;
 					controllerList.Add(comm.controller);
-					comm.Init();
+					//comm.Init();
 				}
 			}
 			if(controllerList.Count <= 0) { throw new Exception("list"); }
@@ -526,13 +527,13 @@ namespace DataCore.BattleItems
 			{
 				//display
 				UnitElement unit = element as UnitElement;
-				unit.Init();
+				//unit.Init();
 				controller.Push(unit.controller);
 			}
 			else
 			{
 				CommandElement comm = element as CommandElement;
-				comm.Init();
+				//comm.Init();
 				controller.Push(comm.controller);
 			}
 		}

@@ -42,13 +42,8 @@ public class CommandElementController : BattleElementController,
 
 
 
-
-
-
-
 	public void CastAnimationEvent(string method)
 	{
-		animeLock = true;
 		float castTime = 0.4f;
 		float waitTime = 0.4f;
 
@@ -62,7 +57,6 @@ public class CommandElementController : BattleElementController,
 				transform.DOMove(stack.transform.position + 500 * Vector3.left, castTime)
 				.OnComplete(() =>
 				{
-					animeLock = false;
 					this.gameObject.SetActive(false);
 				})
 			);
@@ -80,7 +74,6 @@ public class CommandElementController : BattleElementController,
 				transform.DOMove(stack.transform.position + 500 * Vector3.left, castTime)
 				.OnComplete(() =>
 				{
-					animeLock = false;
 					this.gameObject.SetActive(false);
 				})
 			);
@@ -91,45 +84,8 @@ public class CommandElementController : BattleElementController,
 		}
 	}
 
-
-
-
-
-
-
-
-
-	public override void OnBeginDrag(PointerEventData eventData)
+	public void UpdateState(ElementState state)
 	{
-		base.OnBeginDrag(eventData);
+		dataState = state;
 	}
-
-	public override void OnEndDrag(PointerEventData eventData)
-	{
-		base.OnEndDrag(eventData);
-		//cast条件判定
-		if (dataState == ElementState.inHandicap)
-		{
-			handicap.isDragging = false; // 结束拖动
-
-			if (battleSceneManager.PlayerCast(eventData.position, this.handicapIdx) >= 0)
-			{
-				return;
-			}
-
-			handicap.Insert(this);
-		}
-	}
-
-	public override void OnPointerEnter(PointerEventData eventData)
-	{
-		base.OnPointerEnter(eventData);
-	}
-
-	public override void OnPointerExit(PointerEventData eventData)
-	{
-		base.OnPointerExit(eventData);
-	}
-
-
 }

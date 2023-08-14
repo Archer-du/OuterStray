@@ -20,6 +20,7 @@ namespace DataCore.Cards
 		internal string name { get; set; }
 		internal string description { get; set; }
 		internal int cost { get; set; }
+		internal string category { get; set; }
 
 		internal int ownership;
 
@@ -59,7 +60,6 @@ namespace DataCore.Cards
 	internal sealed class UnitCard : Card
 	{
 
-		internal string category { get; set; }
 		internal int attackPoint { get; set; }
 		internal int healthPoint { get; set; }
 		internal int attackCounter { get; set; }
@@ -139,6 +139,7 @@ namespace DataCore.Cards
 		internal CommandCard(string __id, int ownership, string __name, string type, string __description, int __cost, int __maxDurability, int department, int pack, string effects)
 			: base(__id, __name, __description, __cost, ownership, department, pack, effects)
 		{
+			this.category = "Command";
 			this.type = type;
 			this.maxDurability = __maxDurability;
 		}

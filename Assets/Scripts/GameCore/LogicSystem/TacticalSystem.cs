@@ -8,6 +8,8 @@ using InputHandler;
 using DisplayInterface;
 using SystemEventHandler;
 using System;
+using DataCore.BattleElements;
+using Codice.Client.Common.Threading;
 
 namespace LogicCore
 {
@@ -42,6 +44,7 @@ namespace LogicCore
 
 
 		internal Deck playerDeck;
+		internal UnitElement playerBase;
 
 		internal int baseHealth;
 		internal int gasMineToken;
@@ -72,10 +75,10 @@ namespace LogicCore
 			baseHealth = 30;
 			gasMineToken = 30;
 
-			playerDeck = new Deck(system, this);
+			playerDeck = new Deck(system, this, controller.InstantiateDeck());
 			//TODO remove
 			playerDeck.LoadDeckByPath("Assets\\Config\\HumanDeckTest.csv");
-
+			playerBase = playerDeck.bases;
 			//TODO
 			controller.TerrrainsInitialize(this, battleNodeNum);
 
@@ -167,6 +170,7 @@ namespace LogicCore
 			isInNode = false;
 			//向上通知
 			//controller.CampaignFailed();
+			throw new Exception("failed");
 		}
 
 		public void Exit()
