@@ -22,7 +22,7 @@ public class TurnMappedDialogger : MonoBehaviour
 	{
 		manager = GetComponent<BattleSceneManager>();
 		//TODO
-		dialogSource = "\\UnityProject\\AIGC\\OuterStray\\Assets\\Tutorial\\TutorialDialog.txt";
+		dialogSource = "Assets\\Tutorial\\TutorialDialog.txt";
 
 		dialogFrame.SetActive(false);
 
@@ -30,11 +30,11 @@ public class TurnMappedDialogger : MonoBehaviour
 	}
 	public void UpdateDialog()
 	{
-		if (manager.turnNum % 2 == 0)
+		if (manager.turnNum % 2 == 1)
 		{
 			DisplayDialog();
 		}
-		if (manager.turnNum % 2 == 1)
+		if (manager.turnNum % 2 == 0)
 		{
 			dialogFrame.SetActive(false);
 		}

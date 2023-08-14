@@ -1,9 +1,9 @@
 using DataCore.BattleElements;
+using DataCore.BattleItems;
 using DataCore.Cards;
 using DataCore.CultivateItems;
 using DisplayInterface;
 using LogicCore;
-using Serilog.Formatting.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,17 +14,49 @@ namespace DataCore.TacticalItems
 {
 	internal class Deck
 	{
+		private IDeckController Controller;
+		internal IDeckController controller
+		{
+			get => Controller;
+			set
+			{
+				if (value != null)
+				{
+					Controller = value;
+					Controller.Init();
+				}
+				else { Controller = null; }
+			}
+		}
+
 		BattleSystem battleSystem;
 		TacticalSystem tacticalSystem;
 		private List<BattleElement> deck;
+
+		internal Dictionary<int, LightArmorElement> lightArmorSet;
+		internal Dictionary<int, MotorizedElement> motorizedSet;
+		internal Dictionary<int, ArtilleryElement> artillerySet;
+		internal Dictionary<int, GuardianElement> guardianSet;
+		internal Dictionary<int, ConstructionElement> constructionSet;
+
+		internal Dictionary<int, CommandElement> commandSet;
 		internal int count { get => deck.Count; }
 
+		internal UnitElement bases;
 		//TODO remove
-		internal Deck(BattleSystem system, TacticalSystem tacticalSystem)
+		internal Deck(BattleSystem battleSystem, TacticalSystem tacticalSystem, IDeckController controller)
 		{
 			deck = new List<BattleElement>();
-			battleSystem = system;
+			lightArmorSet = new Dictionary<int, LightArmorElement>();
+			motorizedSet = new Dictionary<int, MotorizedElement>();
+			artillerySet = new Dictionary<int, ArtilleryElement>();
+			guardianSet = new Dictionary<int, GuardianElement>();
+			constructionSet = new Dictionary<int, ConstructionElement>();
+			commandSet = new Dictionary<int, CommandElement>();
+
+			this.battleSystem = battleSystem;
 			this.tacticalSystem = tacticalSystem;
+			this.controller = controller;
 		}
 		internal BattleElement this[int index]
 		{
@@ -43,7 +75,7 @@ namespace DataCore.TacticalItems
 		//TODO
 		internal void LoadDeckByPath(string path)
 		{
-			StreamReader reader = File.OpenText("Assets\\Config\\HumanDeckTest.csv");
+			StreamReader reader = File.OpenText(path);
 
 			string ID = reader.ReadLine();
 
@@ -81,6 +113,40 @@ namespace DataCore.TacticalItems
 			}
 			reader.Close();
 
+			for(int i = 1; i < deck.Count; i++)
+			{
+				deck[i].deckID = i;
+				switch (deck[i].category)
+				{
+					case "LightArmor":
+						LightArmorElement lightArmor = deck[i] as LightArmorElement;
+						lightArmorSet.Add(i, lightArmor);
+						break;
+					case "Motorized":
+						MotorizedElement motorized = deck[i] as MotorizedElement;
+						motorizedSet.Add(i, motorized);
+						break;
+					case "Artillery":
+						ArtilleryElement artillery = deck[i] as ArtilleryElement;
+						artillerySet.Add(i, artillery);
+						break;
+					case "Guardian":
+						GuardianElement guardian = deck[i] as GuardianElement;
+						guardianSet.Add(i, guardian);
+						break;
+					case "Construction":
+						ConstructionElement construction = deck[i] as ConstructionElement;
+						constructionSet.Add(i, construction);
+						break;
+					case "Command":
+						CommandElement command = deck[i] as CommandElement;
+						commandSet.Add(i, command);
+						break;
+				}
+			}
+
+			//TODO
+			bases = deck[0] as UnitElement;
 			//CRITICAL
 			UpdateBattleID();
 		}
@@ -91,10 +157,9 @@ namespace DataCore.TacticalItems
 				deck[i].battleID = deck[i].ownership == 0 ? i : -1 - i;
 			}
 		}
-
-		internal void Clear()
+		internal void WriteBack(RandomCardStack stack)
 		{
-			deck.Clear();
+
 		}
 	}
 
@@ -487,7 +552,7 @@ namespace DataCore.TacticalItems
 			string jsonString = File.ReadAllText(battleConfigPath);
 			battleConfig = JsonConvert.DeserializeObject<BattleConfigJson>(jsonString);
 
-			plantDeck = new Deck(battleSystem, tacticalSystem);
+			plantDeck = new Deck(battleSystem, tacticalSystem, null);
 			plantDeck.LoadDeckByPath(battleConfig.plantDeckPath);
 		}
 		internal override void CastNodeEvent()

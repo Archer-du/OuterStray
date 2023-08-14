@@ -51,10 +51,9 @@ public class UnitElementController : BattleElementController,
 	public int maxHealthPoint;
 	public int attackCounter;
 	public int operateCounter;
-	//legacy
 	public int moveRange;
 
-	public Vector3 logicPosition;
+	public Vector3 battleLineLogicPosition;
 
 	public float duration = 0.2f;
 
@@ -63,6 +62,9 @@ public class UnitElementController : BattleElementController,
 
 	public static float componentMove = 10f;
 	public static float componentMoveTime = 0.25f;
+
+	[Header("Components")]
+	public InspectPanelController battleLineInspect;
 	/// <summary>
 	/// 从牌堆加入手牌或战场时初始化
 	/// </summary>
@@ -88,11 +90,19 @@ public class UnitElementController : BattleElementController,
 		InspectorAttackCounter.text = this.category == "Construction" ? "" : attackCounter.ToString();
 
 		InspectorImage.sprite = CardImage.sprite;
+		//TODO
+		InspectorImage.rectTransform.sizeDelta = new Vector3(10, 15);
 		InspectorGround.color = elementGround.color;
 		InspectorFrame.color = elementGround.color;
 		InspectorNameTag.color = elementGround.color;
 		InspectorCostTag.color = elementGround.color;
 		InspectorCategoryIcon.sprite = componentCategoryIcon.sprite;
+
+		battleLineInspect = GetComponent<InspectPanelController>();
+		OnElementStateChanged += battleLineInspect.OnElementStateChanged;
+
+		BattleSceneManager.InputLocked += EnableInputLock;
+		BattleSceneManager.InputUnlocked += DisableInputLock;
 	}
 	public void UpdateInfo(int cost, int attackPoint, int maxHealthPoint, int attackCounter, int operateCounter,
 		ElementState state, int moveRange, bool aura, int attackBuff, int maxHealthBuff)
@@ -113,11 +123,11 @@ public class UnitElementController : BattleElementController,
 
 		if (operateCounter == 0)
 		{
-			operateMask.DOColor(new UnityEngine.Color(0, 0, 0, 0.5f), duration);
+			operateMask.DOColor(new Color(0, 0, 0, 0.5f), duration);
 		}
 		else
 		{
-			operateMask.DOColor(new UnityEngine.Color(0, 0, 0, 0), duration);
+			operateMask.DOColor(new Color(0, 0, 0, 0), duration);
 		}
 
 		this.attackBuff.gameObject.SetActive(false);
@@ -213,19 +223,31 @@ public class UnitElementController : BattleElementController,
 			rightArrowMocked.DOFade(mocking ? 1 : 0, duration);
 		}
 	}
+	public void UpdateInspectComponent()
+	{
+
+	}
+	public void UpdateState(ElementState state)
+	{
+		dataState = state;
+	}
 
 
 
-
-
+	private void EnableInputLock()
+	{
+		inputLock = true;
+	}
+	private void DisableInputLock()
+	{
+		inputLock = false;
+	}
 
 
 
 
 	public void DeployAnimationEvent()
 	{
-		animeLock = true;
-
 		NameTag.gameObject.SetActive(false);
 		nameText.gameObject.SetActive(false);
 		costTag.gameObject.SetActive(false);
@@ -237,8 +259,7 @@ public class UnitElementController : BattleElementController,
 			transform.DOBlendableRotateBy(rotateBy, componentMoveTime);
 		}
 		gameObject.SetActive(true);
-		InspectComponent.transform.DOBlendableLocalMoveBy(new Vector3(0, -componentMove, 0), componentMoveTime)
-			.OnComplete(() => animeLock = false);
+		InspectComponent.transform.DOBlendableLocalMoveBy(new Vector3(0, -componentMove, 0), componentMoveTime);
 		RectTransform counterTransform = counterIcon.GetComponent<RectTransform>();
 		counterTransform.DOScale(counterScaleEnlarge, componentMoveTime);
 		//healthText.fontSize = normalFontSizeEnlarge;
@@ -248,9 +269,7 @@ public class UnitElementController : BattleElementController,
 	}
 	public void MoveAnimationEvent()
 	{
-		animeLock = true;
-		transform.DOScale(battleFieldScale, componentMoveTime)
-			.OnComplete(() => animeLock = false);
+		transform.DOScale(battleFieldScale, componentMoveTime);
 	}
 	/// <summary>
 	/// 攻击动画加入结算队列
@@ -260,10 +279,10 @@ public class UnitElementController : BattleElementController,
 	{
 		if (target == null) return;
 
-		float forwardTime = 0.2f;
+		float forwardTime = 0.15f;
 		float backlashTime = 0.2f;
-		Vector3 oriPosition = logicPosition;
-		Vector3 dstPosition = target.logicPosition;
+		Vector3 oriPosition = battleLineLogicPosition;
+		Vector3 dstPosition = target.battleLineLogicPosition;
 
 		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + " attacked " + "line: " + target.battleLine.lineIdx + "res: " + target.resIdx);
 
@@ -295,10 +314,10 @@ public class UnitElementController : BattleElementController,
 	{
 		if (target == null) return;
 
-		float forwardTime = 0.2f;
+		float forwardTime = 0.15f;
 		float backlashTime = 0.2f;
 		UnitElementController controller = target as UnitElementController;
-		Vector3 oriPosition = logicPosition;
+		Vector3 oriPosition = battleLineLogicPosition;
 
 		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + " random attacked " + "line: " + controller.battleLine.lineIdx + "res: " + controller.resIdx);
 
@@ -306,7 +325,7 @@ public class UnitElementController : BattleElementController,
 		battleSceneManager.sequenceTime += BattleLineController.updateTime + 0.2f;
 
 		battleSceneManager.rotateSequence.Append(
-			transform.DOMove(logicPosition + 100f * Vector3.up * (2 * ownership - 1), forwardTime).OnComplete(() =>
+			transform.DOMove(battleLineLogicPosition + 100f * Vector3.up * (2 * ownership - 1), forwardTime).OnComplete(() =>
 			{
 				transform.DOMove(oriPosition, backlashTime);
 				input.UpdateManual();
@@ -346,14 +365,18 @@ public class UnitElementController : BattleElementController,
 				{
 					healthText.text = health.ToString();
 					healthText.transform.DOScale(originTextScale, forwardTime / 2f);
+					if(this == battleSceneManager.bases[0])
+					{
+						battleSceneManager.UpdateBaseHealth(health);
+					}
 				})
 			);
 		//变色
 		battleSceneManager.rotateSequence.Join(
-			healthText.DOColor(UnityEngine.Color.red, forwardTime / 2f)
+			healthText.DOColor(Color.red, forwardTime / 2f)
 				.OnComplete(() =>
 				{
-					healthText.DOColor(UnityEngine.Color.white, forwardTime / 2f);
+					healthText.DOColor(Color.white, forwardTime / 2f);
 				})
 			);
 	}
@@ -373,6 +396,10 @@ public class UnitElementController : BattleElementController,
 			battleSceneManager.rotateSequence.Join(
 				transform.DOShakeRotation(forwardTime, 20f)
 				);
+			if (battleSceneManager.sequenceTime == 0)
+			{
+				battleSceneManager.sequenceTime += forwardTime;
+			}
 		}
 		//放大
 		battleSceneManager.rotateSequence.Join(
@@ -385,10 +412,10 @@ public class UnitElementController : BattleElementController,
 			);
 		//变色
 		battleSceneManager.rotateSequence.Join(
-			healthText.DOColor(UnityEngine.Color.green, forwardTime / 2f)
+			healthText.DOColor(Color.green, forwardTime / 2f)
 				.OnComplete(() =>
 				{
-					healthText.DOColor(UnityEngine.Color.white, forwardTime / 2f);
+					healthText.DOColor(Color.white, forwardTime / 2f);
 				})
 			);
 	}
@@ -428,12 +455,12 @@ public class UnitElementController : BattleElementController,
 	{
 		if (target == null) return;
 
-		float forwardTime = 0.2f;
+		float forwardTime = 0.15f;
 		float backlashTime = 0.2f;
-		Vector3 oriPosition = logicPosition;
-		Vector3 dstPosition = target.logicPosition;
+		Vector3 oriPosition = battleLineLogicPosition;
+		Vector3 dstPosition = target.battleLineLogicPosition;
 
-		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + " attacked " + "line: " + target.battleLine.lineIdx + "res: " + target.resIdx);
+		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + " CleaveAttacked " + "line: " + target.battleLine.lineIdx + "res: " + target.resIdx);
 
 		//安全间隔
 		battleSceneManager.rotateSequence.AppendInterval(BattleLineController.updateTime + 0.2f);
@@ -467,65 +494,39 @@ public class UnitElementController : BattleElementController,
 		attackCounterText.fontSize = counterfontSizeOrigin;
 		UpdateInspectComponent();
 
+		Vector3 rotateBy = new Vector3(0, 0, ((ownership * 2) - 1) * 90);
 		if (method == "append")
 		{
-			Vector3 rotateBy = new Vector3(0, 0, ((ownership * 2) - 1) * 90);
 			battleSceneManager.rotateSequence.Append(
 				transform.DOMove(stack.transform.position + 500 * Vector3.left, retreatTime)
 				.OnComplete(() =>
 				{
-					animeLock = false;
 					this.gameObject.SetActive(false);
 				})
 			);
-			battleSceneManager.rotateSequence.Join(
-				transform.DOBlendableRotateBy(rotateBy, retreatTime)
-				);
-			battleSceneManager.rotateSequence.Join(transform.DOScale(handicapScale, retreatTime));
 			battleSceneManager.sequenceTime += retreatTime;
 		}
 		else
 		{
-			Vector3 rotateBy = new Vector3(0, 0, ((ownership * 2) - 1) * 90);
 			battleSceneManager.rotateSequence.Join(
 				transform.DOMove(stack.transform.position + 500 * Vector3.left, retreatTime)
 				.OnComplete(() =>
 				{
-					animeLock = false;
 					this.gameObject.SetActive(false);
 				})
 			);
-			battleSceneManager.rotateSequence.Join(
-				transform.DOBlendableRotateBy(rotateBy, retreatTime)
-				);
-			battleSceneManager.rotateSequence.Join(transform.DOScale(handicapScale, retreatTime));
-			transform.DOScale(handicapScale, retreatTime);
-			battleSceneManager.sequenceTime += retreatTime;
+			if (battleSceneManager.sequenceTime == 0)
+			{
+				battleSceneManager.sequenceTime += retreatTime;
+			}
 		}
+
+		transform.DOScale(handicapScale, retreatTime);
+		battleSceneManager.rotateSequence.Join(
+			transform.DOBlendableRotateBy(rotateBy, retreatTime)
+			);
+		battleSceneManager.rotateSequence.Join(transform.DOScale(handicapScale, retreatTime));
 	}
-	public void UpdateInspectComponent()
-	{
-
-	}
-	public void UpdateState(ElementState state)
-	{
-		dataState = state;
-	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -534,7 +535,7 @@ public class UnitElementController : BattleElementController,
 	private float timer = 0;
 	void Update()
 	{
-		if(handicap.isDragging == false && dataState == ElementState.inBattleLine)
+		if(globalAnimeLock == false && dataState == ElementState.inBattleLine)
 		{
 			transform.DOScale(battleFieldScale, duration);
 		}
@@ -544,118 +545,20 @@ public class UnitElementController : BattleElementController,
 		//}
 
 		// 如果鼠标悬停在元素上
-		if (timer > 0)
-		{
-			// 计时器递减
-			timer -= Time.deltaTime;
-			// 如果计时器小于等于 0
-			if (timer <= 0)
-			{
-				// 播放动画
-				//TODO 检视
-				InspectPanel.transform.position = transform.position + 400 * Vector3.right;
-				InspectPanel.DOFade(1f, duration);
+		//if (timer > 0)
+		//{
+		//	// 计时器递减
+		//	timer -= Time.deltaTime;
+		//	// 如果计时器小于等于 0
+		//	if (timer <= 0)
+		//	{
+		//		// 播放动画
+		//		//TODO 检视
+		//		InspectPanel.transform.position = transform.position + 400 * Vector3.right;
+		//		InspectPanel.DOFade(1f, duration);
 
-				canvas.sortingOrder = attackOrder;
-			}
-		}
+		//		canvas.sortingOrder = attackOrder;
+		//	}
+		//}
 	}
-	public override void OnDrag(PointerEventData eventData)
-	{
-		base.OnDrag(eventData);
-		Arrows.GetComponent<CanvasGroup>().alpha = 0f;
-		timer = -1;
-		InspectPanel.alpha = 0;
-	}
-
-	public override void OnBeginDrag(PointerEventData eventData)
-	{
-		base.OnBeginDrag(eventData);
-		//在战线：移动
-		if (dataState == ElementState.inBattleLine)
-		{
-			if (operateCounter <= 0)
-			{
-				return;
-			}
-			if (category == "Construction")
-			{
-				return;
-			}
-			timer = -1;
-			handicap.isDragging = true;
-		}
-	}
-
-	public override void OnEndDrag(PointerEventData eventData)
-	{
-		base.OnEndDrag(eventData);
-
-		//HandicapController.isDragging = false;
-		//部署条件判定
-		if (dataState == ElementState.inHandicap)
-		{
-			if (battleSceneManager.PlayerDeploy(eventData.position, this.handicapIdx) >= 0)
-			{
-				handicap.isDragging = false;
-				return;
-			}
-			handicap.isDragging = false;
-			handicap.Insert(this);
-		}
-		//移动撤退条件判定
-		if (dataState == ElementState.inBattleLine)
-		{
-			if (operateCounter <= 0)
-			{
-				handicap.isDragging = false;
-				return;
-			}
-			if (category == "Construction")
-			{
-				handicap.isDragging = false;
-				return;
-			}
-			if (this.battleLine.lineIdx == 0 && battleSceneManager.PlayerRetreat(eventData.position, this.battleLine, this) >= 0)
-			{
-				handicap.isDragging = false;
-				return;
-			}
-			if (battleSceneManager.PlayerMove(eventData.position, this.battleLine, this) >= 0)
-			{
-				handicap.isDragging = false;
-				return;
-			}
-			handicap.isDragging = false;
-			battleLine.Insert(this);
-		}
-	}
-
-	public override void OnPointerEnter(PointerEventData eventData)
-	{
-		base.OnPointerEnter(eventData);
-
-		if (dataState == ElementState.inBattleLine)
-		{
-			timer = 0.8f;
-			return;
-		}
-	}
-
-	public override void OnPointerExit(PointerEventData eventData)
-	{
-		base.OnPointerExit(eventData);
-
-		if (dataState == ElementState.inBattleLine)
-		{
-			timer = -1;
-			//TODO 检视
-			InspectPanel.DOFade(0f, duration);
-
-			canvas.sortingOrder = oriOrder;
-			return;
-		}
-	}
-
-
 }

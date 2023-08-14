@@ -11,24 +11,88 @@ using UnityEngine.UI;
 using UnityEngine.Rendering;
 using InputHandler;
 using DataCore.BattleElements;
+using System;
 
-public class BattleElementController : MonoBehaviour,
-		IPointerEnterHandler, IPointerExitHandler,
-	    IDragHandler,
-	    IBeginDragHandler, IEndDragHandler
+public class BattleElementController : MonoBehaviour
 {
 	public event System.Action<ElementState> OnElementStateChanged;
 
-	[Header("BasicInfo")]
+	public static event System.Action GlobalAnimeLocked;
+	public static event System.Action GlobalAnimeUnlocked;
+
+	public event System.Action AnimeLocked;
+	public event System.Action AnimeUnlocked;
+
+	private static bool GlobalAnimeLock;
+	public static bool globalAnimeLock
+	{
+		get => GlobalAnimeLock;
+		set
+		{
+			GlobalAnimeLock = value;
+			if(value == true)
+			{
+				GlobalAnimeLocked?.Invoke();
+			}
+			else
+			{
+				GlobalAnimeUnlocked?.Invoke();
+			}
+		}
+	}
+	private bool AnimeLock;
+	public bool animeLock
+	{
+		get => AnimeLock;
+		set
+		{
+			AnimeLock = value;
+			if(value == true)
+			{
+				AnimeLocked?.Invoke();
+			}
+			else
+			{
+				AnimeUnlocked?.Invoke();
+			}
+		}
+	}
+	public bool inputLock;
+
+	public static Vector2 inputOffset;
+
 	public static int cardWidth = 360;
+
+	[Header("BasicInfo")]
+	public Vector3 battleFieldScale;
+	public Vector3 handicapScale;
+
+	public Vector3 targetTextScale;
+	public Vector3 originTextScale;
+
+	public Vector3 counterScaleOrigin;
+	public Vector3 counterScaleEnlarge;
+
+	public Vector3 handicapLogicPosition;
+
+	public float counterfontSizeOrigin;
+	public float counterfontSizeEnlarge;
+
+	public float normalFontSizeOrigin;
+	public float normalFontSizeEnlarge;
 
 	[Header("Connections")]
 	public BattleSceneManager battleSceneManager;
-	public Transform stack;
-	protected Transform buffer;
+	public Transform stack
+	{
+		get => battleSceneManager.cardStackController[ownership].transform;
+	}
 	public Canvas canvas;
 
-	public HandicapController handicap;
+	public HandicapController handicap
+	{
+		get => battleSceneManager.handicapController[ownership];
+	}
 
 	[Header("Data")]
 	private ElementState DataState;
@@ -39,25 +103,6 @@ public class BattleElementController : MonoBehaviour,
 		{
 			DataState = value;
 			OnElementStateChanged?.Invoke(DataState);
-			//switch (DataState)
-			//{
-			//	case ElementState.inStack:
-			//		handicapInspect.active = false;
-			//		battleLineInspect.active = false;
-			//		break;
-			//	case ElementState.inHandicap:
-			//		handicapInspect.active = true;
-			//		battleLineInspect.active = false;
-			//		break;
-			//	case ElementState.inBattleLine:
-			//		handicapInspect.active = false;
-			//		battleLineInspect.active = true;
-			//		break;
-			//	case ElementState.destroyed:
-			//		handicapInspect.active = false;
-			//		battleLineInspect.active = false;
-			//		break;
-			//}
 		}
 	}
 	public int handicapIdx;
@@ -85,10 +130,8 @@ public class BattleElementController : MonoBehaviour,
 
 	[Header("Inspector")]
 	public CanvasGroup InspectPanel;
-	public GameObject Inspector;
 
 	public Image InspectorGround;
-	public Image InspectorShell;
 	public Image InspectorFrame;
 	public Image InspectorCategoryIcon;
 	public Image InspectorNameTag;
@@ -109,42 +152,13 @@ public class BattleElementController : MonoBehaviour,
 	public TMP_Text componentDescriptionText;
 	public Vector3 componentPosition;
 
-	public Vector3 handicapScale;
-	public Vector3 inspectScale;
-	public Vector3 battleFieldScale;
-
-	public Vector3 battleFieldPosition;
-
-	public Vector3 targetTextScale;
-	public Vector3 originTextScale;
-
-	public Vector3 counterScaleOrigin;
-	public Vector3 counterScaleEnlarge;
-
-	public float counterfontSizeOrigin;
-	public float counterfontSizeEnlarge;
-
-	public float normalFontSizeOrigin;
-	public float normalFontSizeEnlarge;
-
-	public float scaleTime = 0.3f;
-
-	public float moveTime = 0.2f;
-
-	public int upperOrder = 100;
-	public int lowerOrder = 0;
-
-	public Vector2 inputOffset;
-
-	public bool animeLock;
-
 	[Header("Components")]
-	public TransformInspector handicapInspect;
-	public InspectPanelController battleLineInspect;
+	public HandicapInspector handicapInspect;
 
 	public void BasicInfoInit()
 	{
 		animeLock = false;
+		inputLock = false;
 		//输入偏移量
 		inputOffset = new Vector2(1980, 1080);
 
@@ -163,12 +177,11 @@ public class BattleElementController : MonoBehaviour,
 		normalFontSizeEnlarge = 50;
 
 		canvas = GetComponent<Canvas>();
-		buffer = GameObject.Find("Buffer").transform;
 
 		battleSceneManager = GameObject.Find("BattleSceneManager").GetComponent<BattleSceneManager>();
 
-		handicap = battleSceneManager.handicapController[ownership];
-		stack = battleSceneManager.cardStackController[ownership].transform;
+		handicapInspect = GetComponent<HandicapInspector>();
+		handicapInspect.Init(handicapScale, this);
 	}
 
 
@@ -179,6 +192,8 @@ public class BattleElementController : MonoBehaviour,
 		this.category = categories;
 		this.description = description;
 
+		battleFieldScale = transform.localScale;
+		handicapScale = 1.35f * battleFieldScale;
 		BasicInfoInit();
 
 		nameText.text = name;
@@ -186,12 +201,6 @@ public class BattleElementController : MonoBehaviour,
 		componentDescriptionText.text = description;
 
 		LoadCardResources(ID);
-
-		battleFieldScale = transform.localScale;
-		handicapScale = 1.35f * battleFieldScale;
-		inspectScale = 1.2f * handicapScale;
-
-		handicapInspect.Init(battleFieldScale);
 	}
 
 
@@ -273,125 +282,6 @@ public class BattleElementController : MonoBehaviour,
 					CardImage.rectTransform.sizeDelta = new Vector2(10, 13);
 				}
 				break;
-		}
-	}
-
-
-	public virtual void OnDrag(PointerEventData eventData)
-	{
-		if (ownership != 0)
-		{
-			return;
-		}
-		if (BattleSceneManager.Turn != 0)
-		{
-			return;
-		}
-		//拖动显示设置
-		if (handicap.isDragging)
-		{
-			transform.SetParent(buffer);
-			transform.DOScale(handicapScale, scaleTime);
-			transform.position = eventData.position - inputOffset;
-		}
-	}
-	public virtual void OnBeginDrag(PointerEventData eventData)
-	{
-		if (animeLock)
-		{
-			return;
-		}
-		if (ownership != 0)
-		{
-			return;
-		}
-		//锁住玩家操作
-		if (BattleSceneManager.Turn != 0)
-		{
-			return;
-		}
-		//在手牌区：部署或cast
-		if (dataState == ElementState.inHandicap)
-		{
-			handicap.isDragging = true;
-		}
-	}
-
-	public virtual void OnEndDrag(PointerEventData eventData)
-	{
-		if (animeLock)
-		{
-			return;
-		}
-		if (ownership != 0)
-		{
-			return;
-		}
-		//锁住玩家操作
-		if (BattleSceneManager.Turn != 0)
-		{
-			return;
-		}
-	}
-
-	public static float moveUp = 450f;
-	public virtual void OnPointerEnter(PointerEventData eventData)
-	{
-		if(animeLock)
-		{
-			return;
-		}
-		if(BattleLineController.updating)
-		{
-			return;
-		}
-		if (handicap.isDragging)
-		{
-			return;
-		}
-		if (handicap.pushing)
-		{
-			return;
-		}
-		if (ownership != 0)
-		{
-			return;
-		}
-		if (dataState == ElementState.inHandicap)
-		{
-			canvas.sortingOrder = upperOrder;
-			transform.DOScale(inspectScale, moveTime);
-			transform.DOMove(handicap.GetInsertionPosition(handicapIdx) + moveUp * Vector3.up, moveTime);
-		}
-	}
-
-	public virtual void OnPointerExit(PointerEventData eventData)
-	{
-		if (animeLock)
-		{
-			return;
-		}
-		if (BattleLineController.updating)
-		{
-			return;
-		}
-		if (handicap.isDragging)
-		{
-			return;
-		}
-		if (handicap.pushing)
-		{
-			return;
-		}
-		if (ownership != 0)
-		{
-			return;
-		}
-		if (dataState == ElementState.inHandicap)
-		{
-			handicap.UpdateHandicapPosition();
-			transform.DOScale(handicapScale, 0.2f);
-			transform.DOMove(handicap.GetInsertionPosition(handicapIdx), moveTime);
 		}
 	}
 }

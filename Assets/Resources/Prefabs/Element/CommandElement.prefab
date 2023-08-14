@@ -14,6 +14,8 @@ GameObject:
   - component: {fileID: 3730036816524844629}
   - component: {fileID: 4387264406864628924}
   - component: {fileID: 6642998932481347951}
+  - component: {fileID: 5301183072029538561}
+  - component: {fileID: 836410684810502576}
   m_Layer: 0
   m_Name: CommandElement
   m_TagString: Untagged
@@ -120,7 +122,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_PresetInfoIsWorld: 0
 --- !u!114 &6642998932481347951
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -133,10 +135,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c098620c55c1224982f5d23f9abc33f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inputLock: 0
+  battleFieldScale: {x: 0, y: 0, z: 0}
+  handicapScale: {x: 0, y: 0, z: 0}
+  targetTextScale: {x: 0, y: 0, z: 0}
+  originTextScale: {x: 0, y: 0, z: 0}
+  counterScaleOrigin: {x: 0, y: 0, z: 0}
+  counterScaleEnlarge: {x: 0, y: 0, z: 0}
+  handicapLogicPosition: {x: 0, y: 0, z: 0}
+  counterfontSizeOrigin: 0
+  counterfontSizeEnlarge: 0
+  normalFontSizeOrigin: 0
+  normalFontSizeEnlarge: 0
   battleSceneManager: {fileID: 0}
-  stack: {fileID: 0}
   canvas: {fileID: 0}
-  handicap: {fileID: 0}
   handicapIdx: 0
   ID: 
   ownership: 0
@@ -144,8 +156,6 @@ MonoBehaviour:
   category: 
   description: 
   cost: 0
-  dataState: 0
-  preprocessed: 0
   CardImage: {fileID: 5312439951030344005}
   InspectorImage: {fileID: 0}
   elementGround: {fileID: 4291519945463573474}
@@ -156,9 +166,7 @@ MonoBehaviour:
   nameText: {fileID: 4714844451199132177}
   costText: {fileID: 2644479884992049911}
   InspectPanel: {fileID: 0}
-  Inspector: {fileID: 0}
   InspectorGround: {fileID: 0}
-  InspectorShell: {fileID: 0}
   InspectorFrame: {fileID: 0}
   InspectorCategoryIcon: {fileID: 0}
   InspectorNameTag: {fileID: 0}
@@ -175,27 +183,48 @@ MonoBehaviour:
   componentCategoryIcon: {fileID: 8041817276537351629}
   componentDescriptionText: {fileID: 5557872177618315967}
   componentPosition: {x: 0, y: 0, z: 0}
-  handicapScale: {x: 0, y: 0, z: 0}
-  inspectScale: {x: 0, y: 0, z: 0}
-  battleFieldScale: {x: 0, y: 0, z: 0}
-  battleFieldPosition: {x: 0, y: 0, z: 0}
-  targetTextScale: {x: 0, y: 0, z: 0}
-  originTextScale: {x: 0, y: 0, z: 0}
-  counterScaleOrigin: {x: 0, y: 0, z: 0}
-  counterScaleEnlarge: {x: 0, y: 0, z: 0}
-  counterfontSizeOrigin: 0
-  counterfontSizeEnlarge: 0
-  normalFontSizeOrigin: 0
-  normalFontSizeEnlarge: 0
-  scaleTime: 0.3
-  moveTime: 0.2
-  upperOrder: 100
-  lowerOrder: 0
-  inputOffset: {x: 0, y: 0}
-  animeLock: 0
+  handicapInspect: {fileID: 0}
   durabilityText: {fileID: 7830084836532847539}
   durability: 0
   type: 
+--- !u!114 &5301183072029538561
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1308769503806020367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 815ee7d460c77954f80337857a7bfd51, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controller: {fileID: 6642998932481347951}
+  inspectFactor: 1.2
+  offset: {x: 0, y: 450, z: 0}
+  duration: 0.2
+  canvas: {fileID: 1453865705016682070}
+  upperOrder: 100
+  lowerOrder: 0
+--- !u!114 &836410684810502576
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1308769503806020367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db6d013cc9000d94fb4f59fd7a47575c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controller: {fileID: 6642998932481347951}
+  inspector: {fileID: 0}
+  buffer: {fileID: 0}
+  canvas: {fileID: 0}
+  upperOrder: 0
+  lowerOrder: 0
+  duration: 0
 --- !u!1 &1714055929003134500
 GameObject:
   m_ObjectHideFlags: 0
@@ -340,8 +369,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 12
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: afcc5cc520f12334980de9a824a45293, type: 2}
+  m_sharedMaterial: {fileID: -8328883905887426020, guid: afcc5cc520f12334980de9a824a45293, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1334,8 +1363,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 3
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: afcc5cc520f12334980de9a824a45293, type: 2}
+  m_sharedMaterial: {fileID: -8328883905887426020, guid: afcc5cc520f12334980de9a824a45293, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

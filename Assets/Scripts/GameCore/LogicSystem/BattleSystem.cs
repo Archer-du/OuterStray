@@ -104,15 +104,10 @@ namespace LogicCore
 			this.pool = pool;
 			//系统层渲染接口
 			controller = bsdspl;
-			//TODO 之后由战术层参数化
+
 			eventTable = new EventTable[2] { new EventTable(), new EventTable() };
 
 			bases = new UnitElement[2];
-
-			//-----------------------
-
-			deployQueue = new List<UnitElement>();
-			UnitIDDic = new Dictionary<string, List<UnitElement>>();
 
 		}
 		public void SetSceneController(IBattleSceneController bsdspl)
@@ -129,12 +124,15 @@ namespace LogicCore
 		/// <summary>
 		/// 由战术层指定参数构建战场
 		/// </summary>
-		/// <param name="deck"></param>
+		/// <param name="playerDeck"></param>
 		/// <param name="enemyDeck"></param>
-		internal void BuildBattleField(Deck deck, Deck enemyDeck, int fieldCapacity, int[] battleLinesCapacity,
+		internal void BuildBattleField(Deck playerDeck, Deck enemyDeck, int fieldCapacity, int[] battleLinesCapacity,
 			int initialTurn, int initialHumanEnergy, int initialPlantEnergy, int initialHumanHandicaps, int initialPlantHandicaps,
 			List<BattleNode.FieldPreset> fieldPresets)
 		{
+			deployQueue = new List<UnitElement>();
+			UnitIDDic = new Dictionary<string, List<UnitElement>>();
+
 			stacks = new RandomCardStack[2];
 			handicaps = new RedemptionZone[2];
 
@@ -162,12 +160,12 @@ namespace LogicCore
 
 			BuildBattleLine(fieldCapacity, battleLinesCapacity);
 
-			BuildHumanStack(deck);
+			BuildHumanStack(playerDeck);
 			BuildPlantStack(enemyDeck);
 
-			InitializeHandicaps(initialHumanHandicaps, initialPlantHandicaps);
+			BuildHandicaps(initialHumanHandicaps, initialPlantHandicaps);
 
-			FieldPreset(fieldPresets);
+			FieldPreset(playerDeck.bases ,fieldPresets);
 
 			//渲染控件初始化
 			controller.UpdateEnergy(0, energy[0]);
@@ -179,10 +177,34 @@ namespace LogicCore
 			energy[TURN] += energySupply[TURN];
 			controller.UpdateEnergy(energy[TURN]);
 		}
+		//TODO clear
 		internal void UnloadBattleField()
 		{
+			eventTable[0].UnloadAllHandler();
+			eventTable[1].UnloadAllHandler();
 
+			linesCapacity = 0;
+
+			//display
+
+			UnloadBattleLine();
+			UnloadStack();
+			UnloadHandicaps();
 		}
+		private void UnloadBattleLine()
+		{
+			battleLines = null;
+		}
+		private void UnloadStack()
+		{
+			stacks = null;
+		}
+		private void UnloadHandicaps()
+		{
+			handicaps = null;
+		}
+
+
 
 		/// <summary>
 		/// 构建战线
@@ -205,22 +227,12 @@ namespace LogicCore
 			}
 			//初始只有自己的支援战线归属权为自己
 		}
-		private void UnloadBattleLine()
-		{
-			battleLines.Clear();
-		}
-
-
 
 		private void BuildHumanStack(Deck deck)
 		{
 			stacks[0] = new RandomCardStack(0, controller.InstantiateCardStack(0));
 
 			stacks[0].Fill(deck);
-		}
-		private void UnloadHumanStack()
-		{
-			stacks[0].Clear();
 		}
 
 
@@ -232,15 +244,11 @@ namespace LogicCore
 
 			stacks[1].Fill(deck);
 		}
-		private void UnloadPlantStack()
+
+
+		private void BuildHandicaps(int initialHumanHandicaps, int initialPlantHandicaps)
 		{
-			stacks[1].Clear();
-		}
-
-
-
-		private void InitializeHandicaps(int initialHumanHandicaps, int initialPlantHandicaps)
-		{
+			//TODO simplify
 			handicaps[0] = new RedemptionZone();
 			handicaps[1] = new RedemptionZone();
 			handicaps[0].controller = controller.InstantiateHandicap(0);
@@ -264,20 +272,16 @@ namespace LogicCore
 			handicaps[0].Fill(list[0]);
 			handicaps[1].Fill(list[1]);
 		}
-		private void UnloadHandicaps()
+
+		internal void FieldPreset(UnitElement playerBase, List<BattleNode.FieldPreset> fieldPresets)
 		{
-			handicaps[0].Clear();
-			handicaps[1].Clear();
-		}
+			bases[0] = playerBase;
+			bases[0].controller = controller.InstantiateUnitInBattleField(0, 0, 0);
+			bases[0].Deploy(battleLines[0], 0);
+			UpdateFrontLine();
+			UpdateAttackRange();
 
-
-
-
-
-
-		internal void FieldPreset(List<BattleNode.FieldPreset> fieldPresets)
-		{
-			foreach(BattleNode.FieldPreset fieldPreset in fieldPresets)
+			foreach (BattleNode.FieldPreset fieldPreset in fieldPresets)
 			{
 				UnitCard card = pool.GetCardByID(fieldPreset.cardPreset.ID) as UnitCard;
 				UnitElement element = null;
@@ -286,23 +290,23 @@ namespace LogicCore
 				{
 					case "LightArmor":
 						element = new LightArmorElement(card, this,
-							controller.InstantiateUnitInBattleField(0, lineIdx, 0));
+							controller.InstantiateUnitInBattleField(card.ownership, lineIdx, 0));
 						break;
 					case "Motorized":
 						element = new MotorizedElement(card, this,
-							controller.InstantiateUnitInBattleField(0, lineIdx, 0));
+							controller.InstantiateUnitInBattleField(card.ownership, lineIdx, 0));
 						break;
 					case "Artillery":
 						element = new ArtilleryElement(card, this,
-							controller.InstantiateUnitInBattleField(0, lineIdx, 0));
+							controller.InstantiateUnitInBattleField(card.ownership, lineIdx, 0));
 						break;
 					case "Guardian":
 						element = new GuardianElement(card, this,
-							controller.InstantiateUnitInBattleField(0, lineIdx, 0));
+							controller.InstantiateUnitInBattleField(card.ownership, lineIdx, 0));
 						break;
 					case "Construction":
 						element = new ConstructionElement(card, this,
-							controller.InstantiateUnitInBattleField(0, lineIdx, 0));
+							controller.InstantiateUnitInBattleField(card.ownership, lineIdx, 0));
 						break;
 				}
 				if (fieldPreset.cardPreset.boss)
@@ -313,60 +317,13 @@ namespace LogicCore
 				element.dynAttackWriter = fieldPreset.cardPreset.attackPreset;
 				element.dynAttackCounter = fieldPreset.cardPreset.attackCounterPreset;
 				//TODO
-				element.operateCounter = 1;
 				element.Deploy(battleLines[lineIdx], 0);
 
 				UpdateFrontLine();
 				UpdateAttackRange();
 			}
+			controller.InitBases(bases[0].controller, bases[1].controller);
 		}
-		//tutorial temp function
-		//private void TutorialInit()
-		//{
-		//	//TODO
-		//	UnitCard card = new UnitCard("human_10000", 0, "基地车", "Construction", 0, 0, 30, 100000, "基地", -1, -1, "none");
-		//	bases[0] = new ConstructionElement(card, this);
-		//	bases[0].dynHealth = 3;
-		//	bases[0].controller = controller.InstantiateUnitInBattleField(0, 0, 0);
-		//	bases[0].Init();
-		//	bases[0].Deploy(this, battleLines[0], 0);
-		//	bases[0].operateCounter = 1;
-		//	bases[0].UpdateInfo();
-
-		//	card = pool.GetCardByID("human_03") as UnitCard;
-		//	LightArmorElement human03 = new LightArmorElement(card, this);
-		//	human03.dynAttackCounter = 1;
-  //          human03.controller = controller.InstantiateUnitInBattleField(0, 0, 0);
-		//	human03.Init();
-		//	human03.Deploy(this, battleLines[0], 0);
-		//	human03.operateCounter = 1;
-		//	human03.UpdateInfo();
-
-		//	card = pool.GetCardByID("mush_00") as UnitCard;
-		//	LightArmorElement mush1 = new LightArmorElement(card, this);
-		//	mush1.controller = controller.InstantiateUnitInBattleField(1, 1, 0);
-		//	LightArmorElement mush2 = new LightArmorElement(card, this);
-		//	mush2.controller = controller.InstantiateUnitInBattleField(1, 1, 0);
-  //          mush1.Init();
-		//	mush2.Init();
-		//	mush1.Deploy(this, battleLines[1], 0);
-		//	mush2.Deploy(this, battleLines[1], 0);
-		//	mush1.operateCounter = 1;
-		//	mush2.operateCounter = 1;
-		//	mush1.UpdateInfo();
-		//	mush2.UpdateInfo();
-
-		//	card = pool.GetCardByID("mush_99_01") as UnitCard;
-		//	ConstructionElement strangeMush = new ConstructionElement(card, this);
-  //          strangeMush.controller = controller.InstantiateUnitInBattleField(1, 3, 0);
-		//	strangeMush.Init();
-		//	strangeMush.Deploy(this, this.battleLines[3], 0);
-		//	strangeMush.operateCounter = 1;
-		//	strangeMush.UpdateInfo();
-
-		//	UpdateFrontLine();
-		//	UpdateAttackRange();
-		//}
 
 
 		public void Deploy(int handicapIdx, int dstLineIdx, int dstPos)
@@ -390,8 +347,6 @@ namespace LogicCore
 				throw new InvalidOperationException("not enough energy!");
 			}
 
-
-
 			//无参事件
 			eventTable[TURN].RaiseEvent("DeployUnit", null, this);
 
@@ -405,16 +360,9 @@ namespace LogicCore
 
 			element.Deploy(battleLines[dstLineIdx], dstPos);
 
-
-
-			//更新前线指针
 			UpdateFrontLine();
 			UpdateAttackRange();
-			//更新目标
 			Settlement();
-
-
-
 
 			if (dstLineIdx == frontLines[TURN])
 			{
@@ -459,10 +407,8 @@ namespace LogicCore
 				stacks[TURN].Push(element);
 			}
 
-			//更新前线指针
 			UpdateFrontLine();
 			UpdateAttackRange();
-			//更新目标
 			Settlement();
 
 
@@ -523,34 +469,6 @@ namespace LogicCore
 
 			controller.Settlement();
 		}
-		[Obsolete("legacy")]
-
-
-		public void VerticalMove(int resLineIdx, int resIdx, int dstPos)
-		{
-			if (dstPos >= battleLines[resLineIdx].count)
-			{
-				throw new InvalidOperationException("battleLine out of range");
-			}
-
-			eventTable[TURN].RaiseEvent("MoveUnit", null, this);
-
-
-			UnitElement element = battleLines[resLineIdx][resIdx];
-			battleLines[resLineIdx].Receive(battleLines[resLineIdx].Send(resIdx), dstPos);
-
-			//先更新前线再更新目标
-			UpdateFrontLine();
-			UpdateAttackRange();
-
-			//element.Move();
-
-
-			eventTable[TURN].RaiseEvent("UnitMoved", null, this);
-
-			eventTable[TURN].RaiseEvent("UpdateAura", null, this);
-			eventTable[(TURN + 1) % 2].RaiseEvent("UpdateAura", null, this);
-		}
 
 
 		public void Retreat(int resLineIdx, int resIdx)
@@ -594,10 +512,11 @@ namespace LogicCore
 				handicaps[TURN].Push(element);
 			}
 
-			Settlement();
+			RotateSettlement();
 
 			TURN = (TURN + 1) % 2;
 
+			//TODO config
 			energy[TURN] = energy[TURN] + energySupply[TURN] > 15 ? 15 : energy[TURN] + energySupply[TURN];
 			controller.UpdateEnergy(TURN, energy[TURN]);
 
@@ -617,14 +536,29 @@ namespace LogicCore
 		}
 
 
+
+
 		public void BattleFailed()
+		{
+			UnloadBattleField();
+			//display TODO
+			tacticalSystem.CampaignFailed();
+		}
+		public void BattleFailedCheck()
 		{
 
 		}
 		public void BattleWinned()
 		{
+			UnloadBattleField();
+			tacticalSystem.CampaignCompleted();
+			tacticalSystem.playerDeck.WriteBack(stacks[0]);
+		}
+		public void BattleWinnedCheck()
+		{
 
 		}
+
 
 
 
@@ -734,6 +668,17 @@ namespace LogicCore
 				if (deployQueue[i].state == ElementState.inBattleLine)
 				{
 					deployQueue[i].Settlement();
+					UpdateAttackRange();
+				}
+			}
+		}
+		private void RotateSettlement()
+		{
+			for (int i = 0; i < deployQueue.Count; i++)
+			{
+				if (deployQueue[i].state == ElementState.inBattleLine)
+				{
+					deployQueue[i].RotateSettlement();
 					UpdateAttackRange();
 				}
 			}

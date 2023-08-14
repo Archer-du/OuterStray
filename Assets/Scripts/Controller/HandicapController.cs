@@ -10,10 +10,7 @@ using DataCore.BattleElements;
 public class HandicapController : MonoBehaviour,
 	IHandicapController
 {
-
-
 	public Transform parent;
-
 
 	private int ownership;
 
@@ -21,16 +18,12 @@ public class HandicapController : MonoBehaviour,
 	private float horizontalEdge;
 	private float gridWidth;
 
-	public int capacity;//TODO 与数据层链接
+	public int capacity;
 	/// <summary>
 	/// 手牌数，有上限
 	/// </summary>
 	/// //TODO
 	public int count { get => handiCards.Count; }
-
-	public bool isDragging;
-
-	public bool awaked = false;
 
 	List<BattleElementController> handiCards;
 	internal BattleElementController this[int index]
@@ -39,10 +32,6 @@ public class HandicapController : MonoBehaviour,
 		set => handiCards[index] = value;
 	}
 
-
-
-
-	//note: start太晚，awake太早，晕了 TODO
 	public void Init()
 	{
 		ownership = transform.GetSiblingIndex();
@@ -51,15 +40,12 @@ public class HandicapController : MonoBehaviour,
 		length = GetComponent<RectTransform>().rect.width - 2 * horizontalEdge;
 		gridWidth = 240f;
 
+		//TODO config
 		capacity = 8;
 
-		isDragging = false;
-		pushing = false;
+		//isDragging = false;
 
 		handiCards = new List<BattleElementController>();
-
-
-		awaked = true;
 	}
 
 
@@ -77,32 +63,31 @@ public class HandicapController : MonoBehaviour,
 	public void Fill(List<IBattleElementController> list)
 	{
 		Sequence seq = DOTween.Sequence();
-		pushing = true;
+		//pushing = true;
 		for (int i = 0; i < list.Count; i++)
 		{
 			BattleElementController element = list[i] as BattleElementController;
 
+			element.animeLock = true;
 			element.gameObject.SetActive(true);
 			element.transform.SetParent(transform);
 			element.transform.localScale = element.handicapScale;
 
-			Vector3 moveBy = GetInsertionPosition(i) - element.transform.position;
+			Vector3 moveBy = GetLogicPosition(i) - element.transform.position;
 			Vector3 rotateBy = new Vector3(0, 0, (1 - (ownership * 2)) * 90);
 
 			seq.Append(element.transform.DOBlendableMoveBy(moveBy, popTime));
 			seq.Join(element.transform.DOBlendableRotateBy(rotateBy, popTime)
 				.OnComplete(() =>
 				{
+					element.animeLock = false;
 					handiCards.Add(element);
-					UpdateElements();
 					UpdateHandicapPosition();
 				}));
 		}
-		UpdateElements();
 
 		seq.OnComplete(() =>
 		{
-			pushing = false;
 			UpdateHandicapPosition();
 		});
 		seq.Play();
@@ -124,10 +109,10 @@ public class HandicapController : MonoBehaviour,
 		}
 
 		BattleElementController element = controller as BattleElementController;
-		pushing = true;
 
 		handiCards.Add(element);
 
+		element.animeLock = true;
 		element.gameObject.SetActive(true);
 		element.transform.SetParent(transform);
 		element.transform.localScale = element.handicapScale;
@@ -135,36 +120,6 @@ public class HandicapController : MonoBehaviour,
 		PushAnimation(element);
 
 	}
-	//FIXME TODO dataState有多驱动问题
-	public void PushAnimation(BattleElementController element)
-	{
-		Vector3 moveBy = GetInsertionPosition(count) - element.transform.position;
-		Vector3 rotateBy = new Vector3(0, 0, (1 - (ownership * 2)) * 90);
-
-		Sequence seq = DOTween.Sequence();
-		seq.Append(element.transform.DOBlendableMoveBy(moveBy, popTime));
-		seq.Join(element.transform.DOBlendableRotateBy(rotateBy, popTime)
-			.OnComplete(() =>
-			{
-				UpdateElements();
-				UpdateHandicapPosition();
-				pushing = false;
-			}));
-		seq.Play();
-	}
-	private void UpdateElements()
-	{
-		for (int i = 0; i < handiCards.Count; i++)
-		{
-			handiCards[i].handicapIdx = i;
-		}
-	}
-
-
-
-
-
-
 	/// <summary>
 	/// 成功移除卡牌时调用
 	/// </summary>
@@ -172,30 +127,59 @@ public class HandicapController : MonoBehaviour,
 	/// <returns></returns>
 	public IBattleElementController Pop(int handicapIdx)
 	{
-		isDragging = true;
 		BattleElementController controller = handiCards[handicapIdx];
 		handiCards.RemoveAt(handicapIdx);
-		UpdateElements();
-
 
 		UpdateHandicapPosition();
 
 		return controller as IBattleElementController;
 	}
-	public float updateTime = 0.2f;
+	public void PushAnimation(BattleElementController element)
+	{
+		Vector3 moveBy = GetLogicPosition(count) - element.transform.position;
+		Vector3 rotateBy = new Vector3(0, 0, (1 - (ownership * 2)) * 90);
+
+		Sequence seq = DOTween.Sequence();
+		seq.Append(element.transform.DOBlendableMoveBy(moveBy, popTime));
+		seq.Join(element.transform.DOBlendableRotateBy(rotateBy, popTime)
+			.OnComplete(() =>
+			{
+				element.animeLock = false;
+				UpdateHandicapPosition();
+			}));
+		seq.Play();
+	}
+
+
+
+
+
+
+	private float updateTime = 0.2f;
 	public void UpdateHandicapPosition()
 	{
+		UpdateElements();
+
 		for (int i = 0; i < handiCards.Count; i++)
 		{
+			handiCards[i].animeLock = true;
 			Vector3 oriPos = handiCards[i].transform.position;
-			Vector3 dstPos = GetInsertionPosition(i);
+			Vector3 dstPos = handiCards[i].handicapLogicPosition;
 			//TODO config
-
-			handiCards[i].transform.DOMove(dstPos, updateTime).OnComplete(() => isDragging = false);
+			int temp = i;
+			handiCards[i].transform.DOMove(dstPos, updateTime)
+				.OnComplete(() => handiCards[temp].animeLock = false);
 			handiCards[i].canvas.sortingOrder = i;
 		}
 	}
-
+	private void UpdateElements()
+	{
+		for (int i = 0; i < handiCards.Count; i++)
+		{
+			handiCards[i].handicapIdx = i;
+			handiCards[i].handicapLogicPosition = GetLogicPosition(i);
+		}
+	}
 
 
 
@@ -206,25 +190,19 @@ public class HandicapController : MonoBehaviour,
 	public BattleElementController draggingElement;
 	public void Insert(BattleElementController element)
 	{
-		if(element.animeLock)
-		{
-			return;
-		}
-		//TODO 这里得锁住
-		isDragging = true;
-
+		//isDragging = true;
 		draggingElement = element;
-		element.transform.DOMove(GetInsertionPosition(element.handicapIdx), returnTime).OnComplete(ResetHierachy);
+		draggingElement.animeLock = true;
+		draggingElement.transform.DOScale(draggingElement.handicapScale, returnTime).OnComplete(() => draggingElement.animeLock = false);
+		element.transform.DOMove(GetLogicPosition(element.handicapIdx), returnTime).OnComplete(ResetHierachy);
 	}
 	private void ResetHierachy()
 	{
-		isDragging = false;
-
 		draggingElement.transform.SetParent(transform);
 		draggingElement.transform.SetSiblingIndex(draggingElement.handicapIdx + 2);
 
 	}
-	public Vector3 GetInsertionPosition(int index)
+	public Vector3 GetLogicPosition(int index)
 	{
 		Vector3 offset = new Vector3((index - count / 2) * gridWidth + gridWidth / 2 * ((count + 1) % 2), 0, 0);
 		return transform.position + offset;

@@ -10,11 +10,13 @@ using System;
 using System.Xml.Linq;
 using System.Data;
 using System.IO;
-
+using UnityEditor;
 
 public class BattleSceneManager : MonoBehaviour,
 	IBattleSceneController
 {
+	public static event Action InputLocked;
+	public static event Action InputUnlocked;
 	/// <summary>
 	/// GameManager单例
 	/// </summary>
@@ -25,10 +27,6 @@ public class BattleSceneManager : MonoBehaviour,
 	/// 系统输入接口
 	/// </summary>
 	IBattleSystemInput battleSystem;
-
-
-
-
 
 	[Header("Prototype")]
 	public GameObject battleLinePrototype;
@@ -72,6 +70,19 @@ public class BattleSceneManager : MonoBehaviour,
 	public int[] energy;
 	public int[] energySupply;
 
+	public UnitElementController[] bases;
+
+	public Image baseImage;
+	public Image baseFrame;
+	public Image baseGround;
+	public Image baseIcon;
+	public TMP_Text baseHealth;
+	public TMP_Text baseDescription;
+
+
+	public Button exitButton;
+
+
 	/// <summary>
 	/// 战场战线容量
 	/// </summary>
@@ -96,8 +107,6 @@ public class BattleSceneManager : MonoBehaviour,
 
 	//结算锁
 	public static bool settlement = false;
-	public bool check = false;
-
 
 
     public void FieldInitialize(IBattleSystemInput handler, int fieldCapacity)
@@ -115,6 +124,8 @@ public class BattleSceneManager : MonoBehaviour,
 
 		cardStackController = new CardStackController[2];
 		handicapController = new HandicapController[2];
+
+		bases = new UnitElementController[2];
 
 
 		skipButton.onClick.AddListener(Skip);
@@ -134,14 +145,28 @@ public class BattleSceneManager : MonoBehaviour,
 			plantSlots[i].SetActive(false);
 		}
 
+		InputLocked?.Invoke();
 		rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
-
-		check = true;
 	}
+	public void InitBases(IUnitElementController humanBase, IUnitElementController plantBase)
+	{
+		bases[0] = humanBase as UnitElementController;
+		bases[1] = plantBase as UnitElementController;
 
-
-
+		Color color = bases[0].elementFrame.color;
+		baseImage.sprite = bases[0].CardImage.sprite;
+		baseFrame.color = color;
+		baseGround.color = color;
+		baseIcon.sprite = bases[0].InspectorCategoryIcon.sprite;
+		baseDescription.text = bases[0].description;
+	}
+	public float healthDuration = 0.2f;
+	public void UpdateBaseHealth(int health)
+	{
+		baseHealth.text = health.ToString();
+		baseHealth.DOColor(new Color(1 - (float)health / bases[0].maxHealthPoint, 0, 0), healthDuration);
+	}
 
     /// <summary>
     /// 
@@ -152,6 +177,7 @@ public class BattleSceneManager : MonoBehaviour,
 		rotateSequence.InsertCallback(sequenceTime, () =>
 		{
 			sequenceTime = 0;
+			InputUnlocked?.Invoke();
 			UpdateTurn();
 		});
 	}
@@ -160,6 +186,7 @@ public class BattleSceneManager : MonoBehaviour,
 		rotateSequence.InsertCallback(sequenceTime, () =>
 		{
 			sequenceTime = 0;
+			InputUnlocked?.Invoke();
 		});
 	}
 	public void UpdateTurn(int TURN)
@@ -332,13 +359,17 @@ public class BattleSceneManager : MonoBehaviour,
 
 
 
-
+	public void Exit()
+	{
+		battleSystem.Exit();
+	}
 	/// <summary>
 	/// 敌我双方公用的输入 结束回合
 	/// </summary>
 	public void Skip()
 	{
 		//分配动画队列
+		InputLocked?.Invoke();
 		rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
 		battleSystem.Skip();
@@ -351,17 +382,7 @@ public class BattleSceneManager : MonoBehaviour,
 	/// <returns></returns>
 	public int PlayerDeploy(Vector2 position, int handicapIdx)
 	{
-		//不是自己的回合
-		if (Turn != 0)
-		{
-			return -1;
-		}
-		if (BattleLineController.updating)
-		{
-			return -1;
-		}
 		int idx = GetBattleLineIdx(position.y);
-		//没有部署在支援战线 TODO 扩展
 		if(idx != 0)
 		{
 			return -1;
@@ -377,6 +398,7 @@ public class BattleSceneManager : MonoBehaviour,
 		//---解析输入---
 
 
+		InputLocked?.Invoke();
 		rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
 
@@ -389,15 +411,6 @@ public class BattleSceneManager : MonoBehaviour,
 	}
 	public int PlayerCast(Vector2 position, int handicapIdx)
 	{
-		//不是自己的回合
-		if (Turn != 0)
-		{
-			return -1;
-		}
-		if (BattleLineController.updating)
-		{
-			return -1;
-		}
 		int idx = GetBattleLineIdx(position.y);
 		if (idx < 0)
 		{
@@ -409,7 +422,6 @@ public class BattleSceneManager : MonoBehaviour,
 			return -1;
 		}
 		int pos = battleLineControllers[idx].GetCastPos(position.x);
-		Debug.Log(pos);
 		string type = (handicapController[0][handicapIdx] as CommandElementController).type;
 		if(pos < 0 && type == "Target") return -1;
 
@@ -432,24 +444,12 @@ public class BattleSceneManager : MonoBehaviour,
 	/// <returns></returns>
 	public int PlayerMove(Vector2 position, BattleLineController resLine, UnitElementController element)
 	{
-		if (Turn != 0)
-		{
-			return -1;
-		}
-		if (BattleLineController.updating)
-		{
-			return -1;
-		}
 		int dstLineIdx = GetBattleLineIdx(position.y);
 		int resLineIdx = resLine.lineIdx;
 		int resIdx = element.resIdx;
 		int dstPos = battleLineControllers[dstLineIdx].GetDeployPos(position.x);
 		if(dstPos < 0) return -1;
 
-		if (element.operateCounter == 0)
-		{
-			return -1;
-		}
 		if (dstLineIdx == resLineIdx) return -1;
 		if(Math.Abs(dstLineIdx - resLineIdx) > element.moveRange) return -1;
 
@@ -461,6 +461,7 @@ public class BattleSceneManager : MonoBehaviour,
 		//解析成功
 
 
+		InputLocked?.Invoke();
 		rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
 
@@ -470,10 +471,6 @@ public class BattleSceneManager : MonoBehaviour,
 	}
 	public int PlayerRetreat(Vector2 position, BattleLineController resLine, UnitElementController element)
 	{
-		if (Turn != 0)
-		{
-			return -1;
-		}
 		if(resLine.lineIdx != 0)
 		{
 			return -1;
@@ -483,7 +480,6 @@ public class BattleSceneManager : MonoBehaviour,
 		{
 			return -1;
 		}
-		
 
 		rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
@@ -550,8 +546,6 @@ public class BattleSceneManager : MonoBehaviour,
 			}
 			else break;
 		}
-
-
 		Skip();
 	}
 	private int GetMaxCost()

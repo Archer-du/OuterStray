@@ -47,11 +47,18 @@ namespace DisplayInterface
 	{
 		public void TerrrainsInitialize(ITacticalSystemInput handler, int terrainsLength);
 		public ITerrainController InstantiateTerrain(int idx);
+		public IDeckController InstantiateDeck();
 		public void EnterNextTerrain();
 		public void UpdateCurrentNode(INodeController controller);
 
 		public void CampaignCompleted();
 		public void CampaignFailed();
+	}
+	public interface IDeckController
+	{
+		public void Init();
+
+		public void InstantiateDeckTag();
 	}
 	public interface ITerrainController
 	{
@@ -78,6 +85,7 @@ namespace DisplayInterface
 		/// </summary>
 		/// <param name="handler"></param>
 		public void FieldInitialize(IBattleSystemInput handler, int fieldCapacity);
+		public void InitBases(IUnitElementController humanBase, IUnitElementController plantBase);
 
 		public IBattleLineController InstantiateBattleLine(int idx, int capacity);
 		public IHandicapController InstantiateHandicap(int turn);
@@ -178,6 +186,7 @@ namespace DisplayInterface
 		public void CommandInit(string ID, int ownership, string name, string type, int cost, string description);
 
 		public void UpdateInfo(int cost, int durability, ElementState state);
+		public void UpdateState(ElementState state);
 
 		public void CastAnimationEvent(string method);
 	}
