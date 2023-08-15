@@ -2,7 +2,7 @@
     "initialTurn": 0,
     "fieldCapacity": 4,
     "battleLinesCapacity":[
-        4, 4, 4, 4
+        5, 5, 4, 4
     ],
     "plantDeckPath": "Assets\\Config\\DeckConfigs\\BattleNode_3.csv",
     "initialHumanEnergy": 1,

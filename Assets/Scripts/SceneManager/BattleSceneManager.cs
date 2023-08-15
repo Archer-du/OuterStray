@@ -108,7 +108,6 @@ public class BattleSceneManager : MonoBehaviour,
 	//结算锁
 	public static bool settlement = false;
 
-
     public void FieldInitialize(IBattleSystemInput handler, int fieldCapacity)
 	{
 		DontDestroyOnLoad(gameObject);
@@ -502,6 +501,7 @@ public class BattleSceneManager : MonoBehaviour,
 	HandicapController AIHandicap;
 	BattleLineController AISupportLine;
 	BattleLineController AIAdjacentLine;
+
 	IEnumerator AIBehavior()
 	{
 		AIHandicap = handicapController[1];
@@ -513,14 +513,31 @@ public class BattleSceneManager : MonoBehaviour,
 
 		yield return new WaitForSeconds(waitTime);
 
-
-
 		int deploytimes = 1;
 		int movetimes = 1;
 		int cost = GetMinCost();
 
-		//把支援战线铺满
-		while(AISupportLine.count < 5)
+		// 策略：先过牌，再铺场，最后赚卡
+
+		// 优先使用“蔓延”，补充手牌
+        for (int i = 0; i < AIHandicap.count; i++)
+        {
+            if (AIHandicap[i].ID == "comm_mush_07" && energy[Turn] > 2)
+            {
+                AICast(i);
+            }
+        }
+
+        //把支援战线铺满
+        for (int i = 0; i < AIHandicap.count; i++)
+		{
+			if (AIHandicap[i].ID == "comm_mush_01" && energy[Turn] > 2)
+			{
+				AICast(i);
+			}
+		}
+
+        while (AISupportLine.count < 5)
 		{
 			int idx = GetMinCostUnitPointer();
 			if (idx >= 0)
@@ -546,9 +563,161 @@ public class BattleSceneManager : MonoBehaviour,
 			}
 			else break;
 		}
+
+		// 使用散播孢子，扩大场面
+        for (int i = 0; i < AIHandicap.count; i++)
+		{
+			if (AIHandicap[i].ID == "comm_mush_13" && energy[Turn] > 6 && AIAdjacentLine.count < AIAdjacentLine.capacity)
+			{
+				AICast(i);
+			}
+		}
 		Skip();
 	}
-	private int GetMaxCost()
+
+    IEnumerator AIBehaviourNode3()
+	{
+        HandicapController handicap = handicapController[1];
+
+        float waitTime = 0.9f;
+        yield return new WaitForSeconds(waitTime);
+
+        int movetimes = 1;
+		int frontLineIdx = GetFrontLineIdx();
+
+        // 移动策略：调整各蘑人站位，血量少的往前推，血量多的往后撤，使回合结束增殖时收益最大
+		// 从支援战线开始遍历一次，调整站位
+        for (int i = battleLineControllers.Length - 1; i > frontLineIdx; i--)
+        {
+            int halfCapacity = battleLineControllers[i].capacity / 2;
+
+            // 单位数大于容量的一半时，将本战线血量低的单位往前推
+            while (battleLineControllers[i].count > halfCapacity && i > frontLineIdx + 1)
+            {
+                Tuple<int, int> minHealthInfo = GetAvailableMinHealth(i);
+                int minHealthPointer = minHealthInfo.Item2;
+
+				// 若存在可操作对象，则执行操作
+				if (minHealthPointer > -1)
+				{
+                    Move(i, minHealthPointer, i + 1, 0);
+                    movetimes++;
+                }
+            }
+
+            // 当单位数小于或等于容量的一半减一，且前一条战线单位数大于容量一半时，将前一条战线血量高的往后撤
+            while (battleLineControllers[i].count <= halfCapacity - 1 && battleLineControllers[i - 1].count > battleLineControllers[i - 1].capacity / 2 && i > frontLineIdx + 1)
+            {
+                Tuple<int, int> maxHealthInfo = GetAvailableMaxHealth(i - 1);
+                int maxHealthPointer = maxHealthInfo.Item2;
+
+				if(maxHealthPointer > -1)
+				{
+                    Move(i - 1, maxHealthPointer, i, 0);
+                    movetimes++;
+                }
+            }
+        }
+		// 反向遍历一次，使站位更合理
+		for (int i = frontLineIdx + 1; i < battleLineControllers.Length; i++)
+		{
+			int halfCapacity = battleLineControllers[i].capacity / 2;
+
+			// 当单位数大于容量一半，且后一条战线单位数小于容量一半时，将本战线血量高的往后撤
+			while (battleLineControllers[i].count > halfCapacity && battleLineControllers[i + 1].count <= battleLineControllers[i + 1].capacity / 2 && i < fieldCapacity - 1)
+            {
+				Tuple<int, int> maxHealthInfo = GetAvailableMaxHealth(i);
+				int maxHealthPointer = maxHealthInfo.Item2;
+
+				if (maxHealthPointer > -1)
+				{
+                    Move(i, maxHealthPointer, i + 1, 0);
+                    movetimes++;
+                }
+			}
+
+			// 当单位数小于或等于容量一半加一,且后一条战线单位数大于或等于容量一半时，将后一条战线血量低的往前推
+			while (battleLineControllers[i].count <= halfCapacity + 1 && battleLineControllers[i + 1].count > battleLineControllers[i + 1].capacity / 2 && i < fieldCapacity - 1)
+			{
+				Tuple<int, int> minHealthInfo = GetAvailableMinHealth(i + 1);
+				int minHealthPointer = minHealthInfo.Item2;
+
+				if(minHealthPointer > -1)
+				{
+                    Move(i + 1, minHealthPointer, i, 0);
+                    movetimes++;
+                }
+			}
+		}
+
+		// 指令卡策略：费用够就出
+		while (energy[Turn] > 3 && handicap.count > 0)
+		{
+			AICast(0);
+		}
+
+		Skip();
+    }
+
+	private void Move(int resIdx, int resLineIdx, int dstLineIdx, int dstPos)
+    {
+        rotateSequence.Kill();
+        rotateSequence = DOTween.Sequence();
+
+        battleSystem.Move(resLineIdx, resIdx, dstLineIdx, dstPos);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns>返回可操作战线的索引-1</returns>
+    private int GetFrontLineIdx()
+	{
+		int idx = battleLineControllers.Length - 1;
+		while (battleLineControllers[idx].ownerShip == 1 || battleLineControllers[idx].count == 0)
+		{
+			idx--;
+		}
+		return idx;
+	}
+
+    /// <summary>
+    /// 获取某条战线上可操作的单位中生命值最小的单位的生命值和索引
+    /// </summary>
+    /// <returns>返回一个元组，包含生命值最小单位的生命值和索引</returns>
+    private Tuple<int, int> GetAvailableMinHealth(int battleLineIdx)
+    {
+        BattleLineController battleLine = battleLineControllers[battleLineIdx];
+        int minHealth = 100;
+        int minHealthPointer = -1;
+        for (int i = 0; i < battleLine.count; i++)
+        {
+            if (battleLine[i].healthPoint < minHealth && battleLine[i].operateCounter == 1)
+            {
+                minHealth = battleLine[i].healthPoint;
+                minHealthPointer = i;
+            }
+        }
+        return Tuple.Create(minHealth, minHealthPointer);
+    }
+
+    private Tuple<int, int> GetAvailableMaxHealth(int battleLineIdx)
+    {
+        BattleLineController battleLine = battleLineControllers[battleLineIdx];
+        int maxHealth = 0;
+        int maxHealthPointer = -1;
+        for (int i = 0; i < battleLine.count; i++)
+        {
+            if (battleLine[i].healthPoint > maxHealth && battleLine[i].operateCounter == 1)
+            {
+                maxHealth = battleLine[i].healthPoint;
+                maxHealthPointer = i;
+            }
+        }
+        return Tuple.Create(maxHealth, maxHealthPointer);
+    }
+
+    private int GetMaxCost()
 	{
 		int maxCost = 0;
 		int maxPointer = -1;
@@ -660,6 +829,8 @@ public class BattleSceneManager : MonoBehaviour,
 	{
 		rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
+
+		battleSystem.Cast(handicapIdx, 0, 0);
 	}
 
 	public void AIMove(int resIdx)
