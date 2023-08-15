@@ -14,7 +14,7 @@ namespace DataCore.BattleElements
 	/// <summary>
 	/// battle element: actual operator during a battle
 	/// </summary>
-	internal abstract class BattleElement
+	internal abstract class BattleElement : IComparable<BattleElement>
 	{
 		/// <summary>
 		/// 指向作战系统，获取全局信息
@@ -72,7 +72,10 @@ namespace DataCore.BattleElements
 		/// 费用
 		/// </summary>
 		internal int cost { get; set; }
-
+		/// <summary>
+		/// 气矿消耗
+		/// </summary>
+		internal int gasMineCost;
 		/// <summary>
 		/// 兵种
 		/// </summary>
@@ -85,23 +88,25 @@ namespace DataCore.BattleElements
 		internal int stackIdx;
 
 
-		internal BattleElement(Card __card, BattleSystem system)
+		internal BattleElement(Card card, BattleSystem system)
 		{
 			battleSystem = system;
 			//初始化事件系统和效果表
 			eventTable = new EventTable();
 			effectsTable = new EffectsTable(this);
 
-			this.card = __card;
-			this.backendID = __card.backendID;
-			this.name = __card.name;
-			this.description = __card.description;
-			this.cost = __card.cost;
-			this.ownership = __card.ownership;
+			this.card = card;
+			this.backendID = card.backendID;
+			this.name = card.name;
+			this.description = card.description;
+			this.cost = card.cost;
+			this.category = card.category;
+			this.ownership = card.ownership;
 			//TODO 维护
 			this.stackIdx = -1;
+			this.gasMineCost = card.gasMineCost;
 
-			EffectsParse(__card.effects);
+			EffectsParse(card.effects);
 		}
 
 		/// <summary>
@@ -215,6 +220,15 @@ namespace DataCore.BattleElements
 
 		internal virtual void UpdateInfo() { }
 		internal virtual void UpdateState() { }
+
+		public int CompareTo(BattleElement other)
+		{
+			if(category == other.category)
+			{
+				return cost.CompareTo(other.cost);
+			}
+			else return category.CompareTo(other.category);
+		}
 	}
 
 
@@ -804,9 +818,13 @@ namespace DataCore.BattleElements
 			battleLine.ElementRemove(inlineIdx);
 			controller.TerminateAnimationEvent(method);
 
-			if (this == battleSystem.bases[ownership])
+			if (this == battleSystem.bases[0])
 			{
 				battleSystem.BattleFailed();
+			}
+			if(this == battleSystem.bases[1])
+			{
+				battleSystem.BattleWinned();
 			}
 
 			//not likely
@@ -840,7 +858,7 @@ namespace DataCore.BattleElements
 
 
 		//死亡和战斗结束时调用
-		private void UnloadEffects()
+		internal void UnloadEffects()
 		{
 			//初始化攻击范围和攻击目标
 			attackRange[0] = null;
@@ -856,12 +874,7 @@ namespace DataCore.BattleElements
 			this.recover = 0;
 			this.damage = 0;
 
-			this.armor = 0;
-			this.moveRange = 1;
-
 			parry = false;
-			cleave = false;
-			mocking = false;
 
 			aura = false;
 		}

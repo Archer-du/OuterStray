@@ -10,6 +10,7 @@ using SystemEventHandler;
 using System;
 using DataCore.CultivateItems;
 using DataCore.Cards;
+using CodiceApp.EventTracking.Plastic;
 
 namespace LogicCore
 {
@@ -180,9 +181,6 @@ namespace LogicCore
 		//TODO clear
 		internal void UnloadBattleField()
 		{
-			eventTable[0].UnloadAllHandler();
-			eventTable[1].UnloadAllHandler();
-
 			linesCapacity = 0;
 
 			//display
@@ -540,24 +538,22 @@ namespace LogicCore
 
 		public void BattleFailed()
 		{
+			controller.BattleFailed();
 			UnloadBattleField();
-			//display TODO
-			tacticalSystem.CampaignFailed();
-		}
-		public void BattleFailedCheck()
-		{
-
 		}
 		public void BattleWinned()
 		{
+			controller.BattleWinned();
+			tacticalSystem.playerDeck.WriteBack();
 			UnloadBattleField();
-			tacticalSystem.CampaignCompleted();
-			tacticalSystem.playerDeck.WriteBack(stacks[0]);
 		}
-		public void BattleWinnedCheck()
+		public void BattleOverChecked()
 		{
-
+			tacticalSystem.playerDeck.InstantiateDeckTags();
+			//TODO win or fail
+			tacticalSystem.CampaignCompleted();
 		}
+
 
 
 

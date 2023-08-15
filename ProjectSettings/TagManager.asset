@@ -74,6 +74,9 @@ TagManager:
   - name: BattleUI
     uniqueID: 2994034489
     locked: 0
+  - name: Settler
+    uniqueID: 2677494725
+    locked: 0
   - name: Loader
     uniqueID: 2898645981
     locked: 0

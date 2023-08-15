@@ -33,7 +33,7 @@
         {
             "cardPreset" : {
                 "boss": true,
-                "backendID": "mush_99_01",
+                "backendID": "mush_100_01",
                 "attack": 1,
                 "health": 1,
                 "attackCounter": 1

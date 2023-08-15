@@ -4,10 +4,12 @@ using DataCore.Cards;
 using DataCore.CultivateItems;
 using DisplayInterface;
 using LogicCore;
+using NetMQ.Sockets;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using Unity.Plastic.Newtonsoft.Json;
 
 namespace DataCore.TacticalItems
@@ -72,8 +74,96 @@ namespace DataCore.TacticalItems
 		{
 			throw new NotImplementedException();
 		}
-		//TODO
-		internal void LoadDeckByPath(string path)
+		internal void AddTag(BattleElement element)
+		{
+			deck.Add(element);
+			deck.Sort();
+			UpdateDeckID();
+			//显示层自动更新层级
+		}
+		//TODO controller rebuild
+		internal void LoadDeckByPathHuman(string path)
+		{
+			StreamReader reader = File.OpenText(path);
+
+			string ID = reader.ReadLine();
+			bases = new ConstructionElement(tacticalSystem.pool.GetCardByID(ID) as UnitCard, battleSystem, null);
+			ID = reader.ReadLine();
+
+			while (ID != null)
+			{
+				Card card = tacticalSystem.pool.GetCardByID(ID);
+
+				if (card is UnitCard)
+				{
+					string category = (card as UnitCard).category;
+					switch (category)
+					{
+						case "LightArmor":
+							deck.Add(new LightArmorElement(card as UnitCard, battleSystem, null));
+							break;
+						case "Motorized":
+							deck.Add(new MotorizedElement(card as UnitCard, battleSystem, null));
+							break;
+						case "Artillery":
+							deck.Add(new ArtilleryElement(card as UnitCard, battleSystem, null));
+							break;
+						case "Guardian":
+							deck.Add(new GuardianElement(card as UnitCard, battleSystem, null));
+							break;
+						case "Construction":
+							deck.Add(new ConstructionElement(card as UnitCard, battleSystem, null));
+							break;
+					}
+				}
+				else
+				{
+					deck.Add(new CommandElement(card as CommandCard, battleSystem));
+				}
+				ID = reader.ReadLine();
+			}
+			reader.Close();
+
+			//CRITICAL
+			deck.Sort();
+			UpdateDeckID();
+
+			for(int i = 0; i < deck.Count; i++)
+			{
+				switch (deck[i].category)
+				{
+					case "LightArmor":
+						LightArmorElement lightArmor = deck[i] as LightArmorElement;
+						lightArmorSet.Add(i, lightArmor);
+						break;
+					case "Motorized":
+						MotorizedElement motorized = deck[i] as MotorizedElement;
+						motorizedSet.Add(i, motorized);
+						break;
+					case "Artillery":
+						ArtilleryElement artillery = deck[i] as ArtilleryElement;
+						artillerySet.Add(i, artillery);
+						break;
+					case "Guardian":
+						GuardianElement guardian = deck[i] as GuardianElement;
+						guardianSet.Add(i, guardian);
+						break;
+					case "Construction":
+						ConstructionElement construction = deck[i] as ConstructionElement;
+						constructionSet.Add(i, construction);
+						break;
+					case "Command":
+						CommandElement command = deck[i] as CommandElement;
+						commandSet.Add(i, command);
+						break;
+				}
+			}
+			//CRITICAL
+			UpdateBattleID();
+
+			InstantiateDeckTags();
+		}
+		internal void LoadDeckByPathPlant(string path)
 		{
 			StreamReader reader = File.OpenText(path);
 
@@ -113,42 +203,14 @@ namespace DataCore.TacticalItems
 			}
 			reader.Close();
 
-			for(int i = 1; i < deck.Count; i++)
+			UpdateBattleID();
+		}
+		private void UpdateDeckID()
+		{
+			for(int i = 0; i < deck.Count; i++)
 			{
 				deck[i].deckID = i;
-				switch (deck[i].category)
-				{
-					case "LightArmor":
-						LightArmorElement lightArmor = deck[i] as LightArmorElement;
-						lightArmorSet.Add(i, lightArmor);
-						break;
-					case "Motorized":
-						MotorizedElement motorized = deck[i] as MotorizedElement;
-						motorizedSet.Add(i, motorized);
-						break;
-					case "Artillery":
-						ArtilleryElement artillery = deck[i] as ArtilleryElement;
-						artillerySet.Add(i, artillery);
-						break;
-					case "Guardian":
-						GuardianElement guardian = deck[i] as GuardianElement;
-						guardianSet.Add(i, guardian);
-						break;
-					case "Construction":
-						ConstructionElement construction = deck[i] as ConstructionElement;
-						constructionSet.Add(i, construction);
-						break;
-					case "Command":
-						CommandElement command = deck[i] as CommandElement;
-						commandSet.Add(i, command);
-						break;
-				}
 			}
-
-			//TODO
-			bases = deck[0] as UnitElement;
-			//CRITICAL
-			UpdateBattleID();
 		}
 		private void UpdateBattleID()
 		{
@@ -157,9 +219,69 @@ namespace DataCore.TacticalItems
 				deck[i].battleID = deck[i].ownership == 0 ? i : -1 - i;
 			}
 		}
-		internal void WriteBack(RandomCardStack stack)
+		internal void WriteBack()
 		{
+			RandomCardStack playerStack = battleSystem.stacks[0];
+			//lightArmorSet.Clear();
+			//motorizedSet.Clear();
+			//artillerySet.Clear();
+			//guardianSet.Clear();
+			//constructionSet.Clear();
+			//commandSet.Clear();
 
+			deck.Clear();
+			for(int i = 0; i < playerStack.count; i++)
+			{
+				deck.Add(playerStack.stack[i]);
+			}
+			for(int i = 0; i < battleSystem.linesCapacity; i++)
+			{
+				for(int j = 0; j < battleSystem.battleLines[i].count; j++)
+				{
+					if (battleSystem.battleLines[i][j].ownership == 0)
+					{
+						deck.Add(battleSystem.battleLines[i][j]);
+					}
+				}
+			}
+
+			foreach(BattleElement element in deck)
+			{
+				if(element is UnitElement)
+				{
+					UnitElement unit = element as UnitElement;
+					unit.UnloadEffects();
+				}
+			}
+
+			deck.Sort();
+			UpdateDeckID();
+			UpdateBattleID();
+		}
+		internal void InstantiateDeckTags()
+		{
+			controller.UnloadDeckTags();
+			foreach(BattleElement element in deck)
+			{
+				controller.InstantiateDeckTag(element.backendID, element.name, element.category, element.deckID, element.description);
+				if(element.category == "Command")
+				{
+					CommandElement comm = element as CommandElement;
+					controller.UpdateCommandTagInfo(comm.deckID, comm.cost, comm.dynDurability);
+				}
+				else
+				{
+					UnitElement unit = element as UnitElement;
+					//TODO check
+					controller.UpdateUnitTagInfo(unit.category, unit.deckID, unit.cost, unit.dynAttackWriter, unit.dynHealth, unit.oriHealth, unit.oriAttackCounter);
+				}
+			}
+			controller.UpdateHierachy();
+		}
+		public void UnitHealed(int deckID)
+		{
+			UnitElement unit = deck[deckID] as UnitElement;
+			controller.UpdateHealth(deckID, unit.dynHealth);
 		}
 	}
 
@@ -305,7 +427,7 @@ namespace DataCore.TacticalItems
 					{
 						BattleNode bn = new(i, j, this,
 							controller.InstantiateNode(length, width[i], i, j, "battle"),
-							battleSystem);
+							battleSystem, "Assets\\Config\\NodeConfigs\\BattleNode_" + 4 + ".json");
 						nodeList[i].Add(bn);
 					}
 					//以一定权重随机生成 TODO
@@ -318,8 +440,9 @@ namespace DataCore.TacticalItems
 							int randSeed = random.Next(0, 10);
 							if(randSeed >= 0 && randSeed < 3)
 							{
-								PromoteNode pn = new PromoteNode(i, j, this,
-									controller.InstantiateNode(length, width[i], i, j, "promote"));
+								//TODO
+								MedicalNode pn = new MedicalNode(i, j, this,
+									controller.InstantiateNode(length, width[i], i, j, "medical"));
 								nodeList[i].Add(pn);
 							}
 							if(randSeed >= 3 && randSeed < 6)
@@ -541,22 +664,23 @@ namespace DataCore.TacticalItems
 		internal BattleConfigJson battleConfig;
 
 		internal BattleNode(int horizontalIdx, int verticalIdx, Terrain terrain, INodeController controller,
-			BattleSystem system)
+			BattleSystem system, string configPath)
 			: base(horizontalIdx, verticalIdx, terrain, controller)
 		{
 			nextTerrain = null;
 			battleSystem = system;
 			//TODO config
-			battleConfigPath = "Assets\\Config\\NodeConfigs\\TotorialNode.json";
+			battleConfigPath = configPath;
 
 			string jsonString = File.ReadAllText(battleConfigPath);
 			battleConfig = JsonConvert.DeserializeObject<BattleConfigJson>(jsonString);
 
 			plantDeck = new Deck(battleSystem, tacticalSystem, null);
-			plantDeck.LoadDeckByPath(battleConfig.plantDeckPath);
+			plantDeck.LoadDeckByPathPlant(battleConfig.plantDeckPath);
 		}
 		internal override void CastNodeEvent()
 		{
+			base.CastNodeEvent();
 			battleSystem.BuildBattleField(playerDeck, plantDeck, fieldCapacity, battleLinesCapacity, 
 				initialTurn, initialHumanEnergy, initialPlantEnergy, initialHumanHandicaps, initialPlantHandicaps,
 				fieldPresets);
@@ -667,36 +791,105 @@ namespace DataCore.TacticalItems
 
 	internal sealed class OutPostNode : Node
 	{
-		internal List<Pack> commercials;
+		internal List<BattleElement> commercials;
 		internal OutPostNode(int horizontalIdx, int verticalIdx, Terrain terrain, INodeController controller) 
 			: base(horizontalIdx, verticalIdx, terrain, controller)
 		{
 			//TODO config
-			commercials = new List<Pack>();
+			commercials = new List<BattleElement>();
+			BuildCommercials();
 		}
 		internal void BuildCommercials()
 		{
-			
-		}
+			List<string> IDs = new List<string>();
+			List<string> names = new List<string>();
+			List<string> categories = new List<string>();
+			List<int> costs = new List<int>();
+			List<int> attacks = new List<int>();
+			List<int> healths = new List<int>();
+			List<int> counters = new List<int>();
+			List<int> gasMineCosts = new List<int>();
+			List<string> descriptions = new List<string>();
 
-		internal class Pack
-		{
-			internal List<BattleElement> pack;
-			internal int packCapacity;
-
-			internal Pack()
+			Random random = new Random();
+			//TODO config
+			for(int i = 0; i < 8; i++)
 			{
-				packCapacity = 4;
-				pack = new List<BattleElement>();
-			}
-
-			internal void BuildPack()
-			{
-				for(int i = 0; i < packCapacity; i++)
+				int index = random.Next(0, tacticalSystem.pool.humanCardPool.Count);
+				while (tacticalSystem.pool.humanCardPool[index].backendID.Contains("base"))
 				{
-					//pack.Add(new BattleElement());
+					index = random.Next(0, tacticalSystem.pool.humanCardPool.Count);
+				}
+				Card card = tacticalSystem.pool.humanCardPool[index];
+
+				IDs.Add(card.backendID);
+				names.Add(card.name);
+				categories.Add(card.category);
+				costs.Add(card.cost);
+				gasMineCosts.Add(card.gasMineCost);
+				descriptions.Add(card.description);
+
+				string category = tacticalSystem.pool.humanCardPool[index].category;
+				switch (category)
+				{
+					case "LightArmor":
+						LightArmorElement lightArmor = new(tacticalSystem.pool.humanCardPool[index] as UnitCard,
+							tacticalSystem.battleSystem, null);
+						commercials.Add(lightArmor);
+						attacks.Add(lightArmor.oriAttack);
+						healths.Add(lightArmor.oriHealth);
+						counters.Add(lightArmor.oriAttackCounter);
+						break;
+					case "Motorized":
+						MotorizedElement motorized = new(tacticalSystem.pool.humanCardPool[index] as UnitCard,
+							tacticalSystem.battleSystem, null);
+						commercials.Add(motorized);
+						attacks.Add(motorized.oriAttack);
+						healths.Add(motorized.oriHealth);
+						counters.Add(motorized.oriAttackCounter);
+						break;
+					case "Artillery":
+						ArtilleryElement artillery = new(tacticalSystem.pool.humanCardPool[index] as UnitCard,
+							tacticalSystem.battleSystem, null);
+						commercials.Add(artillery);
+						attacks.Add(artillery.oriAttack);
+						healths.Add(artillery.oriHealth);
+						counters.Add(artillery.oriAttackCounter);
+						break;
+					case "Guardian":
+						GuardianElement guardian = new(tacticalSystem.pool.humanCardPool[index] as UnitCard,
+							tacticalSystem.battleSystem, null);
+						commercials.Add(guardian);
+						attacks.Add(guardian.oriAttack);
+						healths.Add(guardian.oriHealth);
+						counters.Add(guardian.oriAttackCounter);
+						break;
+					case "Construction":
+						ConstructionElement construction = new(tacticalSystem.pool.humanCardPool[index] as UnitCard,
+							tacticalSystem.battleSystem, null);
+						commercials.Add(construction);
+						attacks.Add(construction.oriAttack);
+						healths.Add(construction.oriHealth);
+						counters.Add(construction.oriAttackCounter);
+						break;
+					case "Command":
+						CommandElement command = new(tacticalSystem.pool.humanCardPool[index] as CommandCard,
+							tacticalSystem.battleSystem);
+						commercials.Add(command);
+						//防止错位
+						attacks.Add(0);
+						healths.Add(0);
+						counters.Add(command.oriDurability);
+						break;
 				}
 			}
+
+			controller.DisplayElement(IDs, names, categories, costs, attacks, healths, counters, gasMineCosts, descriptions);
+		}
+		internal BattleElement Purchase(int index)
+		{
+			tacticalSystem.gasMineToken -= commercials[index].gasMineCost;
+			return commercials[index];
 		}
 	}
 	internal sealed class LegacyNode : Node
@@ -705,16 +898,45 @@ namespace DataCore.TacticalItems
 		internal LegacyNode(int horizontalIdx, int verticalIdx, Terrain terrain, INodeController controller) 
 			: base(horizontalIdx, verticalIdx, terrain, controller)
 		{
-
+			Random random = new Random();
+			//TODO
+			legacy = random.Next(5, 10);
+			controller.UpdateBasicInfo(legacy, 0);
+		}
+		internal override void CastNodeEvent()
+		{
+			base.CastNodeEvent();
+			tacticalSystem.gasMineToken += legacy;
 		}
 	}
 	internal sealed class MedicalNode : Node
 	{
-		internal int cost;
+		//TODO
+		internal int pricePerHealth;
 		internal MedicalNode(int horizontalIdx, int verticalIdx, Terrain terrain, INodeController controller) 
 			: base(horizontalIdx, verticalIdx, terrain, controller)
 		{
-
+			//TODO config
+			pricePerHealth = 4;
+			controller.UpdateBasicInfo(0, pricePerHealth);
+		}
+		internal void HealElement(bool fullfill, UnitElement unit)
+		{
+			int gasMineCost = (unit.maxHealthWriter - unit.dynHealth) * pricePerHealth;
+			if (fullfill)
+			{
+				tacticalSystem.gasMineToken -= gasMineCost;
+				unit.dynHealth = unit.maxHealthWriter;
+				tacticalSystem.playerDeck.UnitHealed(unit.deckID);
+				controller.UpdateHealth(unit.dynHealth);
+			}
+			else
+			{
+				tacticalSystem.gasMineToken -= pricePerHealth;
+				unit.dynHealth += 1;
+				tacticalSystem.playerDeck.UnitHealed(unit.deckID);
+				controller.UpdateHealth(unit.dynHealth);
+			}
 		}
 	}
 	internal sealed class PromoteNode : Node
@@ -723,7 +945,6 @@ namespace DataCore.TacticalItems
 			: base(horizontalIdx, verticalIdx, terrain, controller)
 		{
 		}
-
 	}
 	internal sealed class SupplyNode : Node
 	{
@@ -733,6 +954,97 @@ namespace DataCore.TacticalItems
 			: base(horizontalIdx, verticalIdx, terrain, controller)
 		{
 			supply = new List<BattleElement>();
+			BuildSupply();
+		}
+		internal void BuildSupply()
+		{
+			List<string> IDs = new List<string>();
+			List<string> names = new List<string>();
+			List<string> categories = new List<string>();
+			List<int> costs = new List<int>();
+			List<int> attacks = new List<int>();
+			List<int> healths = new List<int>();
+			List<int> counters = new List<int>();
+			List<int> gasMineCosts = new List<int>();
+			List<string> descriptions = new List<string>();
+
+			Random random = new Random();
+			int categoryEnum = random.Next(0, 6);
+			int index = 0;
+			//TODO config
+			for (int i = 0; i < 4; i++)
+			{
+				switch (categoryEnum)
+				{
+					case 0:
+						category = "LightArmor";
+						index = random.Next(0, tacticalSystem.pool.humanLightArmorSet.Count);
+						supply.Add(new LightArmorElement(tacticalSystem.pool.humanLightArmorSet[index] as UnitCard,
+							tacticalSystem.battleSystem, null));
+						break;
+					case 1:
+						category = "Motorized";
+						index = random.Next(0, tacticalSystem.pool.humanMotorizedSet.Count);
+						supply.Add(new MotorizedElement(tacticalSystem.pool.humanMotorizedSet[index] as UnitCard,
+							tacticalSystem.battleSystem, null));
+						break;
+					case 2:
+						category = "Artillery";
+						index = random.Next(0, tacticalSystem.pool.humanArtillerySet.Count);
+						supply.Add(new ArtilleryElement(tacticalSystem.pool.humanArtillerySet[index] as UnitCard,
+							tacticalSystem.battleSystem, null));
+						break;
+					case 3:
+						category = "Guardian";
+						index = random.Next(0, tacticalSystem.pool.humanGuardianSet.Count);
+						supply.Add(new GuardianElement(tacticalSystem.pool.humanGuardianSet[index] as UnitCard,
+							tacticalSystem.battleSystem, null));
+						break;
+					case 4:
+						category = "Construction";
+						index = random.Next(0, tacticalSystem.pool.humanConstructionSet.Count);
+						supply.Add(new ConstructionElement(tacticalSystem.pool.humanConstructionSet[index] as UnitCard,
+							tacticalSystem.battleSystem, null));
+						break;
+					case 5:
+						category = "Command";
+						index = random.Next(0, tacticalSystem.pool.humanCommandSet.Count);
+						supply.Add(new CommandElement(tacticalSystem.pool.humanCommandSet[index] as CommandCard,
+							tacticalSystem.battleSystem));
+						break;
+				}
+			}
+			for(int i = 0; i < 4; i++)
+			{
+				BattleElement element = supply[i];
+
+				IDs.Add(element.backendID);
+				names.Add(element.name);
+				categories.Add(element.category);
+				costs.Add(element.cost);
+				gasMineCosts.Add(element.gasMineCost);
+				descriptions.Add(element.description);
+				if(element is UnitElement)
+				{
+					UnitElement unit = element as UnitElement;
+					attacks.Add(unit.oriAttack);
+					healths.Add(unit.oriHealth);
+					counters.Add(unit.oriAttackCounter);
+				}
+				else
+				{
+					CommandElement comm = element as CommandElement;
+					attacks.Add(0);
+					healths.Add(0);
+					counters.Add(comm.oriDurability);
+				}
+			}
+
+			controller.DisplayElement(IDs, names, categories, costs, attacks, healths, counters, gasMineCosts, descriptions);
+		}
+		internal BattleElement Choose(int index)
+		{
+			return supply[index];
 		}
 	}
 }

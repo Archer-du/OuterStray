@@ -1,4 +1,4 @@
-base_00,human,基地车,Construction,0,0,30,NA,,-1,-1,none
+base_00,human,基地车,Construction,0,0,30,NA,,-1,-1,none,
 human_00,human,黄蜂无人机,Motorized,2,3,2,3,突击,0,0,Assault,2
 human_02,human,卡瓦兰通信专员,LightArmor,2,1,3,2,部署：抽取一张指令牌，使其耐久+1。,-1,0,<self:AfterDeploy+DrawCommandCardsRandomAndRecover-2-1-1>,4
 human_03,human,卡瓦兰伐木工,LightArmor,1,2,2,2,,-1,0,none,1
@@ -9,7 +9,7 @@ human_10,human,卡瓦兰安保卫队,Guardian,3,1,6,1,,-1,0,none,3
 human_11,human,卡瓦兰探险家,LightArmor,4,2,5,3,部署：抽一张牌。,-1,0,<self:AfterDeploy+DrawCardsRandom-1-1>,2
 human_13,human,卡瓦兰斥候,Motorized,4,3,3,3,,-1,0,none,2
 human_15,human,“索姆努斯”维修单元,Artillery,8,5,6,2,护甲（1），部署：为你的基地恢复8点耐久。,-1,0,<self:Initialize+Armor-1-1>/<self:BeforeAttacked+ArmorOnEnable-0>|<self:AfterDeploy+RecoverBase-1-8>,5
-human_16,human,化学制配中心,Construction,3,0,3,NA,每当友方单位获得治疗时，便随机对一个敌方单位造成1点伤害。,-1,0,<global:ally:UnitHealed+RandomDamage-2-0-1>,3
+human_16,human,化学制配中心,Construction,3,0,3,NA,每当友方单位获得治疗时，便随机对一个敌方单位造成1点伤害。,-1,0,<Aura:ally:UnitHealed+RandomDamage-2-0-1>,3
 human_17,human,医疗中心,Construction,2,0,3,NA,在你的回合开始时，随机为一个受伤的友方单位恢复3点耐久。,-1,0,<self:StartOfTurn+RandomRecoverDamaged-1-3>,5
 human_20,human,创伤小组,Motorized,8,8,8,8,突击，每当一个友方单位受到治疗时，攻击计时-1。,-1,0,Assault|<Aura:ally:UnitHealed+AuraAttackCounterDecrease-1-1>,3
 human_21,human,机械安保,Guardian,4,1,5,2,部署，缜密：获得格挡。,-1,0,<self:AfterDeploy+Parry-0>/<self:BeforeDamaged+ParryOnEnable-0>/<self:AfterDamaged+ParryUnload-0>|<self:Meticulous+Parry-0>/<self:BeforeDamaged+ParryOnEnable-0>/<self:AfterDamaged+ParryUnload-0>,3
@@ -31,7 +31,6 @@ mush_07,plant,治疗菌毯,Construction,3,2,4,NA,回合结束时，为一个受�
 mush_08,plant,喷射孢子丛,Artillery,1,2,1,2,,-1,0,none,
 mush_09,plant,摇曳菇,Artillery,4,3,2,3,部署：攻击计时-2。缜密：将该单位移回你的手牌。,-1,0,<self:AfterDeploy+AttackCounterDecrease-1-2>,
 mush_10,plant,臭臭菇,Artillery,4,3,4,3,部署：对一个处于前线的随机敌方单位造成4点伤害。,-1,0,<self:AfterDeploy+RandomDamage-2-1-4>,
-mush_101,plant,克隆蘑人,LightArmor,0,1,8,1,回合结束时，若战线未满，在当前战线部署一个克隆蘑人(mush101)；若战线已满，当前战线的克隆蘑人恢复1点耐久。阵亡：场上的克隆蘑人+1/+1,
 mush_100_01,plant,奇怪的蘑菇,Construction,0,1,1,NA,茁壮成长......,-1,0,<self:EndOfTurn+StrangeGrowth-3-2-2-20>,
 mush_100_00,plant,9号实验体,Guardian,0,6,15,2,顺劈，护甲（2）,-1,0,Cleave|<self:Initialize+Armor-1-2>/<self:BeforeAttacked+ArmorOnEnable-0>,
 mush_99_01,plant,奇怪的蘑菇,Construction,0,1,1,NA,茁壮成长......,-1,0,<self:EndOfTurn+StrangeGrowthTutorial-3-2-2-15>,

@@ -19,9 +19,9 @@ namespace LogicCore
 
 		public ITacticalSceneController controller;
 
-		private BattleSystem battleSystem;
+		internal BattleSystem battleSystem;
 
-		private List<Terrain> terrains;
+		internal List<Terrain> terrains;
 
 		private Node currentNode;
 		private Terrain currentTerrain
@@ -46,8 +46,26 @@ namespace LogicCore
 		internal Deck playerDeck;
 		internal UnitElement playerBase;
 
-		internal int baseHealth;
-		internal int gasMineToken;
+		internal int baseHealth
+		{
+			get => playerBase.dynHealth;
+		}
+
+		internal int cardNum
+		{
+			get => playerDeck.count;
+		}
+
+		private int GasMineToken;
+		internal int gasMineToken
+		{
+			get => GasMineToken;
+			set
+			{
+				GasMineToken = value;
+				controller.UpdateGasMineToken(value);
+			}
+		}
 
 		public int battleNodeNum;
 
@@ -71,14 +89,16 @@ namespace LogicCore
 			battleNodeNum = 5;
 			terrains = new List<Terrain>(battleNodeNum);
 
-			//TODO
-			baseHealth = 30;
-			gasMineToken = 30;
 
 			playerDeck = new Deck(system, this, controller.InstantiateDeck());
 			//TODO remove
-			playerDeck.LoadDeckByPath("Assets\\Config\\HumanDeckTest.csv");
+			playerDeck.LoadDeckByPathHuman("Assets\\Config\\HumanDeckTest.csv");
 			playerBase = playerDeck.bases;
+
+			controller.UpdateCardNum(cardNum);
+			controller.UpdateBaseHealth(baseHealth, playerBase.maxHealthWriter);
+
+			gasMineToken = 30;
 			//TODO
 			controller.TerrrainsInitialize(this, battleNodeNum);
 
@@ -145,7 +165,7 @@ namespace LogicCore
 
 
 			//TODO test
-			if(currentNode is not BattleNode)
+			if (currentNode is not BattleNode)
 			{
 				CampaignCompleted();
 			}
@@ -170,12 +190,66 @@ namespace LogicCore
 			isInNode = false;
 			//向上通知
 			//controller.CampaignFailed();
-			throw new Exception("failed");
+			throw new Exception("expedition failed");
 		}
 
 		public void Exit()
 		{
 			throw new NotImplementedException();
+		}
+
+
+
+		public void MedicalNodeHeal(bool fullfill, int deckID)
+		{
+			if(currentNode is not MedicalNode)
+			{
+				throw new InvalidCastException();
+			}
+			if (playerDeck[deckID] is not UnitElement)
+			{
+				throw new InvalidCastException();
+			}
+			MedicalNode medical = currentNode as MedicalNode;
+			UnitElement unit = playerDeck[deckID] as UnitElement;
+			if(gasMineToken < medical.pricePerHealth)
+			{
+				throw new InvalidOperationException();
+			}
+			if(fullfill && (unit.maxHealthWriter - unit.dynHealth) * medical.pricePerHealth > gasMineToken)
+			{
+				throw new InvalidOperationException();
+			}
+
+			medical.HealElement(fullfill, unit);
+		}
+
+		public void OutPostNodePurchase(int index)
+		{
+			if(currentNode is not OutPostNode)
+			{
+				throw new InvalidCastException();
+			}
+			OutPostNode outPost = currentNode as OutPostNode;
+			if (gasMineToken < outPost.commercials[index].gasMineCost)
+			{
+				throw new InvalidOperationException();
+			}
+
+			playerDeck.AddTag(outPost.Purchase(index));
+			controller.UpdateCardNum(cardNum);
+		}
+
+		public void SupplyNodeChoose(int index)
+		{
+			if(currentNode is not SupplyNode)
+			{
+				throw new InvalidCastException();
+			}
+			SupplyNode supply = currentNode as SupplyNode;
+
+			playerDeck.AddTag(supply.Choose(index));
+			controller.UpdateCardNum(cardNum);
 		}
 	}
 }

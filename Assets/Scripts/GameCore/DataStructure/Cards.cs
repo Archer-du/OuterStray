@@ -2,7 +2,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-
 using DataCore.StructClass;
 
 using DisplayInterface;
@@ -14,7 +13,7 @@ namespace DataCore.Cards
 	/// static information about cards
 	/// </summary>
 	[Serializable]
-	internal abstract class Card
+	internal abstract class Card : IComparable<Card>
 	{
 		internal string backendID { get; set; }
 		internal string name { get; set; }
@@ -29,6 +28,8 @@ namespace DataCore.Cards
 		internal int pack;
 
 		internal string effects;
+
+		internal int gasMineCost;
 
 		protected Card(string __id, string __name, string __description, int __cost, int ownership, int department, int pack, string effects)
 		{
@@ -52,7 +53,17 @@ namespace DataCore.Cards
 			this.pack = __card.pack;
 			this.effects = __card.effects;
 		}
+		public int CompareTo(Card other)
+		{
+			if (category == other.category)
+			{
+				return cost.CompareTo(other.cost);
+			}
+			else return category.CompareTo(other.category);
+		}
 	}
+
+
 	/// <summary>
 	/// Card class: Unit
 	/// </summary>

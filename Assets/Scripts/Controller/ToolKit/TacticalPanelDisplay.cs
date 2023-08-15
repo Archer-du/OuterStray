@@ -1,14 +1,28 @@
 using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class TacticalPanelDisplay : MonoBehaviour
 {
+	public TacticalSceneManager sceneManager;
+
+
 	public GameObject OutPostPanel;
+	public CardInspect[] OutPostInspectors;
+	public List<int> gasMineCosts;
+	public List<TMP_Text> gasMineCostTexts;
+	public Button[] OutPostButtons;
 	public GameObject PromotePanel;
+	public CardInspect PromoteInspector;
+	public Button onceButton;
+	public Button fullfillButton;
 	public GameObject SupplyPanel;
+	public CardInspect[] SupplyInspectors;
+	public Button[] SupplyButtons;
 
 	public GameObject Panel;
 	public RectTransform mask;
@@ -23,7 +37,9 @@ public class TacticalPanelDisplay : MonoBehaviour
 	public void Init(string category)
 	{
 		//TODO
+		sceneManager = GameManager.GetInstance().tacticalSceneManager;
 		mask.anchoredPosition = - gameObject.GetComponent<RectTransform>().anchoredPosition - new Vector2(300, 0);
+
 
 		this.category = category;
 		switch (category)
@@ -45,6 +61,9 @@ public class TacticalPanelDisplay : MonoBehaviour
 	}
 	public void EnablePanel()
 	{
+		if(category == "Promote") PromoteInspector.gameObject.SetActive(false);
+
+		sceneManager.panelEnabled = true;
 		Panel.SetActive(true);
 		// 创建一个 Tweener 对象
 		Tweener tweener = DOTween.To(
@@ -60,6 +79,7 @@ public class TacticalPanelDisplay : MonoBehaviour
 	}
 	public void DisablePanel()
 	{
+		sceneManager.panelEnabled = false;
 		// 创建一个 Tweener 对象
 		Tweener tweener = DOTween.To(
 			// 获取初始值
@@ -74,5 +94,19 @@ public class TacticalPanelDisplay : MonoBehaviour
 		{
 			Panel.SetActive(false);
 		});
+	}
+	[Obsolete]
+	public bool InteractCheck(Vector3 position, DeckTagController deckTag)
+	{
+		if(category != "Promote" || !sceneManager.panelEnabled)
+		{
+			return false;
+		}
+		if ((position.y > 350 && position.y < 1250) && (position.x > 1900 && position.x < 2600))
+		{
+			PromoteInspector.gameObject.SetActive(true);
+			PromoteInspector.CopyInfo(deckTag);
+		}
+		return false;
 	}
 }

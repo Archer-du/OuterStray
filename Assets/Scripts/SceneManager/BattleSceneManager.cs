@@ -22,6 +22,10 @@ public class BattleSceneManager : MonoBehaviour,
 	/// </summary>
 	public GameManager gameManager;
 
+	public Canvas Settler;
+	public Button SettleButton;
+	public TMP_Text SettleText;
+
 	[Header("Input")]
 	/// <summary>
 	/// 系统输入接口
@@ -113,6 +117,8 @@ public class BattleSceneManager : MonoBehaviour,
 	{
 		DontDestroyOnLoad(gameObject);
 
+		gameManager = GameManager.GetInstance();
+
 		battleSystem = handler;
 
 		//TODO config
@@ -144,6 +150,11 @@ public class BattleSceneManager : MonoBehaviour,
 			humanSlots[i].SetActive(false);
 			plantSlots[i].SetActive(false);
 		}
+
+		Settler.gameObject.transform.position = new Vector3(0, 2160, 0);
+		SettleButton.onClick.AddListener(BattleOverChecked);
+
+		exitButton.onClick.AddListener(Exit);
 
 		InputLocked?.Invoke();
 		rotateSequence.Kill();
@@ -357,6 +368,39 @@ public class BattleSceneManager : MonoBehaviour,
 
 
 
+
+	public void BattleFailed()
+	{
+		SettleText.text = "Failure";
+		SettleText.gameObject.SetActive(true);
+		float duration = 0.4f;
+		Settler.transform.DOMove(new Vector3(0, 0, 0), duration)
+			.OnComplete(() => SettleText.DOFade(1f, duration));
+	}
+
+	public void BattleWinned()
+	{
+		SettleText.text = "Victory";
+		SettleText.gameObject.SetActive(true);
+		float duration = 0.4f;
+		Settler.transform.DOMove(new Vector3(0, 0, 0), duration)
+			.OnComplete(() => SettleText.DOFade(1f, duration));
+	}
+	public void BattleOverChecked()
+	{
+		Settler.transform.position = new Vector3(0, 2160, 0);
+		AsyncOperation async = gameManager.UpdateGameState(SceneState.GameState.Tactical);
+
+		StartCoroutine(LateWriteBack(async));
+	}
+	IEnumerator LateWriteBack(AsyncOperation async)
+	{
+		while (!async.isDone)
+		{
+			yield return null;
+		}
+		battleSystem.BattleOverChecked();
+	}
 
 
 	public void Exit()
@@ -678,5 +722,6 @@ public class BattleSceneManager : MonoBehaviour,
 	{
 		Skip();
 	}
+
 
 }

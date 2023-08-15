@@ -62,6 +62,7 @@ public class GameManager : MonoBehaviour, IGameManagement
 	public AsyncOperation UpdateGameState(GameState state)
 	{
 		gameState = state;
+		AsyncOperation async;
 		switch (state)
 		{
 			case GameState.Start:
@@ -73,13 +74,13 @@ public class GameManager : MonoBehaviour, IGameManagement
 				break;
 
 			case GameState.Tactical:
-				SceneManager.LoadScene("TacticalScene");
-				tacticalSceneManager = GameObject.Find("TacticalSceneManager").GetComponent<TacticalSceneManager>();
-				break;
+				async = SceneManager.LoadSceneAsync("TacticalScene");
+				StartCoroutine(LoadingNewScene(async, "TacticalScene"));
+				return async;
 
 			case GameState.Battle:
-				AsyncOperation async = SceneManager.LoadSceneAsync("BattleScene");
-				StartCoroutine(LoadingNewScene(async));
+				async = SceneManager.LoadSceneAsync("BattleScene");
+				StartCoroutine(LoadingNewScene(async, "BattleScene"));
 				return async;
 
 			case GameState.End://TODO
@@ -91,8 +92,9 @@ public class GameManager : MonoBehaviour, IGameManagement
 
 	public CanvasGroup SceneLoader;
 	public TMP_Text progressText;
-	IEnumerator LoadingNewScene(AsyncOperation async)
+	IEnumerator LoadingNewScene(AsyncOperation async, string scene)
 	{
+		progressText.gameObject.SetActive(true);
 		SceneLoader.alpha = 1.0f;
 		SceneLoader.blocksRaycasts = true;
 		// 获取加载进度并更新 UI 文本或滑动条的值
@@ -104,14 +106,17 @@ public class GameManager : MonoBehaviour, IGameManagement
 			// 等待一帧
 			yield return null;
 		}
-		battleSceneManager = GameObject.Find("BattleSceneManager").GetComponent<BattleSceneManager>();
-		battleSystem.SetSceneController(battleSceneManager);
+		if(scene == "BattleScene")
+		{
+			battleSceneManager = GameObject.Find("BattleSceneManager").GetComponent<BattleSceneManager>();
+			battleSystem.SetSceneController(battleSceneManager);
+		}
 
 		SceneLoader.blocksRaycasts = false;
 		SceneLoader.DOFade(0f, 0.4f)
 			.OnComplete(() =>
 			{
-				SceneLoader.GetComponentInChildren<TMP_Text>().gameObject.SetActive(false);
+				progressText.gameObject.SetActive(false);
 			});
 		//TODO
 		//yield return new WaitForSeconds(0.6f);

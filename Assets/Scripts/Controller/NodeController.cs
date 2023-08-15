@@ -100,4 +100,8 @@ public class NodeController : MonoBehaviour,
 		}
 	}
 
+
+	public virtual void DisplayElement(List<string> IDs, List<string> names, List<string> category, List<int> costs, List<int> attacks, List<int> healths, List<int> counters, List<int> gasMineCosts, List<string> descriptions) { }
+	public virtual void UpdateBasicInfo(int legacy, int medicalPrice) { }
+	public virtual void UpdateHealth(int health) { }
 }

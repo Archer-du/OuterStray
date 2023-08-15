@@ -35,6 +35,12 @@ namespace InputHandler
 		/// <param name="vtcIdx"></param>
 		public void EnterNode(int terrainIdx, int hrztIdx, int vtcIdx);
 
+		public void MedicalNodeHeal(bool fullfill, int deckID);
+
+		public void OutPostNodePurchase(int index);
+
+		public void SupplyNodeChoose(int index);
+
 		public void Exit();
 	}
 
@@ -83,6 +89,8 @@ namespace InputHandler
 
 
 		public void Exit();
+
+		public void BattleOverChecked();
 	}
 
 

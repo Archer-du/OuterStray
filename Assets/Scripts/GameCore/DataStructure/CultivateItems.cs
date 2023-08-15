@@ -22,9 +22,16 @@ namespace DataCore.CultivateItems
 		internal List<Card> cardPool { get; set; }
 
 		[JsonIgnore]
-		internal Hashtable hashPool;
+		internal Hashtable IDhashPool;
 		[JsonIgnore]
-		internal Hashtable humanCardPool;
+		internal List<Card> humanCardPool;
+
+		internal List<Card> humanLightArmorSet;
+		internal List<Card> humanMotorizedSet;
+		internal List<Card> humanArtillerySet;
+		internal List<Card> humanGuardianSet;
+		internal List<Card> humanConstructionSet;
+		internal List<Card> humanCommandSet;
 		[JsonIgnore]
 		internal Hashtable plantCardPool;
 
@@ -33,14 +40,20 @@ namespace DataCore.CultivateItems
 		[JsonIgnore]
 		internal List<Card> enemyCards;
 
-
 		public Pool()
 		{
 			cardPool = new List<Card>();
-			hashPool = new Hashtable();
+			IDhashPool = new Hashtable();
 
-			humanCardPool = new Hashtable();
+			humanCardPool = new List<Card>();
 			plantCardPool = new Hashtable();
+
+			humanLightArmorSet = new List<Card>();
+			humanMotorizedSet = new List<Card>();
+			humanArtillerySet = new List<Card>();
+			humanGuardianSet = new List<Card>();
+			humanConstructionSet = new List<Card>();
+			humanCommandSet = new List<Card>();
 		}
 		internal Card this[int index]
 		{
@@ -48,10 +61,6 @@ namespace DataCore.CultivateItems
 			set => cardPool[index] = value;
 		}
 
-		internal void LoadCardPoolJson()
-		{
-
-		}
 		/// <summary>
 		/// non-console version: read card info from specific media
 		/// </summary>
@@ -75,23 +84,39 @@ namespace DataCore.CultivateItems
 					line = reader.ReadLine();
 					continue;
 				}
-				Card card = null;
 
-				DeserializeMethods.CardDeserialize(out card, data);
+				DeserializeMethods.CardDeserialize(out Card card, data);
 
 				//TODO
 				cardPool.Add(card);
-				if (!hashPool.ContainsKey(card.backendID))
+				if (card.ownership == 0)
 				{
-					hashPool.Add(card.backendID, card);
-				}
-
-				if(card.ownership == 0)
-				{
-					if(!humanCardPool.ContainsKey(card.backendID))
+					switch (card.category)
 					{
-						humanCardPool.Add(card.backendID, card);
+						case "LightArmor":
+							humanLightArmorSet.Add(card);
+							break;
+						case "Motorized":
+							humanMotorizedSet.Add(card);
+							break;
+						case "Artillery":
+							humanArtillerySet.Add(card);
+							break;
+						case "Guardian":
+							humanGuardianSet.Add(card);
+							break;
+						case "Construction":
+							//TODO
+							if (!card.category.Contains("base"))
+							{
+								humanConstructionSet.Add(card);
+							}
+							break;
+						case "Command":
+							humanCommandSet.Add(card);
+							break;
 					}
+					humanCardPool.Add(card);
 				}
 				else
 				{
@@ -101,11 +126,21 @@ namespace DataCore.CultivateItems
 					}
 				}
 
+				if (!IDhashPool.ContainsKey(card.backendID))
+				{
+					IDhashPool.Add(card.backendID, card);
+				}
+
+
 				line = reader.ReadLine();
 				num++;
 				index++;
 			}
 			reader.Close();
+
+			cardPool.Sort();
+			humanCardPool.Sort();
+
 			return num;
 		}
 		internal int LoadCardPool(string path)
@@ -126,16 +161,15 @@ namespace DataCore.CultivateItems
 					line = reader.ReadLine();
 					continue;
 				}
-				Card card = null;
 
-				DeserializeMethods.CardDeserialize(out card, data);
+				DeserializeMethods.CardDeserialize(out Card card, data);
 
 				//TODO
 				cardPool.Add(card);
 
-				if (!hashPool.ContainsKey(card.backendID))
+				if (!IDhashPool.ContainsKey(card.backendID))
 				{
-					hashPool.Add(card.backendID, card);
+					IDhashPool.Add(card.backendID, card);
 				}
 
 				line = reader.ReadLine();
@@ -147,7 +181,7 @@ namespace DataCore.CultivateItems
 		}
 		internal Card GetCardByID(string ID)
 		{
-			return hashPool[ID] as Card;
+			return IDhashPool[ID] as Card;
 		}
 	}
 
