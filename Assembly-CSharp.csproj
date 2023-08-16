@@ -63,6 +63,7 @@
     <Compile Include="Assets\Scripts\Controller\ToolKit\NodeInspector.cs" />
     <Compile Include="Assets\Scripts\Controller\ToolKit\TurnMappedDialogger.cs" />
     <Compile Include="Assets\Scripts\Controller\CommandElementController.cs" />
+    <Compile Include="Assets\Scripts\Controller\ToolKit\ButtonAudio.cs" />
     <Compile Include="Assets\Scripts\Controller\SupplyNodeController.cs" />
     <Compile Include="Assets\Scripts\Controller\ToolKit\InputMask.cs" />
     <Compile Include="Assets\Scripts\Controller\ToolKit\InspectPanelController.cs" />

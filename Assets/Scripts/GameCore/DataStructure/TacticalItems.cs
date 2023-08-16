@@ -440,7 +440,7 @@ namespace DataCore.TacticalItems
 					{
 						BattleNode bn = new(i, j, this,
 							controller.InstantiateNode(length, width[i], i, j, "battle"),
-							battleSystem, "Assets\\Config\\NodeConfigs\\BattleNode_" + i + ".json");
+							battleSystem, "Assets\\Config\\NodeConfigs\\BattleNode_" + index + ".json");
 						nodeList[i].Add(bn);
 					}
 					//以一定权重随机生成 TODO

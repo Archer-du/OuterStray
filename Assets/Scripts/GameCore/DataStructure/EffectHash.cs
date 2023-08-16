@@ -951,7 +951,7 @@ namespace EventEffectModels
 			publisher.maxHealthWriter += 2;
 			publisher.UpdateHealth();
 
-			if (publisher.dynAttackWriter >= 15)
+			if (publisher.dynAttackWriter >= 20)
 			{
 				BattleLine line = publisher.battleLine;
 				int resIdx = publisher.inlineIdx;

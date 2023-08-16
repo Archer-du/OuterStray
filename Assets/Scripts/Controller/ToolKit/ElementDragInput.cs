@@ -30,7 +30,7 @@ public class ElementDragInput : MonoBehaviour,
 
 		if (controller.dataState == ElementState.inHandicap)
 		{
-			if(inspector != null) { inspector.active = false; }
+			if(inspector != null) { inspector.active = false; inspector.DisablePanel(); }
 			BattleElementController.globalAnimeLock = true;
 		}
 		if (controller.dataState == ElementState.inBattleLine)
@@ -50,7 +50,7 @@ public class ElementDragInput : MonoBehaviour,
 		if (controller.ownership != 0) return;
 		if (BattleElementController.globalAnimeLock)
 		{
-			if(inspector != null) { inspector.active = false; }
+			if(inspector != null) { inspector.active = false; inspector.DisablePanel(); }
 			transform.SetParent(buffer);
 			transform.DOScale(controller.handicapScale, duration);
 			transform.position = eventData.position - BattleElementController.inputOffset;

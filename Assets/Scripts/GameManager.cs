@@ -151,11 +151,20 @@ public class GameManager : MonoBehaviour, IGameManagement
 	}
 
 	public Button start;
+	public AudioSource loadAudio;
+	public AudioClip loadAudioClip;
 	private void Start()
 	{
 		DontDestroyOnLoad(gameObject);
 
-		start.onClick.AddListener(() => UpdateGameState(GameState.Cultivate));
+		loadAudio = gameObject.AddComponent<AudioSource>();
+		loadAudio.clip = loadAudioClip;
+
+		start.onClick.AddListener(() =>
+		{
+			loadAudio.Play();
+			UpdateGameState(GameState.Cultivate);
+		});
 
 		//EXTEND
 		pool = new Pool();

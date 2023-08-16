@@ -50,7 +50,7 @@ public class CommandElementController : BattleElementController,
 		Sequence seq = DOTween.Sequence();
 		if (method == "append")
 		{
-			seq.Append(transform.DOMove(inputOffset / 2, castTime));
+			seq.Append(transform.DOMove(inputOffset / 2 + ownership * 500 * Vector2.down, castTime));
 			seq.AppendInterval(waitTime);
 			Vector3 rotateBy = new Vector3(0, 0, ((ownership * 2) - 1) * 90);
 			seq.Append(
