@@ -31,7 +31,7 @@ mush_07,plant,治疗菌毯,Construction,3,2,4,NA,回合结束时，为一个受�
 mush_08,plant,喷射孢子丛,Artillery,1,2,1,2,,-1,0,none,
 mush_09,plant,摇曳菇,Artillery,4,3,2,3,部署：攻击计时-2。缜密：将该单位移回你的手牌。,-1,0,<self:AfterDeploy+AttackCounterDecrease-1-2>,
 mush_10,plant,臭臭菇,Artillery,4,3,4,3,部署：对一个处于前线的随机敌方单位造成4点伤害。,-1,0,<self:AfterDeploy+RandomDamage-2-1-4>,
-mush_101,plant,克隆蘑人,LightArmor,0,1,8,1,回合结束时，若战线未满，在当前战线部署一个克隆蘑人(mush101)；若战线已满，当前战线的克隆蘑人恢复1点耐久。阵亡：场上的克隆蘑人+1/+1,
+mush_101,plant,克隆蘑人,LightArmor,0,1,2,1,回合结束时，若战线未满，在当前战线部署一个克隆蘑人(mush101)。阵亡：场上的克隆蘑人+1/+1,
 mush_100_01,plant,奇怪的蘑菇,Construction,0,1,1,NA,茁壮成长......,-1,0,<self:EndOfTurn+StrangeGrowth-3-2-2-20>,
 mush_100_00,plant,9号实验体,Guardian,0,6,15,2,顺劈，护甲（2）,-1,0,Cleave|<self:Initialize+Armor-1-2>/<self:BeforeAttacked+ArmorOnEnable-0>,
 mush_99_01,plant,奇怪的蘑菇,Construction,0,1,1,NA,茁壮成长......,-1,0,<self:EndOfTurn+StrangeGrowthTutorial-3-2-2-15>,
