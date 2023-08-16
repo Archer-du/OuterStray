@@ -250,7 +250,7 @@ public class BattleLineController : MonoBehaviour,
 			elementList[i].battleLine = this;
 			elementList[i].transform.SetSiblingIndex(i + childNum);
 			elementList[i].battleLineLogicPosition = GetLogicPosition(i);
-			elementList[i].canvas.sortingOrder = i - 100;
+			elementList[i].battleOrder = i - 100;
 		}
 	}
 

@@ -64,10 +64,15 @@ public class UnitElementController : BattleElementController,
 	public static float componentMoveTime = 0.25f;
 
 	[Header("Audio")]
-	public AudioSource attackAudio;
-	public AudioSource deployAudio;
-	public AudioSource randomAttackAudio;
-	public AudioSource healAudio;
+	private AudioSource attackAudio;
+	private AudioSource deployAudio;
+	private AudioSource randomAttackAudio;
+	private AudioSource healAudio;
+	[Header("Clip")]
+	public AudioClip attackClip;
+	public AudioClip deployClip;
+	public AudioClip randomAttackClip;
+	public AudioClip healClip;
 
 	[Header("Components")]
 	public InspectPanelController battleLineInspect;
@@ -109,6 +114,25 @@ public class UnitElementController : BattleElementController,
 
 		BattleSceneManager.InputLocked += EnableInputLock;
 		BattleSceneManager.InputUnlocked += DisableInputLock;
+
+
+
+		attackAudio = gameObject.AddComponent<AudioSource>();
+		attackAudio.clip = attackClip;
+		attackAudio.loop = false;
+		attackAudio.playOnAwake = false;
+		deployAudio = gameObject.AddComponent<AudioSource>();
+		deployAudio.clip = deployClip;
+		deployAudio.loop = false;
+		deployAudio.playOnAwake = false;
+		randomAttackAudio = gameObject.AddComponent<AudioSource>();
+		randomAttackAudio.clip = randomAttackClip;
+		randomAttackAudio.loop = false;
+		randomAttackAudio.playOnAwake = false;
+		healAudio = gameObject.AddComponent<AudioSource>();
+		healAudio.clip = healClip;
+		healAudio.loop = false;
+		healAudio.playOnAwake = false;
 	}
 	public void UpdateInfo(int cost, int attackPoint, int maxHealthPoint, int attackCounter, int operateCounter,
 		ElementState state, int moveRange, bool aura, int attackBuff, int maxHealthBuff)

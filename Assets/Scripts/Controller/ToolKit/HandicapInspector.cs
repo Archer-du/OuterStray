@@ -17,7 +17,10 @@ public class HandicapInspector : MonoBehaviour,
 	public float duration;
 	public Canvas canvas;
 	public int upperOrder;
-	public int lowerOrder;
+	public int lowerOrder
+	{
+		get => controller.handicapOrder;
+	}
 
 	private Vector3 originScale;
 	private Vector3 inspectScale;

@@ -7,6 +7,7 @@ namespace InputHandler
 {
 	public interface ICultivationSystemInput
 	{
+		public void SetSceneController(ICultivateSceneController ctdspl);
 		/// <summary>
 		/// console version
 		/// </summary>
@@ -29,6 +30,7 @@ namespace InputHandler
 	public interface ITacticalSystemInput
 	{
 		public void SetSceneController(ITacticalSceneController tsdspl);
+		public void SetCultivateSystem(ICultivationSystemInput cultivationSystem);
 		/// <summary>
 		/// 检测合法性，进入index或point索引的节点
 		/// </summary>

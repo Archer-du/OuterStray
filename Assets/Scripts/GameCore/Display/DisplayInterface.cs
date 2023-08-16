@@ -36,7 +36,8 @@ namespace DisplayInterface
 
 	public interface ICultivateSceneController
 	{
-
+		public IDeckController InstantiateDeck();
+		public void UpdateBasicInfo(int gasMine, int cardNum, int baseHealth);
 	}
 
 

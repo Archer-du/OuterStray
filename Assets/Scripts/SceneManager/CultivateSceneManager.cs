@@ -6,33 +6,42 @@ using UnityEngine.UI;
 using InputHandler;
 using LogicCore;
 using DisplayInterface;
+using TMPro;
 
 public class CultivateSceneManager : MonoBehaviour,
     ICultivateSceneController
 {
-    ICultivationSystemInput cultivateSystem;
+    public ICultivationSystemInput cultivateSystem;
 
     private GameManager gameManager;
+
+    public DeckController playerDeck;
 
     public DepartmentController buildingController;
 
     public Button startExpedition;
 
+    public Button testImportButton;
 
-    //note: DontDestroyOnLoad的游戏对象，在切换到不存在自身的新场景中时会被保留，但是它不能查找新场景中的物体。
-    public void Start()
+    [Header("Text")]
+	public TMP_Text gasMineText;
+	public TMP_Text cardNumText;
+	public TMP_Text baseHealthText;
+	public TMP_Text baseMaxHealthText;
+
+
+	//note: DontDestroyOnLoad的游戏对象，在切换到不存在自身的新场景中时会被保留，但是它不能查找新场景中的物体。
+	public void Start()
     {
-
         gameManager = GameManager.GetInstance();
 
         GameManager.OnGameStateChanged += OnGameStateChanged;
 
-        cultivateSystem = gameManager.cultivationSystem;
-
-        buildingController = gameManager.GetComponent<DepartmentController>();
+        //buildingController = gameManager.GetComponent<DepartmentController>();
 
         //note: 功能从manager下放到controller
-        startExpedition.onClick.AddListener(() => gameManager.UpdateGameState(GameState.Tactical));
+        startExpedition.onClick.AddListener(StartExpedition);
+        testImportButton.onClick.AddListener(ImportPack);
     }
     public void OnGameStateChanged(GameState state)
     {
@@ -66,11 +75,24 @@ public class CultivateSceneManager : MonoBehaviour,
 
 	public void StartExpedition()
     {
-
-    }
+        gameManager.UpdateGameState(GameState.Tactical);
+	}
 
     public void ImportPack()
     {
-
+        cultivateSystem.FromPackImportDeck(0, 0);
     }
+
+	public IDeckController InstantiateDeck()
+	{
+        return playerDeck;
+	}
+
+	public void UpdateBasicInfo(int gasMine, int cardNum, int baseHealth)
+	{
+        gasMineText.text = gasMine.ToString();
+        cardNumText.text = cardNum.ToString();
+        baseHealthText.text = baseHealth.ToString();
+        baseMaxHealthText.text = baseHealth.ToString();
+	}
 }
