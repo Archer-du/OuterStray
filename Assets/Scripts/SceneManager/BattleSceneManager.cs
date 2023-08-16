@@ -576,62 +576,95 @@ public class BattleSceneManager : MonoBehaviour,
 		int movetimes = 1;
 		int cost = GetMinCost();
 
-		// 策略：先过牌，再铺场，最后赚卡
+	startwhile:
+		while (energy[Turn] > 2)
+		{
+            // 策略：先过牌，再铺场，最后赚卡
 
-		// 优先使用“蔓延”，补充手牌
-        for (int i = 0; i < AIHandicap.count; i++)
-        {
-            if (AIHandicap[i].ID == "comm_mush_18" && energy[Turn] > 3)
+            // 优先使用“蔓延”，补充手牌
+            for (int i = 0; i < AIHandicap.count; i++)
             {
-                AICast(i, 0, 0);
-				yield return new WaitForSeconds(sequenceTime + waitTime);
-			}
-		}
+                if (AIHandicap[i].ID == "comm_mush_07" && energy[Turn] >= 1)
+                {
+                    AICast(i, 0, 0);
+                    yield return new WaitForSeconds(sequenceTime + waitTime);
+					goto startwhile;
+                }
+            }
 
-        while (AISupportLine.count < 5)
-		{
-			int idx = GetMinCostUnitPointer();
-			if (idx >= 0)
-			{
-				AIDeploy(idx);
-				yield return new WaitForSeconds(sequenceTime + waitTime);
-				deploytimes++;
-			}
-			else break;
-		}
-		while (AIAdjacentLine.count < AIAdjacentLine.capacity)
-		{
-			if (AIAdjacentLine.count == 0 || AIAdjacentLine.ownerShip == 1)
-			{
-				int idx = GetOperatorPointerInSupportLine();
-				if (idx >= 0)
-				{
-					AIMove(idx);
-					yield return new WaitForSeconds(sequenceTime + waitTime);
-					movetimes++;
-				}
-				else break;
-			}
-			else break;
-		}
-		//把支援战线铺满
-		for (int i = 0; i < AIHandicap.count; i++)
-		{
-			if (AIHandicap[i].ID == "comm_mush_01" && energy[Turn] > 2)
-			{
-				AICast(i, 0, 0);
-				yield return new WaitForSeconds(sequenceTime + waitTime);
-			}
-		}
-		// 使用散播孢子，扩大场面
-		for (int i = 0; i < AIHandicap.count; i++)
-		{
-			if (AIHandicap[i].ID == "comm_mush_13" && energy[Turn] > 6 && AIAdjacentLine.count < AIAdjacentLine.capacity)
-			{
-				AICast(i, 0, 0);
-				yield return new WaitForSeconds(sequenceTime + waitTime);
-			}
-		}
+			// 铺满支援战线
+            while (AISupportLine.count < AISupportLine.capacity)
+            {
+                int idx = GetMinCostUnitPointer();
+                if (idx >= 0)
+                {
+                    AIDeploy(idx);
+                    yield return new WaitForSeconds(sequenceTime + waitTime);
+                    deploytimes++;
+                    goto startwhile;
+                }
+                else break;
+            }
+            while (AIAdjacentLine.count < AIAdjacentLine.capacity)
+            {
+                if (AIAdjacentLine.count == 0 || AIAdjacentLine.ownerShip == 1)
+                {
+                    int idx = GetOperatorPointerInSupportLine();
+                    if (idx >= 0)
+                    {
+                        AIMove(idx);
+                        yield return new WaitForSeconds(sequenceTime + waitTime);
+                        movetimes++;
+                        goto startwhile;
+                    }
+                    else break;
+                }
+                else break;
+            }
+            for (int i = 0; i < AIHandicap.count; i++)
+            {
+                if (AIHandicap[i].ID == "comm_mush_01" && energy[Turn] >= 2)
+                {
+                    AICast(i, 0, 0);
+                    yield return new WaitForSeconds(sequenceTime + waitTime);
+                    goto startwhile;
+                }
+            }
+
+            // 使用散播孢子，扩大场面
+            for (int i = 0; i < AIHandicap.count; i++)
+            {
+                if (AIHandicap[i].ID == "comm_mush_13" && energy[Turn] >= 6 && AIAdjacentLine.count < AIAdjacentLine.capacity)
+                {
+                    AICast(i, 0, 0);
+                    yield return new WaitForSeconds(sequenceTime + waitTime);
+                    goto startwhile;
+                }
+            }
+
+			// 增殖赚卡
+            for (int i = 0; i < AIHandicap.count; i++)
+            {
+                if (AIHandicap[i].ID == "comm_mush_08" && energy[Turn] >= 2 && AIAdjacentLine.count < AIAdjacentLine.capacity)
+                {
+                    AICast(i, 0, 0);
+                    yield return new WaitForSeconds(sequenceTime + waitTime);
+                    goto startwhile;
+                }
+            }
+
+			// 有多余费用则攻击敌方基地
+            for (int i = 0; i < AIHandicap.count; i++)
+            {
+                if (AIHandicap[i].ID == "comm_mush_18" && energy[Turn] >= 3 && AIAdjacentLine.count < AIAdjacentLine.capacity)
+                {
+                    AICast(i, 0, 0);
+                    yield return new WaitForSeconds(sequenceTime + waitTime);
+                    goto startwhile;
+                }
+            }
+			break;
+        }
 		Skip();
 	}
 
