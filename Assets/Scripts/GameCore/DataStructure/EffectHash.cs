@@ -951,7 +951,7 @@ namespace EventEffectModels
 			publisher.maxHealthWriter += 2;
 			publisher.UpdateHealth();
 
-			if (publisher.dynAttackWriter >= 15)
+			if (publisher.dynAttackWriter >= 20)
 			{
 				BattleLine line = publisher.battleLine;
 				int resIdx = publisher.inlineIdx;
@@ -978,6 +978,7 @@ namespace EventEffectModels
 				UnitCard card = system.pool.GetCardByID("mush_100_00") as UnitCard;
 				UnitElement unit = new GuardianElement(card, system,
 					system.controller.InstantiateUnitInBattleField(element.ownership, line.index, resIdx));
+				system.bases[1] = unit;
 				unit.Deploy(line, resIdx);
 			}
 		}

@@ -50,7 +50,16 @@ public class SupplyNodeController : NodeController
 		}
 		tacticalManager.SupplyNodeChoose(index);
 		CardInspect card = panelDisplay.SupplyInspectors[index];
-		tacticalManager.playerDeck.InstantiateDeckTag(card.ID, card.nameText.text, card.category, 0, card.description);
+		tacticalManager.playerDeck.InstantiateDeckTag(card.ID, card.nameText.text, card.category, 0, card.descriptionText.text);
+		if(card.category == "Command")
+		{
+			tacticalManager.playerDeck.UpdateCommandTagInfo(tacticalManager.playerDeck.tags.Count - 1, int.Parse(card.costText.text), int.Parse(card.counterText.text));
+		}
+		else
+		{
+			tacticalManager.playerDeck.UpdateUnitTagInfo("", tacticalManager.playerDeck.tags.Count - 1, int.Parse(card.costText.text), int.Parse(card.attackText.text), int.Parse(card.healthText.text),
+				int.Parse(card.healthText.text), card.counterText.text == "" ? 1000000 : int.Parse(card.counterText.text));
+		}
 		tacticalManager.playerDeck.UpdateHierachy();
 	}
 

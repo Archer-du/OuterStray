@@ -187,6 +187,7 @@ public class BattleElementController : MonoBehaviour
 
 	public void Init(string ID, int ownership, string name, string categories, int cost, string description)
 	{
+		this.ID = ID;
 		this.ownership = ownership;
 		this.nameContent = name;
 		this.category = categories;
@@ -207,10 +208,10 @@ public class BattleElementController : MonoBehaviour
 	private void LoadCardResources(string ID)
 	{
 		CardImage.sprite = Resources.Load<Sprite>("CardImage/" + ID);
-		if (ownership == 1)
-		{
-			CardImage.rectTransform.sizeDelta = new Vector2(10, 13);
-		}
+		//if (ownership == 1)
+		//{
+		//	CardImage.rectTransform.sizeDelta = new Vector2(10, 13);
+		//}
 
 		Color color;
 		switch (category)

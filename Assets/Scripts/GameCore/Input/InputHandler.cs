@@ -28,6 +28,7 @@ namespace InputHandler
 
 	public interface ITacticalSystemInput
 	{
+		public void SetSceneController(ITacticalSceneController tsdspl);
 		/// <summary>
 		/// 检测合法性，进入index或point索引的节点
 		/// </summary>
@@ -96,7 +97,10 @@ namespace InputHandler
 
 
 
-
+	public interface IDeckInput
+	{
+		public void UpdateManual();
+	}
 
 
 	//test

@@ -3,6 +3,7 @@ using DataCore.BattleItems;
 using DataCore.Cards;
 using DataCore.CultivateItems;
 using DisplayInterface;
+using InputHandler;
 using LogicCore;
 using NetMQ.Sockets;
 using System;
@@ -14,7 +15,7 @@ using Unity.Plastic.Newtonsoft.Json;
 
 namespace DataCore.TacticalItems
 {
-	internal class Deck
+	internal class Deck : IDeckInput
 	{
 		private IDeckController Controller;
 		internal IDeckController controller
@@ -25,7 +26,7 @@ namespace DataCore.TacticalItems
 				if (value != null)
 				{
 					Controller = value;
-					Controller.Init();
+					Controller.Init(this);
 				}
 				else { Controller = null; }
 			}
@@ -283,6 +284,18 @@ namespace DataCore.TacticalItems
 			UnitElement unit = deck[deckID] as UnitElement;
 			controller.UpdateHealth(deckID, unit.dynHealth);
 		}
+
+		public void UpdateManual()
+		{
+			//foreach(BattleElement element in deck)
+			//{
+			//	if(element is UnitElement)
+			//	{
+			//		UnitElement unit = element as UnitElement;
+			//		controller.UpdateUnitTagInfo(unit.deckID, unit.cost, )
+			//	}
+			//}
+		}
 	}
 
 
@@ -427,7 +440,7 @@ namespace DataCore.TacticalItems
 					{
 						BattleNode bn = new(i, j, this,
 							controller.InstantiateNode(length, width[i], i, j, "battle"),
-							battleSystem, "Assets\\Config\\NodeConfigs\\BattleNode_" + 4 + ".json");
+							battleSystem, "Assets\\Config\\NodeConfigs\\BattleNode_" + index + ".json");
 						nodeList[i].Add(bn);
 					}
 					//以一定权重随机生成 TODO
@@ -1003,6 +1016,10 @@ namespace DataCore.TacticalItems
 					case 4:
 						category = "Construction";
 						index = random.Next(0, tacticalSystem.pool.humanConstructionSet.Count);
+						while (tacticalSystem.pool.humanConstructionSet[index].backendID.Contains("base"))
+						{
+							index = random.Next(0, tacticalSystem.pool.humanConstructionSet.Count);
+						}
 						supply.Add(new ConstructionElement(tacticalSystem.pool.humanConstructionSet[index] as UnitCard,
 							tacticalSystem.battleSystem, null));
 						break;

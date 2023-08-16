@@ -63,6 +63,12 @@ public class UnitElementController : BattleElementController,
 	public static float componentMove = 10f;
 	public static float componentMoveTime = 0.25f;
 
+	[Header("Audio")]
+	public AudioSource attackAudio;
+	public AudioSource deployAudio;
+	public AudioSource randomAttackAudio;
+	public AudioSource healAudio;
+
 	[Header("Components")]
 	public InspectPanelController battleLineInspect;
 	/// <summary>
@@ -91,7 +97,7 @@ public class UnitElementController : BattleElementController,
 
 		InspectorImage.sprite = CardImage.sprite;
 		//TODO
-		InspectorImage.rectTransform.sizeDelta = new Vector3(12, 15);
+		//InspectorImage.rectTransform.sizeDelta = new Vector3(12, 15);
 		InspectorGround.color = elementGround.color;
 		InspectorFrame.color = elementGround.color;
 		InspectorNameTag.color = elementGround.color;

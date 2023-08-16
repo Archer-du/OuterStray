@@ -25,6 +25,10 @@ public class InspectPanelController : MonoBehaviour,
 
 	private float timer;
 
+	public void DisablePanel()
+	{
+		inspectPanel.DOFade(0f, duration);
+	}
 	public void OnPointerEnter(PointerEventData eventData)
 	{
 		if(active)

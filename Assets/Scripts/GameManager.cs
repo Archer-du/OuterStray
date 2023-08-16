@@ -47,6 +47,9 @@ public class GameManager : MonoBehaviour, IGameManagement
 		}
 	}
 
+	public AudioSource TacticalBGM;
+	public AudioSource BattleBGM;
+
 	public ICultivationSystemInput cultivationSystem;
 	public ITacticalSystemInput tacticalSystem;
 	public IBattleSystemInput battleSystem;
@@ -57,12 +60,11 @@ public class GameManager : MonoBehaviour, IGameManagement
 	public TacticalSceneManager tacticalSceneManager;
 	public BattleSceneManager battleSceneManager;
 
-
+	public AsyncOperation async;
 	//定义一个公共方法，用于更新游戏状态，并根据不同的状态执行不同的逻辑
 	public AsyncOperation UpdateGameState(GameState state)
 	{
 		gameState = state;
-		AsyncOperation async;
 		switch (state)
 		{
 			case GameState.Start:
@@ -70,7 +72,8 @@ public class GameManager : MonoBehaviour, IGameManagement
 				break;
 
 			case GameState.Cultivate:
-				SceneManager.LoadScene("CultivateScene");
+				async = SceneManager.LoadSceneAsync("CultivateScene");
+				StartCoroutine(LoadingNewScene(async, "CultivateScene"));
 				break;
 
 			case GameState.Tactical:
@@ -79,6 +82,7 @@ public class GameManager : MonoBehaviour, IGameManagement
 				return async;
 
 			case GameState.Battle:
+				TacticalBGM.Stop();
 				async = SceneManager.LoadSceneAsync("BattleScene");
 				StartCoroutine(LoadingNewScene(async, "BattleScene"));
 				return async;
@@ -102,37 +106,66 @@ public class GameManager : MonoBehaviour, IGameManagement
 		{
 			float progress = async.progress;
 			progressText.text = "Loading... " + (progress * 100) + "%";
-			// 或者 progressBar.value = progress;
 			// 等待一帧
 			yield return null;
 		}
-		if(scene == "BattleScene")
+		switch (scene)
 		{
-			battleSceneManager = GameObject.Find("BattleSceneManager").GetComponent<BattleSceneManager>();
-			battleSystem.SetSceneController(battleSceneManager);
+			case "CultivateScene":
+				if (cultivateSceneManager != null)
+				{
+					cultivateSceneManager.DestroyOtherInstancesOfType();
+				}
+				else
+				{
+					cultivateSceneManager = GameObject.Find("CultivateSceneManager").GetComponent<CultivateSceneManager>();
+				}
+				break;
+			case "TacticalScene":
+				if (tacticalSceneManager != null)
+				{
+					tacticalSceneManager.DestroyOtherInstancesOfType();
+				}
+				else
+				{
+					tacticalSceneManager = GameObject.Find("TacticalSceneManager").GetComponent<TacticalSceneManager>();
+					tacticalSystem.SetSceneController(tacticalSceneManager);
+				}
+				break;
+			case "BattleScene":
+				BattleBGM.Play();
+				battleSceneManager = GameObject.Find("BattleSceneManager").GetComponent<BattleSceneManager>();
+				battleSystem.SetSceneController(battleSceneManager);
+				break;
 		}
 
 		SceneLoader.blocksRaycasts = false;
-		SceneLoader.DOFade(0f, 0.4f)
+		SceneLoader.DOFade(0f, 0.3f)
 			.OnComplete(() =>
 			{
 				progressText.gameObject.SetActive(false);
 			});
-		//TODO
-		//yield return new WaitForSeconds(0.6f);
 
 		// 或者 progressBar.gameObject.SetActive(false);
 		// 或者 AudioSource.PlayClipAtPoint(loadSound, transform.position);
 	}
 
+	public Button start;
+	public AudioSource loadAudio;
+	public AudioClip loadAudioClip;
 	private void Start()
 	{
 		DontDestroyOnLoad(gameObject);
 
-		gameState = GameState.Battle;
+		loadAudio = gameObject.AddComponent<AudioSource>();
+		loadAudio.clip = loadAudioClip;
 
+		start.onClick.AddListener(() =>
+		{
+			loadAudio.Play();
+			UpdateGameState(GameState.Cultivate);
+		});
 
-		tacticalSceneManager = GameObject.Find("TacticalSceneManager").GetComponent<TacticalSceneManager>();
 		//EXTEND
 		pool = new Pool();
 		pool.LoadCardPool();
@@ -142,19 +175,20 @@ public class GameManager : MonoBehaviour, IGameManagement
 		battleSystem.SetTacticalSystem(tacticalSystem);
 		cultivationSystem = new CultivationSystem(cultivateSceneManager, tacticalSystem as TacticalSystem);
 
+		TacticalBGM.Play();
 	}
 
 
 
 
 
-	private void OnDisable()
-	{
-		enabled = true;
-	}
+	//private void OnDisable()
+	//{
+	//	enabled = true;
+	//}
 
-	private void OnDestroy()
-	{
-		DontDestroyOnLoad(gameObject);
-	}
+	//private void OnDestroy()
+	//{
+	//	DontDestroyOnLoad(gameObject);
+	//}
 }

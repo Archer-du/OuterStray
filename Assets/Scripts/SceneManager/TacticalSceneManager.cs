@@ -19,7 +19,7 @@ public class TacticalSceneManager : MonoBehaviour,
     [Header("Connection")]
     public GameManager gameManager;
 
-    public GameObject Map;
+    public GameObject UIPrototype;
     public GameObject UI;
 
     public Image InputMask;
@@ -75,19 +75,38 @@ public class TacticalSceneManager : MonoBehaviour,
 
 	public void OnGameStateChanged(GameState state)
     {
-        switch (state)
-        {
-            case GameState.Battle:
-				DontDestroyOnLoad(gameObject);
+		if (state == GameState.Cultivate)
+		{
+			Destroy(this);
+		}
+		else
+		{
+			DOTween.Clear();
 
-				DontDestroyOnLoad(Map);
-                DontDestroyOnLoad(UI);
-                break;
-            //TODO
-        }
+			transform.SetParent(gameManager.transform);
+		}
     }
-    public void Init()
+	public void DestroyOtherInstancesOfType()
+	{
+		// 查找同类型的所有游戏对象
+		TacticalSceneManager[] otherInstances = Object.FindObjectsOfType<TacticalSceneManager>();
+
+		// 遍历并销毁除自身以外的同类型游戏对象
+		foreach (TacticalSceneManager instance in otherInstances)
+		{
+			if (instance != this)
+			{
+				Destroy(instance.gameObject);
+			}
+		}
+	}
+
+
+
+
+	public void Init()
     {
+        gameManager = GameManager.GetInstance();
 		GameManager.OnGameStateChanged += OnGameStateChanged;
 
 		ColorUtility.TryParseHtmlString("#F6921E", out originOrange);
@@ -166,11 +185,29 @@ public class TacticalSceneManager : MonoBehaviour,
 		currentTerrain.srcNode = prevTerrain.dstNode;
         //TODO
         terrainsGroup.DOBlendableMoveBy(terrainLength * Vector3.left, switchDuration);
+
+        currentTerrain.GenerateLineNetFromSource();
 	}
-    /// <summary>
-    /// 更新当前节点
-    /// </summary>
-    /// <param name="controller"></param>
+
+	public void LateUpdateTacticalLayer(INodeController currentNode)
+    {
+		DOTween.Clear();
+
+		StartCoroutine(LateUpdateDisplay(currentNode as NodeController, gameManager.async));
+    }
+    IEnumerator LateUpdateDisplay(NodeController currentNode, AsyncOperation async)
+    {
+        yield return async;
+        DOTween.Clear();
+        //yield return new WaitForSeconds(1f);
+        UpdateCurrentNode(currentNode);
+        EnterNextTerrain();
+    }
+
+	/// <summary>
+	/// 更新当前节点
+	/// </summary>
+	/// <param name="controller"></param>
 	public void UpdateCurrentNode(INodeController controller)
 	{
         DisableArrowCaster();
