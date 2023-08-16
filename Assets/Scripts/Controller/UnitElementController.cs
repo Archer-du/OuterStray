@@ -91,7 +91,7 @@ public class UnitElementController : BattleElementController,
 
 		InspectorImage.sprite = CardImage.sprite;
 		//TODO
-		InspectorImage.rectTransform.sizeDelta = new Vector3(12, 15);
+		//InspectorImage.rectTransform.sizeDelta = new Vector3(12, 15);
 		InspectorGround.color = elementGround.color;
 		InspectorFrame.color = elementGround.color;
 		InspectorNameTag.color = elementGround.color;
