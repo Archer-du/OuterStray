@@ -51,6 +51,10 @@ namespace DisplayInterface
 		public void EnterNextTerrain();
 		public void UpdateCurrentNode(INodeController controller);
 
+		public void UpdateGasMineToken(int gasMineToken);
+		public void UpdateCardNum(int cardNum);
+		public void UpdateBaseHealth(int baseHealth, int baseMaxHealth);
+
 		public void CampaignCompleted();
 		public void CampaignFailed();
 	}
@@ -58,7 +62,17 @@ namespace DisplayInterface
 	{
 		public void Init();
 
-		public void InstantiateDeckTag();
+		public void UnloadDeckTags();
+
+		public void InstantiateDeckTag(string ID, string name, string category, int index, string description);
+
+		public void UpdateUnitTagInfo(string category, int index, int cost, int attack, int health, int maxHealth, int counter);
+
+		public void UpdateCommandTagInfo(int index, int cost, int durability);
+
+		public void UpdateHealth(int index, int health);
+
+		public void UpdateHierachy();
 	}
 	public interface ITerrainController
 	{
@@ -72,6 +86,9 @@ namespace DisplayInterface
 		public void Init();
 		public void SetAdjacentNode(List<INodeController> adjList);
 		public void CastEvent();
+		public void DisplayElement(List<string> IDs, List<string> names, List<string> category, List<int> costs, List<int> attacks, List<int> healths, List<int> counters, List<int> gasMineCosts, List<string> descriptions);
+		public void UpdateBasicInfo(int legacy, int medicalPrice) { }
+		public void UpdateHealth(int health) { }
 	}
 
 
@@ -109,6 +126,8 @@ namespace DisplayInterface
 		public IUnitElementController InstantiateUnitInStack(int turn);
 
 
+		public void BattleFailed();
+		public void BattleWinned();
 	}
 	public interface IBattleLineController
 	{

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class LegacyNodeController : NodeController
 {
+	int legacy;
 	public override void Init()
 	{
 		base.Init();
@@ -17,5 +18,9 @@ public class LegacyNodeController : NodeController
 	public override void CastEvent()
 	{
 		base.CastEvent();
+	}
+	public override void UpdateBasicInfo(int legacy, int medicalPrice)
+	{
+		this.legacy = legacy;
 	}
 }

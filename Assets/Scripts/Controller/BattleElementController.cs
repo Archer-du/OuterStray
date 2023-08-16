@@ -59,7 +59,7 @@ public class BattleElementController : MonoBehaviour
 	}
 	public bool inputLock;
 
-	public static Vector2 inputOffset;
+	public static Vector2 inputOffset = new Vector2(1980, 1080);
 
 	public static int cardWidth = 360;
 

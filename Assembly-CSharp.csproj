@@ -81,6 +81,7 @@
     <Compile Include="Assets\Scripts\Controller\SourceNodeController.cs" />
     <Compile Include="Assets\Scripts\Controller\MedicalNodeController.cs" />
     <Compile Include="Assets\Scripts\SceneManager\BattleSceneManager.cs" />
+    <Compile Include="Assets\Scripts\Controller\ToolKit\CardInspect.cs" />
     <Compile Include="Assets\Scripts\Controller\PromoteNodeController.cs" />
     <Compile Include="Assets\Scripts\Controller\TerrainController.cs" />
     <Compile Include="Assets\Scripts\Controller\HandicapController.cs" />

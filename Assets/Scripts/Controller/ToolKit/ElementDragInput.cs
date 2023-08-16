@@ -110,4 +110,8 @@ public class ElementDragInput : MonoBehaviour,
 	{
 		this.controller = controller;
 	}
+	public void Start()
+	{
+		buffer = GameObject.Find("Buffer").transform;
+	}
 }

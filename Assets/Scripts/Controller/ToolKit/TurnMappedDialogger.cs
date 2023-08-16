@@ -9,6 +9,8 @@ public class TurnMappedDialogger : MonoBehaviour
 {
 	public BattleSceneManager manager;
 
+	public bool disable;
+
 	public GameObject dialogFrame;
 	public TMP_Text dialogText;
 	public string dialogSource;
@@ -30,6 +32,7 @@ public class TurnMappedDialogger : MonoBehaviour
 	}
 	public void UpdateDialog()
 	{
+		if (disable) return;
 		if (manager.turnNum % 2 == 1)
 		{
 			DisplayDialog();

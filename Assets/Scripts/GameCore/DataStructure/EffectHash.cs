@@ -649,6 +649,10 @@ namespace EventEffectModels
 				if (system.deployQueue[i].maxHealthGain.ContainsKey(publisher.battleID))
 				{
 					system.deployQueue[i].maxHealthGain.Remove(publisher.battleID);
+					if(system.deployQueue[i].dynHealth > system.deployQueue[i].maxHealthReader)
+					{
+						system.deployQueue[i].dynHealth = system.deployQueue[i].maxHealthReader;
+					}
 				}
 				system.deployQueue[i].UpdateInfo();
 				system.deployQueue[i].UpdateHealth();
@@ -666,6 +670,10 @@ namespace EventEffectModels
 			if (element.maxHealthGain.ContainsKey(publisher.battleID))
 			{
 				element.maxHealthGain.Remove(publisher.battleID);
+				if (element.dynHealth > element.maxHealthReader)
+				{
+					element.dynHealth = element.maxHealthReader;
+				}
 			}
 			element.UpdateInfo();
 			element.UpdateHealth();
@@ -740,6 +748,7 @@ namespace EventEffectModels
 			{
 				element.attackGain.Add(publisher.battleID, atkGain);
 				element.maxHealthGain.Add(publisher.battleID, mhpGain);
+				element.dynHealth += mhpGain;
 			}
 			element.UpdateInfo();
 			element.UpdateHealth();
@@ -764,6 +773,7 @@ namespace EventEffectModels
 				{
 					element.attackGain.Add(publisher.battleID, atkGain);
 					element.maxHealthGain.Add(publisher.battleID, mhpGain);
+					element.dynHealth += mhpGain;
 				}
 				element.UpdateInfo();
 				element.UpdateHealth();
@@ -952,6 +962,25 @@ namespace EventEffectModels
 				unit.Deploy(line, resIdx);
 			}
 		}
+		internal void StrangeGrowthTutorial(BattleElement element, BattleSystem system)
+		{
+			UnitElement publisher = this.source as UnitElement;
+
+			publisher.dynAttackWriter += 2;
+			publisher.maxHealthWriter += 2;
+			publisher.UpdateHealth();
+
+			if (publisher.dynAttackWriter >= 15)
+			{
+				BattleLine line = publisher.battleLine;
+				int resIdx = publisher.inlineIdx;
+				publisher.Terminate("immediate");
+				UnitCard card = system.pool.GetCardByID("mush_100_00") as UnitCard;
+				UnitElement unit = new GuardianElement(card, system,
+					system.controller.InstantiateUnitInBattleField(element.ownership, line.index, resIdx));
+				unit.Deploy(line, resIdx);
+			}
+		}
 
 		internal EffectsTable(BattleElement source)
 		{
@@ -986,6 +1015,7 @@ namespace EventEffectModels
 				{"RecoverBase", (BattleEventHandler)RecoverBase },
 				{"DrawCommandCardsRandomAndRecover", (BattleEventHandler)DrawCommandCardsRandomAndRecover },
 				{"StrangeGrowth", (BattleEventHandler)StrangeGrowth },
+				{"StrangeGrowthTutorial", (BattleEventHandler)StrangeGrowthTutorial },
 				{"AuraConstantUnitGain", (BattleEventHandler)AuraConstantUnitGain },
 
 				//aura
@@ -1035,6 +1065,7 @@ namespace EventEffectModels
 				{"DrawCommandCardsRandomAndRecover", null },
 				{"RecoverBase", null },
 				{"StrangeGrowth", null },
+				{"StrangeGrowthTutorial", null },
 				{"AuraConstantUnitGain", null },
 
 				{"Aura", null },

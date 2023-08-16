@@ -1,4 +1,4 @@
-base_00,human,基地车,Construction,0,0,30,NA,,-1,-1,none
+base_00,human,基地车,Construction,0,0,30,NA,,-1,-1,none,
 human_00,human,黄蜂无人机,Motorized,2,3,2,3,突击,0,0,Assault,2
 human_02,human,卡瓦兰通信专员,LightArmor,2,1,3,2,部署：抽取一张指令牌，使其耐久+1。,-1,0,<self:AfterDeploy+DrawCommandCardsRandomAndRecover-2-1-1>,4
 human_03,human,卡瓦兰伐木工,LightArmor,1,2,2,2,,-1,0,none,1
@@ -9,7 +9,7 @@ human_10,human,卡瓦兰安保卫队,Guardian,3,1,6,1,,-1,0,none,3
 human_11,human,卡瓦兰探险家,LightArmor,4,2,5,3,部署：抽一张牌。,-1,0,<self:AfterDeploy+DrawCardsRandom-1-1>,2
 human_13,human,卡瓦兰斥候,Motorized,4,3,3,3,,-1,0,none,2
 human_15,human,“索姆努斯”维修单元,Artillery,8,5,6,2,护甲（1），部署：为你的基地恢复8点耐久。,-1,0,<self:Initialize+Armor-1-1>/<self:BeforeAttacked+ArmorOnEnable-0>|<self:AfterDeploy+RecoverBase-1-8>,5
-human_16,human,化学制配中心,Construction,3,0,3,NA,每当友方单位获得治疗时，便随机对一个敌方单位造成1点伤害。,-1,0,<global:ally:UnitHealed+RandomDamage-2-0-1>,3
+human_16,human,化学制配中心,Construction,3,0,3,NA,每当友方单位获得治疗时，便随机对一个敌方单位造成1点伤害。,-1,0,<Aura:ally:UnitHealed+RandomDamage-2-0-1>,3
 human_17,human,医疗中心,Construction,2,0,3,NA,在你的回合开始时，随机为一个受伤的友方单位恢复3点耐久。,-1,0,<self:StartOfTurn+RandomRecoverDamaged-1-3>,5
 human_20,human,创伤小组,Motorized,8,8,8,8,突击，每当一个友方单位受到治疗时，攻击计时-1。,-1,0,Assault|<Aura:ally:UnitHealed+AuraAttackCounterDecrease-1-1>,3
 human_21,human,机械安保,Guardian,4,1,5,2,部署，缜密：获得格挡。,-1,0,<self:AfterDeploy+Parry-0>/<self:BeforeDamaged+ParryOnEnable-0>/<self:AfterDamaged+ParryUnload-0>|<self:Meticulous+Parry-0>/<self:BeforeDamaged+ParryOnEnable-0>/<self:AfterDamaged+ParryUnload-0>,3
@@ -40,4 +40,4 @@ comm_mush_01,plant,菇军奋战,NonTarget,2,1,,,将两个亮顶孢子添加至�
 comm_mush_07,plant,蔓延,NonTarget,1,1,,,将两张“亮顶孢子”加入手牌。本次战役中，每使用一次“蔓延”，便额外加入一张。,-1,0,<self:Cast+Comm_Mush_07-0>,
 comm_mush_13,plant,散播孢子,NonTarget,6,1,,,抽三张牌。将一个耐久与攻击力等同于你手牌数量的亮顶孢子召唤至前线,-1,0,<self:Cast+Comm_Mush_13-0>,
 comm_mush_08,plant,增殖,NonTarget,2,1,,,抽一张牌。战场上每有一个亮顶孢子，便重复一次。,-1,0,<self:Cast+Comm_Mush_08-0>,
-comm_mush_18,plant,腐蚀,NonTarget,3,1,,,对一个敌方单位造成5点伤害。随后，对该单位所在战线的所有单位造成两点伤害。,-1,0,<self:Cast+Comm_Mush_18-0>,
+comm_mush_18,plant,腐蚀,Target,3,1,,,对一个敌方单位造成5点伤害。随后，对该单位所在战线的所有单位造成两点伤害。,-1,0,<self:Cast+Comm_Mush_18-0>,

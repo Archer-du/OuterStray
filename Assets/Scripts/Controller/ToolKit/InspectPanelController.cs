@@ -10,6 +10,7 @@ public class InspectPanelController : MonoBehaviour,
     IPointerEnterHandler, IPointerExitHandler
 {
 	public bool active;
+	public bool disable;
 	public bool boundaryCorrection;
 
 	public float upperBound;
@@ -39,12 +40,16 @@ public class InspectPanelController : MonoBehaviour,
 	public void OnPointerExit(PointerEventData eventData)
 	{
 		timer = -1;
-		inspectPanel.DOFade(0f, duration);
+		if (!disable)
+		{
+			inspectPanel.DOFade(0f, duration);
+		}
 	}
 
 	void Start()
 	{
 		inspectPanel.alpha = 0f;
+		disable = false;
 	}
     void Update()
     {
@@ -55,7 +60,6 @@ public class InspectPanelController : MonoBehaviour,
 			{
 				if (active)
 				{
-					Debug.Log(inspectPanel.transform.position);
 					inspectPanel.transform.position = gameObject.transform.position + displayOffset;
 					if (boundaryCorrection)
 					{

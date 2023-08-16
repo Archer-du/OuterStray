@@ -53,6 +53,10 @@ internal class DeserializeMethods
 
 			card = new UnitCard(id, ownership, name, category, cost, atk, hp, atkc, description, department, pack, effects);
 		}
+		if(!id.Contains("base") && card.ownership == 0)
+		{
+			card.gasMineCost = int.Parse(cardObject[12]);
+		}
 	}
 
 	//internal static void EffectsDeserialize(out BattleElement element, string effects)

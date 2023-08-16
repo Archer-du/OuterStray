@@ -5,6 +5,7 @@ using SceneState;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.XR;
@@ -13,7 +14,7 @@ public class TacticalSceneManager : MonoBehaviour,
     ITacticalSceneController
 {
     [Header("Input")]
-    ITacticalSystemInput tacticalSystem;
+    public ITacticalSystemInput tacticalSystem;
 
     [Header("Connection")]
     public GameManager gameManager;
@@ -23,14 +24,20 @@ public class TacticalSceneManager : MonoBehaviour,
 
     public Image InputMask;
 
+    public DeckController playerDeck;
+
     [Header("Prototype")]
 	public GameObject arrowPrototype;
 	public GameObject terrainPrototype;
 
-    public GameObject deckElementPrototype;
-
-	[Header("Data")]
+    [Header("Data")]
+    public bool panelEnabled;
     public NodeController currentNode;
+
+    public int gasMineToken;
+    public int cardNum;
+    public int baseHealth;
+    public int baseMaxHealth;
 
     public List<TerrainController> terrains;
     public TerrainController currentTerrain
@@ -56,6 +63,10 @@ public class TacticalSceneManager : MonoBehaviour,
     public Transform terrainsGroup;
     public float terrainLength = 2700f;
 
+    public TMP_Text gasMineText;
+    public TMP_Text cardNumText;
+    public TMP_Text baseHealthText;
+    public TMP_Text baseMaxHealthText;
 
     public float switchDuration = 1f;
 
@@ -108,6 +119,19 @@ public class TacticalSceneManager : MonoBehaviour,
     }
 
 
+
+    public void MedicalNodeHeal(bool fullfill, int deckID)
+    {
+        tacticalSystem.MedicalNodeHeal(fullfill, deckID);
+    }
+    public void OutPostNodePurchase(int index)
+    {
+        tacticalSystem.OutPostNodePurchase(index);
+    }
+    public void SupplyNodeChoose(int index)
+    {
+        tacticalSystem.SupplyNodeChoose(index);
+    }
 	/// <summary>
 	/// 生成Terrain控件，返回句柄
 	/// </summary>
@@ -126,7 +150,7 @@ public class TacticalSceneManager : MonoBehaviour,
     }
 	public IDeckController InstantiateDeck()
 	{
-        return null;
+        return playerDeck;
 	}
 
 	/// <summary>
@@ -161,7 +185,27 @@ public class TacticalSceneManager : MonoBehaviour,
             StartCoroutine(ArrowCaster(adjNode));
         }
 	}
-    private void DisableArrowCaster()
+	public void UpdateGasMineToken(int gasMineToken)
+	{
+        this.gasMineToken = gasMineToken;
+        gasMineText.text = gasMineToken.ToString();
+	}
+
+	public void UpdateCardNum(int cardNum)
+	{
+        this.cardNum = cardNum;
+        cardNumText.text = cardNum.ToString();
+	}
+
+	public void UpdateBaseHealth(int baseHealth, int baseMaxHealth)
+	{
+        this.baseMaxHealth = baseMaxHealth;
+        this.baseHealth = baseHealth;
+        baseHealthText.text = baseHealth.ToString();
+        baseMaxHealthText.text = baseMaxHealth.ToString();
+	}
+
+	private void DisableArrowCaster()
     {
 		StopAllCoroutines();
 		GameObject[] mapArrow = GameObject.FindGameObjectsWithTag("MapArrow");

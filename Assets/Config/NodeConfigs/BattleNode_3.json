@@ -8,17 +8,37 @@
     "initialHumanEnergy": 1,
     "initialPlantEnergy": 1,
     "initialHumanHandicaps": 1,
-    "initialPlantHandicaps": 1,
+    "initialPlantHandicaps": 3,
     "fieldPreset": [
         {
             "cardPreset" : {
-                "boss": true,
-                "backendID": "mush_101",
+                "boss": false,
+                "backendID": "mush_00",
                 "attack": 1,
-                "health": 8,
+                "health": 1,
                 "attackCounter": 1
             },
-            "position": 0
+            "position": 2
+        },
+        {
+            "cardPreset" : {
+                "boss": false,
+                "backendID": "mush_00",
+                "attack": 1,
+                "health": 1,
+                "attackCounter": 1
+            },
+            "position": 2
+        },
+        {
+            "cardPreset" : {
+                "boss": true,
+                "backendID": "mush_100_01",
+                "attack": 1,
+                "health": 1,
+                "attackCounter": 1
+            },
+            "position" : 0
         }
     ]
 }
