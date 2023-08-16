@@ -12,7 +12,7 @@
     "fieldPreset": [
         {
             "cardPreset" : {
-                "boss": false,
+                "boss": true,
                 "backendID": "mush_102",
                 "attack": 2,
                 "health": 30,

@@ -271,11 +271,11 @@ namespace LogicCore
 			//初始化手牌
 			for(int i = 0; i < initialHumanHandicaps; i++)
 			{
-				list[0].Add(stacks[0].Pop());
+				list[0].Add(stacks[0].RandomPop());
 			}
 			for (int i = 0; i < initialPlantHandicaps; i++)
 			{
-				list[1].Add(stacks[1].Pop());
+				list[1].Add(stacks[1].RandomPop());
 			}
 			handicaps[0].Fill(list[0]);
 			handicaps[1].Fill(list[1]);
@@ -516,7 +516,7 @@ namespace LogicCore
 			//发牌
 			if (handicaps[TURN].count < handicaps[TURN].capacity)
 			{
-				BattleElement element = stacks[TURN].Pop();
+				BattleElement element = stacks[TURN].RandomPop();
 				handicaps[TURN].Push(element);
 			}
 

@@ -242,7 +242,7 @@ namespace EventEffectModels
 				if (system.handicaps[BattleSystem.TURN].count < system.handicaps[BattleSystem.TURN].capacity)
 				{
 					//TODO
-					BattleElement unit = system.stacks[BattleSystem.TURN].Pop();
+					BattleElement unit = system.stacks[BattleSystem.TURN].RandomPop();
 					system.handicaps[BattleSystem.TURN].Push(unit);
 				}
 			}
@@ -352,7 +352,7 @@ namespace EventEffectModels
 				case 0:
 					if (system.battleLines[system.supportLines[this.source.ownership]].Receiveable())
 					{
-						unit.Init();
+						//unit.Init();
 						system.stacks[this.source.ownership].PopElementByStackIdx(unit.stackIdx);
 						unit.Deploy(system.battleLines[system.supportLines[this.source.ownership]], 0);
 					}
@@ -362,7 +362,7 @@ namespace EventEffectModels
 					UnitElement element = this.source as UnitElement;
 					if (element.battleLine.Receiveable())
 					{
-						unit.Init();
+						//unit.Init();
 						system.stacks[this.source.ownership].PopElementByStackIdx(unit.stackIdx);
 						unit.Deploy(element.battleLine, 0);
 					}
@@ -370,7 +370,7 @@ namespace EventEffectModels
 				case 2:
 					if (system.battleLines[system.frontLines[this.source.ownership]].Receiveable())
 					{
-						unit.Init();
+						//unit.Init();
 						system.stacks[this.source.ownership].PopElementByStackIdx(unit.stackIdx);
 						unit.Deploy(system.battleLines[system.frontLines[this.source.ownership]], 0);
 					}
@@ -474,10 +474,10 @@ namespace EventEffectModels
 			{
 				//0：支援战线
 				case 0:
-					if (system.battleLines[system.supportLines[element.ownership]].Receiveable())
+					if (system.battleLines[system.supportLines[this.source.ownership]].Receiveable())
 					{
-						unit = new UnitElement(card, system, system.controller.InstantiateUnitInStack(element.ownership));
-						unit.Deploy(system.battleLines[system.supportLines[element.ownership]], 0);
+						unit = new UnitElement(card, system, system.controller.InstantiateUnitInStack(this.source.ownership));
+						unit.Deploy(system.battleLines[system.supportLines[this.source.ownership]], 0);
 					}
 					break;
 				//1：当前战线
@@ -490,10 +490,10 @@ namespace EventEffectModels
 					break;
 				//2: 前线
 				case 2:
-					if (system.battleLines[system.frontLines[element.ownership]].Receiveable())
+					if (system.battleLines[system.frontLines[this.source.ownership]].Receiveable())
 					{
-						unit = new UnitElement(card, system, system.controller.InstantiateUnitInStack(element.ownership));
-						unit.Deploy(system.battleLines[system.frontLines[element.ownership]], 0);
+						unit = new UnitElement(card, system, system.controller.InstantiateUnitInStack(this.source.ownership));
+						unit.Deploy(system.battleLines[system.frontLines[this.source.ownership]], 0);
 					}
 					break;
 			}
@@ -846,12 +846,13 @@ namespace EventEffectModels
 
 		internal void Comm_Mush_07(BattleElement source, BattleSystem system)
 		{
-			CommandElement element = source as CommandElement;
+			CommandElement publisher = this.source as CommandElement;
 
-			int category = 0;
+
+            int category = 0;
 			int num = 2;
 			//解析完成， 逻辑处理
-			for (int i = 0; i < num + element.tempBufferForCommMush07; i++)
+			for (int i = 0; i < num + publisher.tempBufferForCommMush07; i++)
 			{
 				UnitCard card = null;
 				switch (category)
@@ -874,7 +875,7 @@ namespace EventEffectModels
 				}
 			}
 
-			element.tempBufferForCommMush07++;
+			publisher.tempBufferForCommMush07++;
 		}
 		internal void Comm_Mush_08(BattleElement source, BattleSystem system)
 		{
