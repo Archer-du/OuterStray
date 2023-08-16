@@ -758,6 +758,8 @@ MonoBehaviour:
   SceneLoader: {fileID: 999689980}
   progressText: {fileID: 244297168}
   start: {fileID: 1182092236}
+  loadAudio: {fileID: 0}
+  loadAudioClip: {fileID: 0}
 --- !u!4 &764031425
 Transform:
   m_ObjectHideFlags: 0
@@ -828,7 +830,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.4716981, g: 0.4716981, b: 0.4716981, a: 1}
+  m_Color: {r: 0.3484336, g: 0.5471698, b: 0.4080274, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
