@@ -126,12 +126,12 @@ TextureImporter:
       name: Atlas-UIFrame_0
       rect:
         serializedVersion: 2
-        x: 13070
-        y: 317
-        width: 2837
-        height: 8576
+        x: 13013
+        y: 483
+        width: 2691
+        height: 8362
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
