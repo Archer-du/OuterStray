@@ -17,7 +17,7 @@ human_23,human,卡瓦兰工程总管,LightArmor,3,1,2,1,你造成的的耐久恢
 human_24,human,“泰坦”矿业外甲,Guardian,8,8,10,5,顺劈，护甲（2），此单位处于前线时，你的基地耐久不会低于1点。,-1,-1,Cleave|<self:Initialize+Armor-1-2>/<self:BeforeAttacked+ArmorOnEnable-0>|<Aura:ally:BaseAttacked+AuraBaseImmunity-0>,8
 human_26,human,机动天马,Motorized,6,6,6,3,突击，当该单位进入前线时，将另一张机动天马招募至支援战线。,-1,0,none,6
 comm_human_01,human,炮击,NonTarget,2,3,,,对一个前线的敌方单位造成3点伤害，抽一张牌。,-1,0,<self:Cast+RandomDamage-2-1-3>|<self:Cast+DrawCardsRandom-1-1>,3
-comm_human_03,human,清理植被,NonTarget,2,6,,,对前线所有敌人造成1点伤害。,-1,0,<self:Cast+AOEDamage-2-2-1>,2
+comm_human_03,human,清理植被,NonTarget,2,6,,,对前线所有敌人造成3点伤害。,-1,0,<self:Cast+AOEDamage-2-2-3>,2
 comm_human_05,human,定点打击,Target,4,5,,,造成6点伤害。,-1,0,<self:Cast+TargetDamage-1-6>,4
 comm_human_13,human,环卡瓦兰,NonTarget,8,3,,,使所有处于前线的敌方单位撤退，招募三个重装单位至前线。,-1,0,<self:Cast+AOERetreat-1-2>|<self:Cast+RecruitByCategory-3-3-2-3>,8
 comm_human_21,human,运输补给,NonTarget,3,4,,,抽两张牌。,-1,0,<self:Cast+DrawCardsRandom-1-2>,2
