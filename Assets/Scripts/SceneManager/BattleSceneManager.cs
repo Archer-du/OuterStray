@@ -628,7 +628,7 @@ public class BattleSceneManager : MonoBehaviour,
         {
             if (AIHandicap[i].ID == "comm_mush_01" && energy[Turn] > 2)
             {
-                AICast(i);
+                AICast(i, 0, 0);
             }
         }
 
