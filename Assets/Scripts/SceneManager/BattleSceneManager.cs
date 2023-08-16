@@ -620,7 +620,7 @@ public class BattleSceneManager : MonoBehaviour,
 			if (AIHandicap[i].ID == "comm_mush_01" && energy[Turn] > 2)
 			{
 				AICast(i, 0, 0);
-				yield return new WaitForSeconds(sequenceTime + waitTime, 0, 0);
+				yield return new WaitForSeconds(sequenceTime + waitTime);
 			}
 		}
 		// 使用散播孢子，扩大场面
