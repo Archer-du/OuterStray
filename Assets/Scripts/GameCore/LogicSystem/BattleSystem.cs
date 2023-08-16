@@ -14,6 +14,12 @@ using CodiceApp.EventTracking.Plastic;
 
 namespace LogicCore
 {
+	public enum BattleResult
+	{
+		normal,
+		win,
+		fail
+	}
 
 	/// <summary>
 	/// note: 应尽量减少战线，手牌，牌堆对element的操作，以防element与过多其他类耦合和破坏封装性。尽量以平铺方式通过战斗系统直接操作element
@@ -21,6 +27,8 @@ namespace LogicCore
 	/// </summary>
 	public class BattleSystem : IBattleSystemInput
 	{
+
+		internal static event Action UpdateWeight;
 		//display-----------------------------------
 		/// <summary>
 		/// 
@@ -120,7 +128,7 @@ namespace LogicCore
 			this.tacticalSystem = tacticalSystem as TacticalSystem;
 		}
 
-
+		internal BattleResult result;
 		//TODO
 		/// <summary>
 		/// 由战术层指定参数构建战场
@@ -131,6 +139,8 @@ namespace LogicCore
 			int initialTurn, int initialHumanEnergy, int initialPlantEnergy, int initialHumanHandicaps, int initialPlantHandicaps,
 			List<BattleNode.FieldPreset> fieldPresets)
 		{
+			result = BattleResult.normal;
+
 			deployQueue = new List<UnitElement>();
 			UnitIDDic = new Dictionary<string, List<UnitElement>>();
 
@@ -320,7 +330,7 @@ namespace LogicCore
 				UpdateFrontLine();
 				UpdateAttackRange();
 			}
-			controller.InitBases(bases[0].controller, bases[1].controller);
+			controller.InitBases(bases[0].controller, null);
 		}
 
 
@@ -551,7 +561,7 @@ namespace LogicCore
 		{
 			tacticalSystem.playerDeck.InstantiateDeckTags();
 			//TODO win or fail
-			tacticalSystem.CampaignCompleted();
+			tacticalSystem.BattleCampaignCompleted();
 		}
 
 
@@ -667,6 +677,16 @@ namespace LogicCore
 					UpdateAttackRange();
 				}
 			}
+			if(result == BattleResult.fail)
+			{
+				BattleFailed();
+			}
+			if(result == BattleResult.win)
+			{
+				BattleFailed();
+			}
+			//TODO
+			UpdateWeight?.Invoke();
 		}
 		private void RotateSettlement()
 		{
@@ -678,6 +698,15 @@ namespace LogicCore
 					UpdateAttackRange();
 				}
 			}
+			if (result == BattleResult.fail)
+			{
+				BattleFailed();
+			}
+			if (result == BattleResult.win)
+			{
+				BattleFailed();
+			}
+			UpdateWeight?.Invoke();
 		}
 
 

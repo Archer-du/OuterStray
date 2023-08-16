@@ -57,6 +57,7 @@ namespace DisplayInterface
 
 		public void CampaignCompleted();
 		public void CampaignFailed();
+		public void LateUpdateTacticalLayer(INodeController currentNode);
 	}
 	public interface IDeckController
 	{

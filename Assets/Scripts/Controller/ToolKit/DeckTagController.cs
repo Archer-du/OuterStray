@@ -166,12 +166,10 @@ public class DeckTagController : MonoBehaviour, IComparable<DeckTagController>,
 
 	public void OnBeginDrag(PointerEventData eventData)
 	{
-		GetComponent<InspectPanelController>().disable = true;
 		if (!controller.sceneManager.panelEnabled) return;
 		if (controller.sceneManager.currentNode is not MedicalNodeController) return;
 		if (category == "Command") return;
-		//TODO
-		if (controller.sceneManager.currentNode is not MedicalNodeController) return;
+		GetComponent<InspectPanelController>().disable = true;
 		GetComponent<InspectPanelController>().inspectPanel.alpha = 1.0f;
 
 	}

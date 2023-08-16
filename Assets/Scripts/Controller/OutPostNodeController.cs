@@ -44,7 +44,7 @@ public class OutPostNodeController : NodeController
 		tacticalManager.OutPostNodePurchase(index);
 		panelDisplay.OutPostButtons[index].interactable = false;
 		CardInspect card = panelDisplay.OutPostInspectors[index];
-		tacticalManager.playerDeck.InstantiateDeckTag(card.ID, card.nameText.text, card.category, 0, card.description);
+		tacticalManager.playerDeck.InstantiateDeckTag(card.ID, card.nameText.text, card.category, 0, card.descriptionText.text);
 		tacticalManager.playerDeck.UpdateHierachy();
 	}
 

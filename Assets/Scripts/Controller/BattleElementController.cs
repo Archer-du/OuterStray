@@ -187,6 +187,7 @@ public class BattleElementController : MonoBehaviour
 
 	public void Init(string ID, int ownership, string name, string categories, int cost, string description)
 	{
+		this.ID = ID;
 		this.ownership = ownership;
 		this.nameContent = name;
 		this.category = categories;

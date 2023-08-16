@@ -89,8 +89,12 @@ namespace LogicCore
 			battleNodeNum = 5;
 			terrains = new List<Terrain>(battleNodeNum);
 
+		}
+		public void SetSceneController(ITacticalSceneController tsdspl)
+		{
+			controller = tsdspl;
 
-			playerDeck = new Deck(system, this, controller.InstantiateDeck());
+			playerDeck = new Deck(battleSystem, this, controller.InstantiateDeck());
 			//TODO remove
 			playerDeck.LoadDeckByPathHuman("Assets\\Config\\HumanDeckTest.csv");
 			playerBase = playerDeck.bases;
@@ -175,14 +179,11 @@ namespace LogicCore
 		{
 			isInNode = false;
 			controller.UpdateCurrentNode(currentNode.controller);
-
-			//显示层更新
-			if (currentNode.IsDstNodeCurTerrain())
-			{
-				controller.EnterNextTerrain();
-				currentTerrain.controller.GenerateLineNetFromSource();
-			}
-			//controller.CampaignCompleted();
+		}
+		public void BattleCampaignCompleted()
+		{
+			isInNode = false;
+			controller.LateUpdateTacticalLayer(currentNode.controller);
 		}
 
 		public void CampaignFailed()
