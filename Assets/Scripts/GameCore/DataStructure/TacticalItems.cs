@@ -1003,6 +1003,10 @@ namespace DataCore.TacticalItems
 					case 4:
 						category = "Construction";
 						index = random.Next(0, tacticalSystem.pool.humanConstructionSet.Count);
+						while (tacticalSystem.pool.humanConstructionSet[index].backendID.Contains("base"))
+						{
+							index = random.Next(0, tacticalSystem.pool.humanConstructionSet.Count);
+						}
 						supply.Add(new ConstructionElement(tacticalSystem.pool.humanConstructionSet[index] as UnitCard,
 							tacticalSystem.battleSystem, null));
 						break;

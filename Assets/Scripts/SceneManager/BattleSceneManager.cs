@@ -112,10 +112,13 @@ public class BattleSceneManager : MonoBehaviour,
 	//结算锁
 	public static bool settlement = false;
 
-    public void FieldInitialize(IBattleSystemInput handler, int fieldCapacity)
+	public void Start()
 	{
-		DontDestroyOnLoad(gameObject);
-
+		Settler.gameObject.transform.position = new Vector3(0, 2160, 0);
+		SettleButton.onClick.AddListener(BattleOverChecked);
+	}
+	public void FieldInitialize(IBattleSystemInput handler, int fieldCapacity)
+	{
 		gameManager = GameManager.GetInstance();
 
 		battleSystem = handler;
@@ -150,9 +153,6 @@ public class BattleSceneManager : MonoBehaviour,
 			plantSlots[i].SetActive(false);
 		}
 
-		Settler.gameObject.transform.position = new Vector3(0, 2160, 0);
-		SettleButton.onClick.AddListener(BattleOverChecked);
-
 		exitButton.onClick.AddListener(Exit);
 
 		InputLocked?.Invoke();
@@ -175,7 +175,7 @@ public class BattleSceneManager : MonoBehaviour,
 	public void UpdateBaseHealth(int health)
 	{
 		baseHealth.text = health.ToString();
-		baseHealth.DOColor(new Color(1 - (float)health / bases[0].maxHealthPoint, 0, 0), healthDuration);
+		baseHealth.DOColor(new Color(1, (float)health / bases[0].maxHealthPoint, (float)health / bases[0].maxHealthPoint), healthDuration);
 	}
 
     /// <summary>
@@ -370,27 +370,38 @@ public class BattleSceneManager : MonoBehaviour,
 
 	public void BattleFailed()
 	{
+		StopAllCoroutines();
 		SettleText.text = "Failure";
 		SettleText.gameObject.SetActive(true);
 		float duration = 0.4f;
 		Settler.transform.DOMove(new Vector3(0, 0, 0), duration)
-			.OnComplete(() => SettleText.DOFade(1f, duration));
+			.OnComplete(() =>
+			{
+				SettleText.DOFade(1f, duration);
+			});
 	}
 
 	public void BattleWinned()
 	{
+		StopAllCoroutines();
 		SettleText.text = "Victory";
 		SettleText.gameObject.SetActive(true);
 		float duration = 0.4f;
 		Settler.transform.DOMove(new Vector3(0, 0, 0), duration)
-			.OnComplete(() => SettleText.DOFade(1f, duration));
+			.OnComplete(() =>
+			{
+				SettleText.DOFade(1f, duration);
+			});
 	}
 	public void BattleOverChecked()
 	{
+		DOTween.Clear();
 		Settler.transform.position = new Vector3(0, 2160, 0);
+		battleSystem.BattleOverChecked();
+
 		AsyncOperation async = gameManager.UpdateGameState(SceneState.GameState.Tactical);
 
-		StartCoroutine(LateWriteBack(async));
+		//StartCoroutine(LateWriteBack(async));
 	}
 	IEnumerator LateWriteBack(AsyncOperation async)
 	{
@@ -566,13 +577,21 @@ public class BattleSceneManager : MonoBehaviour,
 		// 优先使用“蔓延”，补充手牌
         for (int i = 0; i < AIHandicap.count; i++)
         {
-            if (AIHandicap[i].ID == "comm_mush_07" && energy[Turn] > 2)
+            if (AIHandicap[i].ID == "comm_mush_18" && energy[Turn] > 3)
             {
-                AICast(i);
+                AICast(i, 0, 0);
             }
         }
 
         //把支援战线铺满
+        for (int i = 0; i < AIHandicap.count; i++)
+		{
+			if (AIHandicap[i].ID == "comm_mush_01" && energy[Turn] > 2)
+			{
+				AICast(i, 0, 0);
+			}
+		}
+
         while (AISupportLine.count < 5)
 		{
 			int idx = GetMinCostUnitPointer();
@@ -612,7 +631,7 @@ public class BattleSceneManager : MonoBehaviour,
 		{
 			if (AIHandicap[i].ID == "comm_mush_13" && energy[Turn] > 6 && AIAdjacentLine.count < AIAdjacentLine.capacity)
 			{
-				AICast(i);
+				AICast(i, 0, 0);
 			}
 		}
 		Skip();
@@ -696,7 +715,7 @@ public class BattleSceneManager : MonoBehaviour,
 		// 指令卡策略：费用够就出
 		while (energy[Turn] > 3 && handicap.count > 0)
 		{
-			AICast(0);
+			AICast(0, 0, 0);
 		}
 
 		Skip();
@@ -868,12 +887,12 @@ public class BattleSceneManager : MonoBehaviour,
 		//data input 显示层检查完了再动数据层！！！
 		battleSystem.Deploy(handicapIdx, lineidx, 0);
 	}
-	public void AICast(int handicapIdx)
+	public void AICast(int handicapIdx, int dstLineIdx, int dstPos)
 	{
 		rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
 
-		battleSystem.Cast(handicapIdx, 0, 0);
+		battleSystem.Cast(handicapIdx, dstLineIdx, dstPos);
 	}
 
 	public void AIMove(int resIdx)

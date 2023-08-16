@@ -8,6 +8,7 @@ using DisplayInterface;
 using LogicCore;
 using EventEffectModels;
 using InputHandler;
+using WeightUpdaterHash;
 
 namespace DataCore.BattleElements
 {
@@ -28,6 +29,8 @@ namespace DataCore.BattleElements
 		/// 效果表(CRITICAL)
 		/// </summary>
 		protected EffectsTable effectsTable;
+
+		protected WeightUpdaterTable updaterTable;
 
 
 		private ElementState State;
@@ -87,9 +90,13 @@ namespace DataCore.BattleElements
 		internal int ownership;
 		internal int stackIdx;
 
+		internal int weight;
+
 
 		internal BattleElement(Card card, BattleSystem system)
 		{
+			BattleSystem.UpdateWeight += UpdateWeight;
+
 			battleSystem = system;
 			//初始化事件系统和效果表
 			eventTable = new EventTable();
@@ -220,6 +227,7 @@ namespace DataCore.BattleElements
 
 		internal virtual void UpdateInfo() { }
 		internal virtual void UpdateState() { }
+		internal virtual void UpdateWeight() { }
 
 		public int CompareTo(BattleElement other)
 		{
@@ -229,6 +237,7 @@ namespace DataCore.BattleElements
 			}
 			else return category.CompareTo(other.category);
 		}
+
 	}
 
 
@@ -755,7 +764,8 @@ namespace DataCore.BattleElements
 
 			if (this.dynHealth <= 0)
 			{
-				Terminate("append");
+
+				Terminate(method);
 				return -1;
 			}
 
@@ -783,7 +793,15 @@ namespace DataCore.BattleElements
 
 			if (this.dynHealth <= 0)
 			{
-				Terminate("append");
+				if (this == battleSystem.bases[0])
+				{
+					battleSystem.result = BattleResult.fail;
+				}
+				if (this == battleSystem.bases[1])
+				{
+					battleSystem.result = BattleResult.win;
+				}
+				Terminate(method);
 				return -1;
 			}
 
@@ -818,14 +836,7 @@ namespace DataCore.BattleElements
 			battleLine.ElementRemove(inlineIdx);
 			controller.TerminateAnimationEvent(method);
 
-			if (this == battleSystem.bases[0])
-			{
-				battleSystem.BattleFailed();
-			}
-			if(this == battleSystem.bases[1])
-			{
-				battleSystem.BattleWinned();
-			}
+
 
 			//not likely
 			eventTable.RaiseEvent("AfterTerminate", this, battleSystem);
@@ -879,6 +890,11 @@ namespace DataCore.BattleElements
 			aura = false;
 		}
 
+
+		//internal override void UpdateWeight()
+		//{
+		//	updaterTable.RaiseEvent(backendID);
+		//}
 
 
 
@@ -1025,6 +1041,7 @@ namespace DataCore.BattleElements
 		}
 	}
 	//legacy
+	[Obsolete]
 	internal sealed class BehemothsElement : UnitElement
 	{
 		internal BehemothsElement(UnitCard __card, BattleSystem system, IUnitElementController controller) 

@@ -50,7 +50,7 @@ public class SupplyNodeController : NodeController
 		}
 		tacticalManager.SupplyNodeChoose(index);
 		CardInspect card = panelDisplay.SupplyInspectors[index];
-		tacticalManager.playerDeck.InstantiateDeckTag(card.ID, card.nameText.text, card.category, 0, card.description);
+		tacticalManager.playerDeck.InstantiateDeckTag(card.ID, card.nameText.text, card.category, 0, card.descriptionText.text);
 		tacticalManager.playerDeck.UpdateHierachy();
 	}
 
