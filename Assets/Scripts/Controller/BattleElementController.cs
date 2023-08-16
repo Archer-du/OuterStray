@@ -208,10 +208,10 @@ public class BattleElementController : MonoBehaviour
 	private void LoadCardResources(string ID)
 	{
 		CardImage.sprite = Resources.Load<Sprite>("CardImage/" + ID);
-		if (ownership == 1)
-		{
-			CardImage.rectTransform.sizeDelta = new Vector2(10, 13);
-		}
+		//if (ownership == 1)
+		//{
+		//	CardImage.rectTransform.sizeDelta = new Vector2(10, 13);
+		//}
 
 		Color color;
 		switch (category)
