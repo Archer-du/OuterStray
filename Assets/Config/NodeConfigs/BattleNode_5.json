@@ -4,7 +4,7 @@
     "battleLinesCapacity":[
         5, 4, 3, 5
     ],
-    "plantDeckPath": "Assets\\Config\\DeckConfigs\\mush99.csv",
+    "plantDeckPath": "Assets\\Config\\DeckConfigs\\BattleNode_5.csv",
     "initialHumanEnergy": 1,
     "initialPlantEnergy": 1,
     "initialHumanHandicaps": 1,

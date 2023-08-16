@@ -39,4 +39,4 @@ comm_mush_01,plant,菇军奋战,NonTarget,2,1,,,将两个亮顶孢子添加至�
 comm_mush_07,plant,蔓延,NonTarget,1,1,,,将两张“亮顶孢子”加入手牌。本次战役中，每使用一次“蔓延”，便额外加入一张。,-1,0,<self:Cast+Comm_Mush_07-0>,
 comm_mush_13,plant,散播孢子,NonTarget,6,1,,,抽三张牌。将一个耐久与攻击力等同于你手牌数量的亮顶孢子召唤至前线,-1,0,<self:Cast+Comm_Mush_13-0>,
 comm_mush_08,plant,增殖,NonTarget,2,1,,,抽一张牌。战场上每有一个亮顶孢子，便重复一次。,-1,0,<self:Cast+Comm_Mush_08-0>,
-comm_mush_18,plant,腐蚀,NonTarget,3,1,,,对一个敌方单位造成5点伤害。随后，对该单位所在战线的所有单位造成两点伤害。,-1,0,<self:Cast+Comm_Mush_18-0>,
+comm_mush_18,plant,腐蚀,Target,3,1,,,对一个敌方单位造成5点伤害。随后，对该单位所在战线的所有单位造成两点伤害。,-1,0,<self:Cast+Comm_Mush_18-0>,

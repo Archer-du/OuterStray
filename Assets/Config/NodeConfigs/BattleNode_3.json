@@ -2,13 +2,9 @@
     "initialTurn": 0,
     "fieldCapacity": 4,
     "battleLinesCapacity":[
-<<<<<<< HEAD
-        5, 4, 3, 5
-=======
         5, 5, 4, 4
->>>>>>> db58d472fc30e3266ac1aba54c38c7b67008efe8
     ],
-    "plantDeckPath": "Assets\\Config\\DeckConfigs\\mush99.csv",
+    "plantDeckPath": "Assets\\Config\\DeckConfigs\\BattleNode_3.csv",
     "initialHumanEnergy": 1,
     "initialPlantEnergy": 1,
     "initialHumanHandicaps": 1,
