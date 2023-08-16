@@ -47,6 +47,9 @@ public class GameManager : MonoBehaviour, IGameManagement
 		}
 	}
 
+	public AudioSource TacticalBGM;
+	public AudioSource BattleBGM;
+
 	public ICultivationSystemInput cultivationSystem;
 	public ITacticalSystemInput tacticalSystem;
 	public IBattleSystemInput battleSystem;
@@ -79,6 +82,7 @@ public class GameManager : MonoBehaviour, IGameManagement
 				return async;
 
 			case GameState.Battle:
+				TacticalBGM.Stop();
 				async = SceneManager.LoadSceneAsync("BattleScene");
 				StartCoroutine(LoadingNewScene(async, "BattleScene"));
 				return async;
@@ -129,6 +133,7 @@ public class GameManager : MonoBehaviour, IGameManagement
 				}
 				break;
 			case "BattleScene":
+				BattleBGM.Play();
 				battleSceneManager = GameObject.Find("BattleSceneManager").GetComponent<BattleSceneManager>();
 				battleSystem.SetSceneController(battleSceneManager);
 				break;
@@ -161,6 +166,7 @@ public class GameManager : MonoBehaviour, IGameManagement
 		battleSystem.SetTacticalSystem(tacticalSystem);
 		cultivationSystem = new CultivationSystem(cultivateSceneManager, tacticalSystem as TacticalSystem);
 
+		TacticalBGM.Play();
 	}
 
 

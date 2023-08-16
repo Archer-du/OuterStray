@@ -1,4 +1,5 @@
 using DisplayInterface;
+using InputHandler;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting.Antlr3.Runtime.Tree;
@@ -7,6 +8,8 @@ using UnityEngine;
 public class DeckController : MonoBehaviour,
 	IDeckController
 {
+	public IDeckInput deck;
+
 	public TacticalSceneManager sceneManager;
 
 	[Header("Data")]
@@ -22,9 +25,10 @@ public class DeckController : MonoBehaviour,
 
 	[Header("Prototype")]
 	public GameObject deckTagPrototype;
-	public void Init()
+	public void Init(IDeckInput deck)
 	{
 		tags = new List<DeckTagController>();
+		this.deck = deck;
 		//lightArmorDeckTags = new Dictionary<int, DeckTagController>();
 		//motorizedDeckTags = new Dictionary<int, DeckTagController>();
 		//artilleryDeckTags = new Dictionary<int, DeckTagController>();

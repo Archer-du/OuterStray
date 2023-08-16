@@ -45,6 +45,16 @@ public class OutPostNodeController : NodeController
 		panelDisplay.OutPostButtons[index].interactable = false;
 		CardInspect card = panelDisplay.OutPostInspectors[index];
 		tacticalManager.playerDeck.InstantiateDeckTag(card.ID, card.nameText.text, card.category, 0, card.descriptionText.text);
+		//TODO
+		if (card.category == "Command")
+		{
+			tacticalManager.playerDeck.UpdateCommandTagInfo(0, int.Parse(card.costText.text), int.Parse(card.counterText.text));
+		}
+		else
+		{
+			tacticalManager.playerDeck.UpdateUnitTagInfo("", 0, int.Parse(card.costText.text), int.Parse(card.attackText.text), int.Parse(card.healthText.text),
+				int.Parse(card.healthText.text), card.counterText.text == "" ? 1000000 : int.Parse(card.counterText.text));
+		}
 		tacticalManager.playerDeck.UpdateHierachy();
 	}
 

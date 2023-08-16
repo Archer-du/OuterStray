@@ -86,7 +86,7 @@ namespace LogicCore
 			isInNode = false;
 
 			//TODO test
-			battleNodeNum = 5;
+			battleNodeNum = 2;
 			terrains = new List<Terrain>(battleNodeNum);
 
 		}

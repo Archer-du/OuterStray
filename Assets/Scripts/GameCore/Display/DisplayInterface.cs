@@ -61,7 +61,7 @@ namespace DisplayInterface
 	}
 	public interface IDeckController
 	{
-		public void Init();
+		public void Init(IDeckInput input);
 
 		public void UnloadDeckTags();
 

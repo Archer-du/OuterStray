@@ -97,7 +97,10 @@ namespace InputHandler
 
 
 
-
+	public interface IDeckInput
+	{
+		public void UpdateManual();
+	}
 
 
 	//test

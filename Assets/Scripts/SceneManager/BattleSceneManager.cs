@@ -26,6 +26,8 @@ public class BattleSceneManager : MonoBehaviour,
 	public Button SettleButton;
 	public TMP_Text SettleText;
 
+	public static bool inputLock;
+
 	[Header("Input")]
 	/// <summary>
 	/// 系统输入接口
@@ -398,6 +400,8 @@ public class BattleSceneManager : MonoBehaviour,
 		DOTween.Clear();
 		Settler.transform.position = new Vector3(0, 2160, 0);
 		battleSystem.BattleOverChecked();
+		gameManager.BattleBGM.Stop();
+		gameManager.TacticalBGM.Play();
 
 		AsyncOperation async = gameManager.UpdateGameState(SceneState.GameState.Tactical);
 
@@ -580,8 +584,9 @@ public class BattleSceneManager : MonoBehaviour,
             if (AIHandicap[i].ID == "comm_mush_18" && energy[Turn] > 3)
             {
                 AICast(i, 0, 0);
-            }
-        }
+				yield return new WaitForSeconds(sequenceTime + waitTime);
+			}
+		}
 
         //把支援战线铺满
         for (int i = 0; i < AIHandicap.count; i++)
@@ -589,6 +594,7 @@ public class BattleSceneManager : MonoBehaviour,
 			if (AIHandicap[i].ID == "comm_mush_01" && energy[Turn] > 2)
 			{
 				AICast(i, 0, 0);
+				yield return new WaitForSeconds(sequenceTime + waitTime);
 			}
 		}
 
@@ -625,6 +631,7 @@ public class BattleSceneManager : MonoBehaviour,
 			if (AIHandicap[i].ID == "comm_mush_13" && energy[Turn] > 6 && AIAdjacentLine.count < AIAdjacentLine.capacity)
 			{
 				AICast(i, 0, 0);
+				yield return new WaitForSeconds(sequenceTime + waitTime);
 			}
 		}
 		Skip();

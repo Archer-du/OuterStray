@@ -10,6 +10,7 @@ public class CardInspect : MonoBehaviour
 
 	public string ID;
 	public string category;
+	public int cost;
 
 	public string description;
 
