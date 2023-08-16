@@ -624,8 +624,15 @@ public class BattleSceneManager : MonoBehaviour,
 			}
 			else break;
 		}
+        for (int i = 0; i < AIHandicap.count; i++)
+        {
+            if (AIHandicap[i].ID == "comm_mush_01" && energy[Turn] > 2)
+            {
+                AICast(i);
+            }
+        }
 
-		// 使用散播孢子，扩大场面
+        // 使用散播孢子，扩大场面
         for (int i = 0; i < AIHandicap.count; i++)
 		{
 			if (AIHandicap[i].ID == "comm_mush_13" && energy[Turn] > 6 && AIAdjacentLine.count < AIAdjacentLine.capacity)
