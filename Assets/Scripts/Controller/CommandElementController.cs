@@ -52,7 +52,8 @@ public class CommandElementController : BattleElementController,
 		{
 			seq.Append(transform.DOMove(inputOffset / 2 + ownership * 500 * Vector2.down, castTime));
 			seq.AppendInterval(waitTime);
-			Vector3 rotateBy = new Vector3(0, 0, ((ownership * 2) - 1) * 90);
+
+			Vector3 rotateBy = new Vector3(0, 0, - 90);
 			seq.Append(
 				transform.DOMove(stack.transform.position + 500 * Vector3.left, castTime)
 				.OnComplete(() =>

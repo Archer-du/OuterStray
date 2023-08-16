@@ -342,19 +342,19 @@ namespace DataCore.BattleItems
 			return element;
 		}
 		//test tutorial TODO remove
-		internal BattleElement Pop()
-		{
-			if (stack.Count == 0)
-			{
-				return null;
-			}
-			BattleElement element = stack[0];
-			stack.RemoveAt(0);
+		//internal BattleElement Pop()
+		//{
+		//	if (stack.Count == 0)
+		//	{
+		//		return null;
+		//	}
+		//	BattleElement element = stack[0];
+		//	stack.RemoveAt(0);
 
-			UpdateStackIdx();
+		//	UpdateStackIdx();
 
-			return element;
-		}
+		//	return element;
+		//}
 		internal void Clear()
 		{
 			stack.Clear();
