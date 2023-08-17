@@ -572,41 +572,11 @@ public class BattleSceneManager : MonoBehaviour,
 		int AISupportLineIdx = fieldCapacity - 1;
         AISupportLine = battleLineControllers[AISupportLineIdx];
 
-        // int deploytimes = 1;
-        // int movetimes = 1;
-        // int cost = GetMinCost();
-
         int frontLineIdx = GetFrontLineIdx();
 		AIAdjacentLine = battleLineControllers[frontLineIdx + 1];
 		
 		float waitTime = 1f;
 		yield return new WaitForSeconds(waitTime);
-
-/*		while (energy[Turn] > 2)
-		{
-			bool actionTaken;
-			do
-			{
-				actionTaken = false;
-
-				actionTaken |= TryCast("comm_mush_07");
-				actionTaken |= TryAdjustFoward(frontLineIdx);
-				actionTaken |= TryDeployLowCostUnit(AISupportLineIdx);
-				actionTaken |= TryCast("comm_mush_01");
-				actionTaken |= TryCast("comm_mush_13");
-				actionTaken |= TryCast("comm_mush_08");
-				actionTaken |= TryCastComm18(frontLineIdx);
-
-				if (actionTaken)
-				{
-					yield return new WaitForSeconds(sequenceTime + waitTime);
-				}
-			} while (actionTaken);
-
-			break;
-		}*/
-
-
 
 		int whileCounter = 30;
 	startwhile:
@@ -792,7 +762,7 @@ public class BattleSceneManager : MonoBehaviour,
 		return false;
     }
 
-    IEnumerator AIBehaviourNode3()
+    /*IEnumerator AIBehaviourNode3()
 	{
         HandicapController handicap = handicapController[1];
 
@@ -874,7 +844,7 @@ public class BattleSceneManager : MonoBehaviour,
 		}
 
 		Skip();
-    }
+    }*/
 
 	/// <summary>
 	/// 获取某条战线的建筑数量
@@ -1122,4 +1092,30 @@ public class BattleSceneManager : MonoBehaviour,
         battleSystem.Move(resLineIdx, resIdx, dstLineIdx, dstPos);
     }
 
+	public abstract class BTNode
+	{
+		public abstract bool Execute();
+	}
+
+	public class Selector : BTNode
+	{
+		private List<BTNode> children;
+
+		public Selector(List<BTNode> children)
+		{
+			this.children = children;
+		}
+
+		public override bool Execute()
+		{
+			foreach (BTNode child in children)
+			{
+				if (child.Execute())
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+	}
 }
