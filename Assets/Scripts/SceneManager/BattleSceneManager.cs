@@ -11,6 +11,7 @@ using System.Xml.Linq;
 using System.Data;
 using System.IO;
 using UnityEditor;
+using JetBrains.Annotations;
 
 public class BattleSceneManager : MonoBehaviour,
 	IBattleSceneController
@@ -564,22 +565,25 @@ public class BattleSceneManager : MonoBehaviour,
 	IEnumerator AIBehavior()
 	{
         AIHandicap = handicapController[1];
-        AISupportLine = battleLineControllers[fieldCapacity - 1];
+
+		int AISupportLineIdx = fieldCapacity - 1;
+        AISupportLine = battleLineControllers[AISupportLineIdx];
 
         int deploytimes = 1;
         int movetimes = 1;
-        int cost = GetMinCost();
+        // int cost = GetMinCost();
 
         int frontLineIdx = GetFrontLineIdx();
 		AIAdjacentLine = battleLineControllers[frontLineIdx + 1];
 		
-		float waitTime = 0.9f;
+		float waitTime = 1f;
 		yield return new WaitForSeconds(waitTime);
 
 
-
-    startwhile:
-		while (energy[Turn] > 2)
+		int whileCounter = 30;
+	startwhile:
+		whileCounter--;
+		while (energy[Turn] > 2 && whileCounter != 0)
 		{
             // 策略：先过牌，再铺场，最后赚卡
 
@@ -594,40 +598,68 @@ public class BattleSceneManager : MonoBehaviour,
                 }
             }
 
-            // 部署低费卡
-            if(AISupportLine.count < AISupportLine.capacity)
-            {
-                int idx = GetMinCostUnitPointer();
-                if (idx >= 0)
-                {
-                    AIDeploy(idx);
-                    yield return new WaitForSeconds(sequenceTime + waitTime);
-                    deploytimes++;
-                    goto startwhile;
-                }
-                else break;
-            }
-
 			// 符合条件的卡前移
             for (int i = fieldCapacity - 1; i > frontLineIdx; i--)
             {
                BattleLineController battleLine = battleLineControllers[i];
                 if (GetIsLineAvailable(i - 1) && i > frontLineIdx + 1)
                 {
-					for (int j = 0; j < battleLineControllers[i].count; j++)
+					for (int j = 0; j < battleLine.count; j++)
 					{
-						if (battleLine[j].category != "Artillery" && battleLine[j].category != "Construction"  && battleLine[j].operateCounter == 1)
+						if (GetIsLineAvailable(i))
 						{
-							AIMove(i, j, i - 1, 0);
-                            yield return new WaitForSeconds(sequenceTime + waitTime);
-                            movetimes++;
-                            goto startwhile;
+                            if (battleLine[j].category != "Artillery" && battleLine[j].category != "Construction" && battleLine[j].operateCounter == 1)
+                            {
+                                AIMove(i, j, i - 1, 0);
+                                yield return new WaitForSeconds(sequenceTime + waitTime);
+                                movetimes++;
+                                goto startwhile;
+                            }
+                        }
+						else
+						{
+                            if (battleLine[j].ID != "mush_102" && battleLine[j].operateCounter == 1)
+                            {
+                                AIMove(i, j, i - 1, 0);
+                                yield return new WaitForSeconds(sequenceTime + waitTime);
+                                movetimes++;
+                                goto startwhile;
+                            }
                         }
                     }
                 }
             }
 
-			// 
+
+			// 部署低费卡
+            if (AISupportLine.count < AISupportLine.capacity)
+            {
+                if (GetConstructionNum(AISupportLineIdx) < AISupportLine.capacity - 2)
+                {
+                    int idx = GetMinCostUnitPointer();
+                    if (idx >= 0)
+                    {
+                        AIDeploy(idx);
+                        yield return new WaitForSeconds(sequenceTime + waitTime);
+                        deploytimes++;
+                        goto startwhile;
+                    }
+                }
+				// 若支援战线的建筑数大于等于战线容量减二，则不部署建筑
+				else
+				{
+					int idx = GetMinCostUnitPointerExcConstr();
+					if (idx >= 0)
+					{
+						AIDeploy(idx);
+                        yield return new WaitForSeconds(sequenceTime + waitTime);
+                        deploytimes++;
+                        goto startwhile;
+                    }
+                }
+            }
+
+            // 
             for (int i = 0; i < AIHandicap.count; i++)
             {
                 if (AIHandicap[i].ID == "comm_mush_01" && energy[Turn] >= 2)
@@ -660,7 +692,7 @@ public class BattleSceneManager : MonoBehaviour,
                 }
             }
 
-			// 有多余费用则攻击敌方血量最高的单位
+			// 有多余费用则用指令攻击敌方血量最高的单位
             for (int i = 0; i < AIHandicap.count; i++)
             {
                 if (AIHandicap[i].ID == "comm_mush_18" && energy[Turn] >= 3)
@@ -686,6 +718,8 @@ public class BattleSceneManager : MonoBehaviour,
             }
 			break;
         }
+
+		yield return new WaitForSeconds(waitTime);
 		Skip();
 	}
 
@@ -773,7 +807,27 @@ public class BattleSceneManager : MonoBehaviour,
 		Skip();
     }
 
-	private bool GetIsLineAvailable(int idx)
+	/// <summary>
+	/// 获取某条战线的建筑数量
+	/// </summary>
+	/// <param name="idx">战线索引</param>
+	/// <returns></returns>
+	private int GetConstructionNum(int idx)
+	{
+		int num = 0;
+		BattleLineController battleLine = battleLineControllers[idx];
+		for (int i = 0; i < battleLine.count; i++)
+		{
+			if (battleLine[i].category == "Construction")
+			{
+				num++;
+			}
+		}
+		return num;
+	}
+
+
+    private bool GetIsLineAvailable(int idx)
 	{
 		return battleLineControllers[idx].count < battleLineControllers[idx].capacity;
 	}
@@ -917,6 +971,28 @@ public class BattleSceneManager : MonoBehaviour,
 		}
 		return minPointer;
 	}
+	private int GetMinCostUnitPointerExcConstr()
+	{
+        int minCost = 10000;
+        int minPointer = -1;
+        for (int i = 0; i < AIHandicap.count; i++)
+        {
+            if (AIHandicap[i].category != "Construction" && AIHandicap[i].cost < minCost && AIHandicap[i] is UnitElementController)
+            {
+                minCost = AIHandicap[i].cost;
+                minPointer = i;
+            }
+        }
+        if (minPointer == -1)
+        {
+            return -1;
+        }
+        if (AIHandicap[minPointer].cost > energy[1])
+        {
+            return -1;
+        }
+        return minPointer;
+    }
 	/// <summary>
 	/// 若没有合适的操作目标返回-1
 	/// </summary>

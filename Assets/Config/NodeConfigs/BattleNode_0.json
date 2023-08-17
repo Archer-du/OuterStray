@@ -5,8 +5,8 @@
         4, 3, 3, 4
     ],
     "plantDeckPath": "Assets\\Config\\DeckConfigs\\BattleNode_0.csv",
-    "initialHumanEnergy": 1,
-    "initialPlantEnergy": 1,
+    "initialHumanEnergy": 3,
+    "initialPlantEnergy": 3,
     "initialHumanHandicaps": 3,
     "initialPlantHandicaps": 3,
     "fieldPreset": [
@@ -18,7 +18,7 @@
                 "health": 30,
                 "attackCounter": 2
             },
-            "position": 1
+            "position": 0
         }
     ]
 }
