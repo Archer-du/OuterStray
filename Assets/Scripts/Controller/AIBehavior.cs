@@ -50,7 +50,8 @@ public class AIBehavior : MonoBehaviour
 	//			{
 	//				AIMove(idx);
 	//				yield return new WaitForSeconds(sequenceTime + waitTime);
-	//				movetimes++;
+	//				
+	//				++;
 	//			}
 	//			else break;
 	//		}
