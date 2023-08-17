@@ -570,8 +570,8 @@ public class BattleSceneManager : MonoBehaviour,
 		int AISupportLineIdx = fieldCapacity - 1;
         AISupportLine = battleLineControllers[AISupportLineIdx];
 
-        int deploytimes = 1;
-        int movetimes = 1;
+        // int deploytimes = 1;
+        // int movetimes = 1;
         // int cost = GetMinCost();
 
         int frontLineIdx = GetFrontLineIdx();
@@ -580,149 +580,215 @@ public class BattleSceneManager : MonoBehaviour,
 		float waitTime = 1f;
 		yield return new WaitForSeconds(waitTime);
 
+/*		while (energy[Turn] > 2)
+		{
+			bool actionTaken;
+			do
+			{
+				actionTaken = false;
+
+				actionTaken |= TryCast("comm_mush_07");
+				actionTaken |= TryAdjustFoward(frontLineIdx);
+				actionTaken |= TryDeployLowCostUnit(AISupportLineIdx);
+				actionTaken |= TryCast("comm_mush_01");
+				actionTaken |= TryCast("comm_mush_13");
+				actionTaken |= TryCast("comm_mush_08");
+				actionTaken |= TryCastComm18(frontLineIdx);
+
+				if (actionTaken)
+				{
+					yield return new WaitForSeconds(sequenceTime + waitTime);
+				}
+			} while (actionTaken);
+
+			break;
+		}*/
+
+
 
 		int whileCounter = 30;
 	startwhile:
 		whileCounter--;
-		while (energy[Turn] > 2 && whileCounter != 0)
+        Debug.Log(whileCounter);
+        while (energy[Turn] > 2 && whileCounter != 0)
 		{
-            // 策略：先过牌，再铺场，最后赚卡
-
             // 优先使用“蔓延”，补充手牌
-            for (int i = 0; i < AIHandicap.count; i++)
-            {
-                if (AIHandicap[i].ID == "comm_mush_07" && energy[Turn] >= 1)
-                {
-                    AICast(i, 0, 0);
-                    yield return new WaitForSeconds(sequenceTime + waitTime);
-					goto startwhile;
-                }
+            if (TryCast("comm_mush_07"))
+			{
+                yield return new WaitForSeconds(sequenceTime + waitTime);
+                goto startwhile;
             }
 
-			// 符合条件的卡前移
-            for (int i = fieldCapacity - 1; i > frontLineIdx; i--)
+            // 调整战线
+            if (TryAdjustFoward(frontLineIdx))
             {
-               BattleLineController battleLine = battleLineControllers[i];
-                if (GetIsLineAvailable(i - 1) && i > frontLineIdx + 1)
-                {
-					for (int j = 0; j < battleLine.count; j++)
-					{
-						if (GetIsLineAvailable(i))
-						{
-                            if (battleLine[j].category != "Artillery" && battleLine[j].category != "Construction" && battleLine[j].operateCounter == 1)
-                            {
-                                AIMove(i, j, i - 1, 0);
-                                yield return new WaitForSeconds(sequenceTime + waitTime);
-                                movetimes++;
-                                goto startwhile;
-                            }
-                        }
-						else
-						{
-                            if (battleLine[j].ID != "mush_102" && battleLine[j].operateCounter == 1)
-                            {
-                                AIMove(i, j, i - 1, 0);
-                                yield return new WaitForSeconds(sequenceTime + waitTime);
-                                movetimes++;
-                                goto startwhile;
-                            }
-                        }
-                    }
-                }
+                yield return new WaitForSeconds(sequenceTime + waitTime);
+                goto startwhile;
             }
-
 
 			// 部署低费卡
-            if (AISupportLine.count < AISupportLine.capacity)
+			if (TryDeployLowCostUnit(AISupportLineIdx))
+			{
+				yield return new WaitForSeconds(sequenceTime + waitTime);
+				goto startwhile;
+			}
+
+			// 菇军奋战，铺场
+            if (TryCast("comm_mush_01"))
             {
-                if (GetConstructionNum(AISupportLineIdx) < AISupportLine.capacity - 2)
-                {
-                    int idx = GetMinCostUnitPointer();
-                    if (idx >= 0)
-                    {
-                        AIDeploy(idx);
-                        yield return new WaitForSeconds(sequenceTime + waitTime);
-                        deploytimes++;
-                        goto startwhile;
-                    }
-                }
-				// 若支援战线的建筑数大于等于战线容量减二，则不部署建筑
-				else
-				{
-					int idx = GetMinCostUnitPointerExcConstr();
-					if (idx >= 0)
-					{
-						AIDeploy(idx);
-                        yield return new WaitForSeconds(sequenceTime + waitTime);
-                        deploytimes++;
-                        goto startwhile;
-                    }
-                }
+                yield return new WaitForSeconds(sequenceTime + waitTime);
+                goto startwhile;
             }
 
-            // 
-            for (int i = 0; i < AIHandicap.count; i++)
+            // 散播孢子，扩大场面
+            if (TryCastComm13(AIAdjacentLine))
             {
-                if (AIHandicap[i].ID == "comm_mush_01" && energy[Turn] >= 2)
-                {
-                    AICast(i, 0, 0);
-                    yield return new WaitForSeconds(sequenceTime + waitTime);
-                    goto startwhile;
-                }
+                yield return new WaitForSeconds(sequenceTime + waitTime);
+                goto startwhile;
             }
 
-            // 使用散播孢子，扩大场面
-            for (int i = 0; i < AIHandicap.count; i++)
+            // 增殖，赚卡
+            if (TryCast("comm_mush_08"))
             {
-                if (AIHandicap[i].ID == "comm_mush_13" && energy[Turn] >= 6 && AIAdjacentLine.count < AIAdjacentLine.count)
-                {
-                    AICast(i, 0, 0);
-                    yield return new WaitForSeconds(sequenceTime + waitTime);
-                    goto startwhile;
-                }
+                yield return new WaitForSeconds(sequenceTime + waitTime);
+                goto startwhile;
             }
 
-			// 增殖赚卡
-            for (int i = 0; i < AIHandicap.count; i++)
+            // 腐蚀，攻击血量高的单位
+            if (TryCastComm18(frontLineIdx))
             {
-                if (AIHandicap[i].ID == "comm_mush_08" && energy[Turn] >= 2)
-                {
-                    AICast(i, 0, 0);
-                    yield return new WaitForSeconds(sequenceTime + waitTime);
-                    goto startwhile;
-                }
+                yield return new WaitForSeconds(sequenceTime + waitTime);
+                goto startwhile;
             }
 
-			// 有多余费用则用指令攻击敌方血量最高的单位
-            for (int i = 0; i < AIHandicap.count; i++)
-            {
-                if (AIHandicap[i].ID == "comm_mush_18" && energy[Turn] >= 3)
-                {
-					
-					int dstLineIdx = 0;
-					int dstPos = 0;
-					int maxHealth = 0;
-					Tuple<int, int>lineMaxHealth = Tuple.Create(0, 0);
-					for (int j = 0; j < frontLineIdx + 1; j++)
-					{
-						lineMaxHealth = GetMaxHealth(j);
-						if (maxHealth > lineMaxHealth.Item1)
-						{
-							dstLineIdx = j;
-							dstPos = lineMaxHealth.Item2;
-						}
-					}
-                    AICast(i, dstLineIdx, dstPos);
-                    yield return new WaitForSeconds(sequenceTime + waitTime);
-                    goto startwhile;
-                }
-            }
 			break;
-        }
+		}
 
 		yield return new WaitForSeconds(waitTime);
 		Skip();
 	}
+
+	private bool TryCast(string cardID)
+	{
+		for (int i = 0; i < AIHandicap.count; i++)
+		{
+			if (AIHandicap[i].ID == cardID && energy[Turn] >= AIHandicap[i].cost)
+			{
+				AICast(i, 0, 0);
+				Debug.Log($"Cast '{cardID}'");
+				return true;
+			}
+		}
+		return false;
+	}
+
+    private bool TryCastComm18(int frontLineIdx)
+	{
+        for (int i = 0; i < AIHandicap.count; i++)
+        {
+            if (AIHandicap[i].ID == "comm_mush_18" && energy[Turn] >= 3)
+            {
+
+                int dstLineIdx = 0;
+                int dstPos = 0;
+                int maxHealth = 0;
+                Tuple<int, int> lineMaxHealth = Tuple.Create(0, 0);
+                for (int j = 0; j < frontLineIdx + 1; j++)
+                {
+                    lineMaxHealth = GetMaxHealth(j);
+                    if (maxHealth > lineMaxHealth.Item1)
+                    {
+                        dstLineIdx = j;
+                        dstPos = lineMaxHealth.Item2;
+                    }
+                }
+                AICast(i, dstLineIdx, dstPos);
+                Debug.Log("Cast 'comm_mush_18'");
+                return true;
+            }
+        }
+		return false;
+    }
+
+	private bool TryCastComm13(BattleLineController AIAdjacentLine)
+	{
+        for (int i = 0; i < AIHandicap.count; i++)
+        {
+            if (AIHandicap[i].ID == "comm_mush_13" && energy[Turn] >= 6 && AIAdjacentLine.count < AIAdjacentLine.count)
+            {
+                AICast(i, 0, 0);
+                Debug.Log("Cast 'comm_mush_13'");
+                return true;
+            }
+        }
+		return false;
+    }
+
+    private bool TryAdjustFoward(int frontLineIdx)
+	{
+        for (int i = fieldCapacity - 1; i > frontLineIdx + 1; i--)
+        {
+            BattleLineController battleLine = battleLineControllers[i];
+
+            // 前一条线有空位则尝试前移
+            if (GetIsLineAvailable(i - 1))
+            {
+                for (int j = 0; j < battleLine.count; j++)
+                {
+					// 不是建筑和bossmush_102则尝试前移
+                    if (battleLine[j].ID != "mush_102" && battleLine[j].category != "Construction")
+					{
+                        if (GetIsLineAvailable(i) && battleLine[j].operateCounter == 1)
+						{
+							if (battleLine[j].category != "Artillery" && battleLine[j].category != "Construction")
+							{
+								AIMove(i, j, i - 1, 0);
+								Debug.Log($"AIMove({i}, {j}, {i - 1}, 0)");
+								return true;
+							}
+						}
+						else
+						{
+                            AIMove(i, j, i - 1, 0);
+                            Debug.Log($"AIMove({i}, {j}, {i - 1}, 0)");
+                            return true;
+                        }
+					}
+
+                }
+            }
+        }
+		return false;
+    }
+
+	private bool TryDeployLowCostUnit(int AISupportLineIdx)
+	{
+        if (AISupportLine.count < AISupportLine.capacity)
+        {
+            if (GetConstructionNum(AISupportLineIdx) < AISupportLine.capacity - 2)
+            {
+                int idx = GetMinCostUnitPointer();
+                if (idx >= 0)
+                {
+                    AIDeploy(idx); 
+					Debug.Log("Deploy");
+                    return true;
+                }
+            }
+            // 若支援战线的建筑数大于等于战线容量减二，则不部署建筑
+            else
+            {
+                int idx = GetMinCostUnitPointerExcConstr();
+                if (idx >= 0)
+                {
+                    AIDeploy(idx);
+                    Debug.Log("Deploy");
+                    return true;
+                }
+            }
+        }
+		return false;
+    }
 
     IEnumerator AIBehaviourNode3()
 	{
