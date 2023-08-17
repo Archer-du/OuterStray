@@ -45,14 +45,14 @@ public class CommandElementController : BattleElementController,
 	public void CastAnimationEvent(string method)
 	{
 		float castTime = 0.4f;
-		float waitTime = 0.4f;
+		float waitTime = 0.8f;
 
 		Sequence seq = DOTween.Sequence();
 		if (method == "append")
 		{
 			//飞向战场侧中
 			seq.Append(transform.DOMove(inputOffset / 2 + ownership * 500 * Vector2.down, castTime));
-			seq.Join(transform.DORotate(new Vector3(0, 0, ownership * 180), castTime));
+			seq.Join(transform.DORotate(new Vector3(0, 0, 0), castTime));
 			//等待
 			seq.AppendInterval(waitTime);
 

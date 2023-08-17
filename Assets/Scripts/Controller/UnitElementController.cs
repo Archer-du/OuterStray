@@ -315,7 +315,7 @@ public class UnitElementController : BattleElementController,
 		Vector3 oriPosition = battleLineLogicPosition;
 		Vector3 dstPosition = target.battleLineLogicPosition;
 
-		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + " attacked " + "line: " + target.battleLine.lineIdx + "res: " + target.resIdx);
+		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + nameContent + " attacked " + "line: " + target.battleLine.lineIdx + "res: " + target.resIdx + target.nameContent);
 
 		//安全间隔
 		battleSceneManager.rotateSequence.AppendInterval(BattleLineController.updateTime + 0.2f);
@@ -350,7 +350,7 @@ public class UnitElementController : BattleElementController,
 		UnitElementController controller = target as UnitElementController;
 		Vector3 oriPosition = battleLineLogicPosition;
 
-		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + " random attacked " + "line: " + controller.battleLine.lineIdx + "res: " + controller.resIdx);
+		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + nameContent + " random attacked " + "line: " + controller.battleLine.lineIdx + "res: " + controller.resIdx + controller.nameContent);
 
 		battleSceneManager.rotateSequence.AppendInterval(BattleLineController.updateTime + 0.2f);
 		battleSceneManager.sequenceTime += BattleLineController.updateTime + 0.2f;

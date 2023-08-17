@@ -67,7 +67,6 @@ public class ElementDragInput : MonoBehaviour,
 
 		if (inspector != null) { inspector.active = controller.dataState == ElementState.inBattleLine; }
 		BattleElementController.globalAnimeLock = false;
-		canvas.sortingOrder = lowerOrder;
 
 		if (controller.dataState == ElementState.inHandicap)
 		{
@@ -85,6 +84,7 @@ public class ElementDragInput : MonoBehaviour,
 					return;
 				}
 			}
+			canvas.sortingOrder = controller.handicapOrder;
 			controller.handicap.Insert(controller);
 		}
 
@@ -102,6 +102,7 @@ public class ElementDragInput : MonoBehaviour,
 			{
 				return;
 			}
+			canvas.sortingOrder = unit.battleOrder;
 			unit.battleLine.Insert(unit);
 		}
 	}

@@ -43,7 +43,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -121,7 +121,154 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: Atlas-Main_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 3788
+        width: 10778
+        height: 898
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fec7816b999a41e479fda14fef2f846c
+      internalID: -1084765857
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Atlas-Main_11
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 2499
+        width: 1506
+        height: 368
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 278eb1c8df0070c4b91aa19488256a5d
+      internalID: 238799896
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Atlas-Main_16
+      rect:
+        serializedVersion: 2
+        x: 350
+        y: 1666
+        width: 1230
+        height: 364
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 38c84280890ec4448a465c0010d1729d
+      internalID: 1418442334
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Atlas-Main_20
+      rect:
+        serializedVersion: 2
+        x: 113
+        y: 829
+        width: 1738
+        height: 364
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 89ad78c49eba64846bf6d7ab38d4bff8
+      internalID: 2054630188
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Atlas-Main_22
+      rect:
+        serializedVersion: 2
+        x: 492
+        y: 0
+        width: 971
+        height: 358
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 84f3f0d419e4c694583a2918f1f8aca8
+      internalID: 921004415
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Atlas-Main_30
+      rect:
+        serializedVersion: 2
+        x: 3287
+        y: 1337
+        width: 2944
+        height: 197
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5e6f152d899d7fa42a2daca3a2c663bc
+      internalID: 994782769
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Atlas-Main_31
+      rect:
+        serializedVersion: 2
+        x: 4702
+        y: 908
+        width: 183
+        height: 97
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f5b21adc38a87c04091642e2703b3ba0
+      internalID: -1379091449
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -132,7 +279,39 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Atlas-Main_0: -1084765857
+      Atlas-Main_1: -1344161552
+      Atlas-Main_10: -1841120623
+      Atlas-Main_11: 238799896
+      Atlas-Main_12: -1408094338
+      Atlas-Main_13: -1105644664
+      Atlas-Main_14: -770166287
+      Atlas-Main_15: 437671603
+      Atlas-Main_16: 1418442334
+      Atlas-Main_17: 1664449544
+      Atlas-Main_18: 771238002
+      Atlas-Main_19: 542074321
+      Atlas-Main_2: -269911603
+      Atlas-Main_20: 2054630188
+      Atlas-Main_21: -1194267781
+      Atlas-Main_22: 921004415
+      Atlas-Main_23: 1382130166
+      Atlas-Main_24: 2015277679
+      Atlas-Main_25: 491486529
+      Atlas-Main_26: -900942705
+      Atlas-Main_27: -786435965
+      Atlas-Main_28: 891019627
+      Atlas-Main_29: 862080280
+      Atlas-Main_3: -33125160
+      Atlas-Main_30: 994782769
+      Atlas-Main_31: -1379091449
+      Atlas-Main_4: -259406104
+      Atlas-Main_5: -1649125081
+      Atlas-Main_6: 1664476697
+      Atlas-Main_7: -1074448026
+      Atlas-Main_8: 612531511
+      Atlas-Main_9: 1832736011
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

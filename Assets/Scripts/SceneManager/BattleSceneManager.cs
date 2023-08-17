@@ -488,6 +488,7 @@ public class BattleSceneManager : MonoBehaviour,
 
 		UnitElementController controller = handicapController[0].Pop(handicapIdx) as UnitElementController;
 
+		if (type == "Target") Debug.Log("Cast : " + idx + " " + pos);
 		battleSystem.Cast(handicapIdx, idx, pos);
 
 		return 1;

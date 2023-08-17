@@ -310,7 +310,7 @@ namespace DataCore.BattleItems
 		}
 		internal void Push(BattleElement element)
 		{
-			stack.Insert(count - 1, element);
+			stack.Insert(0, element);
 
 			if (element is UnitElement)
 			{
