@@ -361,7 +361,12 @@ public class BattleSceneManager : MonoBehaviour,
 	{
 		if(y > BattleLineController.fieldLowerBound && y < BattleLineController.fieldUpperBound)
 		{
-			return (int)((y - 180) / (BattleLineController.lineWidth + BattleLineController.lineInterval));
+			int idx = (int)((y - 180) / (BattleLineController.lineWidth + BattleLineController.lineInterval));
+			if(idx < 0 || idx > fieldCapacity - 1)
+			{
+				return -1;
+			}
+			return idx;
 		}
 		return -1;
 	}
@@ -375,6 +380,7 @@ public class BattleSceneManager : MonoBehaviour,
 	public void BattleFailed()
 	{
 		StopAllCoroutines();
+		StopCoroutine(AIBehavior());
 		SettleText.text = "Failure";
 		SettleText.gameObject.SetActive(true);
 		float duration = 0.4f;
@@ -390,6 +396,7 @@ public class BattleSceneManager : MonoBehaviour,
 	public void BattleWinned()
 	{
 		StopAllCoroutines();
+		StopCoroutine(AIBehavior());
 		SettleText.text = "Victory";
 		SettleText.gameObject.SetActive(true);
 		float duration = 0.4f;
@@ -512,6 +519,7 @@ public class BattleSceneManager : MonoBehaviour,
 	public int PlayerMove(Vector2 position, BattleLineController resLine, UnitElementController element)
 	{
 		int dstLineIdx = GetBattleLineIdx(position.y);
+		if (dstLineIdx < 0) return -1;
 		int resLineIdx = resLine.lineIdx;
 		int resIdx = element.resIdx;
 		int dstPos = battleLineControllers[dstLineIdx].GetDeployPos(position.x);
@@ -573,6 +581,8 @@ public class BattleSceneManager : MonoBehaviour,
 
 	IEnumerator AIBehavior()
 	{
+        float waitTime = 1f;
+        yield return new WaitForSeconds(waitTime);
         AIHandicap = handicapController[1];
 
 		int AISupportLineIdx = fieldCapacity - 1;
@@ -580,9 +590,7 @@ public class BattleSceneManager : MonoBehaviour,
 
         int frontLineIdx = GetFrontLineIdx();
 		AIAdjacentLine = battleLineControllers[frontLineIdx + 1];
-		
-		float waitTime = 1f;
-		yield return new WaitForSeconds(waitTime);
+
 
 		int whileCounter = 30;
 	startwhile:
@@ -758,7 +766,6 @@ public class BattleSceneManager : MonoBehaviour,
                     if (battleLine[i].ID == "mush_04" || battleLine[i].ID == "mush_09" || battleLine[i].ID == "mush_10" || battleLine[i].ID == "mush_11" || battleLine[i].ID == "mush_13")
                     {
                         AIRetreat(AISupportLineIdx, i);
-                        Debug.Log($"Retreat第{i}位{battleLine[i].ID}");
                         return true;
                     }
                 }
@@ -1134,7 +1141,7 @@ public class BattleSceneManager : MonoBehaviour,
 		{
             rotateSequence.Kill();
             rotateSequence = DOTween.Sequence();
-
+            Debug.Log($"Retreat第{resPos}位{battleLine[resPos].ID}");
             battleSystem.Retreat(resLineIdx, resPos);
 		}
 	}
