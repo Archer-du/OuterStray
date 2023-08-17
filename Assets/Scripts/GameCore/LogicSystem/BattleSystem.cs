@@ -771,13 +771,13 @@ namespace LogicCore
 			return battleLines[frontLines[(ownership + 1) % 2]][counter];
 		}
 
-		internal UnitElement DamagedAlly()
+		internal UnitElement DamagedAlly(int ownership)
 		{
 			for (int i = 0; i < deployQueue.Count; i++)
 			{
 				if (deployQueue[i].state == ElementState.inBattleLine)
 				{
-					if (deployQueue[i].maxHealthReader > deployQueue[i].dynHealth)
+					if (deployQueue[i].maxHealthReader > deployQueue[i].dynHealth && deployQueue[i].ownership == ownership)
 					{
 						return deployQueue[i];
 					}

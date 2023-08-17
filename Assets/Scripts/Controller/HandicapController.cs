@@ -112,7 +112,11 @@ public class HandicapController : MonoBehaviour,
 
 		handiCards.Add(element);
 
-		element.animeLock = true;
+        element.NameTag.gameObject.SetActive(true);
+        element.nameText.gameObject.SetActive(true);
+        element.costTag.gameObject.SetActive(true);
+        element.costText.gameObject.SetActive(true);
+        element.animeLock = true;
 		element.gameObject.SetActive(true);
 		element.transform.SetParent(transform);
 		element.transform.localScale = element.handicapScale;

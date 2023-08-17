@@ -316,7 +316,7 @@ namespace EventEffectModels
 
 			int recover = ((List<int>)argsTable["RandomRecoverDamaged"])[0];
 
-			UnitElement unit = system.DamagedAlly();
+			UnitElement unit = system.DamagedAlly(this.source.ownership);
 			unit?.Recover(recover);
 		}
 		internal void DamageAdjacent(BattleElement source, BattleSystem system)

@@ -10,7 +10,10 @@ public class DeckController : MonoBehaviour,
 {
 	public IDeckInput deck;
 
-	public TacticalSceneManager sceneManager;
+	public TacticalSceneManager sceneManager
+	{
+		get => GameManager.GetInstance().tacticalSceneManager;
+	}
 
 	[Header("Data")]
 	public Dictionary<int, DeckTagController> deckTags;

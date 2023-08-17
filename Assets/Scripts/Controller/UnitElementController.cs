@@ -197,10 +197,15 @@ public class UnitElementController : BattleElementController,
 			() =>
 			{
 				healthText.text = dynHealth.ToString();
-			}
-		);
-		healthText.DOColor(new Color(1, (float)dynHealth / maxHealthPoint, (float)dynHealth / maxHealthPoint), duration);
+				healthText.DOColor(new Color(1, (float)dynHealth / maxHealthPoint, (float)dynHealth / maxHealthPoint), duration);
+            }
+        );
 	}
+	public void UpdateHealthImmediate(int dynHealth)
+	{
+        healthText.text = dynHealth.ToString();
+        healthText.DOColor(new Color(1, (float)dynHealth / maxHealthPoint, (float)dynHealth / maxHealthPoint), duration);
+    }
 	public void UpdateTarget(int t1, int t2, int t3, IUnitElementController target, int targetIdx, bool mocking, bool cleave)
 	{
 		this.target = target as UnitElementController;
@@ -286,6 +291,7 @@ public class UnitElementController : BattleElementController,
 
 	public void DeployAnimationEvent()
 	{
+		deployAudio.Play();
 		NameTag.gameObject.SetActive(false);
 		nameText.gameObject.SetActive(false);
 		costTag.gameObject.SetActive(false);
@@ -317,8 +323,9 @@ public class UnitElementController : BattleElementController,
 	{
 		if (target == null) return;
 
+		attackAudio.Play();
 		float forwardTime = 0.15f;
-		float backlashTime = 0.2f;
+        float backlashTime = 0.2f;
 		Vector3 oriPosition = battleLineLogicPosition;
 		Vector3 dstPosition = target.battleLineLogicPosition;
 
@@ -352,6 +359,7 @@ public class UnitElementController : BattleElementController,
 	{
 		if (target == null) return;
 
+		randomAttackAudio.Play();
 		float forwardTime = 0.15f;
 		float backlashTime = 0.2f;
 		UnitElementController controller = target as UnitElementController;
@@ -379,6 +387,7 @@ public class UnitElementController : BattleElementController,
 	{
 		float forwardTime = 0.2f;
 
+		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + nameContent + " damaged ");
 		if(method == "append")
 		{
 			battleSceneManager.rotateSequence.Append(
@@ -414,16 +423,18 @@ public class UnitElementController : BattleElementController,
 			healthText.DOColor(Color.red, forwardTime / 2f)
 				.OnComplete(() =>
 				{
-					healthText.DOColor(Color.white, forwardTime / 2f);
-				})
+                    UpdateHealthImmediate(health);
+                })
 			);
 	}
 	public void RecoverAnimationEvent(int health, string method)
 	{
 		float forwardTime = 0.2f;
 
+		healAudio.Play();
+		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + nameContent + " healed ");
 		if (method == "append")
-		{
+        {
 			battleSceneManager.rotateSequence.Append(
 				transform.DOShakeRotation(forwardTime, 20f)
 				);
@@ -457,7 +468,7 @@ public class UnitElementController : BattleElementController,
 			healthText.DOColor(Color.green, forwardTime / 2f)
 				.OnComplete(() =>
 				{
-					healthText.DOColor(Color.white, forwardTime / 2f);
+					UpdateHealthImmediate(health);
 				})
 			);
 	}
@@ -466,7 +477,7 @@ public class UnitElementController : BattleElementController,
 	/// </summary>
 	public void TerminateAnimationEvent(string method)
 	{
-		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + " destroyed!");
+		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + nameContent + " destroyed!");
 
 		if(method == "append")
 		{

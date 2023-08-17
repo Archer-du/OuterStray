@@ -874,6 +874,8 @@ namespace DataCore.BattleElements
 		//死亡和战斗结束时调用
 		internal void UnloadEffects()
 		{
+			eventTable = new EventTable();
+			effectsTable = new EffectsTable(this);
 			//初始化攻击范围和攻击目标
 			attackRange[0] = null;
 			attackRange[1] = null;
