@@ -556,6 +556,7 @@ public class UnitElementController : BattleElementController,
 				transform.DOMove(stack.transform.position + 500 * Vector3.left, retreatTime)
 				.OnComplete(() =>
 				{
+					arrowsGroup.alpha = 0;
 					this.gameObject.SetActive(false);
 				})
 			);
