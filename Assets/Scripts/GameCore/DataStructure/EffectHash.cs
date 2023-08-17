@@ -206,7 +206,7 @@ namespace EventEffectModels
 		//args effects------------------------------------------------------
 
 		/// <summary>
-		/// 
+		/// 无目标/自身生效
 		/// </summary>
 		/// <param name="element"></param>
 		/// <param name="system"></param>
@@ -229,6 +229,42 @@ namespace EventEffectModels
 			element.dynAttackCounter -= decrease;
 
 			element.UpdateInfo();
+		}
+		internal void AOEResetAttackCounter(BattleElement source, BattleSystem system)
+		{
+			int position = ((List<int>)argsTable["AOEResetAttackCounter"])[0];
+
+			BattleLine line;
+			switch (position)
+			{
+				//0：支援战线
+				case 0:
+					line = system.battleLines[system.supportLines[this.source.ownership]];
+					for (int i = 0; i < line.count; i++)
+					{
+						line[i].dynAttackCounter = line[i].oriAttackCounter;
+						line[i].UpdateInfo();
+					}
+					break;
+				//1：当前战线
+				case 1:
+					UnitElement element = this.source as UnitElement;
+
+					for (int i = 0; i < element.battleLine.count; i++)
+					{
+						element.battleLine[i].dynAttackCounter = element.battleLine[i].oriAttackCounter;
+						element.battleLine[i].UpdateInfo();
+					}
+					break;
+				case 2:
+					line = system.battleLines[system.frontLines[this.source.ownership]];
+					for (int i = 0; i < line.count; i++)
+					{
+						line[i].dynAttackCounter = line[i].oriAttackCounter;
+						line[i].UpdateInfo();
+					}
+					break;
+			}
 		}
 		internal void DrawCardsRandom(BattleElement source, BattleSystem system)
 		{
@@ -807,6 +843,46 @@ namespace EventEffectModels
 				element.UpdateHealth();
 			}
 		}
+		internal void AuraSelfAttackGainByID(BattleElement target, BattleSystem system)
+		{
+			UnitElement publisher = this.source as UnitElement;
+			if (!publisher.aura)
+			{
+				return;
+			}
+
+			//第一个参数是对象ID数值域
+			string ID = ((List<int>)argsTable["AuraSelfAttackGainByID"])[0] < 10
+				? "0" + ((List<int>)argsTable["AuraSelfAttackGainByID"])[0].ToString() : ((List<int>)argsTable["AuraSelfAttackGainByID"])[0].ToString();
+			//TODO
+			ID = publisher.ownership == 0 ? "human_" + ID : "mush_" + ID;
+			//第二个参数是增益数值
+			int atkGain = ((List<int>)argsTable["AuraSelfAttackGainByID"])[1];
+
+			publisher.attackGain.Add(publisher.battleID, atkGain);
+			publisher.UpdateInfo();
+
+		}
+		internal void AuraConstantSelfAttackGainByID(BattleElement target, BattleSystem system)
+		{
+			UnitElement publisher = this.source as UnitElement;
+			if (!publisher.aura)
+			{
+				return;
+			}
+
+			//第一个参数是对象ID数值域
+			string ID = ((List<int>)argsTable["AuraConstantSelfAttackGainByID"])[0] < 10
+				? "0" + ((List<int>)argsTable["AuraConstantSelfAttackGainByID"])[0].ToString() : ((List<int>)argsTable["AuraConstantSelfAttackGainByID"])[0].ToString();
+			//TODO
+			ID = publisher.ownership == 0 ? "human_" + ID : "mush_" + ID;
+			//第二个参数是增益数值
+			int atkGain = ((List<int>)argsTable["AuraConstantSelfAttackGainByID"])[1];
+
+			int num = system.UnitIDDic[ID].Count;
+			publisher.attackGain.Add(publisher.battleID, atkGain * num);
+			publisher.UpdateInfo();
+		}
 
 
 
@@ -1019,6 +1095,8 @@ namespace EventEffectModels
 				{"StrangeGrowth", (BattleEventHandler)StrangeGrowth },
 				{"StrangeGrowthTutorial", (BattleEventHandler)StrangeGrowthTutorial },
 				{"AuraConstantUnitGain", (BattleEventHandler)AuraConstantUnitGain },
+				{"AOEResetAttackCounter", (BattleEventHandler)AOEResetAttackCounter },
+				{"AuraConstantSelfAttackGainByID", (BattleEventHandler)AuraConstantSelfAttackGainByID },
 
 				//aura
 				{"Aura", (BattleEventHandler)Aura },
@@ -1030,6 +1108,7 @@ namespace EventEffectModels
 				{"AuraUnitGain", (BattleEventHandler)AuraUnitGain },
 				{"AuraDoubleRecover", (BattleEventHandler)AuraDoubleRecover },
 				{"AuraBaseImmunity", (BattleEventHandler)AuraBaseImmunity },
+				{"AuraSelfAttackGainByID", (BattleEventHandler)AuraSelfAttackGainByID },
 
 				//command
 				{"Comm_Mush_07", (BattleEventHandler)Comm_Mush_07 },
@@ -1069,6 +1148,8 @@ namespace EventEffectModels
 				{"StrangeGrowth", null },
 				{"StrangeGrowthTutorial", null },
 				{"AuraConstantUnitGain", null },
+				{"AOEResetAttackCounter", null },
+				{"AuraConstantSelfAttackGainByID", null },
 
 				{"Aura", null },
 				{"AuraUnload", null },
@@ -1078,6 +1159,7 @@ namespace EventEffectModels
 				{"AuraUnitGain", null },
 				{"AuraDoubleRecover", null },
 				{"AuraBaseImmunity", null },
+				{"AuraSelfAttackGainByID", null },
 
 				{"Comm_Mush_07", null },
 				{"Comm_Mush_08", null },

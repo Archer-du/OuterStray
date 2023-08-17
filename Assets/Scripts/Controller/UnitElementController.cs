@@ -199,6 +199,7 @@ public class UnitElementController : BattleElementController,
 				healthText.text = dynHealth.ToString();
 			}
 		);
+		healthText.DOColor(new Color(1, (float)dynHealth / maxHealthPoint, (float)dynHealth / maxHealthPoint), duration);
 	}
 	public void UpdateTarget(IUnitElementController target, int targetIdx, bool mocking, bool cleave)
 	{
