@@ -380,8 +380,9 @@ namespace LogicCore
 			UpdateFrontLine();
 			UpdateAttackRange();
 			Settlement();
+            if (result != BattleResult.normal) { return; }
 
-			if (dstLineIdx == frontLines[TURN])
+            if (dstLineIdx == frontLines[TURN])
 			{
 				eventTable[TURN].RaiseEvent("EnterFrontLine", element, this);
 				element.eventTable.RaiseEvent("EnterFrontLine", element, this);
@@ -428,9 +429,10 @@ namespace LogicCore
 			UpdateFrontLine();
 			UpdateAttackRange();
 			Settlement();
+            if (result != BattleResult.normal) { return; }
 
 
-			eventTable[TURN].RaiseEvent("UpdateAura", null, this);
+            eventTable[TURN].RaiseEvent("UpdateAura", null, this);
 			eventTable[(TURN + 1) % 2].RaiseEvent("UpdateAura", null, this);
 
 			controller.Settlement();
@@ -475,8 +477,9 @@ namespace LogicCore
 			UpdateFrontLine();
 			UpdateAttackRange();
 			Settlement();
+            if (result != BattleResult.normal) { return; }
 
-			if (dstLineIdx == frontLines[TURN])
+            if (dstLineIdx == frontLines[TURN])
 			{
 				eventTable[TURN].RaiseEvent("EnterFrontLine", element, this);
 				element.eventTable.RaiseEvent("EnterFrontLine", element, this);
@@ -510,8 +513,10 @@ namespace LogicCore
 
 			UpdateFrontLine();
 			UpdateAttackRange();
+			Settlement();
+            if (result != BattleResult.normal) { return; }
 
-			eventTable[TURN].RaiseEvent("UpdateAura", null, this);
+            eventTable[TURN].RaiseEvent("UpdateAura", null, this);
 			eventTable[(TURN + 1) % 2].RaiseEvent("UpdateAura", null, this);
 		}
 
@@ -532,6 +537,7 @@ namespace LogicCore
 			}
 
 			RotateSettlement();
+			if(result != BattleResult.normal) { return; }
 
 			TURN = (TURN + 1) % 2;
 
@@ -737,7 +743,7 @@ namespace LogicCore
 		public int allyNum;
 		public int enemyNum;
 		//一些战场查询方法
-		internal void UpdateUnitNum()
+		internal void UpdateUnitNum(int ownership)
 		{
 			allyNum = 0;
 			enemyNum = 0;
@@ -745,8 +751,8 @@ namespace LogicCore
 			{
 				if (deployQueue[i].state == ElementState.inBattleLine)
 				{
-					allyNum += deployQueue[i].ownership == TURN ? 1 : 0;
-					enemyNum += deployQueue[i].ownership == (TURN + 1) % 2 ? 1 : 0;
+					allyNum += deployQueue[i].ownership == ownership ? 1 : 0;
+					enemyNum += deployQueue[i].ownership == (ownership + 1) % 2 ? 1 : 0;
 				}
 			}
 		}
@@ -756,7 +762,7 @@ namespace LogicCore
 		/// <returns></returns>
 		internal UnitElement RandomEnemy(int ownership)
 		{
-			UpdateUnitNum();
+			UpdateUnitNum(ownership);
 			if (enemyNum == 0) return null;
 			
 			Random random = new Random();
@@ -768,7 +774,9 @@ namespace LogicCore
 				counter -= battleLines[line].count;
 				if(counter <= 0)
 				{
-					return battleLines[line][battleLines[line].count - 1 + counter];
+					UnitElement unit = battleLines[line][battleLines[line].count - 1 + counter];
+					if(unit.ownership == ownership) throw new InvalidCastException("ownership");
+                    return unit;
 				}
 				if(ownership == 0) { line--; }
 				else { line++; }
