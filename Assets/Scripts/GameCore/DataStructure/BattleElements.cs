@@ -606,8 +606,11 @@ namespace DataCore.BattleElements
 				this.targetIdx = 1;
 			}
 
+			int t1 = attackRange[0] == null ? 0 : 1;
+			int t2 = attackRange[1] == null ? 0 : 1;
+			int t3 = attackRange[2] == null ? 0 : 1;
 
-			controller.UpdateTarget(target?.controller, targetIdx, mocking, cleave);
+			controller.UpdateTarget(t1, t2, t3, target?.controller, targetIdx, mocking, cleave);
 		}
 		/// <summary>
 		/// 回合结束结算攻击，回复操作数（系统更新）

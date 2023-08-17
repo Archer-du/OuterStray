@@ -30,7 +30,6 @@ public class CultivateSceneManager : MonoBehaviour,
 	public TMP_Text baseMaxHealthText;
 
 
-	//note: DontDestroyOnLoad的游戏对象，在切换到不存在自身的新场景中时会被保留，但是它不能查找新场景中的物体。
 	public void Start()
     {
         gameManager = GameManager.GetInstance();
@@ -75,12 +74,18 @@ public class CultivateSceneManager : MonoBehaviour,
 
 	public void StartExpedition()
     {
+        if (playerDeck.IsEmpty())
+        {
+            Debug.LogWarning("你还没有导入卡组！");
+            return;
+        }
         gameManager.UpdateGameState(GameState.Tactical);
 	}
 
     public void ImportPack()
     {
         cultivateSystem.FromPackImportDeck(0, 0);
+        testImportButton.interactable = false;
     }
 
 	public IDeckController InstantiateDeck()

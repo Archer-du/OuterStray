@@ -377,6 +377,7 @@ namespace LogicCore
 			if (dstLineIdx == frontLines[TURN])
 			{
 				eventTable[TURN].RaiseEvent("EnterFrontLine", element, this);
+				element.eventTable.RaiseEvent("EnterFrontLine", element, this);
 			}
 			eventTable[TURN].RaiseEvent("UnitDeployed", element, this);
 
@@ -470,7 +471,8 @@ namespace LogicCore
 
 			if (dstLineIdx == frontLines[TURN])
 			{
-				eventTable[TURN].RaiseEvent("EnterFrontLine", null, this);
+				eventTable[TURN].RaiseEvent("EnterFrontLine", element, this);
+				element.eventTable.RaiseEvent("EnterFrontLine", element, this);
 			}
 			eventTable[TURN].RaiseEvent("UnitMoved", null, this);
 
@@ -685,7 +687,7 @@ namespace LogicCore
 			}
 			if(result == BattleResult.win)
 			{
-				BattleFailed();
+				BattleWinned();
 			}
 			//TODO
 			UpdateWeight?.Invoke();
@@ -706,7 +708,7 @@ namespace LogicCore
 			}
 			if (result == BattleResult.win)
 			{
-				BattleFailed();
+				BattleWinned();
 			}
 			UpdateWeight?.Invoke();
 		}

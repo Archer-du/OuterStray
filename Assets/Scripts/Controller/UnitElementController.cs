@@ -199,29 +199,37 @@ public class UnitElementController : BattleElementController,
 				healthText.text = dynHealth.ToString();
 			}
 		);
+		healthText.DOColor(new Color(1, (float)dynHealth / maxHealthPoint, (float)dynHealth / maxHealthPoint), duration);
 	}
-	public void UpdateTarget(IUnitElementController target, int targetIdx, bool mocking, bool cleave)
+	public void UpdateTarget(int t1, int t2, int t3, IUnitElementController target, int targetIdx, bool mocking, bool cleave)
 	{
 		this.target = target as UnitElementController;
 		battleSceneManager.rotateSequence.InsertCallback(battleSceneManager.sequenceTime,
 			() =>
 			{
-				UpdateTarget(targetIdx, mocking, cleave);
+				if (cleave)
+				{
+					UpdateTarget(t1, t2, t3);
+				}
+				else
+				{
+					UpdateTarget(targetIdx, mocking);
+				}
 			}
 		);
 	}
-	private void UpdateTarget(int targetIdx, bool mocking, bool cleave)
+	private void UpdateTarget(int t1, int t2, int t3)
+	{
+		arrowsGroup.alpha = 1;
+		leftArrow.DOFade(t1, duration);
+		midArrow.DOFade(t2, duration);
+		rightArrow.DOFade(t3, duration);
+	}
+	private void UpdateTarget(int targetIdx, bool mocking)
 	{
 		arrowsGroup.alpha = 0;
 		
-		if (cleave)
-		{
-			arrowsGroup.alpha = 1;
-			leftArrow.DOFade(1, duration);
-			midArrow.DOFade(1, duration);
-			rightArrow.DOFade(1, duration);
-			return;
-		}
+
 		if (targetIdx == 0)
 		{
 			arrowsGroup.alpha = 1;
@@ -314,7 +322,7 @@ public class UnitElementController : BattleElementController,
 		Vector3 oriPosition = battleLineLogicPosition;
 		Vector3 dstPosition = target.battleLineLogicPosition;
 
-		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + " attacked " + "line: " + target.battleLine.lineIdx + "res: " + target.resIdx);
+		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + nameContent + " attacked " + "line: " + target.battleLine.lineIdx + "res: " + target.resIdx + target.nameContent);
 
 		//安全间隔
 		battleSceneManager.rotateSequence.AppendInterval(BattleLineController.updateTime + 0.2f);
@@ -349,7 +357,7 @@ public class UnitElementController : BattleElementController,
 		UnitElementController controller = target as UnitElementController;
 		Vector3 oriPosition = battleLineLogicPosition;
 
-		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + " random attacked " + "line: " + controller.battleLine.lineIdx + "res: " + controller.resIdx);
+		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + nameContent + " random attacked " + "line: " + controller.battleLine.lineIdx + "res: " + controller.resIdx + controller.nameContent);
 
 		battleSceneManager.rotateSequence.AppendInterval(BattleLineController.updateTime + 0.2f);
 		battleSceneManager.sequenceTime += BattleLineController.updateTime + 0.2f;
@@ -490,7 +498,7 @@ public class UnitElementController : BattleElementController,
 		Vector3 oriPosition = battleLineLogicPosition;
 		Vector3 dstPosition = target.battleLineLogicPosition;
 
-		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + " CleaveAttacked " + "line: " + target.battleLine.lineIdx + "res: " + target.resIdx);
+		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + nameContent + " CleaveAttacked ");
 
 		//安全间隔
 		battleSceneManager.rotateSequence.AppendInterval(BattleLineController.updateTime + 0.2f);

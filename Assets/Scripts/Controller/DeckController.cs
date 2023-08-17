@@ -111,4 +111,9 @@ public class DeckController : MonoBehaviour,
 		tags[index].health = health;
 		tags[index].healthText.text = health.ToString();
 	}
+
+	public bool IsEmpty()
+	{
+		return tags.Count == 0;
+	}
 }

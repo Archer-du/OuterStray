@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 6642998932481347951}
   - component: {fileID: 5301183072029538561}
   - component: {fileID: 836410684810502576}
+  - component: {fileID: 4582047904221796783}
   m_Layer: 0
   m_Name: CommandElement
   m_TagString: Untagged
@@ -122,7 +123,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_PresetInfoIsWorld: 0
 --- !u!114 &6642998932481347951
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -185,6 +186,7 @@ MonoBehaviour:
   componentPosition: {x: 0, y: 0, z: 0}
   handicapInspect: {fileID: 0}
   durabilityText: {fileID: 7830084836532847539}
+  selfCanvas: {fileID: 4582047904221796783}
   durability: 0
   type: 
 --- !u!114 &5301183072029538561
@@ -205,7 +207,6 @@ MonoBehaviour:
   duration: 0.2
   canvas: {fileID: 1453865705016682070}
   upperOrder: 100
-  lowerOrder: 0
 --- !u!114 &836410684810502576
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -225,6 +226,18 @@ MonoBehaviour:
   upperOrder: 0
   lowerOrder: 0
   duration: 0
+--- !u!225 &4582047904221796783
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1308769503806020367}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1 &1714055929003134500
 GameObject:
   m_ObjectHideFlags: 0

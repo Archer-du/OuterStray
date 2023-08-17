@@ -137,11 +137,10 @@ public class HandicapController : MonoBehaviour,
 	public void PushAnimation(BattleElementController element)
 	{
 		Vector3 moveBy = GetLogicPosition(count) - element.transform.position;
-		Vector3 rotateBy = new Vector3(0, 0, (1 - (ownership * 2)) * 90);
 
 		Sequence seq = DOTween.Sequence();
 		seq.Append(element.transform.DOBlendableMoveBy(moveBy, popTime));
-		seq.Join(element.transform.DOBlendableRotateBy(rotateBy, popTime)
+		seq.Join(element.transform.DORotate(new Vector3(0, 0, ownership * 180), popTime)
 			.OnComplete(() =>
 			{
 				element.animeLock = false;
