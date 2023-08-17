@@ -1128,6 +1128,8 @@ namespace DataCore.BattleElements
 		{
 			EffectsReParse();
 			eventTable.RaiseEvent("Cast", target, battleSystem);
+			UnloadEffects();
+
 
 			dynDurability -= 1;
 			if(dynDurability <= 0)
@@ -1170,6 +1172,11 @@ namespace DataCore.BattleElements
 		internal override void UpdateState()
 		{
 			controller.UpdateState(state);
+		}
+		internal void UnloadEffects()
+		{
+			eventTable = new EventTable();
+			effectsTable = new EffectsTable(this);
 		}
 	}
 
