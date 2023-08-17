@@ -12,6 +12,7 @@ using System.Data;
 using System.IO;
 using UnityEditor;
 using JetBrains.Annotations;
+using System.Linq;
 
 public class BattleSceneManager : MonoBehaviour,
 	IBattleSceneController
@@ -564,6 +565,7 @@ public class BattleSceneManager : MonoBehaviour,
 	HandicapController AIHandicap;
 	BattleLineController AISupportLine;
 	BattleLineController AIAdjacentLine;
+	// string[] deployEffectUnits = new string[5] { "mush_04", "mush_09", "mush_10", "mush_11", "mush_13"};
 
 	IEnumerator AIBehavior()
 	{
@@ -586,6 +588,13 @@ public class BattleSceneManager : MonoBehaviour,
 		{
             // 优先使用“蔓延”，补充手牌
             if (TryCast("comm_mush_07"))
+			{
+                yield return new WaitForSeconds(sequenceTime + waitTime);
+                goto startwhile;
+            }
+
+			// 撤退一些带有部署效果的卡片
+			if (TryRetreatSomeUnits(AISupportLineIdx))
 			{
                 yield return new WaitForSeconds(sequenceTime + waitTime);
                 goto startwhile;
@@ -733,10 +742,32 @@ public class BattleSceneManager : MonoBehaviour,
 		return false;
     }
 
+	private bool TryRetreatSomeUnits(int AISupportLineIdx)
+	{
+        BattleLineController battleLine = battleLineControllers[AISupportLineIdx];
+        if (battleLine.count == battleLine.capacity)
+		{
+			for (int i = 0; i < battleLine.count; i++)
+			{
+				if (battleLine[i].operateCounter == 1)
+                {
+                    if (battleLine[i].ID == "mush_04" || battleLine[i].ID == "mush_09" || battleLine[i].ID == "mush_10" || battleLine[i].ID == "mush_11" || battleLine[i].ID == "mush_13")
+                    {
+                        AIRetreat(AISupportLineIdx, i);
+                        Debug.Log($"Retreat第{i}位{battleLine[i].ID}");
+                        return true;
+                    }
+                }
+			}
+		}
+		return false;
+	}
+
 	private bool TryDeployLowCostUnit(int AISupportLineIdx)
 	{
         if (AISupportLine.count < AISupportLine.capacity)
         {
+            // 若支援战线的建筑数小于战线容量减二，则建筑也可部署
             if (GetConstructionNum(AISupportLineIdx) < AISupportLine.capacity - 2)
             {
                 int idx = GetMinCostUnitPointer();
@@ -1092,6 +1123,20 @@ public class BattleSceneManager : MonoBehaviour,
         battleSystem.Move(resLineIdx, resIdx, dstLineIdx, dstPos);
     }
 
+	private void AIRetreat(int resLineIdx, int resPos)
+	{
+		BattleLineController battleLine = battleLineControllers[resLineIdx];
+		if(resLineIdx == fieldCapacity - 1 && battleLine[resPos].operateCounter == 1)
+		{
+            rotateSequence.Kill();
+            rotateSequence = DOTween.Sequence();
+
+            battleSystem.Retreat(resLineIdx, resPos);
+		}
+	}
+
+
+	// 行为树节点类
 	public abstract class BTNode
 	{
 		public abstract bool Execute();
