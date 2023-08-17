@@ -18,6 +18,8 @@ public class CommandElementController : BattleElementController,
 
 	public TMP_Text durabilityText;
 
+	public CanvasGroup selfCanvas;
+
 	public int durability;
 	public string type;
 
@@ -56,7 +58,15 @@ public class CommandElementController : BattleElementController,
 			//等待
 			seq.AppendInterval(waitTime);
 
+			if(durability == 0)
+			{
+				seq.Append(selfCanvas.DOFade(0, castTime));
+				return;
+			}
+
 			Vector3 rotateBy = new Vector3(0, 0, - 90);
+
+			//回归
 			seq.Append(
 				transform.DOMove(stack.transform.position + 500 * Vector3.left, castTime)
 				.OnComplete(() =>
@@ -73,23 +83,6 @@ public class CommandElementController : BattleElementController,
 		}
 		else
 		{
-			seq.Append(transform.DOMove(inputOffset / 2 + ownership * 500 * Vector2.down, castTime));
-			seq.Join(transform.DORotate(new Vector3(0, 0, ownership * 180), castTime));
-
-			Vector3 rotateBy = new Vector3(0, 0, - 90);
-			seq.Append(
-				transform.DOMove(stack.transform.position + 500 * Vector3.left, castTime)
-				.OnComplete(() =>
-				{
-					this.gameObject.SetActive(false);
-					transform.rotation = Quaternion.Euler(Vector3.zero);
-					transform.localScale = handicapScale;
-				})
-			);
-			seq.Join(
-				transform.DOBlendableRotateBy(rotateBy, castTime)
-				);
-			seq.Join(transform.DOScale(handicapScale, castTime));
 		}
 	}
 

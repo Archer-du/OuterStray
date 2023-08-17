@@ -687,7 +687,7 @@ namespace LogicCore
 			}
 			if(result == BattleResult.win)
 			{
-				BattleFailed();
+				BattleWinned();
 			}
 			//TODO
 			UpdateWeight?.Invoke();
@@ -708,7 +708,7 @@ namespace LogicCore
 			}
 			if (result == BattleResult.win)
 			{
-				BattleFailed();
+				BattleWinned();
 			}
 			UpdateWeight?.Invoke();
 		}

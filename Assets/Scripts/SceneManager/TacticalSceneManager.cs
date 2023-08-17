@@ -194,17 +194,18 @@ public class TacticalSceneManager : MonoBehaviour,
         currentTerrain.GenerateLineNetFromSource();
 	}
 
-	public void LateUpdateTacticalLayer(INodeController currentNode)
+	public void LateUpdateTacticalLayer(INodeController currentNode, int gasMine)
     {
 		DOTween.Clear();
 
-		StartCoroutine(LateUpdateDisplay(currentNode as NodeController, gameManager.async));
+		StartCoroutine(LateUpdateDisplay(currentNode as NodeController, gasMine, gameManager.async));
     }
-    IEnumerator LateUpdateDisplay(NodeController currentNode, AsyncOperation async)
+    IEnumerator LateUpdateDisplay(NodeController currentNode, int gasMineGain, AsyncOperation async)
     {
         yield return async;
         DOTween.Clear();
         //yield return new WaitForSeconds(1f);
+        UpdateGasMineToken(gasMineToken + gasMineGain);
         UpdateCurrentNode(currentNode);
         EnterNextTerrain();
     }

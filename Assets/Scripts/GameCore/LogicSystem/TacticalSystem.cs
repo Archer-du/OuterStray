@@ -193,7 +193,10 @@ namespace LogicCore
 		public void BattleCampaignCompleted()
 		{
 			isInNode = false;
-			controller.LateUpdateTacticalLayer(currentNode.controller);
+			Random random = new Random();
+			int gasMineGain = random.Next(20, 30);
+			GasMineToken += gasMineGain;
+			controller.LateUpdateTacticalLayer(currentNode.controller, gasMineGain);
 		}
 
 		public void CampaignFailed()

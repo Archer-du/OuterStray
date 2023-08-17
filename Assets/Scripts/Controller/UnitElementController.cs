@@ -201,28 +201,35 @@ public class UnitElementController : BattleElementController,
 		);
 		healthText.DOColor(new Color(1, (float)dynHealth / maxHealthPoint, (float)dynHealth / maxHealthPoint), duration);
 	}
-	public void UpdateTarget(IUnitElementController target, int targetIdx, bool mocking, bool cleave)
+	public void UpdateTarget(int t1, int t2, int t3, IUnitElementController target, int targetIdx, bool mocking, bool cleave)
 	{
 		this.target = target as UnitElementController;
 		battleSceneManager.rotateSequence.InsertCallback(battleSceneManager.sequenceTime,
 			() =>
 			{
-				UpdateTarget(targetIdx, mocking, cleave);
+				if (cleave)
+				{
+					UpdateTarget(t1, t2, t3);
+				}
+				else
+				{
+					UpdateTarget(targetIdx, mocking);
+				}
 			}
 		);
 	}
-	private void UpdateTarget(int targetIdx, bool mocking, bool cleave)
+	private void UpdateTarget(int t1, int t2, int t3)
+	{
+		arrowsGroup.alpha = 1;
+		leftArrow.DOFade(t1, duration);
+		midArrow.DOFade(t2, duration);
+		rightArrow.DOFade(t3, duration);
+	}
+	private void UpdateTarget(int targetIdx, bool mocking)
 	{
 		arrowsGroup.alpha = 0;
 		
-		if (cleave)
-		{
-			arrowsGroup.alpha = 1;
-			leftArrow.DOFade(1, duration);
-			midArrow.DOFade(1, duration);
-			rightArrow.DOFade(1, duration);
-			return;
-		}
+
 		if (targetIdx == 0)
 		{
 			arrowsGroup.alpha = 1;

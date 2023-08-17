@@ -58,7 +58,7 @@ namespace DisplayInterface
 
 		public void CampaignCompleted();
 		public void CampaignFailed();
-		public void LateUpdateTacticalLayer(INodeController currentNode);
+		public void LateUpdateTacticalLayer(INodeController currentNode, int gasMine);
 	}
 	public interface IDeckController
 	{
@@ -182,7 +182,7 @@ namespace DisplayInterface
 		public void UpdateState(ElementState state);
 		public void UpdateHealth(int dynHealth);
 
-		public void UpdateTarget(IUnitElementController target, int targetIdx, bool mocking, bool cleave);
+		public void UpdateTarget(int t1, int t2, int t3, IUnitElementController target, int targetIdx, bool mocking, bool cleave);
 
 		public void DeployAnimationEvent();
 
