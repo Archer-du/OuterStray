@@ -378,11 +378,13 @@ public class BattleSceneManager : MonoBehaviour,
 		SettleText.text = "Failure";
 		SettleText.gameObject.SetActive(true);
 		float duration = 0.4f;
+		rotateSequence.Append(
 		Settler.transform.DOMove(new Vector3(0, 0, 0), duration)
 			.OnComplete(() =>
 			{
 				SettleText.DOFade(1f, duration);
-			});
+			})
+		);
 	}
 
 	public void BattleWinned()
@@ -391,11 +393,13 @@ public class BattleSceneManager : MonoBehaviour,
 		SettleText.text = "Victory";
 		SettleText.gameObject.SetActive(true);
 		float duration = 0.4f;
+		rotateSequence.Append(
 		Settler.transform.DOMove(new Vector3(0, 0, 0), duration)
 			.OnComplete(() =>
 			{
 				SettleText.DOFade(1f, duration);
-			});
+			})
+		);
 	}
 	public void BattleOverChecked()
 	{
