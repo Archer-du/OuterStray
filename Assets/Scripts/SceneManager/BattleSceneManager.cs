@@ -563,19 +563,20 @@ public class BattleSceneManager : MonoBehaviour,
 
 	IEnumerator AIBehavior()
 	{
-		AIHandicap = handicapController[1];
-		//TODO
-		AISupportLine = battleLineControllers[3];
-		//TODO
-		AIAdjacentLine = battleLineControllers[2];
-		float waitTime = 0.9f;
+        AIHandicap = handicapController[1];
+        AISupportLine = battleLineControllers[fieldCapacity - 1];
 
+        int deploytimes = 1;
+        int movetimes = 1;
+        int cost = GetMinCost();
+
+        int frontLineIdx = GetFrontLineIdx();
+		AIAdjacentLine = battleLineControllers[frontLineIdx + 1];
+		
+		float waitTime = 0.9f;
 		yield return new WaitForSeconds(waitTime);
 
-		int deploytimes = 1;
-		int movetimes = 1;
-		int cost = GetMinCost();
-        int frontLineIdx = GetFrontLineIdx();
+
 
     startwhile:
 		while (energy[Turn] > 2)
@@ -615,7 +616,7 @@ public class BattleSceneManager : MonoBehaviour,
                 {
 					for (int j = 0; j < battleLineControllers[i].count; j++)
 					{
-						if (battleLine[j].category != "Artillery")
+						if (battleLine[j].category != "Artillery" && battleLine[j].category != "Construction"  && battleLine[j].operateCounter == 1)
 						{
 							AIMove(i, j, i - 1, 0);
                             yield return new WaitForSeconds(sequenceTime + waitTime);
@@ -640,7 +641,7 @@ public class BattleSceneManager : MonoBehaviour,
             // 使用散播孢子，扩大场面
             for (int i = 0; i < AIHandicap.count; i++)
             {
-                if (AIHandicap[i].ID == "comm_mush_13" && energy[Turn] >= 6 && AIAdjacentLine.count < AIAdjacentLine.capacity)
+                if (AIHandicap[i].ID == "comm_mush_13" && energy[Turn] >= 6 && AIAdjacentLine.count < AIAdjacentLine.count)
                 {
                     AICast(i, 0, 0);
                     yield return new WaitForSeconds(sequenceTime + waitTime);
@@ -651,7 +652,7 @@ public class BattleSceneManager : MonoBehaviour,
 			// 增殖赚卡
             for (int i = 0; i < AIHandicap.count; i++)
             {
-                if (AIHandicap[i].ID == "comm_mush_08" && energy[Turn] >= 2 && AIAdjacentLine.count < AIAdjacentLine.capacity)
+                if (AIHandicap[i].ID == "comm_mush_08" && energy[Turn] >= 2)
                 {
                     AICast(i, 0, 0);
                     yield return new WaitForSeconds(sequenceTime + waitTime);
@@ -659,10 +660,10 @@ public class BattleSceneManager : MonoBehaviour,
                 }
             }
 
-			// 有多余费用则攻击敌方基地
+			// 有多余费用则攻击敌方血量最高的单位
             for (int i = 0; i < AIHandicap.count; i++)
             {
-                if (AIHandicap[i].ID == "comm_mush_18" && energy[Turn] >= 3 && AIAdjacentLine.count < AIAdjacentLine.capacity)
+                if (AIHandicap[i].ID == "comm_mush_18" && energy[Turn] >= 3)
                 {
 					
 					int dstLineIdx = 0;
@@ -892,14 +893,15 @@ public class BattleSceneManager : MonoBehaviour,
 	/// <summary>
 	/// 只有在费用不足时才会返回-1
 	/// </summary>
+	/// <param name="lowerBound">下界，返回的索引对应卡费用不会低于这个值</param>
 	/// <returns></returns>
-	private int GetMinCostUnitPointer()
+	private int GetMinCostUnitPointer(int lowerBound = 0)
 	{
 		int minCost = 10000;
 		int minPointer = -1;
 		for (int i = 0; i < AIHandicap.count; i++)
 		{
-			if (AIHandicap[i].cost < minCost && AIHandicap[i] is UnitElementController)
+			if (lowerBound < AIHandicap[i].cost && AIHandicap[i].cost < minCost && AIHandicap[i] is UnitElementController)
 			{
 				minCost = AIHandicap[i].cost;
 				minPointer = i;
@@ -967,7 +969,7 @@ public class BattleSceneManager : MonoBehaviour,
 		Skip();
 	}
     
-	private void AIMove(int resIdx, int resLineIdx, int dstLineIdx, int dstPos)
+	private void AIMove(int resLineIdx, int resIdx, int dstLineIdx, int dstPos)
     {
         rotateSequence.Kill();
         rotateSequence = DOTween.Sequence();
