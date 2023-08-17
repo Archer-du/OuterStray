@@ -19,12 +19,12 @@ public class TacticalSceneManager : MonoBehaviour,
     [Header("Connection")]
     public GameManager gameManager;
 
-    public GameObject UIPrototype;
-    public GameObject UI;
-
     public Image InputMask;
 
-    public DeckController playerDeck;
+    public DeckController playerDeck
+    {
+        get => gameManager.cultivateSceneManager.playerDeck;
+    }
 
     [Header("Prototype")]
 	public GameObject arrowPrototype;
@@ -116,6 +116,11 @@ public class TacticalSceneManager : MonoBehaviour,
 	{
         Init();
 		tacticalSystem = handler;
+
+        gasMineText = gameManager.cultivateSceneManager.gasMineText;
+        cardNumText = gameManager.cultivateSceneManager.cardNumText;
+        baseHealthText = gameManager.cultivateSceneManager.baseHealthText;
+        baseMaxHealthText = gameManager.cultivateSceneManager.baseMaxHealthText;
 	}
 
 

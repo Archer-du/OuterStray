@@ -50,7 +50,10 @@ public class CommandElementController : BattleElementController,
 		Sequence seq = DOTween.Sequence();
 		if (method == "append")
 		{
+			//飞向战场侧中
 			seq.Append(transform.DOMove(inputOffset / 2 + ownership * 500 * Vector2.down, castTime));
+			seq.Join(transform.DORotate(new Vector3(0, 0, ownership * 180), castTime));
+			//等待
 			seq.AppendInterval(waitTime);
 
 			Vector3 rotateBy = new Vector3(0, 0, - 90);
@@ -59,6 +62,8 @@ public class CommandElementController : BattleElementController,
 				.OnComplete(() =>
 				{
 					this.gameObject.SetActive(false);
+					transform.rotation = Quaternion.Euler(Vector3.zero);
+					transform.localScale = handicapScale;
 				})
 			);
 			seq.Join(
@@ -68,14 +73,17 @@ public class CommandElementController : BattleElementController,
 		}
 		else
 		{
-			seq.Append(transform.DOMove(inputOffset / 2, castTime));
-			seq.AppendInterval(waitTime);
-			Vector3 rotateBy = new Vector3(0, 0, ((ownership * 2) - 1) * 90);
+			seq.Append(transform.DOMove(inputOffset / 2 + ownership * 500 * Vector2.down, castTime));
+			seq.Join(transform.DORotate(new Vector3(0, 0, ownership * 180), castTime));
+
+			Vector3 rotateBy = new Vector3(0, 0, - 90);
 			seq.Append(
 				transform.DOMove(stack.transform.position + 500 * Vector3.left, castTime)
 				.OnComplete(() =>
 				{
 					this.gameObject.SetActive(false);
+					transform.rotation = Quaternion.Euler(Vector3.zero);
+					transform.localScale = handicapScale;
 				})
 			);
 			seq.Join(

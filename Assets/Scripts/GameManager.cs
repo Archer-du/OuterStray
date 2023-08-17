@@ -119,6 +119,8 @@ public class GameManager : MonoBehaviour, IGameManagement
 				else
 				{
 					cultivateSceneManager = GameObject.Find("CultivateSceneManager").GetComponent<CultivateSceneManager>();
+					cultivateSceneManager.cultivateSystem = cultivationSystem;
+					cultivationSystem.SetSceneController(cultivateSceneManager);
 				}
 				break;
 			case "TacticalScene":
@@ -159,6 +161,8 @@ public class GameManager : MonoBehaviour, IGameManagement
 
 		loadAudio = gameObject.AddComponent<AudioSource>();
 		loadAudio.clip = loadAudioClip;
+		loadAudio.playOnAwake = false;
+		loadAudio.loop = false;
 
 		start.onClick.AddListener(() =>
 		{
@@ -173,7 +177,8 @@ public class GameManager : MonoBehaviour, IGameManagement
 		battleSystem = new BattleSystem(pool, battleSceneManager);
 		tacticalSystem = new TacticalSystem(pool, tacticalSceneManager, battleSystem as BattleSystem);
 		battleSystem.SetTacticalSystem(tacticalSystem);
-		cultivationSystem = new CultivationSystem(cultivateSceneManager, tacticalSystem as TacticalSystem);
+		cultivationSystem = new CultivationSystem(cultivateSceneManager, tacticalSystem as TacticalSystem, battleSystem as BattleSystem);
+		tacticalSystem.SetCultivateSystem(cultivationSystem);
 
 		TacticalBGM.Play();
 	}

@@ -128,6 +128,8 @@ namespace LogicCore
 			this.tacticalSystem = tacticalSystem as TacticalSystem;
 		}
 
+
+
 		internal BattleResult result;
 		//TODO
 		/// <summary>

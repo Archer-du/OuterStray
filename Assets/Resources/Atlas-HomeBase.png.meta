@@ -152,7 +152,7 @@ TextureImporter:
         width: 2916
         height: 1559
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -160,6 +160,48 @@ TextureImporter:
       bones: []
       spriteID: 59c45b2169527ad49b35c5367bc10adb
       internalID: -662010163
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Atlas-HomeBase_2
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 7617
+        width: 8622
+        height: 3068
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0bd40a27c884dd94ca42258a465d42cf
+      internalID: -1490717436
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Atlas-HomeBase_3
+      rect:
+        serializedVersion: 2
+        x: 9076
+        y: 7292
+        width: 8830
+        height: 3246
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b4dd9e184a68e4248b20e62f17fe76da
+      internalID: -927498982
       vertices: []
       indices: 
       edges: []
@@ -177,6 +219,8 @@ TextureImporter:
     nameFileIdTable:
       Atlas-HomeBase_0: 1629940400
       Atlas-HomeBase_1: -662010163
+      Atlas-HomeBase_2: -1490717436
+      Atlas-HomeBase_3: -927498982
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

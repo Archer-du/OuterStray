@@ -87,6 +87,25 @@ public class BattleElementController : MonoBehaviour
 	{
 		get => battleSceneManager.cardStackController[ownership].transform;
 	}
+
+	public int handicapOrder
+	{
+		get => handicapOrder;
+		set
+		{
+			handicapOrder = value;
+			canvas.sortingOrder = value;
+		}
+	}
+	public int battleOrder
+	{
+		get => battleOrder;
+		set
+		{
+			battleOrder = value;
+			canvas.sortingOrder = value;
+		}
+	}
 	public Canvas canvas;
 
 	public HandicapController handicap

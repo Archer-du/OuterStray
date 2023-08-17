@@ -169,7 +169,8 @@ public class HandicapController : MonoBehaviour,
 			int temp = i;
 			handiCards[i].transform.DOMove(dstPos, updateTime)
 				.OnComplete(() => handiCards[temp].animeLock = false);
-			handiCards[i].canvas.sortingOrder = i;
+			
+			handiCards[i].handicapOrder = i;
 		}
 	}
 	private void UpdateElements()

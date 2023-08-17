@@ -2527,6 +2527,10 @@ MonoBehaviour:
   duration: 0.2
   attackOrder: 0
   oriOrder: -100
+  attackClip: {fileID: 8300000, guid: 568d8b35557054940aa13404d16bcbd5, type: 3}
+  deployClip: {fileID: 8300000, guid: 7111252e7b8d44141bd72636d501a82a, type: 3}
+  randomAttackClip: {fileID: 8300000, guid: 1ab9b1c8f96f468478dac0f15f3a1036, type: 3}
+  healClip: {fileID: 8300000, guid: b8f106b9b2ab9494191f7a43a92e472e, type: 3}
   battleLineInspect: {fileID: 0}
 --- !u!114 &4717429504215175894
 MonoBehaviour:

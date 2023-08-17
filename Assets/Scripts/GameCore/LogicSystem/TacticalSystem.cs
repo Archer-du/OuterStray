@@ -20,6 +20,7 @@ namespace LogicCore
 		public ITacticalSceneController controller;
 
 		internal BattleSystem battleSystem;
+		internal CultivationSystem cultivationSystem;
 
 		internal List<Terrain> terrains;
 
@@ -43,7 +44,10 @@ namespace LogicCore
 		internal static bool isInNode;
 
 
-		internal Deck playerDeck;
+		internal Deck playerDeck
+		{
+			get => cultivationSystem.playerDeck;
+		}
 		internal UnitElement playerBase;
 
 		internal int baseHealth
@@ -94,19 +98,25 @@ namespace LogicCore
 		{
 			controller = tsdspl;
 
-			playerDeck = new Deck(battleSystem, this, controller.InstantiateDeck());
-			//TODO remove
-			playerDeck.LoadDeckByPathHuman("Assets\\Config\\HumanDeckTest.csv");
+			//playerDeck = new Deck(battleSystem, this, controller.InstantiateDeck());
+			////TODO remove
+			//playerDeck.LoadDeckByPathHuman("Assets\\Config\\HumanDeckTest.csv");
+
+			controller.TerrrainsInitialize(this, battleNodeNum);
 			playerBase = playerDeck.bases;
 
 			controller.UpdateCardNum(cardNum);
 			controller.UpdateBaseHealth(baseHealth, playerBase.maxHealthWriter);
 
-			gasMineToken = 30;
 			//TODO
-			controller.TerrrainsInitialize(this, battleNodeNum);
+			gasMineToken = 20;
+			//TODO
 
 			BuildTerrains();
+		}
+		public void SetCultivateSystem(ICultivationSystemInput cultivationSystem)
+		{
+			this.cultivationSystem = cultivationSystem as CultivationSystem;
 		}
 
 
