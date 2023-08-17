@@ -775,14 +775,21 @@ namespace DataCore.BattleElements
 			this.damage = 0;
 
 
-			if (this.dynHealth <= 0)
-			{
+            if (this.dynHealth <= 0)
+            {
+                if (this == battleSystem.bases[0])
+                {
+                    battleSystem.result = BattleResult.fail;
+                }
+                if (this == battleSystem.bases[1])
+                {
+                    battleSystem.result = BattleResult.win;
+                }
+                Terminate(method);
+                return -1;
+            }
 
-				Terminate(method);
-				return -1;
-			}
-
-			eventTable.RaiseEvent("AfterDamaged", this, battleSystem);
+            eventTable.RaiseEvent("AfterDamaged", this, battleSystem);
 			return 1;
 		}
 		/// <summary>
@@ -1119,6 +1126,7 @@ namespace DataCore.BattleElements
 
 		internal void Cast(UnitElement target)
 		{
+			EffectsReParse();
 			eventTable.RaiseEvent("Cast", target, battleSystem);
 
 			dynDurability -= 1;

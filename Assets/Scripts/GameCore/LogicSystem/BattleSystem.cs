@@ -145,7 +145,7 @@ namespace LogicCore
 		{
 			this.final = final;
 			eventTable = new EventTable[2] { new EventTable(), new EventTable() };
-			ReParse?.Invoke();
+			//ReParse?.Invoke();
 
 
 			result = BattleResult.normal;

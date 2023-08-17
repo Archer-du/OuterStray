@@ -373,8 +373,9 @@ namespace DataCore.BattleItems
 				if (stack[i] is CommandElement)
 				{
 					CommandElement element = stack[i] as CommandElement;
+					stack.RemoveAt(i);
 					return element;
-				}
+                }
 			}
 			return null;
 		}

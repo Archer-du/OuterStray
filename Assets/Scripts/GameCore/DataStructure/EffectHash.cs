@@ -851,13 +851,13 @@ namespace EventEffectModels
 			int argsNum = 2;
 
 
-			int atkGain = ((List<int>)argsTable["AuraUnitGain"])[0];
-			int mhpGain = ((List<int>)argsTable["AuraUnitGain"])[1];
+			int atkGain = ((List<int>)argsTable["AuraConstantUnitGain"])[0];
+			int mhpGain = ((List<int>)argsTable["AuraConstantUnitGain"])[1];
 
 			for(int i = 0; i < system.deployQueue.Count; i++)
 			{
 				UnitElement element = system.deployQueue[i];
-				if(element.ownership == publisher.ownership && element.state == ElementState.inBattleLine && element is not ConstructionElement)
+				if(element.ownership == publisher.ownership && element.state == ElementState.inBattleLine)
 				{
 					element.attackGain.Add(publisher.battleID, atkGain);
 					element.maxHealthGain.Add(publisher.battleID, mhpGain);
@@ -980,7 +980,9 @@ namespace EventEffectModels
 				{
 					CommandElement comm = system.stacks[BattleSystem.TURN].PopCommand();
 
-					comm.dynDurability += 2;
+					if (comm == null) return;
+					comm.dynDurability += recover;
+					comm.UpdateInfo();
 
 					system.handicaps[BattleSystem.TURN].Push(comm);
 				}

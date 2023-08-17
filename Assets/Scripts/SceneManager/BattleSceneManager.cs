@@ -738,9 +738,9 @@ public class BattleSceneManager : MonoBehaviour,
                 for (int j = 0; j < battleLine.count; j++)
                 {
 					// 不是建筑和bossmush_102则尝试前移
-                    if (battleLine[j].ID != "mush_102" && battleLine[j].category != "Construction")
+                    if (battleLine[j].ID != "mush_102" && battleLine[j].category != "Construction" && battleLine[j].operateCounter == 1)
 					{
-                        if (GetIsLineAvailable(i) && battleLine[j].operateCounter == 1)
+                        if (GetIsLineAvailable(i))
 						{
 							if (battleLine[j].category != "Artillery" && battleLine[j].category != "Construction")
 							{
