@@ -61,6 +61,7 @@ public class ElementDragInput : MonoBehaviour,
 	public void OnEndDrag(PointerEventData eventData)
 	{
 		if (BattleSceneManager.Turn != 0) return;
+		if (controller.battleSceneManager.sequenceTime != 0) return;
 		if (controller.animeLock) return;
 		if (controller.inputLock) return;
 		if (controller.ownership != 0) return;

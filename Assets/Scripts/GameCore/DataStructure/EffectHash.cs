@@ -913,7 +913,11 @@ namespace EventEffectModels
 
 			if (system.UnitIDDic.ContainsKey(ID))
 			{
-				int num = system.UnitIDDic[ID].Count;
+				int num = 0;
+				for (int i = 0; i < system.UnitIDDic[ID].Count; i++)
+				{
+					if (system.UnitIDDic[ID][i].state == ElementState.inBattleLine) num++;
+				}
 				if (!publisher.attackGain.ContainsKey(publisher.battleID))
 				{
 					publisher.attackGain.Add(publisher.battleID, atkGain * num);
@@ -944,7 +948,11 @@ namespace EventEffectModels
 
 			if (system.UnitIDDic.ContainsKey(ID))
 			{
-				int num = system.UnitIDDic[ID].Count;
+				int num = 0;
+				for(int i = 0; i < system.UnitIDDic[ID].Count; i++)
+				{
+					if (system.UnitIDDic[ID][i].state == ElementState.inBattleLine) num++;
+				}
 				if (!publisher.attackGain.ContainsKey(publisher.battleID))
 				{
 					publisher.attackGain.Add(publisher.battleID, atkGain * num);
