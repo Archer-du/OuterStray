@@ -123,7 +123,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &6642998932481347951
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -136,6 +136,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c098620c55c1224982f5d23f9abc33f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AnimeLock: 0
   inputLock: 0
   battleFieldScale: {x: 0, y: 0, z: 0}
   handicapScale: {x: 0, y: 0, z: 0}
@@ -150,6 +151,7 @@ MonoBehaviour:
   normalFontSizeEnlarge: 0
   battleSceneManager: {fileID: 0}
   canvas: {fileID: 0}
+  DataState: 0
   handicapIdx: 0
   ID: 
   ownership: 0
@@ -235,8 +237,8 @@ CanvasGroup:
   m_GameObject: {fileID: 1308769503806020367}
   m_Enabled: 1
   m_Alpha: 1
-  m_Interactable: 0
-  m_BlocksRaycasts: 0
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
 --- !u!1 &1714055929003134500
 GameObject:

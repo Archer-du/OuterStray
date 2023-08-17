@@ -40,7 +40,7 @@ public class BattleElementController : MonoBehaviour
 			}
 		}
 	}
-	private bool AnimeLock;
+	[SerializeField] private bool AnimeLock;
 	public bool animeLock
 	{
 		get => AnimeLock;
@@ -116,7 +116,7 @@ public class BattleElementController : MonoBehaviour
 	}
 
 	[Header("Data")]
-	private ElementState DataState;
+	[SerializeField] private ElementState DataState;
 	public ElementState dataState
 	{
 		get => DataState;

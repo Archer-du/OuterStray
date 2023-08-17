@@ -65,7 +65,7 @@ namespace LogicCore
 
 		public void FromPackImportDeck(int buildingID, int packID)
 		{
-			playerDeck.LoadDeckByPathHuman("Assets\\Config\\CommandDeckTest.csv");
+			playerDeck.LoadDeckByPathHuman("Assets\\Config\\HumanDeckTest.csv");
 			controller.UpdateBasicInfo(20, playerDeck.count, playerDeck.bases.oriHealth);
 
 			//if (buildingID < 0 || buildingID > unlockProgress - 1)

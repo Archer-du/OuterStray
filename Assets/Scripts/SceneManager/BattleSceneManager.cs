@@ -487,9 +487,9 @@ public class BattleSceneManager : MonoBehaviour,
 		rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
 
-		UnitElementController controller = handicapController[0].Pop(handicapIdx) as UnitElementController;
+		CommandElementController controller = handicapController[0].Pop(handicapIdx) as CommandElementController;
 
-		if (type == "Target") Debug.Log("Cast : " + idx + " " + pos);
+		if (type == "Target") Debug.Log(controller.nameContent + " Cast on : " + idx + " " + pos + battleLineControllers[idx][pos].nameContent);
 		battleSystem.Cast(handicapIdx, idx, pos);
 
 		return 1;
