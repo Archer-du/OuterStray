@@ -246,8 +246,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.05614, y: 2.0416}
-  m_SizeDelta: {x: 16.89961, y: 18.61502}
+  m_AnchoredPosition: {x: 0.0052012, y: 1.8183212}
+  m_SizeDelta: {x: 18.326, y: 18.9458}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2560947059741495726
 CanvasRenderer:
@@ -1005,6 +1005,7 @@ MonoBehaviour:
   deckID: 0
   ID: 
   category: 
+  cost: 0
   description: 
   costTag: {fileID: 5519420684560711146}
   nameTag: {fileID: 317252702258225113}

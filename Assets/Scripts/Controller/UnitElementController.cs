@@ -446,6 +446,10 @@ public class UnitElementController : BattleElementController,
 				{
 					healthText.text = health.ToString();
 					healthText.transform.DOScale(originTextScale, forwardTime / 2f);
+					if (this == battleSceneManager.bases[0])
+					{
+						battleSceneManager.UpdateBaseHealth(health);
+					}
 				})
 			);
 		//变色

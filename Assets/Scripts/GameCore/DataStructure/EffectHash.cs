@@ -911,7 +911,14 @@ namespace EventEffectModels
 			//第二个参数是增益数值
 			int atkGain = ((List<int>)argsTable["AuraSelfAttackGainByID"])[1];
 
-			publisher.attackGain.Add(publisher.battleID, atkGain);
+			if (!publisher.attackGain.ContainsKey(publisher.battleID))
+			{
+				publisher.attackGain.Add(publisher.battleID, atkGain);
+			}
+			else
+			{
+				publisher.attackGain[publisher.battleID] += atkGain;
+			}
 			publisher.UpdateInfo();
 
 		}
@@ -934,7 +941,14 @@ namespace EventEffectModels
 			if (system.UnitIDDic.ContainsKey(ID))
 			{
 				int num = system.UnitIDDic[ID].Count;
-				publisher.attackGain.Add(publisher.battleID, atkGain * num);
+				if (!publisher.attackGain.ContainsKey(publisher.battleID))
+				{
+					publisher.attackGain.Add(publisher.battleID, atkGain * num);
+				}
+				else
+				{
+					publisher.attackGain[publisher.battleID] += atkGain * num;
+				}
 				publisher.UpdateInfo();
 			}
 		}
