@@ -235,7 +235,7 @@ public class UnitElementController : BattleElementController,
 	private void UpdateTarget(int targetIdx, bool mocking)
 	{
 		arrowsGroup.alpha = 0;
-		
+		if (category == "Construction") return;
 
 		if (targetIdx == 0)
 		{
