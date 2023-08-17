@@ -726,20 +726,30 @@ public class BattleSceneManager : MonoBehaviour,
             // 前一条线有空位则尝试前移
             if (GetIsLineAvailable(i - 1))
             {
+				int artilleryIdx = -1;
+
+				// 遍历该战线
                 for (int j = 0; j < battleLine.count; j++)
                 {
-					// 不是建筑和bossmush_102则尝试前移
+					// 判断规则上能移动的卡（轰击boss || 建筑 || 移动次数为0）
                     if (battleLine[j].ID != "mush_102" && battleLine[j].category != "Construction" && battleLine[j].operateCounter == 1)
 					{
+						// 若该战线有空，则不会移动轰击
                         if (GetIsLineAvailable(i))
 						{
-							if (battleLine[j].category != "Artillery" && battleLine[j].category != "Construction")
+                            if (battleLine[j].category != "Artillery")
 							{
-								AIMove(i, j, i - 1, 0);
-								Debug.Log($"AIMove({i}, {j}, {i - 1}, 0)");
-								return true;
+                                AIMove(i, j, i - 1, 0);
+                                Debug.Log($"AIMove({i}, {j}, {i - 1}, 0)");
+                                return true;
+                            }
+							else
+							{
+								artilleryIdx = j;
 							}
-						}
+                        }
+
+						//TODO 若战线没有空，则可移动轰击，但移动轰击的优先级最低
 						else
 						{
                             AIMove(i, j, i - 1, 0);
@@ -747,7 +757,6 @@ public class BattleSceneManager : MonoBehaviour,
                             return true;
                         }
 					}
-
                 }
             }
         }
