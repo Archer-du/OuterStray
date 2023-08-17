@@ -376,7 +376,6 @@ public class BattleSceneManager : MonoBehaviour,
 
 
 
-
 	public void BattleFailed()
 	{
 		StopAllCoroutines();
@@ -410,7 +409,14 @@ public class BattleSceneManager : MonoBehaviour,
 	}
 	public void BattleOverChecked()
 	{
-		DOTween.Clear();
+        BattleElementController[] otherInstances = UnityEngine.Object.FindObjectsOfType<BattleElementController>();
+
+        // 遍历并销毁除自身以外的同类型游戏对象
+        foreach (BattleElementController instance in otherInstances)
+        {
+            Destroy(instance.gameObject);
+        }
+        DOTween.Clear();
 		Settler.transform.position = new Vector3(0, 2160, 0);
 		if (battleSystem.BattleOverChecked())
 		{
@@ -472,8 +478,9 @@ public class BattleSceneManager : MonoBehaviour,
 
 
 		InputLocked?.Invoke();
+		sequenceTime = 0;
 		rotateSequence.Kill();
-		rotateSequence = DOTween.Sequence();
+        rotateSequence = DOTween.Sequence();
 
 		UnitElementController controller = handicapController[0].Pop(handicapIdx) as UnitElementController;
 
@@ -498,6 +505,7 @@ public class BattleSceneManager : MonoBehaviour,
 		string type = (handicapController[0][handicapIdx] as CommandElementController).type;
 		if(pos < 0 && type == "Target") return -1;
 
+		sequenceTime = 0;
 		rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
 
@@ -537,7 +545,8 @@ public class BattleSceneManager : MonoBehaviour,
 
 
 		InputLocked?.Invoke();
-		rotateSequence.Kill();
+		sequenceTime = 0;
+        rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
 
 		battleSystem.Move(resLineIdx, resIdx, dstLineIdx, dstPos);
@@ -556,7 +565,8 @@ public class BattleSceneManager : MonoBehaviour,
 			return -1;
 		}
 
-		rotateSequence.Kill();
+		sequenceTime = 0;
+        rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
 
 		battleSystem.Retreat(resLine.lineIdx, element.resIdx);
@@ -1112,6 +1122,7 @@ public class BattleSceneManager : MonoBehaviour,
 		UnitElementController controller = AIHandicap.Pop(handicapIdx) as UnitElementController;
 
 
+		sequenceTime = 0;
 		rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
 
@@ -1124,6 +1135,7 @@ public class BattleSceneManager : MonoBehaviour,
 		UnitElementController controller = AIHandicap.Pop(handicapIdx) as UnitElementController;
 
 
+		sequenceTime = 0;
 		rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
 
@@ -1137,6 +1149,7 @@ public class BattleSceneManager : MonoBehaviour,
     
 	private void AIMove(int resLineIdx, int resIdx, int dstLineIdx, int dstPos)
     {
+		sequenceTime = 0;
         rotateSequence.Kill();
         rotateSequence = DOTween.Sequence();
 
@@ -1148,6 +1161,7 @@ public class BattleSceneManager : MonoBehaviour,
 		BattleLineController battleLine = battleLineControllers[resLineIdx];
 		if(resLineIdx == fieldCapacity - 1 && battleLine[resPos].operateCounter == 1)
 		{
+			sequenceTime = 0;
             rotateSequence.Kill();
             rotateSequence = DOTween.Sequence();
             Debug.Log($"Retreat第{resPos}位{battleLine[resPos].ID}");
@@ -1156,8 +1170,8 @@ public class BattleSceneManager : MonoBehaviour,
 	}
 
 
-	// 行为树节点类
-	public abstract class BTNode
+    // 行为树节点类
+    public abstract class BTNode
 	{
 		public abstract bool Execute();
 	}

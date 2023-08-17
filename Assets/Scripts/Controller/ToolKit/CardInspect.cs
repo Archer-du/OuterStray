@@ -58,4 +58,8 @@ public class CardInspect : MonoBehaviour
 			healthText.text = other.healthText.text;
 		}
 	}
+    public void Start()
+    {
+		deckID = -1;
+    }
 }

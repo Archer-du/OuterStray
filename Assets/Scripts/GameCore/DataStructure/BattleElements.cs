@@ -703,12 +703,7 @@ namespace DataCore.BattleElements
 
 			controller.MoveAnimationEvent();
 
-			int lower = resLine.index > dstLine.index ? dstLine.index : resLine.index;
-			int upper = resLine.index > dstLine.index ? resLine.index : dstLine.index;
-			for (int i = lower; i < upper; i++)
-			{
-				battleSystem.battleLines[i].ownerShip = ownership;
-			}
+
 			dstLine.Receive(resLine.Send(resIdx), dstPos);
 			this.operateCounter--;
 
@@ -1000,8 +995,15 @@ namespace DataCore.BattleElements
 		{
 			eventTable.RaiseEvent("BeforeMove", this, battleSystem);
 
-
-			dstLine.Receive(resLine.Send(resIdx), dstPos);
+            dstLine.Receive(resLine.Send(resIdx), dstPos);
+            int lower = resLine.index > dstLine.index ? dstLine.index : resLine.index;
+            int upper = resLine.index > dstLine.index ? resLine.index : dstLine.index;
+            for (int i = lower; i < upper; i++)
+            {
+                battleSystem.battleLines[i].ownerShip = ownership;
+                battleSystem.battleLines[i].UpdateElements();
+                battleSystem.battleLines[i].UpdateInfo();
+            }
 
 			this.dynAttackCounter -= 1;
 			this.operateCounter--;

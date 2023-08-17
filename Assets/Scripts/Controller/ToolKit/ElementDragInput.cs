@@ -24,6 +24,7 @@ public class ElementDragInput : MonoBehaviour,
 	{
 		if (BattleElementController.globalAnimeLock) return;
 		if (BattleSceneManager.Turn != 0) return;
+		//if (controller.battleSceneManager.sequenceTime != 0) return;
 		if (controller.animeLock) return;
 		if (controller.inputLock) return;
 		if (controller.ownership != 0) return;
@@ -47,7 +48,9 @@ public class ElementDragInput : MonoBehaviour,
 	public void OnDrag(PointerEventData eventData)
 	{
 		if (BattleSceneManager.Turn != 0) return;
-		if (controller.ownership != 0) return;
+        //if (controller.animeLock) return;
+        //if (controller.inputLock) return;
+        if (controller.ownership != 0) return;
 		if (BattleElementController.globalAnimeLock)
 		{
 			if(inspector != null) { inspector.active = false; inspector.DisablePanel(); }
@@ -61,7 +64,7 @@ public class ElementDragInput : MonoBehaviour,
 	public void OnEndDrag(PointerEventData eventData)
 	{
 		if (BattleSceneManager.Turn != 0) return;
-		if (controller.battleSceneManager.sequenceTime != 0) return;
+		//if (controller.battleSceneManager.sequenceTime != 0) return;
 		if (controller.animeLock) return;
 		if (controller.inputLock) return;
 		if (controller.ownership != 0) return;

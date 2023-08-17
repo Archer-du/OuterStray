@@ -241,7 +241,7 @@ namespace DataCore.TacticalItems
 			{
 				for(int j = 0; j < battleSystem.battleLines[i].count; j++)
 				{
-					if (battleSystem.battleLines[i][j].ownership == 0)
+					if (battleSystem.battleLines[i][j].ownership == 0 && !battleSystem.battleLines[i][j].backendID.Contains("base"))
 					{
 						deck.Add(battleSystem.battleLines[i][j]);
 					}

@@ -14,9 +14,9 @@
             "cardPreset" : {
                 "boss": true,
                 "backendID": "mush_100_01",
-                "attack": 6,
-                "health": 15,
-                "attackCounter": 2
+                "attack": 4,
+                "health": 4,
+                "attackCounter": 100000
             },
             "position": 0
         }

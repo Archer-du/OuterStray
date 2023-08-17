@@ -58,7 +58,7 @@ namespace DisplayInterface
 
 		public void CampaignCompleted();
 		public void CampaignFailed();
-		public void LateUpdateTacticalLayer(INodeController currentNode, int gasMine);
+		public void LateUpdateTacticalLayer(INodeController currentNode, int gasMine, int baseHealth);
 
 		public void Exit();
 	}

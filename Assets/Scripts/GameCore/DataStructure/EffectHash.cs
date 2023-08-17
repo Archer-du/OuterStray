@@ -1116,9 +1116,10 @@ namespace EventEffectModels
 				BattleLine line = publisher.battleLine;
 				int resIdx = publisher.inlineIdx;
 				publisher.Terminate("immediate");
-				UnitCard card = system.pool.GetCardByID("mush_99_00") as UnitCard;
+				UnitCard card = system.pool.GetCardByID("mush_100") as UnitCard;
 				UnitElement unit = new GuardianElement(card, system,
 					system.controller.InstantiateUnitInBattleField(element.ownership, line.index, resIdx));
+				system.bases[1] = unit;
 				unit.Deploy(line, resIdx);
 			}
 		}

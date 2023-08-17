@@ -2450,6 +2450,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1aceaa0220f961a42adca75c75c14ae2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AnimeLock: 0
   inputLock: 0
   battleFieldScale: {x: 0, y: 0, z: 0}
   handicapScale: {x: 0, y: 0, z: 0}
@@ -2464,6 +2465,7 @@ MonoBehaviour:
   normalFontSizeEnlarge: 0
   battleSceneManager: {fileID: 0}
   canvas: {fileID: 0}
+  DataState: 0
   handicapIdx: 0
   ID: 
   ownership: 0
@@ -2550,7 +2552,6 @@ MonoBehaviour:
   duration: 0.2
   canvas: {fileID: 483946251807401289}
   upperOrder: 100
-  lowerOrder: 0
 --- !u!114 &5026614875311150564
 MonoBehaviour:
   m_ObjectHideFlags: 0

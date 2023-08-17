@@ -583,7 +583,16 @@ namespace LogicCore
 			}
 			tacticalSystem.playerDeck.InstantiateDeckTags();
 			//TODO win or fail
-			tacticalSystem.BattleCampaignCompleted();
+			if(result == BattleResult.win)
+			{
+				tacticalSystem.BattleCampaignCompleted();
+			}
+			if(result == BattleResult.fail)
+			{
+				tacticalSystem.Exit();
+				return false;
+
+			}
 			return true;
 		}
 

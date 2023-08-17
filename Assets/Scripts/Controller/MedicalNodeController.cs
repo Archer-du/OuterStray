@@ -29,6 +29,7 @@ public class MedicalNodeController : NodeController
 	}
 	public void MedicalHeal(bool fullfill, int deckID)
 	{
+		if (deckID == -1) return;
 		if (tacticalManager.playerDeck.tags[deckID].maxHealth == tacticalManager.playerDeck.tags[deckID].health) return;
 		if(fullfill)
 		{

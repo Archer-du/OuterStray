@@ -196,7 +196,7 @@ namespace LogicCore
 			int gasMineGain = random.Next(20, 30);
 			GasMineToken += gasMineGain;
 
-			controller.LateUpdateTacticalLayer(currentNode.controller, gasMineGain);
+			controller.LateUpdateTacticalLayer(currentNode.controller, gasMineGain, playerBase.dynHealth);
 		}
 
 		public void CampaignFailed()
