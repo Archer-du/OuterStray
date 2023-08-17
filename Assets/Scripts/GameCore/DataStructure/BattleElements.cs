@@ -40,7 +40,7 @@ namespace DataCore.BattleElements
 			set
 			{
 				State = value;
-				if(State != ElementState.inDeck)
+				if(State != ElementState.inDeck && State != ElementState.lost)
 				{
 					UpdateState();
 				}
@@ -92,6 +92,7 @@ namespace DataCore.BattleElements
 
 		internal int weight;
 
+		internal string effects;
 
 		internal BattleElement(Card card, BattleSystem system)
 		{
@@ -113,7 +114,10 @@ namespace DataCore.BattleElements
 			this.stackIdx = -1;
 			this.gasMineCost = card.gasMineCost;
 
-			EffectsParse(card.effects);
+			effects = card.effects;
+			//EffectsParse(card.effects);
+
+			BattleSystem.ReParse += EffectsReParse;
 		}
 
 		/// <summary>
@@ -238,6 +242,11 @@ namespace DataCore.BattleElements
 			else return category.CompareTo(other.category);
 		}
 
+		internal void EffectsReParse()
+		{
+			EffectsParse(effects);
+			eventTable.RaiseEvent("Initialize", this, null);
+		}
 	}
 
 
@@ -507,11 +516,11 @@ namespace DataCore.BattleElements
 
 			aura = false;
 
-			eventTable.RaiseEvent("Initialize", this, null);
+			//eventTable.RaiseEvent("Initialize", this, null);
 
 			this.controller = controller;
 			//初始状态在卡组中
-			state = ElementState.inDeck;
+			state = ElementState.lost;
 		}
 
 
@@ -662,6 +671,7 @@ namespace DataCore.BattleElements
 		/// <param name="battleSystem"></param>
 		internal void Deploy(BattleLine dstLine, int dstPos)
 		{
+			EffectsReParse();
 			eventTable.RaiseEvent("BeforeDeploy", this, battleSystem);
 
 			//加入部署队列
@@ -828,7 +838,6 @@ namespace DataCore.BattleElements
 		internal void Terminate(string method)
 		{
 			eventTable.RaiseEvent("BeforeTerminate", this, battleSystem);
-			battleSystem.eventTable[ownership].RaiseEvent("UnitTerminated", this, battleSystem);
 
 
 			//由自己修改的状态
@@ -842,6 +851,7 @@ namespace DataCore.BattleElements
 
 
 			//not likely
+			battleSystem.eventTable[ownership].RaiseEvent("UnitTerminated", this, battleSystem);
 			eventTable.RaiseEvent("AfterTerminate", this, battleSystem);
 		}
 		/// <summary>
@@ -855,7 +865,6 @@ namespace DataCore.BattleElements
 			}
 
 			eventTable.RaiseEvent("BeforeRetreat", this, battleSystem);
-			battleSystem.eventTable[ownership].RaiseEvent("UnitRetreated", this, battleSystem);
 
 			battleLine.Send(this.inlineIdx);
 			//TODO config
@@ -864,6 +873,7 @@ namespace DataCore.BattleElements
 			UnloadEffects();
 
 
+			battleSystem.eventTable[ownership].RaiseEvent("UnitRetreated", this, battleSystem);
 			controller.RetreatAnimationEvent(method);
 		}
 
@@ -1165,6 +1175,7 @@ namespace DataCore.BattleElements
 		inStack,
 		inHandicap,
 		inBattleLine,
-		destroyed
+		destroyed,
+		lost
 	}
 }

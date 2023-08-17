@@ -93,7 +93,7 @@ namespace InputHandler
 
 		public void Exit();
 
-		public void BattleOverChecked();
+		public bool BattleOverChecked();
 	}
 
 

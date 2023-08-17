@@ -48,10 +48,7 @@ public class CultivateSceneManager : MonoBehaviour,
         {
             Destroy(this);
         }
-        if(state == GameState.Cultivate)
-        {
-            DestroyOtherInstancesOfType();
-		}
+
 		else
         {
             transform.SetParent(gameManager.transform);

@@ -400,22 +400,24 @@ public class BattleSceneManager : MonoBehaviour,
 	{
 		DOTween.Clear();
 		Settler.transform.position = new Vector3(0, 2160, 0);
-		battleSystem.BattleOverChecked();
-		gameManager.BattleBGM.Stop();
-		gameManager.TacticalBGM.Play();
+		if (battleSystem.BattleOverChecked())
+		{
+			gameManager.BattleBGM.Stop();
+			gameManager.TacticalBGM.Play();
 
-		AsyncOperation async = gameManager.UpdateGameState(SceneState.GameState.Tactical);
+			AsyncOperation async = gameManager.UpdateGameState(SceneState.GameState.Tactical);
+		}
 
 		//StartCoroutine(LateWriteBack(async));
 	}
-	IEnumerator LateWriteBack(AsyncOperation async)
-	{
-		while (!async.isDone)
-		{
-			yield return null;
-		}
-		battleSystem.BattleOverChecked();
-	}
+	//IEnumerator LateWriteBack(AsyncOperation async)
+	//{
+	//	while (!async.isDone)
+	//	{
+	//		yield return null;
+	//	}
+	//	battleSystem.BattleOverChecked();
+	//}
 
 
 	public void Exit()

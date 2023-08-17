@@ -196,6 +196,7 @@ public class UnitElementController : BattleElementController,
 		battleSceneManager.rotateSequence.InsertCallback(battleSceneManager.sequenceTime,
 			() =>
 			{
+				healthPoint = dynHealth;
 				healthText.text = dynHealth.ToString();
 				healthText.DOColor(new Color(1, (float)dynHealth / maxHealthPoint, (float)dynHealth / maxHealthPoint), duration);
             }
@@ -203,6 +204,7 @@ public class UnitElementController : BattleElementController,
 	}
 	public void UpdateHealthImmediate(int dynHealth)
 	{
+		healthPoint = dynHealth;
         healthText.text = dynHealth.ToString();
         healthText.DOColor(new Color(1, (float)dynHealth / maxHealthPoint, (float)dynHealth / maxHealthPoint), duration);
     }
@@ -387,7 +389,7 @@ public class UnitElementController : BattleElementController,
 	{
 		float forwardTime = 0.2f;
 
-		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + nameContent + " damaged ");
+		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + nameContent + " damaged " + (healthPoint - health).ToString());
 		if(method == "append")
 		{
 			battleSceneManager.rotateSequence.Append(
@@ -432,7 +434,7 @@ public class UnitElementController : BattleElementController,
 		float forwardTime = 0.2f;
 
 		healAudio.Play();
-		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + nameContent + " healed ");
+		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + nameContent + " healed " + (health - healthPoint).ToString());
 		if (method == "append")
         {
 			battleSceneManager.rotateSequence.Append(

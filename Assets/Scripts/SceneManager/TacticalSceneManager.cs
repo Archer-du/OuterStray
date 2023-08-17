@@ -11,7 +11,7 @@ using UnityEngine.UI;
 using UnityEngine.XR;
 
 public class TacticalSceneManager : MonoBehaviour,
-    ITacticalSceneController
+	ITacticalSceneController
 {
     [Header("Input")]
     public ITacticalSystemInput tacticalSystem;
@@ -75,7 +75,7 @@ public class TacticalSceneManager : MonoBehaviour,
 
 	public void OnGameStateChanged(GameState state)
     {
-		if (state == GameState.Cultivate)
+		if (state == GameState.Cultivate || state == GameState.Start)
 		{
 			Destroy(this);
 		}
@@ -100,7 +100,11 @@ public class TacticalSceneManager : MonoBehaviour,
 			}
 		}
 	}
-
+	public void Exit()
+	{
+        DOTween.Clear();
+        gameManager.UpdateGameState(GameState.Start);
+	}
 
 
 
