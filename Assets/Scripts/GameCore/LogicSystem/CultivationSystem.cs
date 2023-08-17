@@ -35,16 +35,16 @@ namespace LogicCore
 			this.tacticalSystem = tacticalSystem;
 			this.battleSystem = battleSystem;
 
-			departments = new List<Department>(SystemConfig.buildingNum);
-			for(int i = 0; i < SystemConfig.buildingNum; i++)
-			{
-				departments.Add(new Department());
-			}
-			foreach (var department in departments)
-			{
-				department.Fill(pool);
-			}
-			unlockProgress = 1;
+			//departments = new List<Department>(SystemConfig.buildingNum);
+			//for(int i = 0; i < SystemConfig.buildingNum; i++)
+			//{
+			//	departments.Add(new Department());
+			//}
+			//foreach (var department in departments)
+			//{
+			//	department.Fill(pool);
+			//}
+			//unlockProgress = 1;
 		}
 		public void SetSceneController(ICultivateSceneController ctdspl)
 		{

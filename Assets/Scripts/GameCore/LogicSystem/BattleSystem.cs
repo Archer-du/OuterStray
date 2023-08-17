@@ -29,6 +29,7 @@ namespace LogicCore
 	{
 
 		internal static event Action UpdateWeight;
+		internal static event Action ReParse;
 		//display-----------------------------------
 		/// <summary>
 		/// 
@@ -131,6 +132,7 @@ namespace LogicCore
 
 
 		internal BattleResult result;
+		internal bool final;
 		//TODO
 		/// <summary>
 		/// 由战术层指定参数构建战场
@@ -139,8 +141,13 @@ namespace LogicCore
 		/// <param name="enemyDeck"></param>
 		internal void BuildBattleField(Deck playerDeck, Deck enemyDeck, int fieldCapacity, int[] battleLinesCapacity,
 			int initialTurn, int initialHumanEnergy, int initialPlantEnergy, int initialHumanHandicaps, int initialPlantHandicaps,
-			List<BattleNode.FieldPreset> fieldPresets)
+			List<BattleNode.FieldPreset> fieldPresets, bool final)
 		{
+			this.final = final;
+			eventTable = new EventTable[2] { new EventTable(), new EventTable() };
+			ReParse?.Invoke();
+
+
 			result = BattleResult.normal;
 
 			deployQueue = new List<UnitElement>();
@@ -561,11 +568,17 @@ namespace LogicCore
 			tacticalSystem.playerDeck.WriteBack();
 			UnloadBattleField();
 		}
-		public void BattleOverChecked()
+		public bool BattleOverChecked()
 		{
+			if (final)
+			{
+				tacticalSystem.Exit();
+				return false;
+			}
 			tacticalSystem.playerDeck.InstantiateDeckTags();
 			//TODO win or fail
 			tacticalSystem.BattleCampaignCompleted();
+			return true;
 		}
 
 

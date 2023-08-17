@@ -211,6 +211,7 @@ namespace DataCore.TacticalItems
 			for(int i = 0; i < deck.Count; i++)
 			{
 				deck[i].deckID = i;
+				deck[i].state = ElementState.inDeck;
 			}
 		}
 		private void UpdateBattleID()
@@ -218,6 +219,7 @@ namespace DataCore.TacticalItems
 			for (int i = 0; i < count; i++)
 			{
 				deck[i].battleID = deck[i].ownership == 0 ? i : -1 - i;
+				deck[i].state = ElementState.inDeck;
 			}
 		}
 		internal void WriteBack()
@@ -696,7 +698,7 @@ namespace DataCore.TacticalItems
 			base.CastNodeEvent();
 			battleSystem.BuildBattleField(playerDeck, plantDeck, fieldCapacity, battleLinesCapacity, 
 				initialTurn, initialHumanEnergy, initialPlantEnergy, initialHumanHandicaps, initialPlantHandicaps,
-				fieldPresets);
+				fieldPresets, nextTerrain == null);
 		}
 
 

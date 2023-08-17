@@ -11,6 +11,7 @@ using TMPro;
 using UnityEngine.UI;
 using DG.Tweening;
 using DataCore.CultivateItems;
+using UnityEngine.EventSystems;
 
 public class GameManager : MonoBehaviour, IGameManagement
 {
@@ -61,6 +62,8 @@ public class GameManager : MonoBehaviour, IGameManagement
 	public BattleSceneManager battleSceneManager;
 
 	public AsyncOperation async;
+
+	public EventSystem eventSystem;
 	//定义一个公共方法，用于更新游戏状态，并根据不同的状态执行不同的逻辑
 	public AsyncOperation UpdateGameState(GameState state)
 	{
@@ -68,7 +71,17 @@ public class GameManager : MonoBehaviour, IGameManagement
 		switch (state)
 		{
 			case GameState.Start:
-				SceneManager.LoadScene("StartScene");
+				async = SceneManager.LoadSceneAsync("StartScene");
+				StandaloneInputModule[] inputModules = FindObjectsOfType<StandaloneInputModule>();
+
+				// 遍历并禁用所有StandaloneInputModule
+				foreach (StandaloneInputModule inputModule in inputModules)
+				{
+					inputModule.enabled = false;
+				}
+				Destroy(eventSystem.gameObject);
+				DOTween.Clear();
+				StartCoroutine(LoadingNewScene(async, "StartScene"));
 				break;
 
 			case GameState.Cultivate:
@@ -109,8 +122,25 @@ public class GameManager : MonoBehaviour, IGameManagement
 			// 等待一帧
 			yield return null;
 		}
+		SceneLoader.blocksRaycasts = false;
+		if(scene != "StartScene")
+		{
+			SceneLoader.DOFade(0f, 0.3f)
+				.OnComplete(() =>
+				{
+					progressText.gameObject.SetActive(false);
+				});
+		}
 		switch (scene)
 		{
+			case "StartScene":
+				OnGameStateChanged = null;
+				Destroy(gameObject);
+				//Destroy(cultivateSceneManager);
+				//Destroy(tacticalSceneManager);
+
+				//DestroyOtherInstancesOfType();
+				break;
 			case "CultivateScene":
 				if (cultivateSceneManager != null)
 				{
@@ -141,12 +171,6 @@ public class GameManager : MonoBehaviour, IGameManagement
 				break;
 		}
 
-		SceneLoader.blocksRaycasts = false;
-		SceneLoader.DOFade(0f, 0.3f)
-			.OnComplete(() =>
-			{
-				progressText.gameObject.SetActive(false);
-			});
 
 		// 或者 progressBar.gameObject.SetActive(false);
 		// 或者 AudioSource.PlayClipAtPoint(loadSound, transform.position);
@@ -182,7 +206,20 @@ public class GameManager : MonoBehaviour, IGameManagement
 
 		TacticalBGM.Play();
 	}
+	private void DestroyOtherInstancesOfType()
+	{
+		// 查找同类型的所有游戏对象
+		GameManager[] otherInstances = Object.FindObjectsOfType<GameManager>();
 
+		// 遍历并销毁除自身以外的同类型游戏对象
+		foreach (GameManager instance in otherInstances)
+		{
+			if (instance != this)
+			{
+				Destroy(instance.gameObject);
+			}
+		}
+	}
 
 
 

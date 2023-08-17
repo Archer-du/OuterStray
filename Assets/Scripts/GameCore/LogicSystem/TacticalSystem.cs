@@ -9,7 +9,6 @@ using DisplayInterface;
 using SystemEventHandler;
 using System;
 using DataCore.BattleElements;
-using Codice.Client.Common.Threading;
 
 namespace LogicCore
 {
@@ -87,11 +86,9 @@ namespace LogicCore
 			this.battleSystem = system;
 
 			//init
-			isInNode = false;
 
 			//TODO test
 			battleNodeNum = 2;
-			terrains = new List<Terrain>(battleNodeNum);
 
 		}
 		public void SetSceneController(ITacticalSceneController tsdspl)
@@ -101,6 +98,8 @@ namespace LogicCore
 			//playerDeck = new Deck(battleSystem, this, controller.InstantiateDeck());
 			////TODO remove
 			//playerDeck.LoadDeckByPathHuman("Assets\\Config\\HumanDeckTest.csv");
+			isInNode = false;
+			terrains = new List<Terrain>(battleNodeNum);
 
 			controller.TerrrainsInitialize(this, battleNodeNum);
 			playerBase = playerDeck.bases;
@@ -196,6 +195,7 @@ namespace LogicCore
 			Random random = new Random();
 			int gasMineGain = random.Next(20, 30);
 			GasMineToken += gasMineGain;
+
 			controller.LateUpdateTacticalLayer(currentNode.controller, gasMineGain);
 		}
 
@@ -209,7 +209,7 @@ namespace LogicCore
 
 		public void Exit()
 		{
-			throw new NotImplementedException();
+			controller.Exit();
 		}
 
 
