@@ -325,7 +325,6 @@ public class UnitElementController : BattleElementController,
 	{
 		if (target == null) return;
 
-		attackAudio.Play();
 		float forwardTime = 0.15f;
         float backlashTime = 0.2f;
 		Vector3 oriPosition = battleLineLogicPosition;
@@ -347,6 +346,7 @@ public class UnitElementController : BattleElementController,
 		battleSceneManager.rotateSequence.Append(
 			transform.DOMove(dstPosition, forwardTime).OnComplete(() =>
 			{
+				attackAudio.Play();
 				transform.DOMove(oriPosition, backlashTime).OnComplete(() => battleLine.UpdateElementPosition());
 				input.UpdateManual();
 			})
@@ -361,7 +361,6 @@ public class UnitElementController : BattleElementController,
 	{
 		if (target == null) return;
 
-		randomAttackAudio.Play();
 		float forwardTime = 0.15f;
 		float backlashTime = 0.2f;
 		UnitElementController controller = target as UnitElementController;
@@ -375,6 +374,7 @@ public class UnitElementController : BattleElementController,
 		battleSceneManager.rotateSequence.Append(
 			transform.DOMove(battleLineLogicPosition + 100f * Vector3.up * (2 * ownership - 1), forwardTime).OnComplete(() =>
 			{
+				randomAttackAudio.Play();
 				transform.DOMove(oriPosition, backlashTime);
 				input.UpdateManual();
 			})
@@ -433,12 +433,12 @@ public class UnitElementController : BattleElementController,
 	{
 		float forwardTime = 0.2f;
 
-		healAudio.Play();
 		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + nameContent + " healed " + (health - healthPoint).ToString());
 		if (method == "append")
         {
 			battleSceneManager.rotateSequence.Append(
 				transform.DOShakeRotation(forwardTime, 20f)
+				.OnComplete(() => healAudio.Play())
 				);
 			battleSceneManager.sequenceTime += forwardTime;
 		}

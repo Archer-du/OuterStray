@@ -169,8 +169,8 @@ public class BattleLineController : MonoBehaviour,
 		{
 			int start = count / 2;
 			int offset = vtcPos + (BattleElementController.cardWidth + interval) / 2 > 0 
-				? (int)((vtcPos - (BattleElementController.cardWidth + interval) / 2) / (BattleElementController.cardWidth + interval))
-				: (int)((vtcPos - 3 * (BattleElementController.cardWidth + interval) / 2) / (BattleElementController.cardWidth + interval));
+				? (int)((vtcPos + (BattleElementController.cardWidth + interval) / 2) / (BattleElementController.cardWidth + interval))
+				: (int)((vtcPos - (BattleElementController.cardWidth + interval) / 2) / (BattleElementController.cardWidth + interval));
 			pos = start + offset;
 			if (pos < 0 || pos > count - 1)
 			{

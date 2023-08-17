@@ -1047,6 +1047,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1023413388}
   - component: {fileID: 1023413387}
+  - component: {fileID: 1023413389}
   m_Layer: 0
   m_Name: CultivateSceneManager
   m_TagString: Untagged
@@ -1090,6 +1091,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1023413389
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1023413386}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6bf51a58f646fd340ad3f2dff5187f65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  start: {fileID: 1598127909}
+  loadAudioClip: {fileID: 8300000, guid: 2817053062e023544a75c9beb385719d, type: 3}
 --- !u!1 &1059774461
 GameObject:
   m_ObjectHideFlags: 0
@@ -1687,6 +1702,7 @@ GameObject:
   - component: {fileID: 1598127910}
   - component: {fileID: 1598127909}
   - component: {fileID: 1598127912}
+  - component: {fileID: 1598127913}
   m_Layer: 5
   m_Name: StartExpedition
   m_TagString: Untagged
@@ -1812,6 +1828,20 @@ MonoBehaviour:
   aura: {fileID: 1598127910}
   inspectFactor: 1.2
   duration: 0.2
+--- !u!114 &1598127913
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1598127907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4172a8d97d0b7ee4882be54dfe3cc3cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: d5365bb221aa411419dd0d8582043d9c, type: 3}
+  loadingAudio: 0
 --- !u!1 &1688088103
 GameObject:
   m_ObjectHideFlags: 0
@@ -2530,7 +2560,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bc654dc1018b1b40a91769e1ac339c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneManager: {fileID: 0}
   tags: []
   deckTagPrototype: {fileID: 3442668585234461305, guid: 03c54fa688f2c3e40991abfb98cb6703, type: 3}
 --- !u!114 &2046824505
