@@ -498,7 +498,7 @@ public class UnitElementController : BattleElementController,
 		Vector3 oriPosition = battleLineLogicPosition;
 		Vector3 dstPosition = target.battleLineLogicPosition;
 
-		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + " CleaveAttacked " + "line: " + target.battleLine.lineIdx + "res: " + target.resIdx);
+		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + nameContent + " CleaveAttacked ");
 
 		//安全间隔
 		battleSceneManager.rotateSequence.AppendInterval(BattleLineController.updateTime + 0.2f);

@@ -48,8 +48,12 @@ public class CommandElementController : BattleElementController,
 	{
 		float castTime = 0.4f;
 		float waitTime = 0.8f;
+		
 
 		Sequence seq = DOTween.Sequence();
+
+		Debug.Log(nameContent + " casted ");
+
 		if (method == "append")
 		{
 			//飞向战场侧中
