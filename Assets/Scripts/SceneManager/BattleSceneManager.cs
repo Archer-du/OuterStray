@@ -172,7 +172,7 @@ public class BattleSceneManager : MonoBehaviour,
 		baseImage.sprite = bases[0].CardImage.sprite;
 		baseFrame.color = color;
 		baseGround.color = color;
-		baseIcon.sprite = bases[0].InspectorCategoryIcon.sprite;
+		baseIcon.sprite = bases[0].categoryIcon.sprite;
 		baseDescription.text = bases[0].description;
 	}
 	public float healthDuration = 0.2f;

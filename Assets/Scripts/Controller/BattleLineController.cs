@@ -11,7 +11,6 @@ using DataCore.BattleElements;
 public class BattleLineController : MonoBehaviour,
     IBattleLineController
 {
-
 	public BattleSceneManager battleSceneManager;
 	/// <summary>
 	/// 战线容量
@@ -30,11 +29,9 @@ public class BattleLineController : MonoBehaviour,
 
 	public float width;
 
-
 	public static float updateTime = 0.2f;
 
 	public int childNum;
-
 	internal UnitElementController this[int index]
 	{
 		get => elementList[index];
@@ -80,6 +77,7 @@ public class BattleLineController : MonoBehaviour,
 		{ throw new Exception("Data inconsistencies"); }
 
 		UpdateElements();
+
 		this.ownerShip = ownerShip;
 
 		if (ownerShip == 0)

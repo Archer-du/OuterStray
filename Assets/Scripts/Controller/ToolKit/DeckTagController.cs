@@ -73,9 +73,10 @@ public class DeckTagController : MonoBehaviour, IComparable<DeckTagController>,
 
 	}
 	public Transform Component;
+	public float initDuration;
 	public void Start()
 	{
-		
+		Component.DOLocalMove(Vector3.zero, initDuration);
 	}
 	public void UpdateInfo()
 	{

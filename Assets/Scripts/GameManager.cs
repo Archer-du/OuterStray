@@ -213,17 +213,4 @@ public class GameManager : MonoBehaviour, IGameManagement
 			}
 		}
 	}
-
-
-
-
-	//private void OnDisable()
-	//{
-	//	enabled = true;
-	//}
-
-	//private void OnDestroy()
-	//{
-	//	DontDestroyOnLoad(gameObject);
-	//}
 }

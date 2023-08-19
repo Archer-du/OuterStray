@@ -58,6 +58,23 @@ public class CardInspect : MonoBehaviour
 			healthText.text = other.healthText.text;
 		}
 	}
+	public void CopyInfo(UnitElementController other)
+	{
+		cardImage.sprite = other.CardImage.sprite;
+		//TODO
+		backGround.color = other.color;
+		frame.color = other.color;
+		nameTag.color = other.color;
+		costTag.color = other.color;
+		categoryIcon.sprite = other.categoryIcon.sprite;
+
+		nameText.text = other.nameContent;
+		costText.text = other.cost.ToString();
+		descriptionText.text = other.description;
+		attackText.text = other.attackText.text;
+		healthText.text = other.maxHealthPoint.ToString();
+		counterText.text = other.category == "Construction" ? "" : other.attackCounter.ToString();
+	}
     public void Start()
     {
 		deckID = -1;

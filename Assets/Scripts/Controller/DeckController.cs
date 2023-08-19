@@ -16,15 +16,7 @@ public class DeckController : MonoBehaviour,
 	}
 
 	[Header("Data")]
-	public Dictionary<int, DeckTagController> deckTags;
 	public List<DeckTagController> tags;
-
-	//public Dictionary<int, DeckTagController> lightArmorDeckTags;
-	//public Dictionary<int, DeckTagController> motorizedDeckTags;
-	//public Dictionary<int, DeckTagController> artilleryDeckTags;
-	//public Dictionary<int, DeckTagController> guardianDeckTags;
-	//public Dictionary<int, DeckTagController> constructionDeckTags;
-	//public Dictionary<int, DeckTagController> commandDeckTags;
 
 	[Header("Prototype")]
 	public GameObject deckTagPrototype;
@@ -32,12 +24,6 @@ public class DeckController : MonoBehaviour,
 	{
 		tags = new List<DeckTagController>();
 		this.deck = deck;
-		//lightArmorDeckTags = new Dictionary<int, DeckTagController>();
-		//motorizedDeckTags = new Dictionary<int, DeckTagController>();
-		//artilleryDeckTags = new Dictionary<int, DeckTagController>();
-		//guardianDeckTags = new Dictionary<int, DeckTagController>();
-		//constructionDeckTags = new Dictionary<int, DeckTagController>();
-		//commandDeckTags = new Dictionary<int, DeckTagController>();
 	}
 	public void UnloadDeckTags()
 	{
@@ -65,7 +51,6 @@ public class DeckController : MonoBehaviour,
 		controller.Init(ID);
 		controller.deckID = index;
 
-		//deckTags.Add(index, controller);
 		tags.Add(controller);
 	}
 

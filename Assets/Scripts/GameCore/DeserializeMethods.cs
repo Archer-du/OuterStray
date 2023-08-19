@@ -44,18 +44,15 @@ internal class DeserializeMethods
 			//理解鹰角程序员，成为鹰角程序员//TODO
 			int atkc = cardObject[7] == "NA" ? 100000 : int.Parse(cardObject[7]);
 
-			int department = int.Parse(cardObject[9]);
-			int pack = int.Parse(cardObject[10]);
-
-			string effects = cardObject[11];
+			string effects = cardObject[10];
 
 			string description = cardObject[8];
 
-			card = new UnitCard(id, ownership, name, category, cost, atk, hp, atkc, description, department, pack, effects);
+			card = new UnitCard(id, ownership, name, category, cost, atk, hp, atkc, description, -1, -1, effects);
 		}
 		if(!id.Contains("base") && card.ownership == 0)
 		{
-			card.gasMineCost = int.Parse(cardObject[12]);
+			card.gasMineCost = int.Parse(cardObject[9]);
 		}
 	}
 

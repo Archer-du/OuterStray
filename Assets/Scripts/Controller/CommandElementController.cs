@@ -14,8 +14,6 @@ using DataCore.BattleElements;
 public class CommandElementController : BattleElementController,
 	ICommandElementController
 {
-
-
 	public TMP_Text durabilityText;
 
 	public CanvasGroup selfCanvas;

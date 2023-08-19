@@ -20,6 +20,8 @@ public class ElementDragInput : MonoBehaviour,
 
 	public float duration;
 
+	private bool innerLock;
+
 	public void OnBeginDrag(PointerEventData eventData)
 	{
 		if (BattleElementController.draggingLock) return;
@@ -118,5 +120,6 @@ public class ElementDragInput : MonoBehaviour,
 	public void Start()
 	{
 		buffer = GameObject.Find("Buffer").transform;
+		innerLock = false;
 	}
 }

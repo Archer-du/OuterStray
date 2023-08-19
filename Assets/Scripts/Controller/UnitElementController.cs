@@ -76,6 +76,7 @@ public class UnitElementController : BattleElementController,
 
 	[Header("Components")]
 	public InspectPanelController battleLineInspect;
+	public CardInspect inspector;
 	/// <summary>
 	/// 从牌堆加入手牌或战场时初始化
 	/// </summary>
@@ -93,21 +94,7 @@ public class UnitElementController : BattleElementController,
 		arrowsGroup.alpha = 0;
 		InspectPanel.alpha = 0f;
 
-		InspectorName.text = name;
-		InspectorCost.text = cost.ToString();
-		InspectorDescription.text = description;
-		InspectorAttack.text = attackText.text;
-		InspectorMaxHealth.text = maxHealthPoint.ToString();
-		InspectorAttackCounter.text = this.category == "Construction" ? "" : attackCounter.ToString();
-
-		InspectorImage.sprite = CardImage.sprite;
-		//TODO
-		//InspectorImage.rectTransform.sizeDelta = new Vector3(12, 15);
-		InspectorGround.color = elementGround.color;
-		InspectorFrame.color = elementGround.color;
-		InspectorNameTag.color = elementGround.color;
-		InspectorCostTag.color = elementGround.color;
-		InspectorCategoryIcon.sprite = componentCategoryIcon.sprite;
+		inspector.CopyInfo(this);
 
 		battleLineInspect = GetComponent<InspectPanelController>();
 		OnElementStateChanged += battleLineInspect.OnElementStateChanged;
@@ -117,6 +104,10 @@ public class UnitElementController : BattleElementController,
 
 
 
+		UnitAudioInitialize();
+	}
+	private void UnitAudioInitialize()
+	{
 		attackAudio = gameObject.AddComponent<AudioSource>();
 		attackAudio.clip = attackClip;
 		attackAudio.loop = false;
@@ -191,6 +182,7 @@ public class UnitElementController : BattleElementController,
 			}
 		}
 	}
+
 	public void UpdateHealth(int dynHealth)
 	{
 		battleSceneManager.rotateSequence.InsertCallback(battleSceneManager.sequenceTime,
@@ -208,6 +200,7 @@ public class UnitElementController : BattleElementController,
         healthText.text = dynHealth.ToString();
         healthText.DOColor(new Color(1, (float)dynHealth / maxHealthPoint, (float)dynHealth / maxHealthPoint), duration);
     }
+
 	public void UpdateTarget(int t1, int t2, int t3, IUnitElementController target, int targetIdx, bool mocking, bool cleave)
 	{
 		this.target = target as UnitElementController;
@@ -225,6 +218,7 @@ public class UnitElementController : BattleElementController,
 			}
 		);
 	}
+
 	private void UpdateTarget(int t1, int t2, int t3)
 	{
 		arrowsGroup.alpha = 1;
@@ -232,6 +226,7 @@ public class UnitElementController : BattleElementController,
 		midArrow.DOFade(t2, duration);
 		rightArrow.DOFade(t3, duration);
 	}
+
 	private void UpdateTarget(int targetIdx, bool mocking)
 	{
 		arrowsGroup.alpha = 0;
@@ -268,6 +263,7 @@ public class UnitElementController : BattleElementController,
 			rightArrowMocked.DOFade(mocking ? 1 : 0, duration);
 		}
 	}
+
 	public void UpdateInspectComponent()
 	{
 

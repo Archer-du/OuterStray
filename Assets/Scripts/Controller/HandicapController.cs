@@ -143,6 +143,7 @@ public class HandicapController : MonoBehaviour,
 		Vector3 moveBy = GetLogicPosition(count) - element.transform.position;
 
 		Sequence seq = DOTween.Sequence();
+
 		seq.Append(element.transform.DOBlendableMoveBy(moveBy, popTime));
 		seq.Join(element.transform.DORotate(new Vector3(0, 0, ownership * 180), popTime)
 			.OnComplete(() =>

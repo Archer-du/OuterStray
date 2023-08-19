@@ -29,14 +29,11 @@ public class CultivateSceneManager : MonoBehaviour,
 	public TMP_Text baseHealthText;
 	public TMP_Text baseMaxHealthText;
 
-
 	public void Start()
     {
         gameManager = GameManager.GetInstance();
 
         GameManager.OnGameStateChanged += OnGameStateChanged;
-
-        //buildingController = gameManager.GetComponent<DepartmentController>();
 
         //note: 功能从manager下放到controller
         startExpedition.onClick.AddListener(StartExpedition);
