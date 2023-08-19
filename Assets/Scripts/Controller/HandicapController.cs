@@ -6,17 +6,18 @@ using DG.Tweening;
 using DisplayInterface;
 using System;
 using DataCore.BattleElements;
+using static UnityEditor.Rendering.FilterWindow;
 
 public class HandicapController : MonoBehaviour,
 	IHandicapController
 {
+	public BattleSceneManager battleSceneManager;
+
 	public Transform parent;
 
 	private int ownership;
 
-	private float length;
-	private float horizontalEdge;
-	private float gridWidth;
+	public static float gridWidth = 240f;
 
 	public int capacity;
 	/// <summary>
@@ -32,18 +33,14 @@ public class HandicapController : MonoBehaviour,
 		set => handiCards[index] = value;
 	}
 
-	public void Init()
+	public void Init(int ownership)
 	{
-		ownership = transform.GetSiblingIndex();
+		battleSceneManager = GameManager.GetInstance().battleSceneManager;
 
-		horizontalEdge = 100f;
-		length = GetComponent<RectTransform>().rect.width - 2 * horizontalEdge;
-		gridWidth = 240f;
+		this.ownership = ownership;
 
 		//TODO config
 		capacity = 8;
-
-		//isDragging = false;
 
 		handiCards = new List<BattleElementController>();
 	}
@@ -51,27 +48,33 @@ public class HandicapController : MonoBehaviour,
 
 
 
-
-
-
-
-	private float popTime = 0.3f;
 	/// <summary>
-	/// 
+	/// 自带动画的fill
 	/// </summary>
 	/// <param name="list"></param>
-	public void Fill(List<IBattleElementController> list)
+	public void Fill(List<IBattleElementController> list, int initialTurn)
 	{
 		Sequence seq = DOTween.Sequence();
-		//pushing = true;
 		for (int i = 0; i < list.Count; i++)
 		{
+			float popTime = 0.3f;
 			BattleElementController element = list[i] as BattleElementController;
 
-			element.animeLock = true;
-			element.gameObject.SetActive(true);
-			element.transform.SetParent(transform);
-			element.transform.localScale = element.handicapScale;
+			if (i == list.Count - 1)
+			{
+				if (initialTurn == ownership)
+				{
+					int temp = i;
+					seq.AppendInterval(2f);
+					seq.OnComplete(() =>
+					{
+						Push(list[temp]);
+					});
+					break;
+				}
+			}
+
+			ResetElementDisplay(element);
 
 			Vector3 moveBy = GetLogicPosition(i) - element.transform.position;
 			Vector3 rotateBy = new Vector3(0, 0, (1 - (ownership * 2)) * 90);
@@ -80,9 +83,16 @@ public class HandicapController : MonoBehaviour,
 			seq.Join(element.transform.DOBlendableRotateBy(rotateBy, popTime)
 				.OnComplete(() =>
 				{
-					element.animeLock = false;
+					element.inspectLock = false;
 					handiCards.Add(element);
 					UpdateHandicapPosition();
+					if (i + 1 == list.Count - 1)
+					{
+						if (initialTurn == ownership)
+						{
+							battleSceneManager.UpdateTurn(initialTurn);
+						}
+					}
 				}));
 		}
 
@@ -93,10 +103,6 @@ public class HandicapController : MonoBehaviour,
 		seq.Play();
 	}
 
-
-
-
-	public bool pushing;
 	/// <summary>
 	/// 播放动画，将element控件加入到手牌列表中
 	/// </summary>
@@ -107,22 +113,23 @@ public class HandicapController : MonoBehaviour,
 		{
 			return;
 		}
-
 		BattleElementController element = controller as BattleElementController;
 
 		handiCards.Add(element);
 
-        element.animeLock = true;
-		element.gameObject.SetActive(true);
-        element.NameTag.gameObject.SetActive(true);
-        element.nameText.gameObject.SetActive(true);
-        element.costTag.gameObject.SetActive(true);
-        element.costText.gameObject.SetActive(true);
-		element.transform.SetParent(transform);
-		element.transform.localScale = element.handicapScale;
+		ResetElementDisplay(element);
 
 		PushAnimation(element);
-
+	}
+	public void ResetElementDisplay(BattleElementController element)
+	{
+		element.gameObject.SetActive(true);
+		element.NameTag.gameObject.SetActive(true);
+		element.nameText.gameObject.SetActive(true);
+		element.costTag.gameObject.SetActive(true);
+		element.costText.gameObject.SetActive(true);
+		element.transform.SetParent(transform);
+		element.transform.localScale = element.handicapScale;
 	}
 	/// <summary>
 	/// 成功移除卡牌时调用
@@ -138,41 +145,53 @@ public class HandicapController : MonoBehaviour,
 
 		return controller as IBattleElementController;
 	}
+	/// <summary>
+	/// 解锁
+	/// </summary>
+	/// <param name="element"></param>
 	public void PushAnimation(BattleElementController element)
 	{
-		Vector3 moveBy = GetLogicPosition(count) - element.transform.position;
+		float popTime = 0.3f;
+		float waitTime = 1f;
 
+		element.inspectLock = true;
 		Sequence seq = DOTween.Sequence();
 
+		//移动到屏幕中心
+		if(element.ownership == 0)
+		{
+			seq.Append(element.transform.DOMove(Vector3.zero, popTime));
+			//展示等待
+			seq.AppendInterval(waitTime);
+		}
+
+		//加入手牌
+		Vector3 moveBy = GetLogicPosition(count) - element.transform.position;
 		seq.Append(element.transform.DOBlendableMoveBy(moveBy, popTime));
 		seq.Join(element.transform.DORotate(new Vector3(0, 0, ownership * 180), popTime)
 			.OnComplete(() =>
 			{
-				element.animeLock = false;
+				element.inspectLock = false;
 				UpdateHandicapPosition();
 			}));
 		seq.Play();
 	}
 
 
-
-
-
-
-	private float updateTime = 0.2f;
 	public void UpdateHandicapPosition()
 	{
 		UpdateElements();
 
 		for (int i = 0; i < handiCards.Count; i++)
 		{
-			handiCards[i].animeLock = true;
+			float updateTime = 0.2f;
+			handiCards[i].inspectLock = true;
 			Vector3 oriPos = handiCards[i].transform.position;
 			Vector3 dstPos = handiCards[i].handicapLogicPosition;
 			//TODO config
 			int temp = i;
 			handiCards[i].transform.DOMove(dstPos, updateTime)
-				.OnComplete(() => handiCards[temp].animeLock = false);
+				.OnComplete(() => handiCards[temp].inspectLock = false);
 			
 			handiCards[i].handicapOrder = i;
 		}
@@ -191,14 +210,16 @@ public class HandicapController : MonoBehaviour,
 
 
 
+
+
 	public float returnTime = 0.2f;
 	public BattleElementController draggingElement;
 	public void Insert(BattleElementController element)
 	{
 		//isDragging = true;
 		draggingElement = element;
-		draggingElement.animeLock = true;
-		draggingElement.transform.DOScale(draggingElement.handicapScale, returnTime).OnComplete(() => draggingElement.animeLock = false);
+		draggingElement.inspectLock = true;
+		draggingElement.transform.DOScale(draggingElement.handicapScale, returnTime).OnComplete(() => draggingElement.inspectLock = false);
 		element.transform.DOMove(GetLogicPosition(element.handicapIdx), returnTime).OnComplete(ResetHierachy);
 	}
 	private void ResetHierachy()
@@ -212,36 +233,5 @@ public class HandicapController : MonoBehaviour,
 		Vector3 offset = new Vector3((index - count / 2) * gridWidth + gridWidth / 2 * ((count + 1) % 2), 0, 0);
 		return transform.position + offset;
 	}
-	/// <summary>
-	/// 根据索引获取对应手牌区位置坐标
-	/// </summary>
-	/// <param name="index"></param>
-	/// <returns></returns>
-	//public Vector3 GetInsertionPosition(int index)
-	//{
-	//	return originalPosition + (1 - (ownership * 2)) * (index * new Vector3(gridWidth - length / 2, 0, 0));
-	//}
-
-	//public void OnPointerEnter(PointerEventData eventData)
-	//{
-	//	if(ownership != 0)
-	//	{
-	//		return;
-	//	}
-	//	if(isDragging)
-	//	{
-	//		return;
-	//	}
-	//	transform.DOMove(targetPosition, moveTime);
-	//}
-
-	//public void OnPointerExit(PointerEventData eventData)
-	//{
-	//	if (ownership != 0)
-	//	{
-	//		return;
-	//	}
-	//	transform.DOMove(originalPosition, moveTime);
-	//}
 }
 

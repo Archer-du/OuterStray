@@ -95,79 +95,47 @@ public class DeckTagController : MonoBehaviour, IComparable<DeckTagController>,
 		costText.text = cost.ToString();
 		counterText.text = category == "Construction" ? "" : counter.ToString();
 	}
+
+	public Color color;
 	private void LoadCardResources(string ID)
 	{
 		cardImage.sprite = Resources.Load<Sprite>("CardImage/" + ID);
 
-		Color color;
 		switch (category)
 		{
 			case "LightArmor":
-				if (UnityEngine.ColorUtility.TryParseHtmlString("#429656", out color))
-				{
-					backGround.color = color;
-					frame.color = color;
-					nameTag.color = color;
-					costTag.color = color;
-					deckCategoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[11];
-					categoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[11];
-				}
+				UnityEngine.ColorUtility.TryParseHtmlString("#429656", out color);
+				deckCategoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[11];
+				categoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[11];
 				break;
 			case "Artillery":
-				if (UnityEngine.ColorUtility.TryParseHtmlString("#CE8849", out color))
-				{
-					backGround.color = color;
-					frame.color = color;
-					nameTag.color = color;
-					costTag.color = color;
-					deckCategoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[8];
-					categoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[8];
-				}
+				UnityEngine.ColorUtility.TryParseHtmlString("#CE8849", out color);
+				deckCategoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[8];
+				categoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[8];
 				break;
 			case "Motorized":
-				if (UnityEngine.ColorUtility.TryParseHtmlString("#426A84", out color))
-				{
-					backGround.color = color;
-					frame.color = color;
-					nameTag.color = color;
-					costTag.color = color;
-					deckCategoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[9];
-					categoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[9];
-				}
+				UnityEngine.ColorUtility.TryParseHtmlString("#426A84", out color);
+				deckCategoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[9];
+				categoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[9];
 				break;
 			case "Guardian":
-				if (UnityEngine.ColorUtility.TryParseHtmlString("#97A5A4", out color))
-				{
-					backGround.color = color;
-					frame.color = color;
-					nameTag.color = color;
-					costTag.color = color;
-					deckCategoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[10];
-					categoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[10];
-				}
+				UnityEngine.ColorUtility.TryParseHtmlString("#97A5A4", out color);
+				deckCategoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[10];
+				categoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[10];
 				break;
 			case "Construction":
-				if (UnityEngine.ColorUtility.TryParseHtmlString("#7855A5", out color))
-				{
-					backGround.color = color;
-					frame.color = color;
-					nameTag.color = color;
-					costTag.color = color;
-					deckCategoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[12];
-					categoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[12];
-				}
+				UnityEngine.ColorUtility.TryParseHtmlString("#7855A5", out color);
+				deckCategoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[12];
+				categoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[12];
 				break;
 			case "Command":
-				if (UnityEngine.ColorUtility.TryParseHtmlString("#7855A5", out color))
-				{
-					color = Color.gray;
-					backGround.color = color;
-					frame.color = color;
-					nameTag.color = color;
-					costTag.color = color;
-				}
+				color = Color.gray;
 				break;
 		}
+		backGround.color = color;
+		frame.color = color;
+		nameTag.color = color;
+		costTag.color = color;
 	}
 
 	public void OnBeginDrag(PointerEventData eventData)
@@ -198,7 +166,7 @@ public class DeckTagController : MonoBehaviour, IComparable<DeckTagController>,
 		if (controller.sceneManager.currentNode is not MedicalNodeController) return;
 		if (category == "Command") return;
 
-		panel.InteractCheck(eventData.position, this);
+		panel.AddNewTag(eventData.position, this);
 
 		GetComponent<InspectPanelController>().inspectPanel.alpha = 0f;
 	}

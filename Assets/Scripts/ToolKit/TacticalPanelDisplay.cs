@@ -40,7 +40,6 @@ public class TacticalPanelDisplay : MonoBehaviour
 		sceneManager = GameManager.GetInstance().tacticalSceneManager;
 		mask.anchoredPosition = - gameObject.GetComponent<RectTransform>().anchoredPosition - new Vector2(300, 0);
 
-
 		this.category = category;
 		switch (category)
 		{
@@ -95,8 +94,7 @@ public class TacticalPanelDisplay : MonoBehaviour
 			Panel.SetActive(false);
 		});
 	}
-	[Obsolete]
-	public bool InteractCheck(Vector3 position, DeckTagController deckTag)
+	public bool AddNewTag(Vector3 position, DeckTagController deckTag)
 	{
 		if(category != "Promote" || !sceneManager.panelEnabled)
 		{

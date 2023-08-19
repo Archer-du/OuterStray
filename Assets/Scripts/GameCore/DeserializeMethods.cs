@@ -55,9 +55,4 @@ internal class DeserializeMethods
 			card.gasMineCost = int.Parse(cardObject[9]);
 		}
 	}
-
-	//internal static void EffectsDeserialize(out BattleElement element, string effects)
-	//{
-
-	//}
 }

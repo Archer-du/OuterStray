@@ -12,6 +12,7 @@ using UnityEngine.Rendering;
 using InputHandler;
 using DataCore.BattleElements;
 using System;
+using UnityEngine.SceneManagement;
 
 public class BattleElementController : MonoBehaviour
 {
@@ -23,13 +24,15 @@ public class BattleElementController : MonoBehaviour
 	public event Action AnimeLocked;
 	public event Action AnimeUnlocked;
 
-	private static bool GlobalAnimeLock;
+	public static bool targetSelectionLock = false;
+
+	private static bool DraggingLock = false;
 	public static bool draggingLock
 	{
-		get => GlobalAnimeLock;
+		get => DraggingLock;
 		set
 		{
-			GlobalAnimeLock = value;
+			DraggingLock = value;
 			if(value == true)
 			{
 				GlobalAnimeLocked?.Invoke();
@@ -40,13 +43,13 @@ public class BattleElementController : MonoBehaviour
 			}
 		}
 	}
-	[SerializeField] private bool AnimeLock;
-	public bool animeLock
+	[SerializeField] private bool InspectLock;
+	public bool inspectLock
 	{
-		get => AnimeLock;
+		get => InspectLock;
 		set
 		{
-			AnimeLock = value;
+			InspectLock = value;
 			if(value == true)
 			{
 				AnimeLocked?.Invoke();
@@ -67,6 +70,8 @@ public class BattleElementController : MonoBehaviour
 	[Header("BasicInfo")]
 	public Vector3 battleFieldScale;
 	public Vector3 handicapScale;
+	public Vector3 castScale;
+	public Vector3 targetScale;
 
 	public Vector3 targetTextScale;
 	public Vector3 originTextScale;
@@ -110,6 +115,8 @@ public class BattleElementController : MonoBehaviour
 		}
 	}
 	public Canvas canvas;
+
+	public CanvasGroup selfCanvas;
 
 	public HandicapController handicap
 	{
@@ -164,12 +171,15 @@ public class BattleElementController : MonoBehaviour
 	[Header("Components")]
 	public HandicapInspector handicapInspect;
 
+
 	public void TransformInfoInit()
 	{
 		componentPosition = InspectComponent.transform.position;
 
 		battleFieldScale = transform.localScale;
 		handicapScale = 1.35f * battleFieldScale;
+		castScale = 1.5f * battleFieldScale;
+		targetScale = 1.25f * battleFieldScale;
 
 		targetTextScale = nameText.transform.localScale * 1.35f;
 		originTextScale = nameText.transform.localScale;
@@ -194,7 +204,7 @@ public class BattleElementController : MonoBehaviour
 		this.category = categories;
 		this.description = description;
 
-		animeLock = false;
+		inspectLock = false;
 		inputLock = false;
 		//输入偏移量
 		inputOffset = new Vector2(1980, 1080);
@@ -256,5 +266,23 @@ public class BattleElementController : MonoBehaviour
 		componentFrame.color = color;
 		NameTag.color = color;
 		costTag.color = color;
+	}
+
+
+
+
+
+	public int GetBattleLineIdx(float y)
+	{
+		if (y > BattleLineController.fieldLowerBound && y < BattleLineController.fieldUpperBound)
+		{
+			int idx = (int)((y - 180) / (BattleLineController.lineWidth + BattleLineController.lineInterval));
+			if (idx < 0 || idx > battleSceneManager.fieldCapacity - 1)
+			{
+				return -1;
+			}
+			return idx;
+		}
+		return -1;
 	}
 }

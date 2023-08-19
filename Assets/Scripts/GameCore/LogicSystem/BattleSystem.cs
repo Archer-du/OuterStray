@@ -144,8 +144,6 @@ namespace LogicCore
 		{
 			this.final = final;
 			eventTable = new EventTable[2] { new EventTable(), new EventTable() };
-			//ReParse?.Invoke();
-
 
 			result = BattleResult.normal;
 
@@ -161,8 +159,6 @@ namespace LogicCore
 
 			//数据层初始化
 			TURN = initialTurn;
-			controller.UpdateTurn(TURN);
-
 
 			if (fieldCapacity != 4)
 			{
@@ -182,7 +178,7 @@ namespace LogicCore
 			BuildHumanStack(playerDeck);
 			BuildPlantStack(enemyDeck);
 
-			BuildHandicaps(initialHumanHandicaps, initialPlantHandicaps);
+			BuildHandicaps(initialHumanHandicaps, initialPlantHandicaps, initialTurn);
 
 			FieldPreset(playerDeck.bases ,fieldPresets);
 
@@ -262,31 +258,31 @@ namespace LogicCore
 		}
 
 
-		private void BuildHandicaps(int initialHumanHandicaps, int initialPlantHandicaps)
+		private void BuildHandicaps(int initialHumanHandicaps, int initialPlantHandicaps, int initialTurn)
 		{
 			//TODO simplify
 			handicaps[0] = new RedemptionZone();
 			handicaps[1] = new RedemptionZone();
 			handicaps[0].controller = controller.InstantiateHandicap(0);
-			handicaps[0].controller.Init();
+			handicaps[0].controller.Init(0);
 			handicaps[1].controller = controller.InstantiateHandicap(1);
-			handicaps[1].controller.Init();
+			handicaps[1].controller.Init(1);
 
 			List<BattleElement>[] list;
 			list = new List<BattleElement>[2];
 			list[0] = new List<BattleElement>();
 			list[1] = new List<BattleElement>();
 			//初始化手牌
-			for(int i = 0; i < initialHumanHandicaps; i++)
+			for(int i = 0; i < initialHumanHandicaps + (initialTurn == 0 ? 1 : 0); i++)
 			{
 				list[0].Add(stacks[0].RandomPop());
 			}
-			for (int i = 0; i < initialPlantHandicaps; i++)
+			for (int i = 0; i < initialPlantHandicaps + (initialTurn == 1 ? 1 : 0); i++)
 			{
 				list[1].Add(stacks[1].RandomPop());
 			}
-			handicaps[0].Fill(list[0]);
-			handicaps[1].Fill(list[1]);
+			handicaps[0].Fill(list[0], initialTurn);
+			handicaps[1].Fill(list[1], initialTurn);
 		}
 
 		internal void FieldPreset(UnitElement playerBase, List<BattleNode.FieldPreset> fieldPresets)
@@ -381,16 +377,9 @@ namespace LogicCore
 			Settlement();
             if (result != BattleResult.normal) { return; }
 
-            if (dstLineIdx == frontLines[TURN])
-			{
-				eventTable[TURN].RaiseEvent("EnterFrontLine", element, this);
-				element.eventTable.RaiseEvent("EnterFrontLine", element, this);
-			}
-			eventTable[TURN].RaiseEvent("UnitDeployed", element, this);
 
 			eventTable[TURN].RaiseEvent("UpdateAura", null, this);
 			eventTable[(TURN + 1) % 2].RaiseEvent("UpdateAura", null, this);
-
 
 			controller.Settlement();
 		}
@@ -412,14 +401,7 @@ namespace LogicCore
 			//显示层更新
 			controller.UpdateEnergy(energy[TURN]);
 
-			if(element.type != "Target")
-			{
-				element.Cast(null);
-			}
-			else
-			{
-				element.Cast(battleLines[dstLineIdx][dstIdx]);
-			}
+			element.Cast(battleLines[dstLineIdx][dstIdx]);
 			if(element.dynDurability > 0)
 			{
 				stacks[TURN].Push(element);
@@ -432,6 +414,39 @@ namespace LogicCore
 
 
             eventTable[TURN].RaiseEvent("UpdateAura", null, this);
+			eventTable[(TURN + 1) % 2].RaiseEvent("UpdateAura", null, this);
+
+			controller.Settlement();
+		}
+		public void Cast(int handicapIdx)
+		{
+			if (handicaps[TURN][handicapIdx] is CommandElement)
+			{
+				//throw event TODO
+				eventTable[TURN].RaiseEvent("", null, this);
+			}
+
+			int cost = handicaps[TURN][handicapIdx].cost;
+			//手牌区弹出卡牌
+			CommandElement element = handicaps[TURN].Pop(handicapIdx) as CommandElement;
+			//消耗费用
+			energy[TURN] -= cost;
+			//显示层更新
+			controller.UpdateEnergy(energy[TURN]);
+
+			element.Cast(null);
+			if (element.dynDurability > 0)
+			{
+				stacks[TURN].Push(element);
+			}
+
+			UpdateFrontLine();
+			UpdateAttackRange();
+			Settlement();
+			if (result != BattleResult.normal) { return; }
+
+
+			eventTable[TURN].RaiseEvent("UpdateAura", null, this);
 			eventTable[(TURN + 1) % 2].RaiseEvent("UpdateAura", null, this);
 
 			controller.Settlement();
@@ -478,12 +493,6 @@ namespace LogicCore
 			Settlement();
             if (result != BattleResult.normal) { return; }
 
-            if (dstLineIdx == frontLines[TURN])
-			{
-				eventTable[TURN].RaiseEvent("EnterFrontLine", element, this);
-				element.eventTable.RaiseEvent("EnterFrontLine", element, this);
-			}
-			eventTable[TURN].RaiseEvent("UnitMoved", null, this);
 
 			eventTable[TURN].RaiseEvent("UpdateAura", null, this);
 			eventTable[(TURN + 1) % 2].RaiseEvent("UpdateAura", null, this);
@@ -515,6 +524,7 @@ namespace LogicCore
 			Settlement();
             if (result != BattleResult.normal) { return; }
 
+
             eventTable[TURN].RaiseEvent("UpdateAura", null, this);
 			eventTable[(TURN + 1) % 2].RaiseEvent("UpdateAura", null, this);
 		}
@@ -528,17 +538,19 @@ namespace LogicCore
 			energySupply[TURN] = energySupply[TURN] + 1 > 5 ? 5 : energySupply[TURN] + 1;
 			controller.UpdateEnergySupply(energySupply[TURN]);
 
+
+			RotateSettlement();
+			if(result != BattleResult.normal) { return; }
+
+
+			//新回合
+			TURN = (TURN + 1) % 2;
 			//发牌
 			if (handicaps[TURN].count < handicaps[TURN].capacity)
 			{
 				BattleElement element = stacks[TURN].RandomPop();
 				handicaps[TURN].Push(element);
 			}
-
-			RotateSettlement();
-			if(result != BattleResult.normal) { return; }
-
-			TURN = (TURN + 1) % 2;
 
 			//TODO config
 			energy[TURN] = energy[TURN] + energySupply[TURN] > 15 ? 15 : energy[TURN] + energySupply[TURN];
