@@ -2,12 +2,9 @@ using DataCore.BattleElements;
 using DataCore.BattleItems;
 using DataCore.Cards;
 using LogicCore;
-using PlasticPipe.PlasticProtocol.Messages;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Xml.Linq;
-using static System.Net.Mime.MediaTypeNames;
 
 
 namespace EventEffectModels

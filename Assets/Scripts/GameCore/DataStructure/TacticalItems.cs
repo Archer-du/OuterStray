@@ -5,12 +5,9 @@ using DataCore.CultivateItems;
 using DisplayInterface;
 using InputHandler;
 using LogicCore;
-using NetMQ.Sockets;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Security.Cryptography.X509Certificates;
 using Unity.Plastic.Newtonsoft.Json;
 
 namespace DataCore.TacticalItems

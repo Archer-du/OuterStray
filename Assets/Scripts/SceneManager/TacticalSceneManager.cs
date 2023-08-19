@@ -4,11 +4,9 @@ using InputHandler;
 using SceneState;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.XR;
 
 public class TacticalSceneManager : MonoBehaviour,
 	ITacticalSceneController
