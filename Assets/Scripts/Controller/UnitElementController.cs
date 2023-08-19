@@ -586,12 +586,14 @@ public class UnitElementController : BattleElementController,
 
 
 
-
-
-	private float timer = 0;
+	public Transform Component;
+	public void Start()
+	{
+		
+	}
 	void Update()
 	{
-		if(globalAnimeLock == false && dataState == ElementState.inBattleLine)
+		if(draggingLock == false && dataState == ElementState.inBattleLine)
 		{
 			transform.DOScale(battleFieldScale, duration);
 		}

@@ -341,10 +341,10 @@ public class BattleSceneManager : MonoBehaviour,
 
 
 
-	float fieldLowerBound = 220f;
-	float fieldUpperBound = 1970f;
-	float lineInterval = 66f;
-	float lineWidth = 400f;
+	//float fieldLowerBound = 220f;
+	//float fieldUpperBound = 1970f;
+	//float lineInterval = 66f;
+	//float lineWidth = 400f;
 
 	private Vector2 GetHandicapPosition(int ownership)
 	{

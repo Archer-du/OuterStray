@@ -24,7 +24,7 @@ public class BattleElementController : MonoBehaviour
 	public event System.Action AnimeUnlocked;
 
 	private static bool GlobalAnimeLock;
-	public static bool globalAnimeLock
+	public static bool draggingLock
 	{
 		get => GlobalAnimeLock;
 		set

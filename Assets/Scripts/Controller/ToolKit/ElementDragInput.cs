@@ -22,7 +22,7 @@ public class ElementDragInput : MonoBehaviour,
 
 	public void OnBeginDrag(PointerEventData eventData)
 	{
-		if (BattleElementController.globalAnimeLock) return;
+		if (BattleElementController.draggingLock) return;
 		if (BattleSceneManager.Turn != 0) return;
 		//if (controller.battleSceneManager.sequenceTime != 0) return;
 		if (controller.animeLock) return;
@@ -32,7 +32,7 @@ public class ElementDragInput : MonoBehaviour,
 		if (controller.dataState == ElementState.inHandicap)
 		{
 			if(inspector != null) { inspector.active = false; inspector.DisablePanel(); }
-			BattleElementController.globalAnimeLock = true;
+			BattleElementController.draggingLock = true;
 		}
 		if (controller.dataState == ElementState.inBattleLine)
 		{
@@ -41,7 +41,7 @@ public class ElementDragInput : MonoBehaviour,
 			if (unit.category == "Construction") return;
 
 			if(inspector != null) { inspector.active = false; }
-			BattleElementController.globalAnimeLock = true;
+			BattleElementController.draggingLock = true;
 		}
 	}
 
@@ -51,7 +51,7 @@ public class ElementDragInput : MonoBehaviour,
         //if (controller.animeLock) return;
         //if (controller.inputLock) return;
         if (controller.ownership != 0) return;
-		if (BattleElementController.globalAnimeLock)
+		if (BattleElementController.draggingLock)
 		{
 			if(inspector != null) { inspector.active = false; inspector.DisablePanel(); }
 			transform.SetParent(buffer);
@@ -70,7 +70,7 @@ public class ElementDragInput : MonoBehaviour,
 		if (controller.ownership != 0) return;
 
 		if (inspector != null) { inspector.active = controller.dataState == ElementState.inBattleLine; }
-		BattleElementController.globalAnimeLock = false;
+		BattleElementController.draggingLock = false;
 
 		if (controller.dataState == ElementState.inHandicap)
 		{

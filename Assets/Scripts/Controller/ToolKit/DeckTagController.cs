@@ -72,6 +72,11 @@ public class DeckTagController : MonoBehaviour, IComparable<DeckTagController>,
 		descriptionText.text = description;
 
 	}
+	public Transform Component;
+	public void Start()
+	{
+		
+	}
 	public void UpdateInfo()
 	{
 		if (category == "Command")
