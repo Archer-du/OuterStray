@@ -13,6 +13,7 @@ using System.IO;
 using UnityEditor;
 using JetBrains.Annotations;
 using System.Linq;
+using BehaviorTree;
 
 public class BattleSceneManager : MonoBehaviour,
 	IBattleSceneController
@@ -102,11 +103,17 @@ public class BattleSceneManager : MonoBehaviour,
 	//结算锁
 	public static bool settlement = false;
 
-	public void Start()
+	// 行为树
+	public BTBattleNode btBattleNode;
+
+    public void Start()
 	{
 		Settler.gameObject.transform.position = new Vector3(0, 2160, 0);
 		SettleButton.onClick.AddListener(BattleOverChecked);
-	}
+
+		// 根据战斗节点选择对应的行为树
+		btBattleNode = new BTBattleNode0();
+    }
 	public void FieldInitialize(IBattleSystemInput handler, int fieldCapacity)
 	{
 		gameManager = GameManager.GetInstance();
@@ -194,10 +201,11 @@ public class BattleSceneManager : MonoBehaviour,
 		else
 		{
 			buttonImage.color = Color.gray;
-
-			// StartCoroutine(AIBehavior());
 			skipButton.enabled = false;
-		}
+
+			// 启动行为树
+            StartCoroutine(btBattleNode.BehaviorTree());
+        }
 	}
 	private void UpdateTurn()
 	{
@@ -217,8 +225,9 @@ public class BattleSceneManager : MonoBehaviour,
 			buttonImage.color = Color.gray;
 			skipButton.enabled = false;
 
-			// StartCoroutine(AIBehavior());
-		}
+            // 启动行为树
+            StartCoroutine(btBattleNode.BehaviorTree());
+        }
 	}
 	public void TurnUpdateAnimation(int TURN)
 	{
@@ -510,11 +519,6 @@ public class BattleSceneManager : MonoBehaviour,
 		battleSystem.Cast(handicapIdx, dstLineIdx, dstIdx);
 	}
 
-
-
-
-
-
 	public void DisableAllSelectionFrame()
 	{
 		foreach(BattleLineController line in battleLines)
@@ -766,90 +770,6 @@ public class BattleSceneManager : MonoBehaviour,
         }
 		return false;
     }
-
-    /*IEnumerator AIBehaviourNode3()
-	{
-        HandicapController handicap = handicapController[1];
-
-        float waitTime = 0.9f;
-        yield return new WaitForSeconds(waitTime);
-
-        int movetimes = 1;
-		int frontLineIdx = GetFrontLineIdx();
-
-        // 移动策略：调整各蘑人站位，血量少的往前推，血量多的往后撤，使回合结束增殖时收益最大
-		// 从支援战线开始遍历一次，调整站位
-        for (int i = battleLineControllers.Length - 1; i > frontLineIdx; i--)
-        {
-            int halfCapacity = battleLineControllers[i].capacity / 2;
-
-            // 单位数大于容量的一半时，将本战线血量低的单位往前推
-            while (battleLineControllers[i].count > halfCapacity && i > frontLineIdx + 1)
-            {
-                Tuple<int, int> minHealthInfo = GetAvailableMinHealth(i);
-                int minHealthPointer = minHealthInfo.Item2;
-
-				// 若存在可操作对象，则执行操作
-				if (minHealthPointer > -1)
-				{
-                    AIMove(i, minHealthPointer, i + 1, 0);
-                    movetimes++;
-                }
-            }
-
-            // 当单位数小于或等于容量的一半减一，且前一条战线单位数大于容量一半时，将前一条战线血量高的往后撤
-            while (battleLineControllers[i].count <= halfCapacity - 1 && battleLineControllers[i - 1].count > battleLineControllers[i - 1].capacity / 2 && i > frontLineIdx + 1)
-            {
-                Tuple<int, int> maxHealthInfo = GetAvailableMaxHealth(i - 1);
-                int maxHealthPointer = maxHealthInfo.Item2;
-
-				if(maxHealthPointer > -1)
-				{
-                    AIMove(i - 1, maxHealthPointer, i, 0);
-                    movetimes++;
-                }
-            }
-        }
-		// 反向遍历一次，使站位更合理
-		for (int i = frontLineIdx + 1; i < battleLineControllers.Length; i++)
-		{
-			int halfCapacity = battleLineControllers[i].capacity / 2;
-
-			// 当单位数大于容量一半，且后一条战线单位数小于容量一半时，将本战线血量高的往后撤
-			while (battleLineControllers[i].count > halfCapacity && battleLineControllers[i + 1].count <= battleLineControllers[i + 1].capacity / 2 && i < fieldCapacity - 1)
-            {
-				Tuple<int, int> maxHealthInfo = GetAvailableMaxHealth(i);
-				int maxHealthPointer = maxHealthInfo.Item2;
-
-				if (maxHealthPointer > -1)
-				{
-                    AIMove(i, maxHealthPointer, i + 1, 0);
-                    movetimes++;
-                }
-			}
-
-			// 当单位数小于或等于容量一半加一,且后一条战线单位数大于或等于容量一半时，将后一条战线血量低的往前推
-			while (battleLineControllers[i].count <= halfCapacity + 1 && battleLineControllers[i + 1].count > battleLineControllers[i + 1].capacity / 2 && i < fieldCapacity - 1)
-			{
-				Tuple<int, int> minHealthInfo = GetAvailableMinHealth(i + 1);
-				int minHealthPointer = minHealthInfo.Item2;
-
-				if(minHealthPointer > -1)
-				{
-                    AIMove(i + 1, minHealthPointer, i, 0);
-                    movetimes++;
-                }
-			}
-		}
-
-		// 指令卡策略：费用够就出
-		while (energy[Turn] > 3 && handicap.count > 0)
-		{
-			AICast(0, 0, 0);
-		}
-
-		Skip();
-    }*/
 
 	/// <summary>
 	/// 获取某条战线的建筑数量
