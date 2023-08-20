@@ -8,6 +8,8 @@ using DisplayInterface;
 using SystemEventHandler;
 using DataCore.CultivateItems;
 using DataCore.TacticalItems;
+using DataCore.BattleElements;
+using DataCore.Cards;
 
 namespace LogicCore
 {
@@ -28,12 +30,24 @@ namespace LogicCore
 		private List<Department> departments;
 		private int unlockProgress;
 
-		public CultivationSystem(ICultivateSceneController controller, TacticalSystem tacticalSystem, BattleSystem battleSystem)
+		public bool tutorial;
+
+		internal UnitElement[] bases;
+
+		public CultivationSystem(Pool pool, ICultivateSceneController controller, TacticalSystem tacticalSystem, BattleSystem battleSystem)
 		{
+			this.pool = pool;
+			tutorial = false;
 			//display
 			//gameManagement = gmdspl;
 			this.tacticalSystem = tacticalSystem;
 			this.battleSystem = battleSystem;
+
+			bases = new UnitElement[3];
+
+			bases[0] = new ConstructionElement(pool.GetCardByID("base_01") as UnitCard, battleSystem, null);
+			bases[1] = new ConstructionElement(pool.GetCardByID("base_02") as UnitCard, battleSystem, null);
+			bases[2] = new ConstructionElement(pool.GetCardByID("base_03") as UnitCard, battleSystem, null);
 
 			//departments = new List<Department>(SystemConfig.buildingNum);
 			//for(int i = 0; i < SystemConfig.buildingNum; i++)
@@ -45,27 +59,24 @@ namespace LogicCore
 			//	department.Fill(pool);
 			//}
 			//unlockProgress = 1;
+
+			
 		}
 		public void SetSceneController(ICultivateSceneController ctdspl)
 		{
 			this.controller = ctdspl;
 			playerDeck = new Deck(battleSystem, tacticalSystem, controller.InstantiateDeck());
 		}
-		/// <summary>
-		/// console version
-		/// </summary>
-		public void EnterTacticalSystem()
+		public void SetBase(int index)
 		{
-			// lock
+			playerDeck.bases = bases[index];
 		}
 
-		public void EnterExpedition()
-		{
-		}
+
 
 		public void FromPackImportDeck(int buildingID, int packID)
 		{
-			playerDeck.LoadDeckByPathHuman("Assets\\Config\\HumanDeckTest.csv");
+			playerDeck.LoadDeckByPathDisplay("Assets\\Config\\HumanDeckTest.csv");
 			controller.UpdateBasicInfo(tacticalSystem.gasMineToken, playerDeck.count, playerDeck.bases.oriHealth);
 
 			//if (buildingID < 0 || buildingID > unlockProgress - 1)
@@ -84,6 +95,18 @@ namespace LogicCore
 		internal void UnlockBuilding()
 		{
 			departments[unlockProgress++].Unlock();
+		}
+
+
+
+
+
+
+
+		public void LoadTutorialHumanDeck()
+		{
+			tutorial = true;
+			playerDeck.LoadDeckByPathDisplay("Assets\\Config\\TutorialData.csv");
 		}
 	}
 }

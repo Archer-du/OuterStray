@@ -49,6 +49,7 @@ namespace LogicCore
 		/// </summary>
 		public static int TURN;
 
+		public bool tutorial;
 
 		/// <summary>
 		/// 战线
@@ -132,7 +133,6 @@ namespace LogicCore
 
 		internal BattleResult result;
 		internal bool final;
-		//TODO
 		/// <summary>
 		/// 由战术层指定参数构建战场
 		/// </summary>
@@ -192,13 +192,11 @@ namespace LogicCore
 			energy[TURN] += energySupply[TURN];
 			controller.UpdateEnergy(energy[TURN]);
 		}
-		//TODO clear
 		internal void UnloadBattleField()
 		{
 			linesCapacity = 0;
 
 			//display
-
 			UnloadBattleLine();
 			UnloadStack();
 			UnloadHandicaps();
@@ -242,17 +240,16 @@ namespace LogicCore
 
 		private void BuildHumanStack(Deck deck)
 		{
-			stacks[0] = new RandomCardStack(0, controller.InstantiateCardStack(0));
+			stacks[0] = new RandomCardStack(0, controller.InstantiateCardStack(0), this);
 
 			stacks[0].Fill(deck);
 		}
 
 
 		//REVIEW
-		//TODO 导入方式与human不同
 		private void BuildPlantStack(Deck deck)
 		{
-			stacks[1] = new RandomCardStack(1, controller.InstantiateCardStack(1));
+			stacks[1] = new RandomCardStack(1, controller.InstantiateCardStack(1), this);
 
 			stacks[1].Fill(deck);
 		}
@@ -260,9 +257,8 @@ namespace LogicCore
 
 		private void BuildHandicaps(int initialHumanHandicaps, int initialPlantHandicaps, int initialTurn)
 		{
-			//TODO simplify
-			handicaps[0] = new RedemptionZone();
-			handicaps[1] = new RedemptionZone();
+			handicaps[0] = new RedemptionZone(this);
+			handicaps[1] = new RedemptionZone(this);
 			handicaps[0].controller = controller.InstantiateHandicap(0);
 			handicaps[0].controller.Init(0);
 			handicaps[1].controller = controller.InstantiateHandicap(1);
@@ -582,8 +578,6 @@ namespace LogicCore
 		public void BattleWinned()
 		{
 			controller.BattleWinned();
-			tacticalSystem.playerDeck.WriteBack();
-			UnloadBattleField();
 		}
 		public bool BattleOverChecked()
 		{
@@ -593,7 +587,6 @@ namespace LogicCore
 				return false;
 			}
 			tacticalSystem.playerDeck.InstantiateDeckTags();
-			//TODO win or fail
 			if(result == BattleResult.win)
 			{
 				tacticalSystem.BattleCampaignCompleted();
@@ -602,10 +595,90 @@ namespace LogicCore
 			{
 				tacticalSystem.Exit();
 				return false;
-
 			}
 			return true;
 		}
+
+
+
+
+		internal BattleElement[] rewards;
+		public void GetReward()
+		{
+			rewards = new BattleElement[3];
+			Random random = new Random();
+
+			string[] IDs = new string[3];
+			string[] names = new string[3];
+			string[] categories = new string[3];
+			int[] costs = new int[3];
+			int[] attacks = new int[3];
+			int[] healths = new int[3];
+			int[] counters = new int[3];
+			string[] descriptions = new string[3];
+
+			//TODO config
+			for(int i = 0; i < 3; i++)
+			{
+				int index = random.Next(0, pool.cardPool.Count);
+				Card card = pool[index];
+				BattleElement reward = null;
+
+				IDs[i] = card.backendID;
+				names[i] = card.name;
+				categories[i] = card.category;
+				costs[i] = card.cost;
+				descriptions[i] = card.description;
+
+				switch (card.category)
+				{
+					case "LightArmor":
+						reward = new LightArmorElement(card as UnitCard, this, null);
+						counters[i] = (reward as UnitElement).oriAttackCounter;
+						attacks[i] = (reward as UnitElement).oriAttack;
+						healths[i] = (reward as UnitElement).oriHealth;
+						break;
+					case "Artillery":
+						reward = new ArtilleryElement(card as UnitCard, this, null);
+						counters[i] = (reward as UnitElement).oriAttackCounter;
+						attacks[i] = (reward as UnitElement).oriAttack;
+						healths[i] = (reward as UnitElement).oriHealth;
+						break;
+					case "Motorized":
+						reward = new MotorizedElement(card as UnitCard, this, null);
+						counters[i] = (reward as UnitElement).oriAttackCounter;
+						attacks[i] = (reward as UnitElement).oriAttack;
+						healths[i] = (reward as UnitElement).oriHealth;
+						break;
+					case "Guardian":
+						reward = new GuardianElement(card as UnitCard, this, null);
+						counters[i] = (reward as UnitElement).oriAttackCounter;
+						attacks[i] = (reward as UnitElement).oriAttack;
+						healths[i] = (reward as UnitElement).oriHealth;
+						break;
+					case "Construction":
+						reward = new ConstructionElement(card as UnitCard, this, null);
+						counters[i] = (reward as UnitElement).oriAttackCounter;
+						attacks[i] = (reward as UnitElement).oriAttack;
+						healths[i] = (reward as UnitElement).oriHealth;
+						break;
+					case "Command":
+						reward = new CommandElement(card as CommandCard, this);
+						counters[i] = (reward as CommandElement).oriDurability;
+						break;
+				}
+				rewards[i] = reward;
+			}
+			controller.InstantiateReward(IDs, names, categories, costs, attacks, healths, counters, descriptions);
+		}
+		public void AddReward(int index)
+		{
+			tacticalSystem.playerDeck.WriteBack(rewards[index]);
+			UnloadBattleField();
+		}
+
+
+
 
 
 
@@ -645,6 +718,7 @@ namespace LogicCore
 				{
 					frontLines[0] = i;
 					frontLines[1] = i + 1;
+					controller.UpdateFrontLine(frontLines[0]);
 				}
 			}
 		}
@@ -777,7 +851,7 @@ namespace LogicCore
 			}
 		}
 		/// <summary>
-		/// 查询敌方随机目标 TODO
+		/// 查询敌方随机目标
 		/// </summary>
 		/// <returns></returns>
 		internal UnitElement RandomEnemy(int ownership)

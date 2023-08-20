@@ -11,6 +11,7 @@ using DataCore.TacticalItems;
 using DisplayInterface;
 using System.Xml.Linq;
 using System.Data;
+using LogicCore;
 
 namespace DataCore.BattleItems
 {
@@ -168,6 +169,8 @@ namespace DataCore.BattleItems
 
 	internal class RandomCardStack
 	{
+		internal BattleSystem system;
+
 		private ICardStackController Controller;
 		internal ICardStackController controller
 		{
@@ -207,8 +210,10 @@ namespace DataCore.BattleItems
 		internal int ownership;
 
 
-		internal RandomCardStack(int ownership, ICardStackController controller)
+		internal RandomCardStack(int ownership, ICardStackController controller, BattleSystem system)
 		{
+			this.system = system;
+
 			stack = new List<BattleElement>(SystemConfig.stackCapacity);
 
 			UnitIDDic = new Dictionary<string, List<UnitElement>>();
@@ -323,14 +328,22 @@ namespace DataCore.BattleItems
 
 			UpdateStackIdx();
 		}
+		/// <summary>
+		/// 教程关中顺序出牌
+		/// </summary>
+		/// <returns></returns>
 		internal BattleElement RandomPop()
 		{
 			if(stack.Count == 0)
 			{
-				return null; //TODO
+				return null;
 			}
-			Random random = new Random();
-			int index = random.Next(0, stack.Count);
+			int index = 0;
+			if (!system.tutorial)
+			{
+				Random random = new Random();
+				index = random.Next(0, stack.Count);
+			}
 			BattleElement element = stack[index];
 			stack.RemoveAt(index);
 
@@ -464,6 +477,8 @@ namespace DataCore.BattleItems
 
 	internal class RedemptionZone
 	{
+		internal BattleSystem system;
+
 		public IHandicapController controller;
 
 		private List<BattleElement> handicap;
@@ -471,8 +486,9 @@ namespace DataCore.BattleItems
 
 		internal int capacity = 8;//TODO config
 		internal int count { get => handicap.Count; }
-		internal RedemptionZone()
+		internal RedemptionZone(BattleSystem system)
 		{
+			this.system = system;
 			handicap = new List<BattleElement>();
 		}
 		internal BattleElement this[int index]

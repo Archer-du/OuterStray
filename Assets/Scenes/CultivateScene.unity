@@ -843,7 +843,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &876261852
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1069,12 +1069,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerDeck: {fileID: 2046824504}
   buildingController: {fileID: 0}
-  startExpedition: {fileID: 1598127909}
+  baseChoose: {fileID: 0}
   testImportButton: {fileID: 499612559}
   gasMineText: {fileID: 1992509995}
   cardNumText: {fileID: 936259586}
   baseHealthText: {fileID: 1212789906}
   baseMaxHealthText: {fileID: 1905132251}
+  baseCardPrototype: {fileID: 5780374535151451473, guid: 4b0120fe8f595c74fa54c70db13e40e0, type: 3}
+  startExpedition: {fileID: 1598127909}
+  selectionIndex: 0
+  selections: []
+  duration: 0.5
 --- !u!4 &1023413388
 Transform:
   m_ObjectHideFlags: 0

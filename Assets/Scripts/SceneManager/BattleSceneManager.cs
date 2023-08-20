@@ -25,6 +25,11 @@ public class BattleSceneManager : MonoBehaviour,
 	/// </summary>
 	public GameManager gameManager;
 
+	public bool tutorial
+	{
+		get => gameManager.config.tutorial;
+	}
+
 	public Canvas Settler;
 	public Button SettleButton;
 	public TMP_Text SettleText;
@@ -44,6 +49,8 @@ public class BattleSceneManager : MonoBehaviour,
 
 	public GameObject unitPrototype;
 	public GameObject commandPrototype;
+
+	public GameObject rewardPrototype;
 
 	[Header("SubControllers")]
 	public BattleLineController[] battleLines;
@@ -80,6 +87,8 @@ public class BattleSceneManager : MonoBehaviour,
 	public int fieldCapacity;
 	public UnitElementController[] bases;
 	//TODO
+	[Header("Display")]
+	public GameObject FrontLine;
 	public GameObject humanEnergy;
 	public GameObject[] humanSlots;
 	public GameObject[] plantSlots;
@@ -92,9 +101,17 @@ public class BattleSceneManager : MonoBehaviour,
 	public EnergyDisplay energyDisplay;
 
 	[Header("Interaction")]
-	public Button exitButton;
 	public Button skipButton;
-	public Image buttonImage;
+	public Image SkipbuttonImage;
+
+	public CommandElementController castingCommand;
+
+	public Button exitButton;
+	public Button rewardConfirmButton;
+	public bool completed;
+
+	public int rewardSelectionIndex;
+	public RewardSelection[] rewards;
 
 	[Header("Sequence")]
 	public Sequence rotateSequence;
@@ -139,8 +156,12 @@ public class BattleSceneManager : MonoBehaviour,
 		bases = new UnitElementController[2];
 
 		skipButton.onClick.AddListener(Skip);
-		buttonImage = skipButton.gameObject.GetComponent<Image>();
+		SkipbuttonImage = skipButton.gameObject.GetComponent<Image>();
+
 		exitButton.onClick.AddListener(Exit);
+		rewardConfirmButton.onClick.AddListener(ContinueExpedition);
+
+		rewardConfirmButton.interactable = false;
 		
 		//TODO trigger
 		turnNum = 0;
@@ -153,6 +174,9 @@ public class BattleSceneManager : MonoBehaviour,
 
 		InputLocked?.Invoke();
 		AcquireSequence();
+
+		FrontLine.transform.position = 
+			new Vector3(0, BattleLineController.fieldLowerBound + BattleLineController.lineWidth + BattleLineController.lineInterval / 2, 0);
 	}
 	public void InitBases(IUnitElementController humanBase, IUnitElementController plantBase)
 	{
@@ -197,13 +221,15 @@ public class BattleSceneManager : MonoBehaviour,
 		
 		if (Turn == 0)
 		{
-			buttonImage.color = Color.white;
+			SkipbuttonImage.color = Color.white;
 			skipButton.enabled = true;
 		}
 		//如果是敌方回合，启动行为树
 		else
 		{
-			buttonImage.color = Color.gray;
+			SkipbuttonImage.color = Color.gray;
+
+			// StartCoroutine(AIBehavior());
 			skipButton.enabled = false;
 
 			// 启动行为树
@@ -219,13 +245,13 @@ public class BattleSceneManager : MonoBehaviour,
 
 		if (Turn == 0)
 		{
-			buttonImage.color = Color.white;
+			SkipbuttonImage.color = Color.white;
 			skipButton.enabled = true;
 		}
 		//如果是敌方回合，启动行为树
 		else
 		{
-			buttonImage.color = Color.gray;
+			SkipbuttonImage.color = Color.gray;
 			skipButton.enabled = false;
 
             // 启动行为树
@@ -282,6 +308,15 @@ public class BattleSceneManager : MonoBehaviour,
 			plantSlots[i].SetActive(true);
 		}
 	}
+	public float shiftTime;
+	public void UpdateFrontLine(int index)
+	{
+		shiftTime = 0.5f;
+		FrontLine.transform.DOMove(
+			new Vector3(0, BattleLineController.fieldLowerBound + BattleLineController.lineWidth + BattleLineController.lineInterval / 2
+			+ index * (BattleLineController.lineWidth + BattleLineController.lineInterval), 0), shiftTime);
+	}
+
 
 
 
@@ -388,6 +423,7 @@ public class BattleSceneManager : MonoBehaviour,
 				SettleText.DOFade(1f, duration);
 			})
 		);
+		completed = true;
 	}
 	public void BattleWinned()
 	{
@@ -400,38 +436,79 @@ public class BattleSceneManager : MonoBehaviour,
 			.OnComplete(() =>
 			{
 				SettleText.DOFade(1f, duration);
+				//rewardText TODO
 			})
 		);
+		completed = false;
 	}
 	public void BattleOverChecked()
 	{
-		BattleElementController[] otherInstances = UnityEngine.Object.FindObjectsOfType<BattleElementController>();
-
-		// 遍历并销毁除自身以外的同类型游戏对象
-		foreach (BattleElementController instance in otherInstances)
+		if (completed)
 		{
-			Destroy(instance.gameObject);
+			BattleElementController[] otherInstances = UnityEngine.Object.FindObjectsOfType<BattleElementController>();
+
+			// 遍历并销毁除自身以外的同类型游戏对象
+			foreach (BattleElementController instance in otherInstances)
+			{
+				Destroy(instance.gameObject);
+			}
+			DOTween.Clear();
+			Settler.transform.position = new Vector3(0, 2160, 0);
+			if (battleSystem.BattleOverChecked())
+			{
+				gameManager.BattleBGM.Stop();
+				gameManager.TacticalBGM.Play();
+
+				AsyncOperation async = gameManager.UpdateGameState(SceneState.GameState.Tactical);
+			}
 		}
-		DOTween.Clear();
-		Settler.transform.position = new Vector3(0, 2160, 0);
-		if (battleSystem.BattleOverChecked())
+		else
 		{
-			gameManager.BattleBGM.Stop();
-			gameManager.TacticalBGM.Play();
-
-			AsyncOperation async = gameManager.UpdateGameState(SceneState.GameState.Tactical);
+			SettleButton.enabled = false;
+			battleSystem.GetReward();
 		}
-
-		//StartCoroutine(LateWriteBack(async));
 	}
-	//IEnumerator LateWriteBack(AsyncOperation async)
-	//{
-	//	while (!async.isDone)
-	//	{
-	//		yield return null;
-	//	}
-	//	battleSystem.BattleOverChecked();
-	//}
+	public void ContinueExpedition()
+	{
+		battleSystem.AddReward(rewardSelectionIndex);
+
+		completed = true;
+		BattleOverChecked();
+	}
+	public float duration;
+	//TEST
+	public void InstantiateReward(string[] IDs, string[] names, string[] categories, int[] cost, int[] attacks, int[] healths, int[] counters, string[] description)
+	{
+		rewards = new RewardSelection[3];
+		duration = 0.5f;
+		rewards[0] = Instantiate(rewardPrototype, new Vector3(2500, 0, 0), Quaternion.Euler(new Vector3(0, 90, 0))).GetComponent<RewardSelection>();
+		rewards[1] = Instantiate(rewardPrototype, new Vector3(3000, 0, 0), Quaternion.Euler(new Vector3(0, 90, 0))).GetComponent<RewardSelection>();
+		rewards[2] = Instantiate(rewardPrototype, new Vector3(3500, 0, 0), Quaternion.Euler(new Vector3(0, 90, 0))).GetComponent<RewardSelection>();
+
+		rewards[0].index = 0;
+		rewards[1].index = 1;
+		rewards[2].index = 2;
+
+		rewards[0].transform.DOBlendableMoveBy(new Vector3(-2000, 0, 0), duration);
+		rewards[1].transform.DOBlendableMoveBy(new Vector3(-2000, 0, 0), duration);
+		rewards[2].transform.DOBlendableMoveBy(new Vector3(-2000, 0, 0), duration);
+	}
+	//interface
+	public void ClearOtherSelectionFrame()
+	{
+		foreach (RewardSelection reward in rewards)
+		{
+			if (reward.index != rewardSelectionIndex)
+			{
+				reward.Frame.SetActive(false);
+				reward.disableExit = false;
+				reward.transform.DOScale(reward.originScale, reward.duration);
+			}
+		}
+	}
+	
+
+
 
 
 
@@ -441,6 +518,8 @@ public class BattleSceneManager : MonoBehaviour,
 		rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
 	}
+
+
 
 
 
@@ -529,7 +608,6 @@ public class BattleSceneManager : MonoBehaviour,
 			line.lineDisplay.DisableSelectionFrame();
 		}
 	}
-
 
 
 

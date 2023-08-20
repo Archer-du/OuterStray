@@ -4,12 +4,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class TargetInspector : MonoBehaviour,
-	IPointerEnterHandler, IPointerExitHandler
+public class TargetSelection : MonoBehaviour,
+	IPointerEnterHandler, IPointerExitHandler,
+	IPointerClickHandler
 {
 	public float duration;
 
-	public BattleElementController controller;
+	public UnitElementController controller;
+
+	public CommandElementController castingCommand
+	{
+		get => controller.battleSceneManager.castingCommand;
+	}
 	public void OnPointerEnter(PointerEventData eventData)
 	{
 		if(BattleElementController.targetSelectionLock)
@@ -29,6 +35,16 @@ public class TargetInspector : MonoBehaviour,
 			{
 				transform.DOScale(controller.battleFieldScale, duration);
 			}
+		}
+	}
+
+	public void OnPointerClick(PointerEventData eventData)
+	{
+		if (BattleElementController.targetSelectionLock)
+		{
+			controller.battleSceneManager.PlayerTargetCast(castingCommand.handicapIdx, controller.battleLine.index, controller.resIdx);
+
+			castingCommand.TargetCastAnimationOver();
 		}
 	}
 }

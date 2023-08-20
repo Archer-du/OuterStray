@@ -80,12 +80,16 @@ namespace DataCore.TacticalItems
 			//显示层自动更新层级
 		}
 		//TODO controller rebuild
-		internal void LoadDeckByPathHuman(string path)
+		internal void LoadDeckByPathDisplay(string path)
 		{
 			StreamReader reader = File.OpenText(path);
 
-			string ID = reader.ReadLine();
-			bases = new ConstructionElement(tacticalSystem.pool.GetCardByID(ID) as UnitCard, battleSystem, null);
+			string ID;
+			if (battleSystem.tutorial)
+			{
+				ID = reader.ReadLine();
+				bases = new ConstructionElement(tacticalSystem.pool.GetCardByID(ID) as UnitCard, battleSystem, null);
+			}
 			ID = reader.ReadLine();
 
 			while (ID != null)
@@ -161,7 +165,7 @@ namespace DataCore.TacticalItems
 
 			InstantiateDeckTags();
 		}
-		internal void LoadDeckByPathPlant(string path)
+		internal void LoadDeckByPathData(string path)
 		{
 			StreamReader reader = File.OpenText(path);
 
@@ -219,7 +223,7 @@ namespace DataCore.TacticalItems
 				deck[i].state = ElementState.inDeck;
 			}
 		}
-		internal void WriteBack()
+		internal void WriteBack(BattleElement reward)
 		{
 			RandomCardStack playerStack = battleSystem.stacks[0];
 			//lightArmorSet.Clear();
@@ -230,6 +234,8 @@ namespace DataCore.TacticalItems
 			//commandSet.Clear();
 
 			deck.Clear();
+
+			deck.Add(reward);
 			for(int i = 0; i < playerStack.count; i++)
 			{
 				deck.Add(playerStack.stack[i]);
@@ -405,6 +411,54 @@ namespace DataCore.TacticalItems
 		/// </summary>
 		internal void GenerateNodes()
 		{
+			if (tacticalSystem.tutorial)
+			{
+				if(index == 0)
+				{
+					length = 2;
+					nodeList.Add(new List<Node>(1));
+					//SourceNode 全局唯一
+					SourceNode s = new(0, 0, this,
+						controller.InstantiateNode(2, 1, 0, 0, "source"));
+					nodeList[0].Add(s);
+
+					nodeList.Add(new List<Node>(1));
+					BattleNode bn = new(1, 0, this,
+						controller.InstantiateNode(length, 1, 1, 0, "battle"),
+						battleSystem, "Assets\\Config\\NodeConfigs\\TutorialNode.json");
+					nodeList[1].Add(bn);
+					return;
+				}
+				if(index == 1)
+				{
+					length = 4;
+					nodeList.Add(new List<Node>(1));
+					nodeList[0].Add(prevTerrain.dstNode);
+
+					nodeList.Add(new List<Node>(1));
+					MedicalNode pn = new MedicalNode(1, 0, this,
+						controller.InstantiateNode(length, 1, 1, 0, "medical"));
+					nodeList[1].Add(pn);
+
+					nodeList.Add(new List<Node>(1));
+					OutPostNode on = new OutPostNode(2, 0, this,
+							controller.InstantiateNode(length, 1, 2, 0, "outpost"));
+					nodeList[2].Add(on);
+
+					nodeList.Add(new List<Node>(1));
+					SupplyNode sn = new SupplyNode(3, 0, this,
+						controller.InstantiateNode(length, 1, 3, 0, "supply"));
+					nodeList[3].Add(sn);
+
+
+					for (int j = 0; j < length - 1; j++)
+					{
+						nodeList[j][0].adjNode[0] = nodeList[j + 1][0];
+						nodeList[j][0].SetAdjacentNode();
+					}
+					return;
+				}
+			}
 			Random random = new Random();
 
 			//生成节点
@@ -425,7 +479,6 @@ namespace DataCore.TacticalItems
 							//SourceNode 全局唯一
 							SourceNode s = new(i, j, this, 
 								controller.InstantiateNode(length, width[i], i, j, "source"));
-							s.controller = controller.InstantiateNode(length, width[i], i, j, "source");
 							nodeList[i].Add(s);
 						}
 						//否则源节点是上一terrain的目的节点
@@ -688,7 +741,7 @@ namespace DataCore.TacticalItems
 			battleConfig = JsonConvert.DeserializeObject<BattleConfigJson>(jsonString);
 
 			plantDeck = new Deck(battleSystem, tacticalSystem, null);
-			plantDeck.LoadDeckByPathPlant(battleConfig.plantDeckPath);
+			plantDeck.LoadDeckByPathData(battleConfig.plantDeckPath);
 		}
 		internal override void CastNodeEvent()
 		{

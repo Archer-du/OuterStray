@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3711398530407322555}
   - component: {fileID: 2766085159130087641}
   m_Layer: 5
-  m_Name: line
+  m_Name: LineNet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

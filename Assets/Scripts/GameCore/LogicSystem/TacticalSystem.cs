@@ -9,6 +9,9 @@ using DisplayInterface;
 using SystemEventHandler;
 using System;
 using DataCore.BattleElements;
+using static DataCore.TacticalItems.BattleNode;
+using Unity.Plastic.Newtonsoft.Json;
+using System.IO;
 
 namespace LogicCore
 {
@@ -20,6 +23,11 @@ namespace LogicCore
 
 		internal BattleSystem battleSystem;
 		internal CultivationSystem cultivationSystem;
+
+		internal bool tutorial
+		{
+			get => cultivationSystem.tutorial;
+		}
 
 		internal List<Terrain> terrains;
 
@@ -108,7 +116,7 @@ namespace LogicCore
 			controller.UpdateBaseHealth(baseHealth, playerBase.maxHealthWriter);
 
 			//TODO
-			gasMineToken = 20;
+			gasMineToken = 100;
 			//TODO
 
 			BuildTerrains();
@@ -121,6 +129,7 @@ namespace LogicCore
 
 		public void BuildTerrains()
 		{
+			if (tutorial) battleNodeNum = 2;
 			//构建terrain
 			for(int i = 0; i < battleNodeNum; i++)
 			{
@@ -145,6 +154,10 @@ namespace LogicCore
 
 			//全局唯一source节点
 			currentNode = terrains[0].resNode;
+			if (tutorial)
+			{
+				currentNode = terrains[0].dstNode;
+			}
 
 			//显示层：当前节点更新
 			controller.UpdateCurrentNode(currentNode.controller);
@@ -152,7 +165,6 @@ namespace LogicCore
 			//显示层：当前terrain生成线网
 			currentTerrain.controller.GenerateLineNetFromSource();
 		}
-
 		/// <summary>
 		/// 进入节点
 		/// </summary>
