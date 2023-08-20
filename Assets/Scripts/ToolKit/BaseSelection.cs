@@ -23,8 +23,11 @@ public class BaseSelection : MonoBehaviour,
 	public void OnPointerClick(PointerEventData eventData)
 	{
 		disableExit = true;
+		Frame.SetActive(true);
+
 		manager.selectionIndex = index;
-		manager.startExpedition.interactable = true;
+		manager.startExpedition.enabled = true;
+		manager.startExpedition.image.color = Color.white;
 		manager.ClearOtherSelectionFrame();
 	}
 

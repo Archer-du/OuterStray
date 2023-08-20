@@ -10,6 +10,7 @@ using DataCore.CultivateItems;
 using DataCore.TacticalItems;
 using DataCore.BattleElements;
 using DataCore.Cards;
+using UnityEditor.Animations;
 
 namespace LogicCore
 {
@@ -70,6 +71,7 @@ namespace LogicCore
 		public void SetBase(int index)
 		{
 			playerDeck.bases = bases[index];
+			controller.UpdateBaseInfo(playerDeck.bases.oriHealth);
 		}
 
 
@@ -77,7 +79,7 @@ namespace LogicCore
 		public void FromPackImportDeck(int buildingID, int packID)
 		{
 			playerDeck.LoadDeckByPathDisplay("Assets\\Config\\HumanDeckTest.csv");
-			controller.UpdateBasicInfo(tacticalSystem.gasMineToken, playerDeck.count, playerDeck.bases.oriHealth);
+			controller.UpdateBasicInfo(tacticalSystem.gasMineToken, playerDeck.count);
 
 			//if (buildingID < 0 || buildingID > unlockProgress - 1)
 			//{

@@ -142,7 +142,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: b0e62b5a2e5f8df4d8d06931bc647f92, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 47d9150ea34ff5d42bad73e168b97ff5, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -220,8 +220,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u8611\u83C7\u8611\u83C7\u8611\u83C7"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 600236e9df5f4e94dab569f5d8a054c4, type: 2}
-  m_sharedMaterial: {fileID: -3815973376372354358, guid: 600236e9df5f4e94dab569f5d8a054c4, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: ca02bdeb21c26724b935a4d669e55b3a, type: 2}
+  m_sharedMaterial: {fileID: 2404960034371725898, guid: ca02bdeb21c26724b935a4d669e55b3a, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -623,7 +623,7 @@ MonoBehaviour:
   displayOffset: {x: 600, y: 0, z: 0}
   inspectPanel: {fileID: 7791636533920035237}
   SubPanel: {fileID: 0}
-  mainPanelEnabled: 0
+  mainPanelEnabled: 1
   subPanelEnabled: 0
 --- !u!1 &3465805072880246064
 GameObject:
@@ -691,7 +691,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 2d45d7c80e987894c801254accf93b7a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: fb546f006e4b3ee4182889df0d0b4888, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

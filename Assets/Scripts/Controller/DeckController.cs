@@ -22,6 +22,7 @@ public class DeckController : MonoBehaviour,
 	public GameObject deckTagPrototype;
 	public void Init(IDeckInput deck)
 	{
+		deckTagLock = false;
 		tags = new List<DeckTagController>();
 		this.deck = deck;
 	}
@@ -95,6 +96,25 @@ public class DeckController : MonoBehaviour,
 	{
 		tags[index].health = health;
 		tags[index].healthText.text = health.ToString();
+	}
+
+
+	public bool deckTagLock;
+	public void DisableAllDeckTags()
+	{
+		deckTagLock = true;
+		foreach(var tag in tags)
+		{
+			tag.GetComponent<InspectPanelController>().active = false;
+		}
+	}
+	public void EnableAllDeckTags()
+	{
+		deckTagLock = false;
+		foreach (var tag in tags)
+		{
+			tag.GetComponent<InspectPanelController>().active = true;
+		}
 	}
 
 	public bool IsEmpty()
