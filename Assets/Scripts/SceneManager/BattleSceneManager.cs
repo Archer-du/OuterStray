@@ -130,16 +130,8 @@ public class BattleSceneManager : MonoBehaviour,
 
 		skipButton.onClick.AddListener(Skip);
 		buttonImage = skipButton.gameObject.GetComponent<Image>();
-<<<<<<< HEAD
-
-		fieldWidth = GameObject.Find("BattleField").GetComponent<RectTransform>().rect.width;
-		fieldHeight = GameObject.Find("BattleField").GetComponent<RectTransform>().rect.height;
-
-		dialogController = GetComponent<TurnMappedDialogger>();
-=======
 		exitButton.onClick.AddListener(Exit);
 		
->>>>>>> 0ae7d296fbd201bc6617cfd582379d8e4ed54991
 		//TODO trigger
 		turnNum = 0;
 
@@ -190,12 +182,9 @@ public class BattleSceneManager : MonoBehaviour,
 
 		Turn = TURN;
 		turnNum++;
-<<<<<<< HEAD
-=======
 
 		TurnUpdateAnimation(TURN);
 		
->>>>>>> 0ae7d296fbd201bc6617cfd582379d8e4ed54991
 		if (Turn == 0)
 		{
 			buttonImage.color = Color.white;
@@ -464,30 +453,7 @@ public class BattleSceneManager : MonoBehaviour,
 
 	public int PlayerDeploy(int handicapIdx, int lineIdx, int pos)
 	{
-<<<<<<< HEAD
-		int idx = GetBattleLineIdx(position.y);
-		if (idx != 0)
-		{
-			return -1;
-		}
-		if (energy[0] < handicapController[0][handicapIdx].cost)
-		{
-			humanEnergy.transform.DOShakePosition(0.3f, 30f);
-			return -1;
-		}
-		//如果容量不足
-		int pos = battleLineControllers[idx].GetDeployPos(position.x);
-		if (pos < 0) return -1;
-		//---解析输入---
-
-
-		InputLocked?.Invoke();
-		sequenceTime = 0;
-		rotateSequence.Kill();
-		rotateSequence = DOTween.Sequence();
-=======
 		AcquireSequence();
->>>>>>> 0ae7d296fbd201bc6617cfd582379d8e4ed54991
 
 		UnitElementController controller = handicapController[0].Pop(handicapIdx) as UnitElementController;
 
@@ -495,37 +461,6 @@ public class BattleSceneManager : MonoBehaviour,
 
 		return 1;
 	}
-<<<<<<< HEAD
-	public int PlayerCast(Vector2 position, int handicapIdx)
-	{
-		int idx = GetBattleLineIdx(position.y);
-		if (idx < 0)
-		{
-			return -1;
-		}
-		if (energy[0] < handicapController[0][handicapIdx].cost)
-		{
-			humanEnergy.transform.DOShakePosition(0.3f, 30f);
-			return -1;
-		}
-		int pos = battleLineControllers[idx].GetCastPos(position.x);
-		string type = (handicapController[0][handicapIdx] as CommandElementController).type;
-		if (pos < 0 && type == "Target") return -1;
-
-		sequenceTime = 0;
-		rotateSequence.Kill();
-		rotateSequence = DOTween.Sequence();
-
-		CommandElementController controller = handicapController[0].Pop(handicapIdx) as CommandElementController;
-
-		if (type == "Target") Debug.Log(controller.nameContent + " Cast on : " + idx + " " + pos + battleLineControllers[idx][pos].nameContent);
-		battleSystem.Cast(handicapIdx, idx, pos);
-
-		return 1;
-	}
-
-=======
->>>>>>> 0ae7d296fbd201bc6617cfd582379d8e4ed54991
 	/// <summary>
 	/// 
 	/// </summary>
@@ -535,32 +470,7 @@ public class BattleSceneManager : MonoBehaviour,
 	/// <returns></returns>
 	public int PlayerMove(int resLineIdx, int resIdx, int dstLineIdx, int dstPos)
 	{
-<<<<<<< HEAD
-		int dstLineIdx = GetBattleLineIdx(position.y);
-		if (dstLineIdx < 0) return -1;
-		int resLineIdx = resLine.lineIdx;
-		int resIdx = element.resIdx;
-		int dstPos = battleLineControllers[dstLineIdx].GetDeployPos(position.x);
-		if (dstPos < 0) return -1;
-
-		if (dstLineIdx == resLineIdx) return -1;
-		if (Math.Abs(dstLineIdx - resLineIdx) > element.moveRange) return -1;
-
-
-		if (battleLineControllers[dstLineIdx].ownerShip != element.ownership && battleLineControllers[dstLineIdx].count > 0)
-		{
-			return -1;
-		}
-		//解析成功
-
-
-		InputLocked?.Invoke();
-		sequenceTime = 0;
-		rotateSequence.Kill();
-		rotateSequence = DOTween.Sequence();
-=======
 		AcquireSequence();
->>>>>>> 0ae7d296fbd201bc6617cfd582379d8e4ed54991
 
 		battleSystem.Move(resLineIdx, resIdx, dstLineIdx, dstPos);
 
@@ -569,27 +479,9 @@ public class BattleSceneManager : MonoBehaviour,
 
 	public int PlayerRetreat(int resLineIdx, int resIdx)
 	{
-<<<<<<< HEAD
-		if (resLine.lineIdx != 0)
-		{
-			return -1;
-		}
-		//TODO
-		if (position.x > 500)
-		{
-			return -1;
-		}
-
-		sequenceTime = 0;
-		rotateSequence.Kill();
-		rotateSequence = DOTween.Sequence();
-
-		battleSystem.Retreat(resLine.lineIdx, element.resIdx);
-=======
 		AcquireSequence();
 
 		battleSystem.Retreat(resLineIdx, resIdx);
->>>>>>> 0ae7d296fbd201bc6617cfd582379d8e4ed54991
 
 		return 1;
 	}
@@ -635,9 +527,6 @@ public class BattleSceneManager : MonoBehaviour,
 
 
 
-<<<<<<< HEAD
-	
-=======
 	//行为树
 	HandicapController AIHandicap;
 	BattleLineController AISupportLine;
@@ -1163,7 +1052,6 @@ public class BattleSceneManager : MonoBehaviour,
 		}
 		return -1;
 	}
->>>>>>> 0ae7d296fbd201bc6617cfd582379d8e4ed54991
 	//private int GetArtilleryUnitPointer()
 	//{
 
@@ -1186,15 +1074,9 @@ public class BattleSceneManager : MonoBehaviour,
 		//data input 显示层检查完了再动数据层！！！
 		battleSystem.Deploy(handicapIdx, lineidx, 0);
 	}
-<<<<<<< HEAD
-	public void AICast(int handicapIdx, int dstLineIdx, int dstPos)
-	{
-		UnitElementController controller = handicapController[1].Pop(handicapIdx) as UnitElementController;
-=======
 	//public void AICast(int handicapIdx, int dstLineIdx, int dstPos)
 	//{
 	//	UnitElementController controller = AIHandicap.Pop(handicapIdx) as UnitElementController;
->>>>>>> 0ae7d296fbd201bc6617cfd582379d8e4ed54991
 
 
 	//	sequenceTime = 0;
@@ -1220,13 +1102,8 @@ public class BattleSceneManager : MonoBehaviour,
 
 	public void AIRetreat(int resLineIdx, int resPos)
 	{
-<<<<<<< HEAD
-		BattleLineController battleLine = battleLineControllers[resLineIdx];
-		if (resLineIdx == fieldCapacity - 1 && battleLine[resPos].operateCounter == 1)
-=======
 		BattleLineController battleLine = battleLines[resLineIdx];
 		if(resLineIdx == fieldCapacity - 1 && battleLine[resPos].operateCounter == 1)
->>>>>>> 0ae7d296fbd201bc6617cfd582379d8e4ed54991
 		{
 			sequenceTime = 0;
 			rotateSequence.Kill();
