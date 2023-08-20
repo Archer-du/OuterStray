@@ -90,6 +90,7 @@ namespace BehaviorTree
             while (loopTimes != 0 && rootNode.Execute())
             {
                 loopTimes--;
+                Debug.Log($"loopTimes:{loopTimes}\nSequenceTime:{SequenceTime}");
                 yield return new WaitForSeconds(SequenceTime + waitTime);
             }
         }
@@ -245,6 +246,7 @@ namespace BehaviorTree
             }
             return maxCost;
         }
+
         protected int GetMinCost()
         {
             int minCost = 100;
@@ -259,6 +261,7 @@ namespace BehaviorTree
             }
             return minCost;
         }
+
         protected int GetMaxCostUnitPointer()
         {
             int maxCost = 0;
@@ -277,11 +280,12 @@ namespace BehaviorTree
             }
             return maxPointer;
         }
+
         /// <summary>
-        /// 只有在费用不足时才会返回-1
+        /// 获取手牌中最低费用的单位卡索引
         /// </summary>
-        /// <param name="lowerBound">下界，返回的索引对应卡费用不会低于这个值</param>
-        /// <returns></returns>
+        /// <param name="lowerBound">费用下界，返回的索引对应卡费用不会低于这个值</param>
+        /// <returns>无单位卡或没有足够的能源则返回-1</returns>
         protected int GetMinCostUnitPointer(int lowerBound = 0)
         {
             int minCost = 10000;
@@ -304,6 +308,45 @@ namespace BehaviorTree
             }
             return minPointer;
         }
+
+        /// <summary>
+        /// 获取手牌中最低费用的指令卡索引
+        /// </summary>
+        /// <param name="lowerBound">费用下界，返回的索引对应卡费用不会低于这个值</param>
+        /// <returns>无指令卡或没有足够能源则返回-1</returns>
+        protected int GetMinCostCommPointer(int lowerBound = 0)
+        {
+            int minCost = 10000;
+            int minPointer = -1;
+            for (int i = 0; i < AIHandicap.count; i++)
+            {
+                if (lowerBound < AIHandicap[i].cost && AIHandicap[i].cost < minCost && AIHandicap[i] is CommandElementController)
+                {
+                    minCost = AIHandicap[i].cost;
+                    minPointer = i;
+                }
+            }
+            if (minPointer == -1)
+            {
+                return -1;
+            }
+            if (GetIsEnergyEnough(AIHandicap[minPointer].cost))
+            {
+                return -1;
+            }
+            return minPointer;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cost"></param>
+        /// <returns>若能源大于等于费用则返回true</returns>
+        protected bool GetIsEnergyEnough(int cost)
+        {
+            return Energy >= cost;
+        }
+
         protected int GetMinCostUnitPointerExcConstr()
         {
             int minCost = 10000;
@@ -328,9 +371,9 @@ namespace BehaviorTree
         }
 
         /// <summary>
-        /// 若没有合适的操作目标返回-1
+        /// 
         /// </summary>
-        /// <returns></returns>
+        /// <returns>若没有合适的操作目标则返回-1</returns>
         protected int GetOperatorPointerInSupportLine()
         {
             for (int i = 0; i < AISupportLine.count; i++)
