@@ -144,7 +144,7 @@ public class DeckTagController : MonoBehaviour, IComparable<DeckTagController>,
 		if (!controller.sceneManager.panelEnabled) return;
 		if (controller.sceneManager.currentNode is not MedicalNodeController) return;
 		if (category == "Command") return;
-		GetComponent<InspectPanelController>().disable = true;
+		GetComponent<InspectPanelController>().fadeDisable = true;
 		GetComponent<InspectPanelController>().inspectPanel.alpha = 1.0f;
 
 	}
@@ -163,7 +163,7 @@ public class DeckTagController : MonoBehaviour, IComparable<DeckTagController>,
 
 	public void OnEndDrag(PointerEventData eventData)
 	{
-		GetComponent<InspectPanelController>().disable = false;
+		GetComponent<InspectPanelController>().fadeDisable = false;
 		if (GameManager.GetInstance().gameState != SceneState.GameState.Tactical) return;
 		if (!controller.sceneManager.panelEnabled) return;
 		if (controller.sceneManager.currentNode is not MedicalNodeController) return;

@@ -26,6 +26,7 @@ public class HandicapInspector : MonoBehaviour,
 	private Vector3 inspectScale;
 	public void OnPointerEnter(PointerEventData eventData)
 	{
+		if (BattleElementController.targetSelectionLock) return;
 		if (BattleElementController.draggingLock) return;
 		if (controller.inspectLock) return;
 		if (controller.ownership != 0) return;
@@ -38,6 +39,7 @@ public class HandicapInspector : MonoBehaviour,
 
 	public void OnPointerExit(PointerEventData eventData)
 	{
+		if (BattleElementController.targetSelectionLock) return;
 		if (BattleElementController.draggingLock) return;
 		if (controller.inspectLock) return;
 		if (controller.ownership != 0) return;

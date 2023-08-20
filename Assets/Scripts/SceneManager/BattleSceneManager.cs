@@ -148,8 +148,6 @@ public class BattleSceneManager : MonoBehaviour,
 		energy = new int[2];
 		energySupply = new int[2];
 
-		turnText = new GameObject[2];
-
 		cardStackController = new CardStackController[2];
 		handicapController = new HandicapController[2];
 
@@ -177,7 +175,7 @@ public class BattleSceneManager : MonoBehaviour,
 		AcquireSequence();
 
 		FrontLine.transform.position = 
-			new Vector3(0, BattleLineController.fieldLowerBound + BattleLineController.lineWidth + BattleLineController.lineInterval / 2, 0);
+			new Vector3(0, -900 + BattleLineController.lineWidth + BattleLineController.lineInterval / 2, 0);
 	}
 	public void InitBases(IUnitElementController humanBase, IUnitElementController plantBase)
 	{
@@ -259,16 +257,29 @@ public class BattleSceneManager : MonoBehaviour,
             StartCoroutine(AIBehavior());
         }
 	}
+
+
+	public bool updatingTurn;
 	public void TurnUpdateAnimation(int TURN)
 	{
-		float duration = 0.2f;
-		float waitTime = 0.4f;
+		float duration = 0.5f;
+		float waitTime = 1f;
+
+		inputLock = true;
+		updatingTurn = true;
+
 		Sequence seq = DOTween.Sequence();
+
 		int temp = TURN;
 		seq.Append(turnText[temp].transform.DOBlendableMoveBy(new Vector3(2500, 0, 0), duration));
 		seq.AppendInterval(waitTime);
 		seq.Append(turnText[temp].transform.DOBlendableMoveBy(new Vector3(2500, 0, 0), duration)
-			.OnComplete(() => turnText[temp].transform.position = turnTextPosition));
+			.OnComplete(() =>
+			{
+				updatingTurn = false;
+				inputLock = false;
+				turnText[temp].transform.position = turnTextPosition;
+			}));
 	}
 
 
@@ -312,10 +323,11 @@ public class BattleSceneManager : MonoBehaviour,
 	public float shiftTime;
 	public void UpdateFrontLine(int index)
 	{
-		shiftTime = 0.5f;
-		FrontLine.transform.DOMove(
-			new Vector3(0, BattleLineController.fieldLowerBound + BattleLineController.lineWidth + BattleLineController.lineInterval / 2
-			+ index * (BattleLineController.lineWidth + BattleLineController.lineInterval), 0), shiftTime);
+		shiftTime = 0.4f;
+		//TODO
+		Vector3 dstPos = new Vector3(0, -900 + BattleLineController.lineWidth + BattleLineController.lineInterval / 2
+			+ index * (BattleLineController.lineWidth + BattleLineController.lineInterval), 0);
+		FrontLine.transform.DOMove(dstPos, shiftTime);
 	}
 
 
@@ -621,8 +633,8 @@ public class BattleSceneManager : MonoBehaviour,
 
 	IEnumerator AIBehavior()
 	{
-        float waitTime = 1f;
-        yield return new WaitForSeconds(waitTime);
+        float waitTime = 2f;
+        yield return new WaitForSeconds(4);
         AIHandicap = handicapController[1];
 
 		int AISupportLineIdx = fieldCapacity - 1;
@@ -630,7 +642,6 @@ public class BattleSceneManager : MonoBehaviour,
 
         int frontLineIdx = GetFrontLineIdx();
 		AIAdjacentLine = battleLines[frontLineIdx + 1];
-
 
 		int whileCounter = 30;
 	startwhile:
@@ -687,12 +698,12 @@ public class BattleSceneManager : MonoBehaviour,
                 goto startwhile;
             }
 
-            // 腐蚀，攻击血量高的单位
-            if (TryCastComm18(frontLineIdx))
-            {
-                yield return new WaitForSeconds(sequenceTime + waitTime);
-                goto startwhile;
-            }
+            //// 腐蚀，攻击血量高的单位
+            //if (TryCastComm18(frontLineIdx))
+            //{
+            //    yield return new WaitForSeconds(sequenceTime + waitTime);
+            //    goto startwhile;
+            //}
 
 			break;
 		}

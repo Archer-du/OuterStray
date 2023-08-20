@@ -55,26 +55,24 @@ public class HandicapController : MonoBehaviour,
 	public void Fill(List<IBattleElementController> list, int initialTurn)
 	{
 		Sequence seq = DOTween.Sequence();
+
 		for (int i = 0; i < list.Count; i++)
 		{
-			float popTime = 0.3f;
-			BattleElementController element = list[i] as BattleElementController;
-
 			if (i == list.Count - 1)
 			{
 				if (initialTurn == ownership)
 				{
 					int temp = i;
-					seq.AppendInterval(2f);
-					seq.OnComplete(() =>
-					{
-						Push(list[temp]);
-					});
+					seq.AppendCallback(() => battleSceneManager.UpdateTurn(initialTurn));
 					break;
 				}
 			}
+			float popTime = 0.3f;
+			BattleElementController element = list[i] as BattleElementController;
+			element.inspectLock = true;
 
 			ResetElementDisplay(element);
+
 
 			Vector3 moveBy = GetLogicPosition(i) - element.transform.position;
 			Vector3 rotateBy = new Vector3(0, 0, (1 - (ownership * 2)) * 90);
@@ -86,19 +84,16 @@ public class HandicapController : MonoBehaviour,
 					element.inspectLock = false;
 					handiCards.Add(element);
 					UpdateHandicapPosition();
-					if (i + 1 == list.Count - 1)
-					{
-						if (initialTurn == ownership)
-						{
-							battleSceneManager.UpdateTurn(initialTurn);
-						}
-					}
 				}));
 		}
 
 		seq.OnComplete(() =>
 		{
 			UpdateHandicapPosition();
+			if(initialTurn == ownership)
+			{
+				Push(list[list.Count - 1], "append");
+			}
 		});
 		seq.Play();
 	}
@@ -107,7 +102,7 @@ public class HandicapController : MonoBehaviour,
 	/// 播放动画，将element控件加入到手牌列表中
 	/// </summary>
 	/// <param name="element"></param>
-	public void Push(IBattleElementController controller)
+	public void Push(IBattleElementController controller, string method)
 	{
 		if(count >= capacity)
 		{
@@ -117,9 +112,7 @@ public class HandicapController : MonoBehaviour,
 
 		handiCards.Add(element);
 
-		ResetElementDisplay(element);
-
-		PushAnimation(element);
+		PushAnimation(element, method);
 	}
 	public void ResetElementDisplay(BattleElementController element)
 	{
@@ -149,7 +142,7 @@ public class HandicapController : MonoBehaviour,
 	/// 解锁
 	/// </summary>
 	/// <param name="element"></param>
-	public void PushAnimation(BattleElementController element)
+	public void PushAnimation(BattleElementController element, string method)
 	{
 		float popTime = 0.3f;
 		float waitTime = 1f;
@@ -157,23 +150,38 @@ public class HandicapController : MonoBehaviour,
 		element.inspectLock = true;
 		Sequence seq = DOTween.Sequence();
 
+		seq.AppendInterval(method == "append" ? 2f : 0);
+
+		seq.AppendCallback(() => ResetElementDisplay(element));
 		//移动到屏幕中心
-		if(element.ownership == 0)
+		if (element.ownership == 0)
 		{
 			seq.Append(element.transform.DOMove(Vector3.zero, popTime));
+			seq.Join(element.transform.DORotate(new Vector3(0, 0, ownership * 180), popTime));
+	
 			//展示等待
 			seq.AppendInterval(waitTime);
+			//加入手牌
+			Vector3 dstPos = GetLogicPosition(count);
+			seq.Append(element.transform.DOMove(dstPos, popTime)
+				.OnComplete(() =>
+				{
+					element.inspectLock = false;
+					UpdateHandicapPosition();
+				}));
 		}
-
-		//加入手牌
-		Vector3 moveBy = GetLogicPosition(count) - element.transform.position;
-		seq.Append(element.transform.DOBlendableMoveBy(moveBy, popTime));
-		seq.Join(element.transform.DORotate(new Vector3(0, 0, ownership * 180), popTime)
-			.OnComplete(() =>
-			{
-				element.inspectLock = false;
-				UpdateHandicapPosition();
-			}));
+		else
+		{
+			//加入手牌
+			Vector3 dstPos = GetLogicPosition(count);
+			seq.Append(element.transform.DOMove(dstPos, popTime));
+			seq.Join(element.transform.DORotate(new Vector3(0, 0, ownership * 180), popTime)
+				.OnComplete(() =>
+				{
+					element.inspectLock = false;
+					UpdateHandicapPosition();
+				}));
+		}
 		seq.Play();
 	}
 
@@ -185,7 +193,7 @@ public class HandicapController : MonoBehaviour,
 		for (int i = 0; i < handiCards.Count; i++)
 		{
 			float updateTime = 0.2f;
-			handiCards[i].inspectLock = true;
+			//handiCards[i].inspectLock = true;
 			Vector3 oriPos = handiCards[i].transform.position;
 			Vector3 dstPos = handiCards[i].handicapLogicPosition;
 			//TODO config

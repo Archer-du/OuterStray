@@ -164,7 +164,7 @@ namespace DisplayInterface
 	{
 		public void Init(int ownership);
 		public void Fill(List<IBattleElementController> list, int initialTurn);
-		public void Push(IBattleElementController element);
+		public void Push(IBattleElementController element, string method);
 		public IBattleElementController Pop(int handicapIdx);
 	}
 

@@ -930,6 +930,11 @@ MonoBehaviour:
   SceneLoader: {fileID: 999689980}
   progressText: {fileID: 244297168}
   start: {fileID: 1182092236}
+  config:
+    tutorial: 0
+  dialogGround: {fileID: 0}
+  dialogTexts: []
+  readyText: {fileID: 0}
 --- !u!4 &764031425
 Transform:
   m_ObjectHideFlags: 0

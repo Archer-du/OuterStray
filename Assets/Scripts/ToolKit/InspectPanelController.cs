@@ -10,7 +10,7 @@ public class InspectPanelController : MonoBehaviour,
     IPointerEnterHandler, IPointerExitHandler
 {
 	public bool active;
-	public bool disable;
+	public bool fadeDisable;
 	public bool boundaryCorrection;
 
 	public float upperBound;
@@ -20,7 +20,12 @@ public class InspectPanelController : MonoBehaviour,
 
 	public float timerValve = 0.6f;
 	public float duration = 0.2f;
-	public Vector3 displayOffset;
+
+	[Header("Offset")]
+	public Vector3 mainDisplayOffset;
+	public Vector3 subDisplayOffset;
+
+	[Header("Panels")]
 	public CanvasGroup inspectPanel;
 
 	public CanvasGroup SubPanel;
@@ -33,6 +38,7 @@ public class InspectPanelController : MonoBehaviour,
 	public void DisablePanel()
 	{
 		if (inspectPanel != null) inspectPanel.DOFade(0f, duration);
+		if (SubPanel != null) SubPanel.DOFade(0f, duration);
 	}
 	public void OnPointerEnter(PointerEventData eventData)
 	{
@@ -49,16 +55,17 @@ public class InspectPanelController : MonoBehaviour,
 	public void OnPointerExit(PointerEventData eventData)
 	{
 		timer = -1;
-		if (!disable)
+		if (!fadeDisable)
 		{
 			if (inspectPanel != null) inspectPanel.DOFade(0f, duration);
+			if (SubPanel != null) SubPanel.DOFade(0f, duration);
 		}
 	}
 
 	void Start()
 	{
 		if(inspectPanel != null) inspectPanel.alpha = 0f;
-		disable = false;
+		fadeDisable = false;
 	}
     void Update()
     {
@@ -71,7 +78,7 @@ public class InspectPanelController : MonoBehaviour,
 				{
 					if (inspectPanel != null && mainPanelEnabled)
 					{
-						inspectPanel.transform.position = gameObject.transform.position + displayOffset;
+						inspectPanel.transform.position = gameObject.transform.position + mainDisplayOffset;
 						if (boundaryCorrection)
 						{
 							if(inspectPanel.transform.position.y > upperBound)
@@ -93,11 +100,17 @@ public class InspectPanelController : MonoBehaviour,
 						}
 						inspectPanel.DOFade(1f, duration);
 					}
-					if (SubPanel != null && subPanelEnabled) SubPanel.DOFade(1f, duration);
+					if (SubPanel != null && subPanelEnabled)
+					{
+						SubPanel.transform.position = gameObject.transform.position + subDisplayOffset;
+						SubPanel.DOFade(1f, duration);
+					}
 				}
 			}
 		}
     }
+
+
 
 
 	//TODO remove
@@ -106,6 +119,7 @@ public class InspectPanelController : MonoBehaviour,
 		if(state == ElementState.inBattleLine)
 		{
 			active = true;
+			if(inspectPanel != null) mainPanelEnabled = true;
 		}
 		else
 		{

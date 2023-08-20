@@ -1735,11 +1735,11 @@ MonoBehaviour:
   turnText:
   - {fileID: 628275987}
   - {fileID: 794532478}
-  turnTextPosition: {x: 0, y: 0, z: 0}
+  turnTextPosition: {x: -2500, y: 500, z: 0}
   baseDisplay: {fileID: 7442338079515085734}
   energyDisplay: {fileID: 0}
   skipButton: {fileID: 957499425}
-  SkipbuttonImage: {fileID: 0}
+  SkipbuttonImage: {fileID: 957499426}
   castingCommand: {fileID: 0}
   exitButton: {fileID: 1285366973}
   rewardConfirmButton: {fileID: 638559877}
@@ -1747,6 +1747,7 @@ MonoBehaviour:
   rewardSelectionIndex: 0
   rewards: []
   sequenceTime: 0
+  updatingTurn: 0
   shiftTime: 0
   duration: 0
 --- !u!4 &796735672
@@ -2015,6 +2016,7 @@ GameObject:
   - component: {fileID: 1148343571}
   - component: {fileID: 1148343573}
   - component: {fileID: 1148343572}
+  - component: {fileID: 1148343574}
   m_Layer: 5
   m_Name: FrontLine
   m_TagString: Untagged
@@ -2040,7 +2042,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -860}
-  m_SizeDelta: {x: 2500, y: 10}
+  m_SizeDelta: {x: 2000, y: 10}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1148343572
 MonoBehaviour:
@@ -2080,6 +2082,29 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1148343570}
   m_CullTransparentMesh: 1
+--- !u!223 &1148343574
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1148343570}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 1
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: -1375090905
+  m_SortingOrder: 1000
+  m_TargetDisplay: 0
 --- !u!1 &1172882115
 GameObject:
   m_ObjectHideFlags: 0

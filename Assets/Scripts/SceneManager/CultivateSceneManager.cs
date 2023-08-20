@@ -125,10 +125,6 @@ public class CultivateSceneManager : MonoBehaviour,
 	}
     public void StartExpedition()
     {
-        Debug.Log("test");
-
-        EnableAllBuilding();
-        playerDeck.EnableAllDeckTags();
 		inputMask.alpha = 0;
 
 		cultivateSystem.SetBase(selectionIndex);

@@ -1675,6 +1675,7 @@ GameObject:
   - component: {fileID: 5026614875311150564}
   - component: {fileID: 4267143697029492169}
   - component: {fileID: 8489957186278045733}
+  - component: {fileID: 8849192416795725279}
   m_Layer: 0
   m_Name: UnitElement
   m_TagString: Untagged
@@ -1820,7 +1821,7 @@ MonoBehaviour:
   normalFontSizeEnlarge: 0
   battleSceneManager: {fileID: 0}
   canvas: {fileID: 483946251807401289}
-  selfCanvas: {fileID: 0}
+  selfCanvas: {fileID: 8489957186278045733}
   DataState: 0
   handicapIdx: 0
   ID: 
@@ -1932,7 +1933,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   active: 0
-  disable: 0
+  fadeDisable: 0
   boundaryCorrection: 0
   upperBound: 0
   lowerBound: 0
@@ -1940,7 +1941,8 @@ MonoBehaviour:
   rightBound: 0
   timerValve: 0.6
   duration: 0.2
-  displayOffset: {x: 400, y: 0, z: 0}
+  mainDisplayOffset: {x: 400, y: 0, z: 0}
+  subDisplayOffset: {x: 0, y: 400, z: 0}
   inspectPanel: {fileID: 6590979290978971568}
   SubPanel: {fileID: 8610403419108934566}
   mainPanelEnabled: 0
@@ -1957,6 +1959,20 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &8849192416795725279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5613162459952636112}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c43d132814702a8458b083ff2440c628, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  duration: 0.2
+  controller: {fileID: -6681870225697412084}
 --- !u!1 &6086894628411140953
 GameObject:
   m_ObjectHideFlags: 0
@@ -2447,6 +2463,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2386429324431057907}
   - component: {fileID: 8610403419108934566}
+  - component: {fileID: 1271815011500268906}
   m_Layer: 0
   m_Name: SubPanel
   m_TagString: Untagged
@@ -2488,6 +2505,29 @@ CanvasGroup:
   m_Interactable: 0
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
+--- !u!223 &1271815011500268906
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7478984966391478942}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 1
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: -1300932807
+  m_SortingOrder: 1000
+  m_TargetDisplay: 0
 --- !u!1 &7848691167493410977
 GameObject:
   m_ObjectHideFlags: 0

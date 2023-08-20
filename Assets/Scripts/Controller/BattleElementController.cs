@@ -178,7 +178,7 @@ public class BattleElementController : MonoBehaviour
 
 		battleFieldScale = transform.localScale;
 		handicapScale = 1.35f * battleFieldScale;
-		castScale = 1.5f * battleFieldScale;
+		castScale = 2f * battleFieldScale;
 		targetScale = 1.25f * battleFieldScale;
 
 		targetTextScale = nameText.transform.localScale * 1.35f;

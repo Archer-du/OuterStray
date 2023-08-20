@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5884751291407983349}
   - component: {fileID: 3926916785910420400}
+  - component: {fileID: 5115928180307762388}
   m_Layer: 0
   m_Name: SubPanel
   m_TagString: Untagged
@@ -51,6 +52,29 @@ CanvasGroup:
   m_Interactable: 0
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
+--- !u!223 &5115928180307762388
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 917097719873485156}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 1
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: -1300932807
+  m_SortingOrder: 1000
+  m_TargetDisplay: 0
 --- !u!1 &1308769503806020367
 GameObject:
   m_ObjectHideFlags: 0
@@ -99,7 +123,7 @@ RectTransform:
   - {fileID: 789246198600677410}
   - {fileID: 5884751291407983349}
   m_Father: {fileID: 0}
-  m_RootOrder: -1
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -267,7 +291,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controller: {fileID: 6642998932481347951}
-  inspector: {fileID: 0}
+  inspector: {fileID: 4443099353950873168}
   buffer: {fileID: 0}
   canvas: {fileID: 1453865705016682070}
   upperOrder: 0
@@ -297,8 +321,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83fdc1a816b4da54ba087ee1a59de6d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  active: 0
-  disable: 0
+  active: 1
+  fadeDisable: 0
   boundaryCorrection: 0
   upperBound: 0
   lowerBound: 0
@@ -306,7 +330,8 @@ MonoBehaviour:
   rightBound: 0
   timerValve: 0.6
   duration: 0.2
-  displayOffset: {x: 0, y: 0, z: 0}
+  mainDisplayOffset: {x: 0, y: 0, z: 0}
+  subDisplayOffset: {x: 0, y: 400, z: 0}
   inspectPanel: {fileID: 0}
   SubPanel: {fileID: 3926916785910420400}
   mainPanelEnabled: 0

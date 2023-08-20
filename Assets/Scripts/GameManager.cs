@@ -152,6 +152,8 @@ public class GameManager : MonoBehaviour, IGameManagement
 				else
 				{
 					cultivateSceneManager = GameObject.Find("CultivateSceneManager").GetComponent<CultivateSceneManager>();
+					cultivateSceneManager.EnableAllBuilding();
+					cultivateSceneManager.playerDeck.EnableAllDeckTags();
 					cultivateSceneManager.cultivateSystem = cultivationSystem;
 					cultivationSystem.SetSceneController(cultivateSceneManager);
 					if (config.tutorial) cultivationSystem.LoadTutorialHumanDeck();

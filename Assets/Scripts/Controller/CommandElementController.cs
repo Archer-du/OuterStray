@@ -79,7 +79,7 @@ public class CommandElementController : BattleElementController,
 		{
 			//飞向战场侧中
 			seq.Append(transform.DOMove(inputOffset / 2 + 500 * Vector2.down, castTime));
-			seq.Append(transform.DOScale(castScale, castTime));
+			seq.Join(transform.DOScale(castScale, castTime));
 			seq.Join(transform.DORotate(new Vector3(0, 0, 0), castTime));
 			//等待
 			seq.AppendInterval(waitTime);

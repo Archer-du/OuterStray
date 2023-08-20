@@ -35,6 +35,7 @@ public class ElementDragInput : MonoBehaviour,
 		if (BattleElementController.draggingLock) return;
 		if (BattleElementController.targetSelectionLock) return;
 		if (BattleSceneManager.Turn != 0) return;
+		if (BattleSceneManager.inputLock) return;
 		if (controller.inspectLock) return;
 		if (controller.inputLock) return;
 		if (controller.ownership != 0) return;
@@ -63,6 +64,7 @@ public class ElementDragInput : MonoBehaviour,
 	{
 		if (BattleElementController.targetSelectionLock) return;
 		if (BattleSceneManager.Turn != 0) return;
+		if (BattleSceneManager.inputLock) return;
 		if (controller.inspectLock) return;
 		if (controller.inputLock) return;
 		if (controller.ownership != 0) return;
@@ -81,21 +83,26 @@ public class ElementDragInput : MonoBehaviour,
 			sceneManager.DisableAllSelectionFrame();
 			int lineIdx = controller.GetBattleLineIdx(eventData.position.y);
 			BattleLineController battleLine = lineIdx >= 0 && lineIdx <= sceneManager.fieldCapacity - 1 ? sceneManager.battleLines[lineIdx] : null;
-			if (battleLine == null) return;
-			foreach(BattleLineController line in sceneManager.battleLines)
-			{
-				if (battleLine != line)
-				{
-					line.UpdateElementPosition();
-				}
-			}
+
 
 			if (controller.category != "Command")
 			{
+				UnitElementController unit = controller as UnitElementController;
+				foreach(BattleLineController line in sceneManager.battleLines)
+				{
+					if (line != battleLine && line != unit.battleLine)
+					{
+						line.UpdateElementPosition();
+					}
+				}
+
+				if (battleLine == null) return;
+
 				battleLine.lineDisplay.DisplaySelectionFrame();
 				//费用预检测
 				if (controller.dataState == ElementState.inHandicap)
 				{
+					if (battleLine.index != 0) return;
 					if (sceneManager.energy[0] < controller.cost)
 					{
 						return;
@@ -106,6 +113,8 @@ public class ElementDragInput : MonoBehaviour,
 				}
 				if (controller.dataState == ElementState.inBattleLine)
 				{
+					if (battleLine.ownership != 0) return;
+					if (battleLine == unit.battleLine) return;
 					int pos = battleLine.GetOperatePos(eventData.position.x);
 					if (pos < 0) return;
 					battleLine.PreUpdateElementPosition(pos);
@@ -118,6 +127,7 @@ public class ElementDragInput : MonoBehaviour,
 	{
 		if (BattleElementController.targetSelectionLock) return;
 		if (BattleSceneManager.Turn != 0) return;
+		if (BattleSceneManager.inputLock) return;
 		if (controller.inspectLock) return;
 		if (controller.inputLock) return;
 		if (controller.ownership != 0) return;
