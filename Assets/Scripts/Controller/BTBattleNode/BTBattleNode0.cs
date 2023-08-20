@@ -187,10 +187,10 @@ public class BTBattleNode0 : BattleSceneManager
         AIHandicap = handicapController[1];
 
         int AISupportLineIdx = fieldCapacity - 1;
-        AISupportLine = battleLineControllers[AISupportLineIdx];
+        AISupportLine = battleLines[AISupportLineIdx];
 
         int frontLineIdx = GetFrontLineIdx();
-        AIAdjacentLine = battleLineControllers[frontLineIdx + 1];
+        AIAdjacentLine = battleLines[frontLineIdx + 1];
 
 
         int whileCounter = 30;
@@ -322,7 +322,7 @@ public class BTBattleNode0 : BattleSceneManager
     {
         for (int i = fieldCapacity - 1; i > frontLineIdx + 1; i--)
         {
-            BattleLineController battleLine = battleLineControllers[i];
+            BattleLineController battleLine = battleLines[i];
 
             // 前一条线有空位则尝试前移
             if (GetIsLineAvailable(i - 1))
@@ -366,7 +366,7 @@ public class BTBattleNode0 : BattleSceneManager
 
     private bool TryRetreatSomeUnits(int AISupportLineIdx)
     {
-        BattleLineController battleLine = battleLineControllers[AISupportLineIdx];
+        BattleLineController battleLine = battleLines[AISupportLineIdx];
         if (battleLine.count == battleLine.capacity)
         {
             for (int i = 0; i < battleLine.count; i++)
@@ -506,7 +506,7 @@ public class BTBattleNode0 : BattleSceneManager
     private int GetConstructionNum(int idx)
     {
         int num = 0;
-        BattleLineController battleLine = battleLineControllers[idx];
+        BattleLineController battleLine = battleLines[idx];
         for (int i = 0; i < battleLine.count; i++)
         {
             if (battleLine[i].category == "Construction")
@@ -520,7 +520,7 @@ public class BTBattleNode0 : BattleSceneManager
 
     private bool GetIsLineAvailable(int idx)
     {
-        return battleLineControllers[idx].count < battleLineControllers[idx].capacity;
+        return battleLines[idx].count < battleLines[idx].capacity;
     }
 
     /// <summary>
@@ -530,7 +530,7 @@ public class BTBattleNode0 : BattleSceneManager
     private int GetFrontLineIdx()
     {
         int idx = fieldCapacity - 1;
-        while (battleLineControllers[idx].ownerShip == 1 || battleLineControllers[idx].count == 0)
+        while (battleLines[idx].ownership == 1 || battleLines[idx].count == 0)
         {
             idx--;
         }
@@ -543,7 +543,7 @@ public class BTBattleNode0 : BattleSceneManager
     /// <returns>返回一个元组，包含生命值最小单位的生命值和索引</returns>
     private Tuple<int, int> GetAvailableMinHealth(int battleLineIdx)
     {
-        BattleLineController battleLine = battleLineControllers[battleLineIdx];
+        BattleLineController battleLine = battleLines[battleLineIdx];
         int minHealth = 100;
         int minHealthPointer = -1;
         for (int i = 0; i < battleLine.count; i++)
@@ -559,7 +559,7 @@ public class BTBattleNode0 : BattleSceneManager
 
     private Tuple<int, int> GetAvailableMaxHealth(int battleLineIdx)
     {
-        BattleLineController battleLine = battleLineControllers[battleLineIdx];
+        BattleLineController battleLine = battleLines[battleLineIdx];
         int maxHealth = 0;
         int maxHealthPointer = -1;
         for (int i = 0; i < battleLine.count; i++)
@@ -575,7 +575,7 @@ public class BTBattleNode0 : BattleSceneManager
 
     private Tuple<int, int> GetMaxHealth(int battleLineIdx)
     {
-        BattleLineController battleLine = battleLineControllers[battleLineIdx];
+        BattleLineController battleLine = battleLines[battleLineIdx];
         int maxHealth = 0;
         int maxHealthPointer = -1;
         for (int i = 0; i < battleLine.count; i++)

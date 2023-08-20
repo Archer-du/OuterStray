@@ -162,7 +162,7 @@ namespace BehaviorTree
         // 战线
         public BattleLineController[] battleLineControllers
         {
-            get => sceneManager.battleLineControllers;
+            get => sceneManager.battleLines;
         }
 
         // 能量
@@ -246,7 +246,7 @@ namespace BehaviorTree
         public int GetFrontLineIdx()
         {
             int idx = fieldCapacity - 1;
-            while (battleLineControllers[idx].ownerShip == 1 || battleLineControllers[idx].count == 0)
+            while (battleLineControllers[idx].ownership == 1 || battleLineControllers[idx].count == 0)
             {
                 idx--;
             }
