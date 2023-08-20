@@ -79,8 +79,8 @@
      <Compile Include="Library\PackageCache\com.unity.timeline@1.7.4\Editor\treeview\TimelineDataSource.cs" />
      <Compile Include="Library\PackageCache\com.unity.timeline@1.7.4\Editor\Signals\TreeView\SignalReceiverTreeView.cs" />
      <Compile Include="Library\PackageCache\com.unity.timeline@1.7.4\Editor\Manipulators\AddDelete\AddDeleteItemModeRipple.cs" />
-     <Compile Include="Library\PackageCache\com.unity.timeline@1.7.4\Editor\CustomEditors\MarkerTrackEditor.cs" />
      <Compile Include="Library\PackageCache\com.unity.timeline@1.7.4\Editor\Utilities\Scopes\HorizontalScope.cs" />
+     <Compile Include="Library\PackageCache\com.unity.timeline@1.7.4\Editor\CustomEditors\MarkerTrackEditor.cs" />
      <Compile Include="Library\PackageCache\com.unity.timeline@1.7.4\Editor\Animation\CurveTreeViewNode.cs" />
      <Compile Include="Library\PackageCache\com.unity.timeline@1.7.4\Editor\Window\TimelineWindow_Selection.cs" />
      <Compile Include="Library\PackageCache\com.unity.timeline@1.7.4\Editor\Activation\ActivationTrackInspector.cs" />
