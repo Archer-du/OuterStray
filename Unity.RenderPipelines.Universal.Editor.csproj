@@ -244,9 +244,9 @@
      <Compile Include="Library\PackageCache\com.unity.render-pipelines.universal@14.0.8\Editor\2D\ShapeEditor\EditablePath\MultipleEditablePathController.cs" />
      <Compile Include="Library\PackageCache\com.unity.render-pipelines.universal@14.0.8\Editor\SavedParameter.cs" />
      <Compile Include="Library\PackageCache\com.unity.render-pipelines.universal@14.0.8\Editor\2D\ShaderGraph\Targets\UniversalSpriteLitSubTarget.cs" />
-     <Compile Include="Library\PackageCache\com.unity.render-pipelines.universal@14.0.8\Editor\2D\ShapeEditor\View\Drawer.cs" />
      <Compile Include="Library\PackageCache\com.unity.render-pipelines.universal@14.0.8\Editor\2D\Converter\BuiltInToURP2DConverterContainer.cs" />
      <Compile Include="Library\PackageCache\com.unity.render-pipelines.universal@14.0.8\Editor\2D\ShapeEditor\View\IEditablePathView.cs" />
+     <Compile Include="Library\PackageCache\com.unity.render-pipelines.universal@14.0.8\Editor\2D\ShapeEditor\View\Drawer.cs" />
      <Compile Include="Library\PackageCache\com.unity.render-pipelines.universal@14.0.8\Editor\AssetPostProcessors\FBXMaterialDescriptionPreprocessor.cs" />
      <Compile Include="Library\PackageCache\com.unity.render-pipelines.universal@14.0.8\Editor\Overrides\FilmGrainEditor.cs" />
      <Compile Include="Library\PackageCache\com.unity.render-pipelines.universal@14.0.8\Editor\2D\ShaderGraph\AssetCallbacks\CreateSpriteLitShaderGraph.cs" />

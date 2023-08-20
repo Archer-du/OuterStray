@@ -60,8 +60,8 @@
      <Compile Include="Library\PackageCache\com.unity.mathematics@1.2.6\Unity.Mathematics\double4x3.gen.cs" />
      <Compile Include="Library\PackageCache\com.unity.mathematics@1.2.6\Unity.Mathematics\float4x4.gen.cs" />
      <Compile Include="Library\PackageCache\com.unity.mathematics@1.2.6\Unity.Mathematics\Noise\noise3Dgrad.cs" />
-     <Compile Include="Library\PackageCache\com.unity.mathematics@1.2.6\Unity.Mathematics\Noise\noise4D.cs" />
      <Compile Include="Library\PackageCache\com.unity.mathematics@1.2.6\Unity.Mathematics\Il2CppEagerStaticClassConstructionAttribute.cs" />
+     <Compile Include="Library\PackageCache\com.unity.mathematics@1.2.6\Unity.Mathematics\Noise\noise4D.cs" />
      <Compile Include="Library\PackageCache\com.unity.mathematics@1.2.6\Unity.Mathematics\double4x2.gen.cs" />
      <Compile Include="Library\PackageCache\com.unity.mathematics@1.2.6\Unity.Mathematics\bool2x4.gen.cs" />
      <Compile Include="Library\PackageCache\com.unity.mathematics@1.2.6\Unity.Mathematics\matrix.gen.cs" />
