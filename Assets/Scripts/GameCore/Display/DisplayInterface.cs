@@ -105,7 +105,7 @@ namespace DisplayInterface
 		/// 战斗系统渲染层初始化
 		/// </summary>
 		/// <param name="handler"></param>
-		public void FieldInitialize(IBattleSystemInput handler, int fieldCapacity);
+		public void FieldInitialize(IBattleSystemInput handler, int fieldCapacity, int BTindex);
 		public void InitBases(IUnitElementController humanBase, IUnitElementController plantBase);
 
 		public IBattleLineController InstantiateBattleLine(int idx, int capacity);
@@ -124,6 +124,8 @@ namespace DisplayInterface
 		public void UpdateEnergySupply(int supply);
 		public void UpdateEnergySupply(int turn, int supply);
 
+		public void UpdateFrontLine(int humanFrontLine);
+
 
 		public IUnitElementController InstantiateUnitInBattleField(int ownership, int lineIdx, int pos);
 
@@ -132,6 +134,8 @@ namespace DisplayInterface
 
 		public void BattleFailed();
 		public void BattleWinned();
+
+		public void InstantiateReward(string[] IDs, string[] names, string[] categories, int[] cost, int[] attacks, int[] healths, int[] counters, string[] description);
 	}
 	public interface IBattleLineController
 	{

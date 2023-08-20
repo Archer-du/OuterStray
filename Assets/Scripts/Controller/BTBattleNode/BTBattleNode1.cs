@@ -2,9 +2,9 @@ using BehaviorTree;
 using System.Collections.Generic;
 
 /// <summary>
-/// boss白菇，策略为大量部署亮顶孢子
+/// boss九号实验体，策略跟白菇类似
 /// </summary>
-public class BTBattleNode0 : BTBattleNode
+public class BTBattleNode1 : BTBattleNode
 {
     protected override void BuildBT()
     {

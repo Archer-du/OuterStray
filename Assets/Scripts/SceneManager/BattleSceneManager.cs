@@ -13,6 +13,7 @@ using System.IO;
 using UnityEditor;
 using JetBrains.Annotations;
 using System.Linq;
+using BehaviorTree;
 
 public class BattleSceneManager : MonoBehaviour,
 	IBattleSceneController
@@ -23,6 +24,11 @@ public class BattleSceneManager : MonoBehaviour,
 	/// GameManager单例
 	/// </summary>
 	public GameManager gameManager;
+
+	public bool tutorial
+	{
+		get => gameManager.config.tutorial;
+	}
 
 	public Canvas Settler;
 	public Button SettleButton;
@@ -43,6 +49,8 @@ public class BattleSceneManager : MonoBehaviour,
 
 	public GameObject unitPrototype;
 	public GameObject commandPrototype;
+
+	public GameObject rewardPrototype;
 
 	[Header("SubControllers")]
 	public BattleLineController[] battleLines;
@@ -79,6 +87,8 @@ public class BattleSceneManager : MonoBehaviour,
 	public int fieldCapacity;
 	public UnitElementController[] bases;
 	//TODO
+	[Header("Display")]
+	public GameObject FrontLine;
 	public GameObject humanEnergy;
 	public GameObject[] humanSlots;
 	public GameObject[] plantSlots;
@@ -91,9 +101,17 @@ public class BattleSceneManager : MonoBehaviour,
 	public EnergyDisplay energyDisplay;
 
 	[Header("Interaction")]
-	public Button exitButton;
 	public Button skipButton;
-	public Image buttonImage;
+	public Image SkipbuttonImage;
+
+	public CommandElementController castingCommand;
+
+	public Button exitButton;
+	public Button rewardConfirmButton;
+	public bool completed;
+
+	public int rewardSelectionIndex;
+	public RewardSelection[] rewards;
 
 	[Header("Sequence")]
 	public Sequence rotateSequence;
@@ -102,20 +120,29 @@ public class BattleSceneManager : MonoBehaviour,
 	//结算锁
 	public static bool settlement = false;
 
-	public void Start()
+	// 行为树
+	public BTBattleNode btBattleNode;
+
+    public void Start()
 	{
 		Settler.gameObject.transform.position = new Vector3(0, 2160, 0);
 		SettleButton.onClick.AddListener(BattleOverChecked);
-	}
-	public void FieldInitialize(IBattleSystemInput handler, int fieldCapacity)
+    }
+	public void FieldInitialize(IBattleSystemInput handler, int fieldCapacity, int BTindex)
 	{
 		gameManager = GameManager.GetInstance();
 
 		battleSystem = handler;
 
-		//TODO config
-		//data
-		this.fieldCapacity = fieldCapacity;
+		switch (BTindex)
+		{
+			case 0: btBattleNode = new BTBattleNode0();
+				break;
+		}
+
+        //TODO config
+        //data
+        this.fieldCapacity = fieldCapacity;
 		battleLines = new BattleLineController[fieldCapacity];
 
 		energy = new int[2];
@@ -129,8 +156,12 @@ public class BattleSceneManager : MonoBehaviour,
 		bases = new UnitElementController[2];
 
 		skipButton.onClick.AddListener(Skip);
-		buttonImage = skipButton.gameObject.GetComponent<Image>();
+		SkipbuttonImage = skipButton.gameObject.GetComponent<Image>();
+
 		exitButton.onClick.AddListener(Exit);
+		rewardConfirmButton.onClick.AddListener(ContinueExpedition);
+
+		rewardConfirmButton.interactable = false;
 		
 		//TODO trigger
 		turnNum = 0;
@@ -143,6 +174,9 @@ public class BattleSceneManager : MonoBehaviour,
 
 		InputLocked?.Invoke();
 		AcquireSequence();
+
+		FrontLine.transform.position = 
+			new Vector3(0, BattleLineController.fieldLowerBound + BattleLineController.lineWidth + BattleLineController.lineInterval / 2, 0);
 	}
 	public void InitBases(IUnitElementController humanBase, IUnitElementController plantBase)
 	{
@@ -187,17 +221,20 @@ public class BattleSceneManager : MonoBehaviour,
 		
 		if (Turn == 0)
 		{
-			buttonImage.color = Color.white;
+			SkipbuttonImage.color = Color.white;
 			skipButton.enabled = true;
 		}
 		//如果是敌方回合，启动行为树
 		else
 		{
-			buttonImage.color = Color.gray;
+			SkipbuttonImage.color = Color.gray;
 
 			// StartCoroutine(AIBehavior());
 			skipButton.enabled = false;
-		}
+
+			// 启动行为树
+            StartCoroutine(btBattleNode.BehaviorTree());
+        }
 	}
 	private void UpdateTurn()
 	{
@@ -208,17 +245,18 @@ public class BattleSceneManager : MonoBehaviour,
 
 		if (Turn == 0)
 		{
-			buttonImage.color = Color.white;
+			SkipbuttonImage.color = Color.white;
 			skipButton.enabled = true;
 		}
 		//如果是敌方回合，启动行为树
 		else
 		{
-			buttonImage.color = Color.gray;
+			SkipbuttonImage.color = Color.gray;
 			skipButton.enabled = false;
 
-			// StartCoroutine(AIBehavior());
-		}
+            // 启动行为树
+            StartCoroutine(btBattleNode.BehaviorTree());
+        }
 	}
 	public void TurnUpdateAnimation(int TURN)
 	{
@@ -270,6 +308,15 @@ public class BattleSceneManager : MonoBehaviour,
 			plantSlots[i].SetActive(true);
 		}
 	}
+	public float shiftTime;
+	public void UpdateFrontLine(int index)
+	{
+		shiftTime = 0.5f;
+		FrontLine.transform.DOMove(
+			new Vector3(0, BattleLineController.fieldLowerBound + BattleLineController.lineWidth + BattleLineController.lineInterval / 2
+			+ index * (BattleLineController.lineWidth + BattleLineController.lineInterval), 0), shiftTime);
+	}
+
 
 
 
@@ -376,6 +423,7 @@ public class BattleSceneManager : MonoBehaviour,
 				SettleText.DOFade(1f, duration);
 			})
 		);
+		completed = true;
 	}
 	public void BattleWinned()
 	{
@@ -388,38 +436,79 @@ public class BattleSceneManager : MonoBehaviour,
 			.OnComplete(() =>
 			{
 				SettleText.DOFade(1f, duration);
+				//rewardText TODO
 			})
 		);
+		completed = false;
 	}
 	public void BattleOverChecked()
 	{
-		BattleElementController[] otherInstances = UnityEngine.Object.FindObjectsOfType<BattleElementController>();
-
-		// 遍历并销毁除自身以外的同类型游戏对象
-		foreach (BattleElementController instance in otherInstances)
+		if (completed)
 		{
-			Destroy(instance.gameObject);
+			BattleElementController[] otherInstances = UnityEngine.Object.FindObjectsOfType<BattleElementController>();
+
+			// 遍历并销毁除自身以外的同类型游戏对象
+			foreach (BattleElementController instance in otherInstances)
+			{
+				Destroy(instance.gameObject);
+			}
+			DOTween.Clear();
+			Settler.transform.position = new Vector3(0, 2160, 0);
+			if (battleSystem.BattleOverChecked())
+			{
+				gameManager.BattleBGM.Stop();
+				gameManager.TacticalBGM.Play();
+
+				AsyncOperation async = gameManager.UpdateGameState(SceneState.GameState.Tactical);
+			}
 		}
-		DOTween.Clear();
-		Settler.transform.position = new Vector3(0, 2160, 0);
-		if (battleSystem.BattleOverChecked())
+		else
 		{
-			gameManager.BattleBGM.Stop();
-			gameManager.TacticalBGM.Play();
-
-			AsyncOperation async = gameManager.UpdateGameState(SceneState.GameState.Tactical);
+			SettleButton.enabled = false;
+			battleSystem.GetReward();
 		}
-
-		//StartCoroutine(LateWriteBack(async));
 	}
-	//IEnumerator LateWriteBack(AsyncOperation async)
-	//{
-	//	while (!async.isDone)
-	//	{
-	//		yield return null;
-	//	}
-	//	battleSystem.BattleOverChecked();
-	//}
+	public void ContinueExpedition()
+	{
+		battleSystem.AddReward(rewardSelectionIndex);
+
+		completed = true;
+		BattleOverChecked();
+	}
+	public float duration;
+	//TEST
+	public void InstantiateReward(string[] IDs, string[] names, string[] categories, int[] cost, int[] attacks, int[] healths, int[] counters, string[] description)
+	{
+		rewards = new RewardSelection[3];
+		duration = 0.5f;
+		rewards[0] = Instantiate(rewardPrototype, new Vector3(2500, 0, 0), Quaternion.Euler(new Vector3(0, 90, 0))).GetComponent<RewardSelection>();
+		rewards[1] = Instantiate(rewardPrototype, new Vector3(3000, 0, 0), Quaternion.Euler(new Vector3(0, 90, 0))).GetComponent<RewardSelection>();
+		rewards[2] = Instantiate(rewardPrototype, new Vector3(3500, 0, 0), Quaternion.Euler(new Vector3(0, 90, 0))).GetComponent<RewardSelection>();
+
+		rewards[0].index = 0;
+		rewards[1].index = 1;
+		rewards[2].index = 2;
+
+		rewards[0].transform.DOBlendableMoveBy(new Vector3(-2000, 0, 0), duration);
+		rewards[1].transform.DOBlendableMoveBy(new Vector3(-2000, 0, 0), duration);
+		rewards[2].transform.DOBlendableMoveBy(new Vector3(-2000, 0, 0), duration);
+	}
+	//interface
+	public void ClearOtherSelectionFrame()
+	{
+		foreach (RewardSelection reward in rewards)
+		{
+			if (reward.index != rewardSelectionIndex)
+			{
+				reward.Frame.SetActive(false);
+				reward.disableExit = false;
+				reward.transform.DOScale(reward.originScale, reward.duration);
+			}
+		}
+	}
+	
+
+
 
 
 
@@ -429,6 +518,8 @@ public class BattleSceneManager : MonoBehaviour,
 		rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
 	}
+
+
 
 
 
@@ -510,11 +601,6 @@ public class BattleSceneManager : MonoBehaviour,
 		battleSystem.Cast(handicapIdx, dstLineIdx, dstIdx);
 	}
 
-
-
-
-
-
 	public void DisableAllSelectionFrame()
 	{
 		foreach(BattleLineController line in battleLines)
@@ -522,7 +608,6 @@ public class BattleSceneManager : MonoBehaviour,
 			line.lineDisplay.DisableSelectionFrame();
 		}
 	}
-
 
 
 
@@ -766,90 +851,6 @@ public class BattleSceneManager : MonoBehaviour,
         }
 		return false;
     }
-
-    /*IEnumerator AIBehaviourNode3()
-	{
-        HandicapController handicap = handicapController[1];
-
-        float waitTime = 0.9f;
-        yield return new WaitForSeconds(waitTime);
-
-        int movetimes = 1;
-		int frontLineIdx = GetFrontLineIdx();
-
-        // 移动策略：调整各蘑人站位，血量少的往前推，血量多的往后撤，使回合结束增殖时收益最大
-		// 从支援战线开始遍历一次，调整站位
-        for (int i = battleLineControllers.Length - 1; i > frontLineIdx; i--)
-        {
-            int halfCapacity = battleLineControllers[i].capacity / 2;
-
-            // 单位数大于容量的一半时，将本战线血量低的单位往前推
-            while (battleLineControllers[i].count > halfCapacity && i > frontLineIdx + 1)
-            {
-                Tuple<int, int> minHealthInfo = GetAvailableMinHealth(i);
-                int minHealthPointer = minHealthInfo.Item2;
-
-				// 若存在可操作对象，则执行操作
-				if (minHealthPointer > -1)
-				{
-                    AIMove(i, minHealthPointer, i + 1, 0);
-                    movetimes++;
-                }
-            }
-
-            // 当单位数小于或等于容量的一半减一，且前一条战线单位数大于容量一半时，将前一条战线血量高的往后撤
-            while (battleLineControllers[i].count <= halfCapacity - 1 && battleLineControllers[i - 1].count > battleLineControllers[i - 1].capacity / 2 && i > frontLineIdx + 1)
-            {
-                Tuple<int, int> maxHealthInfo = GetAvailableMaxHealth(i - 1);
-                int maxHealthPointer = maxHealthInfo.Item2;
-
-				if(maxHealthPointer > -1)
-				{
-                    AIMove(i - 1, maxHealthPointer, i, 0);
-                    movetimes++;
-                }
-            }
-        }
-		// 反向遍历一次，使站位更合理
-		for (int i = frontLineIdx + 1; i < battleLineControllers.Length; i++)
-		{
-			int halfCapacity = battleLineControllers[i].capacity / 2;
-
-			// 当单位数大于容量一半，且后一条战线单位数小于容量一半时，将本战线血量高的往后撤
-			while (battleLineControllers[i].count > halfCapacity && battleLineControllers[i + 1].count <= battleLineControllers[i + 1].capacity / 2 && i < fieldCapacity - 1)
-            {
-				Tuple<int, int> maxHealthInfo = GetAvailableMaxHealth(i);
-				int maxHealthPointer = maxHealthInfo.Item2;
-
-				if (maxHealthPointer > -1)
-				{
-                    AIMove(i, maxHealthPointer, i + 1, 0);
-                    movetimes++;
-                }
-			}
-
-			// 当单位数小于或等于容量一半加一,且后一条战线单位数大于或等于容量一半时，将后一条战线血量低的往前推
-			while (battleLineControllers[i].count <= halfCapacity + 1 && battleLineControllers[i + 1].count > battleLineControllers[i + 1].capacity / 2 && i < fieldCapacity - 1)
-			{
-				Tuple<int, int> minHealthInfo = GetAvailableMinHealth(i + 1);
-				int minHealthPointer = minHealthInfo.Item2;
-
-				if(minHealthPointer > -1)
-				{
-                    AIMove(i + 1, minHealthPointer, i, 0);
-                    movetimes++;
-                }
-			}
-		}
-
-		// 指令卡策略：费用够就出
-		while (energy[Turn] > 3 && handicap.count > 0)
-		{
-			AICast(0, 0, 0);
-		}
-
-		Skip();
-    }*/
 
 	/// <summary>
 	/// 获取某条战线的建筑数量

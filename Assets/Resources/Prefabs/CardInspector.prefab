@@ -948,7 +948,7 @@ GameObject:
   - component: {fileID: 8107065775523644728}
   - component: {fileID: -7917182421558431459}
   m_Layer: 0
-  m_Name: Inspector
+  m_Name: CardInspector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

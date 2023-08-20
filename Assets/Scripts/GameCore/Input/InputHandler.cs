@@ -9,21 +9,15 @@ namespace InputHandler
 	{
 		public void SetSceneController(ICultivateSceneController ctdspl);
 		/// <summary>
-		/// console version
-		/// </summary>
-		public void EnterTacticalSystem();
-		/// <summary>
 		/// 选择指定建筑物的指定卡包，将卡包导入到卡组中
 		/// </summary>
 		/// <param name="buildingID"></param>
 		/// <param name="packID"></param>
 		public void FromPackImportDeck(int buildingID, int packID);
 
-		/// <summary>
-		/// start expedition<br/>
-		/// 开始远征
-		/// </summary>
-		public void EnterExpedition();
+		public void LoadTutorialHumanDeck();
+
+		public void SetBase(int index);
 	}
 
 
@@ -95,6 +89,9 @@ namespace InputHandler
 		public void Exit();
 
 		public bool BattleOverChecked();
+
+		public void GetReward();
+		public void AddReward(int rewardIndex);
 	}
 
 
