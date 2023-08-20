@@ -43,6 +43,8 @@ public class BaseSelection : MonoBehaviour,
 
 	public void Start()
 	{
+		manager = GameManager.GetInstance().cultivateSceneManager;
+
 		Frame.SetActive(false);
 
 		originScale = transform.localScale;
