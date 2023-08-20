@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// <summary>
 /// boss克隆蘑人，策略为调整战线使得每次克隆的克隆蘑人数量最多
 /// </summary>
-public class BTBattleNode2 : BTBattleNode
+public class BTBattleNode3 : BTBattleNode
 {
     protected override void Init()
     {
@@ -75,12 +75,6 @@ public class BTBattleNode2 : BTBattleNode
                     BTMove(i - 1, maxHealthPointer, i, 0);
                 }
             }
-        }
-
-        // 指令卡策略：费用够就出
-        while (Energy > 3 && AIHandicap.count > 0)
-        {
-            BTCast(0, 0, 0);
         }
     }
 
