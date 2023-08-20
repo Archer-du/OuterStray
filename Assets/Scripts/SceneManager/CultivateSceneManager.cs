@@ -23,9 +23,11 @@ public class CultivateSceneManager : MonoBehaviour,
 
     public DepartmentController buildingController;
 
-    public Button baseChoose;
 
+    public Button baseChooseButton;
     public Button testImportButton;
+
+    public CanvasGroup inputMask;
 
     [Header("Text")]
 	public TMP_Text gasMineText;
@@ -51,13 +53,18 @@ public class CultivateSceneManager : MonoBehaviour,
         GameManager.OnGameStateChanged += OnGameStateChanged;
 
         //note: 功能从manager下放到controller
-        baseChoose.onClick.AddListener(BaseChoose);
+        baseChooseButton.onClick.AddListener(BaseChoose);
         startExpedition.onClick.AddListener(StartExpedition);
         testImportButton.onClick.AddListener(ImportPack);
 
+        buildingsDisabled = false;
+
         selectionIndex = -1;
-        startExpedition.interactable = false;
-    }
+        startExpedition.enabled = false;
+        startExpedition.image.color = Color.gray;
+
+		selections = new BaseSelection[3];
+	}
     public void OnGameStateChanged(GameState state)
     {
         if(state == GameState.Start)
@@ -98,25 +105,61 @@ public class CultivateSceneManager : MonoBehaviour,
 			Debug.LogWarning("你还没有导入卡组！");
 			return;
 		}
+        Debug.Log("test");
 		duration = 0.5f;
-        GameObject base1 = Instantiate(baseCardPrototype, new Vector3(2500, 0, 0), Quaternion.Euler(new Vector3(0, 90, 0)));
-		GameObject base2 = Instantiate(baseCardPrototype, new Vector3(3000, 0, 0), Quaternion.Euler(new Vector3(0, 90, 0)));
-		GameObject base3 = Instantiate(baseCardPrototype, new Vector3(3500, 0, 0), Quaternion.Euler(new Vector3(0, 90, 0)));
 
-        base1.GetComponent<BaseSelection>().index = 0;
-        base2.GetComponent<BaseSelection>().index = 1;
-        base3.GetComponent<BaseSelection>().index = 2;
+        DisableAllBuildings();
+        playerDeck.DisableAllDeckTags();
+		inputMask.DOFade(0.3f, duration);
 
-        base1.transform.DOBlendableMoveBy(new Vector3(-2000, 0, 0), duration);
-        base2.transform.DOBlendableMoveBy(new Vector3(-2000, 0, 0), duration);
-        base3.transform.DOBlendableMoveBy(new Vector3(-2000, 0, 0), duration);
+        for(int i = 0; i < 3; i++)
+        {
+            GameObject bases = Instantiate(baseCardPrototype, new Vector3(2500, 0, 0), Quaternion.Euler(new Vector3(0, 90, 0)));
+			selections[i] = bases.GetComponent<BaseSelection>();
+            selections[i].transform.SetParent(transform.Find("UI"));
+            selections[i].index = i;
+            selections[i].transform.DOBlendableMoveBy(new Vector3(-3000 + i * 800, 0, 0), duration);
+            selections[i].transform.DOBlendableRotateBy(new Vector3(0, -90, 0), duration);
+		}
+        startExpedition.transform.DOMove(new Vector3(300, -800, 0), duration);
 	}
     public void StartExpedition()
     {
-        cultivateSystem.SetBase(selectionIndex);
+        Debug.Log("test");
+
+        EnableAllBuilding();
+        playerDeck.EnableAllDeckTags();
+		inputMask.alpha = 0;
+
+		cultivateSystem.SetBase(selectionIndex);
+        startExpedition.transform.position = new Vector3(0, -1200, 0);
+		// 查找同类型的所有游戏对象
+		BaseSelection[] otherInstances = Object.FindObjectsOfType<BaseSelection>();
+
+		// 遍历并销毁除自身以外的同类型游戏对象
+		foreach (BaseSelection instance in otherInstances)
+		{
+			if (instance != this)
+			{
+				Destroy(instance.gameObject);
+			}
+		}
 
 		gameManager.UpdateGameState(GameState.Tactical);
     }
+    public bool buildingsDisabled;
+    public void DisableAllBuildings()
+    {
+        buildingsDisabled = true;
+        testImportButton.interactable = false;
+        baseChooseButton.interactable = false;
+	}
+    public void EnableAllBuilding()
+    {
+        buildingsDisabled = false;
+		testImportButton.interactable = true;
+		baseChooseButton.interactable = true;
+	}
 
 
 
@@ -132,14 +175,18 @@ public class CultivateSceneManager : MonoBehaviour,
 		return playerDeck;
 	}
 
-	public void UpdateBasicInfo(int gasMine, int cardNum, int baseHealth)
+	public void UpdateBasicInfo(int gasMine, int cardNum)
 	{
 		gasMineText.text = gasMine.ToString();
 		cardNumText.text = cardNum.ToString();
-		baseHealthText.text = baseHealth.ToString();
-		baseMaxHealthText.text = baseHealth.ToString();
+		//baseHealthText.text = baseHealth.ToString();
+		//baseMaxHealthText.text = baseHealth.ToString();
 	}
-
+    public void UpdateBaseInfo(int baseHealth)
+    {
+        baseHealthText.text = baseHealth.ToString();
+        baseMaxHealthText.text = baseHealth.ToString();
+    }
 
 
 

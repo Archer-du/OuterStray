@@ -8,6 +8,11 @@ using UnityEngine.UI;
 public class BaseBuildingButton : MonoBehaviour,
 	IPointerEnterHandler, IPointerExitHandler
 {
+	public CultivateSceneManager manager
+	{
+		get => GameManager.GetInstance().cultivateSceneManager;
+	}
+
 	public Image aura;
 	public float inspectFactor;
 	public float duration;
@@ -16,12 +21,14 @@ public class BaseBuildingButton : MonoBehaviour,
 	private Vector3 inspectScale;
 	public void OnPointerEnter(PointerEventData eventData)
 	{
+		if (manager.buildingsDisabled) return;
 		aura.DOFade(1f, duration);
 		transform.DOScale(inspectScale, duration);
 	}
 
 	public void OnPointerExit(PointerEventData eventData)
 	{
+		if (manager.buildingsDisabled) return;
 		aura.DOFade(0f, duration);
 		transform.DOScale(originScale, duration);
 	}

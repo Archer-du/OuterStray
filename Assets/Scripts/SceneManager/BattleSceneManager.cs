@@ -163,6 +163,7 @@ public class BattleSceneManager : MonoBehaviour,
 
 		rewardConfirmButton.interactable = false;
 		
+		rewards = new RewardSelection[3];
 		//TODO trigger
 		turnNum = 0;
 
@@ -233,7 +234,7 @@ public class BattleSceneManager : MonoBehaviour,
 			skipButton.enabled = false;
 
 			// 启动行为树
-            StartCoroutine(btBattleNode.BehaviorTree());
+            StartCoroutine(AIBehavior());
         }
 	}
 	private void UpdateTurn()
@@ -255,7 +256,7 @@ public class BattleSceneManager : MonoBehaviour,
 			skipButton.enabled = false;
 
             // 启动行为树
-            StartCoroutine(btBattleNode.BehaviorTree());
+            StartCoroutine(AIBehavior());
         }
 	}
 	public void TurnUpdateAnimation(int TURN)
@@ -479,19 +480,19 @@ public class BattleSceneManager : MonoBehaviour,
 	//TEST
 	public void InstantiateReward(string[] IDs, string[] names, string[] categories, int[] cost, int[] attacks, int[] healths, int[] counters, string[] description)
 	{
-		rewards = new RewardSelection[3];
 		duration = 0.5f;
-		rewards[0] = Instantiate(rewardPrototype, new Vector3(2500, 0, 0), Quaternion.Euler(new Vector3(0, 90, 0))).GetComponent<RewardSelection>();
-		rewards[1] = Instantiate(rewardPrototype, new Vector3(3000, 0, 0), Quaternion.Euler(new Vector3(0, 90, 0))).GetComponent<RewardSelection>();
-		rewards[2] = Instantiate(rewardPrototype, new Vector3(3500, 0, 0), Quaternion.Euler(new Vector3(0, 90, 0))).GetComponent<RewardSelection>();
 
-		rewards[0].index = 0;
-		rewards[1].index = 1;
-		rewards[2].index = 2;
+		for (int i = 0; i < 3; i++)
+		{
+			GameObject reward = Instantiate(rewardPrototype, new Vector3(2500, 0, 0), Quaternion.Euler(new Vector3(0, 90, 0)));
+			rewards[i] = reward.GetComponent<RewardSelection>();
+			rewards[i].transform.SetParent(transform.Find("UI"));
+			rewards[i].index = i;
+			rewards[i].transform.DOBlendableMoveBy(new Vector3(-3000 + i * 800, 0, 0), duration);
+			rewards[i].transform.DOBlendableRotateBy(new Vector3(0, -90, 0), duration);
+		}
+		rewardConfirmButton.transform.DOMove(new Vector3(0, -800, 0), duration);
 
-		rewards[0].transform.DOBlendableMoveBy(new Vector3(-2000, 0, 0), duration);
-		rewards[1].transform.DOBlendableMoveBy(new Vector3(-2000, 0, 0), duration);
-		rewards[2].transform.DOBlendableMoveBy(new Vector3(-2000, 0, 0), duration);
 	}
 	//interface
 	public void ClearOtherSelectionFrame()

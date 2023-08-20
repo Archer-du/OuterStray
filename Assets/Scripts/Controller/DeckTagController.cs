@@ -140,6 +140,7 @@ public class DeckTagController : MonoBehaviour, IComparable<DeckTagController>,
 
 	public void OnBeginDrag(PointerEventData eventData)
 	{
+		if (GameManager.GetInstance().gameState != SceneState.GameState.Tactical) return;
 		if (!controller.sceneManager.panelEnabled) return;
 		if (controller.sceneManager.currentNode is not MedicalNodeController) return;
 		if (category == "Command") return;
@@ -150,6 +151,7 @@ public class DeckTagController : MonoBehaviour, IComparable<DeckTagController>,
 
 	public void OnDrag(PointerEventData eventData)
 	{
+		if (GameManager.GetInstance().gameState != SceneState.GameState.Tactical) return;
 		if (!controller.sceneManager.panelEnabled) return;
 		if (controller.sceneManager.currentNode is not MedicalNodeController) return;
 		if (category == "Command") return;
@@ -162,6 +164,7 @@ public class DeckTagController : MonoBehaviour, IComparable<DeckTagController>,
 	public void OnEndDrag(PointerEventData eventData)
 	{
 		GetComponent<InspectPanelController>().disable = false;
+		if (GameManager.GetInstance().gameState != SceneState.GameState.Tactical) return;
 		if (!controller.sceneManager.panelEnabled) return;
 		if (controller.sceneManager.currentNode is not MedicalNodeController) return;
 		if (category == "Command") return;
@@ -173,11 +176,13 @@ public class DeckTagController : MonoBehaviour, IComparable<DeckTagController>,
 
 	public void OnPointerEnter(PointerEventData eventData)
 	{
+		if (controller.deckTagLock) return;
 		ground.DOFade(0.5f, duration);
 	}
 
 	public void OnPointerExit(PointerEventData eventData)
 	{
+		if (controller.deckTagLock) return;
 		ground.DOFade(0, duration);
 	}
 
