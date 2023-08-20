@@ -105,7 +105,7 @@ namespace DisplayInterface
 		/// 战斗系统渲染层初始化
 		/// </summary>
 		/// <param name="handler"></param>
-		public void FieldInitialize(IBattleSystemInput handler, int fieldCapacity);
+		public void FieldInitialize(IBattleSystemInput handler, int fieldCapacity, int BTindex);
 		public void InitBases(IUnitElementController humanBase, IUnitElementController plantBase);
 
 		public IBattleLineController InstantiateBattleLine(int idx, int capacity);

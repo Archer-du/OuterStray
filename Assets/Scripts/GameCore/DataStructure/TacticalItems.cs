@@ -693,13 +693,16 @@ namespace DataCore.TacticalItems
 		internal override void CastNodeEvent()
 		{
 			base.CastNodeEvent();
-			battleSystem.BuildBattleField(playerDeck, plantDeck, fieldCapacity, battleLinesCapacity, 
+			battleSystem.BuildBattleField(BTindex, playerDeck, plantDeck, fieldCapacity, battleLinesCapacity, 
 				initialTurn, initialHumanEnergy, initialPlantEnergy, initialHumanHandicaps, initialPlantHandicaps,
 				fieldPresets, nextTerrain == null);
 		}
 
 
-
+		internal int BTindex
+		{
+			get => battleConfig.BTindex;
+		}
 		internal int initialTurn
 		{
 			get => battleConfig.initialTurn;
@@ -741,6 +744,9 @@ namespace DataCore.TacticalItems
 		[Serializable]
 		internal class BattleConfigJson
 		{
+			[JsonProperty("BTIndex")]
+			internal int BTindex;
+
 			[JsonProperty("initialTurn")]
 			internal int initialTurn;
 

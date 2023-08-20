@@ -138,7 +138,7 @@ namespace LogicCore
 		/// </summary>
 		/// <param name="playerDeck"></param>
 		/// <param name="enemyDeck"></param>
-		internal void BuildBattleField(Deck playerDeck, Deck enemyDeck, int fieldCapacity, int[] battleLinesCapacity,
+		internal void BuildBattleField(int BTindex, Deck playerDeck, Deck enemyDeck, int fieldCapacity, int[] battleLinesCapacity,
 			int initialTurn, int initialHumanEnergy, int initialPlantEnergy, int initialHumanHandicaps, int initialPlantHandicaps,
 			List<BattleNode.FieldPreset> fieldPresets, bool final)
 		{
@@ -155,7 +155,7 @@ namespace LogicCore
 
 			linesCapacity = fieldCapacity;
 
-			controller.FieldInitialize(this, linesCapacity);
+			controller.FieldInitialize(this, linesCapacity, BTindex);
 
 			//数据层初始化
 			TURN = initialTurn;

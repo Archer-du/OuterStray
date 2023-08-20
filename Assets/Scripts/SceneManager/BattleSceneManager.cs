@@ -110,19 +110,22 @@ public class BattleSceneManager : MonoBehaviour,
 	{
 		Settler.gameObject.transform.position = new Vector3(0, 2160, 0);
 		SettleButton.onClick.AddListener(BattleOverChecked);
-
-		// 根据战斗节点选择对应的行为树
-		btBattleNode = new BTBattleNode0();
     }
-	public void FieldInitialize(IBattleSystemInput handler, int fieldCapacity)
+	public void FieldInitialize(IBattleSystemInput handler, int fieldCapacity, int BTindex)
 	{
 		gameManager = GameManager.GetInstance();
 
 		battleSystem = handler;
 
-		//TODO config
-		//data
-		this.fieldCapacity = fieldCapacity;
+		switch (BTindex)
+		{
+			case 0: btBattleNode = new BTBattleNode0();
+				break;
+		}
+
+        //TODO config
+        //data
+        this.fieldCapacity = fieldCapacity;
 		battleLines = new BattleLineController[fieldCapacity];
 
 		energy = new int[2];
