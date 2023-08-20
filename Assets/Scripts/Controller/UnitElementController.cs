@@ -12,13 +12,13 @@ using UnityEngine.Rendering;
 using InputHandler;
 using DataCore.BattleElements;
 using System;
+using static UnityEditor.Rendering.FilterWindow;
 
 
 public class UnitElementController : BattleElementController,
 	IUnitElementController
 {
 	public IUnitInput input;
-
 
 	public TMP_Text attackText;
 	public TMP_Text healthText;
@@ -68,6 +68,7 @@ public class UnitElementController : BattleElementController,
 	private AudioSource deployAudio;
 	private AudioSource randomAttackAudio;
 	private AudioSource healAudio;
+
 	[Header("Clip")]
 	public AudioClip attackClip;
 	public AudioClip deployClip;
@@ -101,8 +102,6 @@ public class UnitElementController : BattleElementController,
 
 		BattleSceneManager.InputLocked += EnableInputLock;
 		BattleSceneManager.InputUnlocked += DisableInputLock;
-
-
 
 		UnitAudioInitialize();
 	}
@@ -287,6 +286,49 @@ public class UnitElementController : BattleElementController,
 
 
 
+	public void PlayerDeploy(int lineIdx, int pos)
+	{
+		//能量判定
+		if (battleSceneManager.energy[0] < cost)
+		{
+			//TODO
+			battleSceneManager.humanEnergy.transform.DOShakePosition(0.3f, 30f);
+			canvas.sortingOrder = handicapOrder;
+			handicap.Insert(this);
+			return;
+		}
+		if (pos < 0 || lineIdx != 0)
+		{
+			canvas.sortingOrder = handicapOrder;
+			handicap.Insert(this);
+			return;
+		}
+
+		battleSceneManager.PlayerDeploy(handicapIdx, lineIdx, pos);
+		handicapIdx = -1;
+	}
+	public void PlayerMove(int lineIdx, int pos)
+	{
+		if (pos < 0 || lineIdx == battleLine.index || Math.Abs(lineIdx - battleLine.index) > moveRange 
+			|| (battleSceneManager.battleLines[lineIdx].ownership != ownership &&  battleSceneManager.battleLines[lineIdx].count > 0))
+		{
+			canvas.sortingOrder = handicapOrder;
+			handicap.Insert(this);
+			return;
+		}
+
+		battleSceneManager.PlayerMove(battleLine.index, resIdx, lineIdx, pos);
+	}
+	public void PlayerRetreat()
+	{
+		battleSceneManager.PlayerRetreat(battleLine.index, resIdx);
+	}
+
+
+
+
+
+
 	public void DeployAnimationEvent()
 	{
 		deployAudio.Play();
@@ -321,12 +363,12 @@ public class UnitElementController : BattleElementController,
 	{
 		if (target == null) return;
 
-		float forwardTime = 0.15f;
-        float backlashTime = 0.2f;
+		float forwardTime = 0.2f;
+        float backlashTime = 0.4f;
 		Vector3 oriPosition = battleLineLogicPosition;
 		Vector3 dstPosition = target.battleLineLogicPosition;
 
-		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + nameContent + " attacked " + "line: " + target.battleLine.lineIdx + "res: " + target.resIdx + target.nameContent);
+		Debug.Log("line: " + battleLine.index + "res: " + resIdx + nameContent + " attacked " + "line: " + target.battleLine.index + "res: " + target.resIdx + target.nameContent);
 
 		//安全间隔
 		battleSceneManager.rotateSequence.AppendInterval(BattleLineController.updateTime + 0.2f);
@@ -357,12 +399,12 @@ public class UnitElementController : BattleElementController,
 	{
 		if (target == null) return;
 
-		float forwardTime = 0.15f;
+		float forwardTime = 0.2f;
 		float backlashTime = 0.2f;
 		UnitElementController controller = target as UnitElementController;
 		Vector3 oriPosition = battleLineLogicPosition;
 
-		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + nameContent + " random attacked " + "line: " + controller.battleLine.lineIdx + "res: " + controller.resIdx + controller.nameContent);
+		Debug.Log("line: " + battleLine.index + "res: " + resIdx + nameContent + " random attacked " + "line: " + controller.battleLine.index + "res: " + controller.resIdx + controller.nameContent);
 
 		battleSceneManager.rotateSequence.AppendInterval(BattleLineController.updateTime + 0.2f);
 		battleSceneManager.sequenceTime += BattleLineController.updateTime + 0.2f;
@@ -385,7 +427,7 @@ public class UnitElementController : BattleElementController,
 	{
 		float forwardTime = 0.2f;
 
-		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + nameContent + " damaged " + (healthPoint - health).ToString());
+		Debug.Log("line: " + battleLine.index + "res: " + resIdx + nameContent + " damaged " + (healthPoint - health).ToString());
 		if(method == "append")
 		{
 			battleSceneManager.rotateSequence.Append(
@@ -429,7 +471,7 @@ public class UnitElementController : BattleElementController,
 	{
 		float forwardTime = 0.2f;
 
-		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + nameContent + " healed " + (health - healthPoint).ToString());
+		Debug.Log("line: " + battleLine.index + "res: " + resIdx + nameContent + " healed " + (health - healthPoint).ToString());
 		if (method == "append")
         {
 			battleSceneManager.rotateSequence.Append(
@@ -475,19 +517,22 @@ public class UnitElementController : BattleElementController,
 	/// </summary>
 	public void TerminateAnimationEvent(string method)
 	{
-		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + nameContent + " destroyed!");
+		float fadeTime = 0.25f;
+		Debug.Log("line: " + battleLine.index + "res: " + resIdx + nameContent + " destroyed!");
 
 		if(method == "append")
 		{
-			battleSceneManager.rotateSequence.InsertCallback(battleSceneManager.sequenceTime,
-				() =>
-				{
-					battleLine.ElementRemove(resIdx);
-					battleLine.UpdateElementPosition();
-					gameObject.SetActive(false);
-					input.UpdateManual();
-				}
-			);
+			battleSceneManager.rotateSequence.Append(selfCanvas.DOFade(0, fadeTime)
+				.OnComplete(
+					() =>
+					{
+						battleLine.ElementRemove(resIdx);
+						battleLine.UpdateElementPosition();
+						gameObject.SetActive(false);
+						input.UpdateManual();
+					})
+				);
+			battleSceneManager.sequenceTime += fadeTime;
 		}
 		else
 		{
@@ -511,7 +556,7 @@ public class UnitElementController : BattleElementController,
 		Vector3 oriPosition = battleLineLogicPosition;
 		Vector3 dstPosition = target.battleLineLogicPosition;
 
-		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + nameContent + " CleaveAttacked ");
+		Debug.Log("line: " + battleLine.index + "res: " + resIdx + nameContent + " CleaveAttacked ");
 
 		//安全间隔
 		battleSceneManager.rotateSequence.AppendInterval(BattleLineController.updateTime + 0.2f);

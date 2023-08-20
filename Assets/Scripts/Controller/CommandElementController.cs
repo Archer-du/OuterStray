@@ -10,13 +10,15 @@ using UnityEngine.UI;
 using UnityEngine.Rendering;
 using InputHandler;
 using DataCore.BattleElements;
+using LogicCore;
+using UnityEngine.UIElements;
+using UnityEngine.SceneManagement;
 
 public class CommandElementController : BattleElementController,
-	ICommandElementController
+	ICommandElementController,
+	IPointerClickHandler
 {
 	public TMP_Text durabilityText;
-
-	public CanvasGroup selfCanvas;
 
 	public int durability;
 	public string type;
@@ -38,15 +40,37 @@ public class CommandElementController : BattleElementController,
 		costText.text = cost.ToString();
 		durabilityText.text = durability.ToString();
 	}
+	public void PlayerCast()
+	{
+		//能量判定
+		if (battleSceneManager.energy[0] < cost)
+		{
+			//TODO
+			battleSceneManager.humanEnergy.transform.DOShakePosition(0.3f, 30f);
+			canvas.sortingOrder = handicapOrder;
+			handicap.Insert(this);
+			return;
+		}
+
+		if(type == "NonTarget")
+		{
+			battleSceneManager.PlayerNonTargetCast(handicapIdx);
+		}
+		else
+		{
+			TargetCastAnimationEvent();
+		}
+	}
 
 
 
 
-	public void CastAnimationEvent(string method)
+
+
+	public void NonTargetCastAnimationEvent(string method)
 	{
 		float castTime = 0.4f;
-		float waitTime = 0.8f;
-		
+		float waitTime = 1f;
 
 		Sequence seq = DOTween.Sequence();
 
@@ -55,7 +79,8 @@ public class CommandElementController : BattleElementController,
 		if (method == "append")
 		{
 			//飞向战场侧中
-			seq.Append(transform.DOMove(inputOffset / 2 + ownership * 500 * Vector2.down, castTime));
+			seq.Append(transform.DOMove(inputOffset / 2 + 500 * Vector2.down, castTime));
+			seq.Append(transform.DOScale(castScale, castTime));
 			seq.Join(transform.DORotate(new Vector3(0, 0, 0), castTime));
 			//等待
 			seq.AppendInterval(waitTime);
@@ -83,13 +108,83 @@ public class CommandElementController : BattleElementController,
 				);
 			seq.Join(transform.DOScale(handicapScale, castTime));
 		}
-		else
+	}
+	public void TargetCastAnimationEvent()
+	{
+		float castTime = 0.4f;
+
+		Sequence seq = DOTween.Sequence();
+
+		Debug.Log(nameContent + " casted ");
+
+		targetSelectionLock = true;
+
+		seq.Append(transform.DOMove(inputOffset / 2 + 500 * Vector2.down, castTime));
+		seq.Join(transform.DORotate(new Vector3(0, 0, 0), castTime));
+	}
+	public void TargetCastAnimationOver()
+	{
+		float castTime = 0.4f;
+
+		Sequence seq = DOTween.Sequence();
+
+		Vector3 rotateBy = new Vector3(0, 0, - 90);
+
+		targetSelectionLock = false;
+
+		//消耗
+		if (durability == 0)
 		{
+			//TODO
+			seq.Append(selfCanvas.DOFade(0, castTime));
+			return;
+		}
+		//回归
+		seq.Append(
+			transform.DOMove(stack.transform.position + 500 * Vector3.left, castTime)
+			.OnComplete(() =>
+			{
+				this.gameObject.SetActive(false);
+				transform.rotation = Quaternion.Euler(Vector3.zero);
+				transform.localScale = handicapScale;
+			})
+		);
+		seq.Join(
+			transform.DOBlendableRotateBy(rotateBy, castTime)
+			);
+		seq.Join(transform.DOScale(handicapScale, castTime));
+	}
+
+
+
+
+
+
+	public void OnPointerClick(PointerEventData eventData)
+	{
+		float castTime = 0.4f;
+
+		//等待
+		int lineIdx = GetBattleLineIdx(eventData.position.y);
+		BattleLineController battleLine = lineIdx >= 0 && lineIdx <= battleSceneManager.fieldCapacity - 1 ? battleSceneManager.battleLines[lineIdx] : null;
+		if (battleLine != null)
+		{
+			int dstPos = battleLine.GetOperatePos(eventData.position.x);
+			if(dstPos >= 0)
+			{
+				battleSceneManager.PlayerTargetCast(handicapIdx, lineIdx, dstPos);
+
+				TargetCastAnimationOver();
+			}
 		}
 	}
+
+
+
 
 	public void UpdateState(ElementState state)
 	{
 		dataState = state;
 	}
+
 }
