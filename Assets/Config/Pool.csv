@@ -1,4 +1,4 @@
-base_00,human,基地车,Construction,0,0,30,NA,0,,none,,
+base_00,human,基地车,Construction,0,0,30,,,,none,,
 base_01,human,“旅者”,Construction,0,0,20,,,战斗开始时获得三点额外费用。/你的回合开始时，额外抽一张牌。,,,
 base_02,human,“决意”,Construction,0,0,15,,,所有手牌的费用减少1点。,,,
 base_03,human,“城塞”,Construction,0,0,30,,,在你的回合结束时，为基地相邻的单位恢复2点耐久。,,,
