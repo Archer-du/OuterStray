@@ -33,6 +33,7 @@ public class ElementDragInput : MonoBehaviour,
 	public void OnBeginDrag(PointerEventData eventData)
 	{
 		if (BattleElementController.draggingLock) return;
+		if (BattleElementController.targetSelectionLock) return;
 		if (BattleSceneManager.Turn != 0) return;
 		if (controller.inspectLock) return;
 		if (controller.inputLock) return;
@@ -60,6 +61,7 @@ public class ElementDragInput : MonoBehaviour,
 
 	public void OnDrag(PointerEventData eventData)
 	{
+		if (BattleElementController.targetSelectionLock) return;
 		if (BattleSceneManager.Turn != 0) return;
 		if (controller.inspectLock) return;
 		if (controller.inputLock) return;
@@ -80,7 +82,13 @@ public class ElementDragInput : MonoBehaviour,
 			int lineIdx = controller.GetBattleLineIdx(eventData.position.y);
 			BattleLineController battleLine = lineIdx >= 0 && lineIdx <= sceneManager.fieldCapacity - 1 ? sceneManager.battleLines[lineIdx] : null;
 			if (battleLine == null) return;
-
+			foreach(BattleLineController line in sceneManager.battleLines)
+			{
+				if (battleLine != line)
+				{
+					line.UpdateElementPosition();
+				}
+			}
 
 			if (controller.category != "Command")
 			{
@@ -108,6 +116,7 @@ public class ElementDragInput : MonoBehaviour,
 
 	public void OnEndDrag(PointerEventData eventData)
 	{
+		if (BattleElementController.targetSelectionLock) return;
 		if (BattleSceneManager.Turn != 0) return;
 		if (controller.inspectLock) return;
 		if (controller.inputLock) return;

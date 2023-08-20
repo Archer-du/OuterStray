@@ -94,9 +94,10 @@ public class TacticalPanelDisplay : MonoBehaviour
 			Panel.SetActive(false);
 		});
 	}
+	//TODO
 	public bool AddNewTag(Vector3 position, DeckTagController deckTag)
 	{
-		if(category != "Promote" || !sceneManager.panelEnabled)
+		if((category != "Promote" && category != "OutPost") || !sceneManager.panelEnabled)
 		{
 			return false;
 		}

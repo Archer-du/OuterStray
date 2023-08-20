@@ -15,8 +15,7 @@ using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
 
 public class CommandElementController : BattleElementController,
-	ICommandElementController,
-	IPointerClickHandler
+	ICommandElementController
 {
 	public TMP_Text durabilityText;
 
@@ -118,6 +117,7 @@ public class CommandElementController : BattleElementController,
 		Debug.Log(nameContent + " casted ");
 
 		targetSelectionLock = true;
+		battleSceneManager.castingCommand = this;
 
 		seq.Append(transform.DOMove(inputOffset / 2 + 500 * Vector2.down, castTime));
 		seq.Join(transform.DORotate(new Vector3(0, 0, 0), castTime));
@@ -131,6 +131,7 @@ public class CommandElementController : BattleElementController,
 		Vector3 rotateBy = new Vector3(0, 0, - 90);
 
 		targetSelectionLock = false;
+		battleSceneManager.castingCommand = null;
 
 		//消耗
 		if (durability == 0)
@@ -156,28 +157,6 @@ public class CommandElementController : BattleElementController,
 	}
 
 
-
-
-
-
-	public void OnPointerClick(PointerEventData eventData)
-	{
-		float castTime = 0.4f;
-
-		//等待
-		int lineIdx = GetBattleLineIdx(eventData.position.y);
-		BattleLineController battleLine = lineIdx >= 0 && lineIdx <= battleSceneManager.fieldCapacity - 1 ? battleSceneManager.battleLines[lineIdx] : null;
-		if (battleLine != null)
-		{
-			int dstPos = battleLine.GetOperatePos(eventData.position.x);
-			if(dstPos >= 0)
-			{
-				battleSceneManager.PlayerTargetCast(handicapIdx, lineIdx, dstPos);
-
-				TargetCastAnimationOver();
-			}
-		}
-	}
 
 
 

@@ -127,7 +127,7 @@ namespace DataCore.BattleElements
 		/// <exception cref="Exception"></exception>
 		protected void EffectsParse(string effects)
 		{
-			if (effects != "none")
+			if (effects != "none" && effects != "")
 			{
 				//复数效果分离
 				string[] effect = effects.Split('|');

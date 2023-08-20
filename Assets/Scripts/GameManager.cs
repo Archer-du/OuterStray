@@ -12,6 +12,9 @@ using UnityEngine.UI;
 using DG.Tweening;
 using DataCore.CultivateItems;
 using UnityEngine.EventSystems;
+using System;
+using System.IO;
+using UnityEngine.Rendering.VirtualTexturing;
 
 public class GameManager : MonoBehaviour, IGameManagement
 {
@@ -151,6 +154,7 @@ public class GameManager : MonoBehaviour, IGameManagement
 					cultivateSceneManager = GameObject.Find("CultivateSceneManager").GetComponent<CultivateSceneManager>();
 					cultivateSceneManager.cultivateSystem = cultivationSystem;
 					cultivationSystem.SetSceneController(cultivateSceneManager);
+					if (config.tutorial) cultivationSystem.LoadTutorialHumanDeck();
 				}
 				break;
 			case "TacticalScene":
@@ -177,15 +181,17 @@ public class GameManager : MonoBehaviour, IGameManagement
 	}
 
 	public Button start;
+
+	public GlobalConfig config;
 	private void Start()
 	{
 		DontDestroyOnLoad(gameObject);
 
+		string configPath = "Assets\\Config\\GlobalConfig.json";
+		string jsonContent = File.ReadAllText(configPath);
+		config = JsonUtility.FromJson<GlobalConfig>(jsonContent);
 
-		start.onClick.AddListener(() =>
-		{
-			UpdateGameState(GameState.Cultivate);
-		});
+		start.onClick.AddListener(StartGame);
 
 		//EXTEND
 		pool = new Pool();
@@ -194,7 +200,7 @@ public class GameManager : MonoBehaviour, IGameManagement
 		battleSystem = new BattleSystem(pool, battleSceneManager);
 		tacticalSystem = new TacticalSystem(pool, tacticalSceneManager, battleSystem as BattleSystem);
 		battleSystem.SetTacticalSystem(tacticalSystem);
-		cultivationSystem = new CultivationSystem(cultivateSceneManager, tacticalSystem as TacticalSystem, battleSystem as BattleSystem);
+		cultivationSystem = new CultivationSystem(pool, cultivateSceneManager, tacticalSystem as TacticalSystem, battleSystem as BattleSystem);
 		tacticalSystem.SetCultivateSystem(cultivationSystem);
 
 		TacticalBGM.Play();
@@ -202,7 +208,7 @@ public class GameManager : MonoBehaviour, IGameManagement
 	private void DestroyOtherInstancesOfType()
 	{
 		// 查找同类型的所有游戏对象
-		GameManager[] otherInstances = Object.FindObjectsOfType<GameManager>();
+		GameManager[] otherInstances = UnityEngine.Object.FindObjectsOfType<GameManager>();
 
 		// 遍历并销毁除自身以外的同类型游戏对象
 		foreach (GameManager instance in otherInstances)
@@ -212,5 +218,78 @@ public class GameManager : MonoBehaviour, IGameManagement
 				Destroy(instance.gameObject);
 			}
 		}
+	}
+
+
+
+	//Tutorial
+	public void StartGame()
+	{
+		if (!config.tutorial)
+		{
+			UpdateGameState(GameState.Cultivate);
+		}
+		else
+		{
+			AsyncOperation async = UpdateGameState(GameState.Cultivate);
+			StartCoroutine(LateLoadTactical(async));
+		}
+	}
+	IEnumerator LateLoadTactical(AsyncOperation async)
+	{
+		while (!async.isDone)
+		{
+			yield return null;
+		}
+		TutorialDialogAnimation();
+		UpdateGameState(GameState.Tactical);
+	}
+	public void BuildTutorial()
+	{
+		dialogGround.gameObject.SetActive(false);
+		tacticalSceneManager.currentNode.CastEvent();
+	}
+
+
+
+
+	public Button dialogGround;
+
+	public TMP_Text[] dialogTexts;
+	public TMP_Text readyText;
+	public void TutorialDialogAnimation()
+	{
+
+		float start = 0.5f;
+		float end = 0.5f;
+		float duration = 2f;
+
+		dialogGround.gameObject.SetActive(true);
+		dialogGround.enabled = false;
+		dialogGround.onClick.AddListener(BuildTutorial);
+
+		Sequence seq = DOTween.Sequence();
+		for(int i = 0; i < dialogTexts.Length; i++)
+		{
+			int temp = i;
+			seq.Append(dialogTexts[temp].DOFade(1, start));
+			seq.AppendInterval(duration);
+			seq.Append(dialogTexts[temp].DOFade(1, end));
+		}
+
+		seq.Append(readyText.DOFade(1, start));
+
+		seq.OnComplete(() => dialogGround.enabled = true);
+	}
+
+
+
+
+
+
+	[Serializable]
+	public class GlobalConfig
+	{
+		public bool tutorial;
 	}
 }
