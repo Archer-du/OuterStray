@@ -135,7 +135,7 @@ public class BattleSceneManager : MonoBehaviour,
 		//TODO trigger
 		turnNum = 0;
 
-        for (int i = 0; i < 5; i++)
+		for (int i = 0; i < 5; i++)
 		{
 			humanSlots[i].SetActive(false);
 			plantSlots[i].SetActive(false);
@@ -156,10 +156,10 @@ public class BattleSceneManager : MonoBehaviour,
 		baseDisplay.UpdateBaseHealth(health, bases[0].maxHealthPoint);
 	}
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public void UpdateTurnWithSettlement()
+	/// <summary>
+	/// 
+	/// </summary>
+	public void UpdateTurnWithSettlement()
 	{
 		//结算攻击动画
 		rotateSequence.InsertCallback(sequenceTime, () =>
@@ -195,7 +195,7 @@ public class BattleSceneManager : MonoBehaviour,
 		{
 			buttonImage.color = Color.gray;
 
-			StartCoroutine(AIBehavior());
+			// StartCoroutine(AIBehavior());
 			skipButton.enabled = false;
 		}
 	}
@@ -217,7 +217,7 @@ public class BattleSceneManager : MonoBehaviour,
 			buttonImage.color = Color.gray;
 			skipButton.enabled = false;
 
-			StartCoroutine(AIBehavior());
+			// StartCoroutine(AIBehavior());
 		}
 	}
 	public void TurnUpdateAnimation(int TURN)
@@ -234,7 +234,7 @@ public class BattleSceneManager : MonoBehaviour,
 
 
 
-    public void UpdateEnergy(int energy)
+	public void UpdateEnergy(int energy)
 	{
 		this.energy[Turn] = energy;
 		this.energyText[Turn].text = energy.ToString();
@@ -265,7 +265,7 @@ public class BattleSceneManager : MonoBehaviour,
 		{
 			humanSlots[i].SetActive(true);
 		}
-		for(int i = 0; i < this.energySupply[1]; i++)
+		for (int i = 0; i < this.energySupply[1]; i++)
 		{
 			plantSlots[i].SetActive(true);
 		}
@@ -346,10 +346,10 @@ public class BattleSceneManager : MonoBehaviour,
 	}
 	public int GetBattleLineIdx(float y)
 	{
-		if(y > BattleLineController.fieldLowerBound && y < BattleLineController.fieldUpperBound)
+		if (y > BattleLineController.fieldLowerBound && y < BattleLineController.fieldUpperBound)
 		{
 			int idx = (int)((y - 180) / (BattleLineController.lineWidth + BattleLineController.lineInterval));
-			if(idx < 0 || idx > fieldCapacity - 1)
+			if (idx < 0 || idx > fieldCapacity - 1)
 			{
 				return -1;
 			}
@@ -393,14 +393,14 @@ public class BattleSceneManager : MonoBehaviour,
 	}
 	public void BattleOverChecked()
 	{
-        BattleElementController[] otherInstances = UnityEngine.Object.FindObjectsOfType<BattleElementController>();
+		BattleElementController[] otherInstances = UnityEngine.Object.FindObjectsOfType<BattleElementController>();
 
-        // 遍历并销毁除自身以外的同类型游戏对象
-        foreach (BattleElementController instance in otherInstances)
-        {
-            Destroy(instance.gameObject);
-        }
-        DOTween.Clear();
+		// 遍历并销毁除自身以外的同类型游戏对象
+		foreach (BattleElementController instance in otherInstances)
+		{
+			Destroy(instance.gameObject);
+		}
+		DOTween.Clear();
 		Settler.transform.position = new Vector3(0, 2160, 0);
 		if (battleSystem.BattleOverChecked())
 		{
@@ -1063,7 +1063,7 @@ public class BattleSceneManager : MonoBehaviour,
 	public void AIDeploy(int handicapIdx)
 	{
 		int lineidx = 3;//supportline
-		UnitElementController controller = AIHandicap.Pop(handicapIdx) as UnitElementController;
+		UnitElementController controller = handicapController[1].Pop(handicapIdx) as UnitElementController;
 
 
 		sequenceTime = 0;
@@ -1090,55 +1090,26 @@ public class BattleSceneManager : MonoBehaviour,
 	{
 		Skip();
 	}
-    
-	private void AIMove(int resLineIdx, int resIdx, int dstLineIdx, int dstPos)
-    {
+
+	public void AIMove(int resLineIdx, int resIdx, int dstLineIdx, int dstPos)
+	{
 		sequenceTime = 0;
-        rotateSequence.Kill();
-        rotateSequence = DOTween.Sequence();
+		rotateSequence.Kill();
+		rotateSequence = DOTween.Sequence();
 
-        battleSystem.Move(resLineIdx, resIdx, dstLineIdx, dstPos);
-    }
+		battleSystem.Move(resLineIdx, resIdx, dstLineIdx, dstPos);
+	}
 
-	private void AIRetreat(int resLineIdx, int resPos)
+	public void AIRetreat(int resLineIdx, int resPos)
 	{
 		BattleLineController battleLine = battleLines[resLineIdx];
 		if(resLineIdx == fieldCapacity - 1 && battleLine[resPos].operateCounter == 1)
 		{
 			sequenceTime = 0;
-            rotateSequence.Kill();
-            rotateSequence = DOTween.Sequence();
-            Debug.Log($"Retreat第{resPos}位{battleLine[resPos].ID}");
-            battleSystem.Retreat(resLineIdx, resPos);
-		}
-	}
-
-
-    // 行为树节点类
-    public abstract class BTNode
-	{
-		public abstract bool Execute();
-	}
-
-	public class Selector : BTNode
-	{
-		private List<BTNode> children;
-
-		public Selector(List<BTNode> children)
-		{
-			this.children = children;
-		}
-
-		public override bool Execute()
-		{
-			foreach (BTNode child in children)
-			{
-				if (child.Execute())
-				{
-					return true;
-				}
-			}
-			return false;
+			rotateSequence.Kill();
+			rotateSequence = DOTween.Sequence();
+			Debug.Log($"Retreat第{resPos}位{battleLine[resPos].ID}");
+			battleSystem.Retreat(resLineIdx, resPos);
 		}
 	}
 }
