@@ -1722,7 +1722,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 806367706}
-  - component: {fileID: 806367707}
   m_Layer: 0
   m_Name: BehaviorTree
   m_TagString: Untagged
