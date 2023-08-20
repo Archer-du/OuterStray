@@ -671,7 +671,9 @@ namespace DataCore.BattleElements
 		/// <param name="battleSystem"></param>
 		internal void Deploy(BattleLine dstLine, int dstPos)
 		{
+			//部署前解析效果
 			EffectsReParse();
+
 			eventTable.RaiseEvent("BeforeDeploy", this, battleSystem);
 
 			//加入部署队列
@@ -690,8 +692,15 @@ namespace DataCore.BattleElements
 			dstLine.Receive(this, dstPos);
 			this.operateCounter--;
 
-			eventTable.RaiseEvent("AfterDeploy", this, battleSystem);
 
+
+			eventTable.RaiseEvent("AfterDeploy", this, battleSystem);
+			battleSystem.eventTable[ownership].RaiseEvent("UnitDeployed", this, battleSystem);
+			if (dstLine.index == battleSystem.frontLines[ownership])
+			{
+				battleSystem.eventTable[ownership].RaiseEvent("EnterFrontLine", this, battleSystem);
+				eventTable.RaiseEvent("EnterFrontLine", this, battleSystem);
+			}
 			UpdateInfo();
 		}
 		/// <summary>
@@ -707,9 +716,15 @@ namespace DataCore.BattleElements
 			dstLine.Receive(resLine.Send(resIdx), dstPos);
 			this.operateCounter--;
 
-			UpdateInfo();
 
 			eventTable.RaiseEvent("AfterMove", this, battleSystem);
+			if (dstLine.index == battleSystem.frontLines[ownership])
+			{
+				battleSystem.eventTable[ownership].RaiseEvent("EnterFrontLine", this, battleSystem);
+				eventTable.RaiseEvent("EnterFrontLine", this, battleSystem);
+			}
+			battleSystem.eventTable[ownership].RaiseEvent("UnitMoved", this, battleSystem);
+			UpdateInfo();
 		}
 		/// <summary>
 		/// 强制移动，不消耗移动次数
@@ -839,6 +854,19 @@ namespace DataCore.BattleElements
 			controller.RecoverAnimationEvent(this.dynHealth, "append");
 
 			this.recover = 0;
+
+			if (this.dynHealth <= 0)
+			{
+				if (this == battleSystem.bases[0])
+				{
+					battleSystem.result = BattleResult.fail;
+				}
+				if (this == battleSystem.bases[1])
+				{
+					battleSystem.result = BattleResult.win;
+				}
+				Terminate("append");
+			}
 		}
 		/// <summary>
 		/// 死亡
@@ -855,8 +883,6 @@ namespace DataCore.BattleElements
 
 			battleLine.ElementRemove(inlineIdx);
 			controller.TerminateAnimationEvent(method);
-
-
 
 			//not likely
 			battleSystem.eventTable[ownership].RaiseEvent("UnitTerminated", this, battleSystem);
@@ -1008,9 +1034,15 @@ namespace DataCore.BattleElements
 			this.dynAttackCounter -= 1;
 			this.operateCounter--;
 
-			UpdateInfo();
 
 			eventTable.RaiseEvent("AfterMove", this, battleSystem);
+			if (dstLine.index == battleSystem.frontLines[ownership])
+			{
+				battleSystem.eventTable[ownership].RaiseEvent("EnterFrontLine", this, battleSystem);
+				eventTable.RaiseEvent("EnterFrontLine", this, battleSystem);
+			}
+			battleSystem.eventTable[ownership].RaiseEvent("UnitMoved", this, battleSystem);
+			UpdateInfo();
 		}
 	}
 	internal sealed class ArtilleryElement : UnitElement
@@ -1145,8 +1177,12 @@ namespace DataCore.BattleElements
 				Terminate();
 			}
 
+
+			if(type == "NonTarget" || ownership == 1)
+			{
+				controller.NonTargetCastAnimationEvent("append");
+			}
 			UpdateInfo();
-			controller.CastAnimationEvent("append");
 		}
 		internal void Recover(int heal)
 		{

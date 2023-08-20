@@ -157,8 +157,8 @@ namespace DisplayInterface
 
 	public interface IHandicapController
 	{
-		public void Init();
-		public void Fill(List<IBattleElementController> list);
+		public void Init(int ownership);
+		public void Fill(List<IBattleElementController> list, int initialTurn);
 		public void Push(IBattleElementController element);
 		public IBattleElementController Pop(int handicapIdx);
 	}
@@ -211,6 +211,6 @@ namespace DisplayInterface
 		public void UpdateInfo(int cost, int durability, ElementState state);
 		public void UpdateState(ElementState state);
 
-		public void CastAnimationEvent(string method);
+		public void NonTargetCastAnimationEvent(string method);
 	}
 }

@@ -6,19 +6,12 @@ using UnityEngine;
 public class CardStackController : MonoBehaviour,
     ICardStackController
 {
-
-	private int ownership;
-
 	public GameObject unitPrototype;
 
 	public GameObject commandPrototype;
 
-
-
-
 	public void Init(int ownership)
 	{
-		this.ownership = ownership;
 	}
 	/// <summary>
 	/// 重载的方法，用于初始化Fill
@@ -27,7 +20,6 @@ public class CardStackController : MonoBehaviour,
 	/// <returns></returns>
 	public IUnitElementController InstantiateUnitElementInBattle()
 	{
-		Transform stacks = GameObject.Find("UI/Stacks").transform;
 		Quaternion initRotation = Quaternion.Euler(new Vector3(0, 0, -90));
 
 		GameObject unit = Instantiate(unitPrototype, transform.position, initRotation);
@@ -39,7 +31,6 @@ public class CardStackController : MonoBehaviour,
 	}
 	public ICommandElementController InstantiateCommandElementInBattle()
 	{
-		Transform stacks = GameObject.Find("UI/Stacks").transform;
 		Quaternion initRotation = Quaternion.Euler(new Vector3(0, 0, -90));
 
 		GameObject comm = Instantiate(commandPrototype, transform.position, initRotation);

@@ -12,13 +12,13 @@ using UnityEngine.Rendering;
 using InputHandler;
 using DataCore.BattleElements;
 using System;
+using static UnityEditor.Rendering.FilterWindow;
 
 
 public class UnitElementController : BattleElementController,
 	IUnitElementController
 {
 	public IUnitInput input;
-
 
 	public TMP_Text attackText;
 	public TMP_Text healthText;
@@ -68,6 +68,7 @@ public class UnitElementController : BattleElementController,
 	private AudioSource deployAudio;
 	private AudioSource randomAttackAudio;
 	private AudioSource healAudio;
+
 	[Header("Clip")]
 	public AudioClip attackClip;
 	public AudioClip deployClip;
@@ -76,6 +77,7 @@ public class UnitElementController : BattleElementController,
 
 	[Header("Components")]
 	public InspectPanelController battleLineInspect;
+	public CardInspect inspector;
 	/// <summary>
 	/// 从牌堆加入手牌或战场时初始化
 	/// </summary>
@@ -93,21 +95,7 @@ public class UnitElementController : BattleElementController,
 		arrowsGroup.alpha = 0;
 		InspectPanel.alpha = 0f;
 
-		InspectorName.text = name;
-		InspectorCost.text = cost.ToString();
-		InspectorDescription.text = description;
-		InspectorAttack.text = attackText.text;
-		InspectorMaxHealth.text = maxHealthPoint.ToString();
-		InspectorAttackCounter.text = this.category == "Construction" ? "" : attackCounter.ToString();
-
-		InspectorImage.sprite = CardImage.sprite;
-		//TODO
-		//InspectorImage.rectTransform.sizeDelta = new Vector3(12, 15);
-		InspectorGround.color = elementGround.color;
-		InspectorFrame.color = elementGround.color;
-		InspectorNameTag.color = elementGround.color;
-		InspectorCostTag.color = elementGround.color;
-		InspectorCategoryIcon.sprite = componentCategoryIcon.sprite;
+		inspector.CopyInfo(this);
 
 		battleLineInspect = GetComponent<InspectPanelController>();
 		OnElementStateChanged += battleLineInspect.OnElementStateChanged;
@@ -115,8 +103,10 @@ public class UnitElementController : BattleElementController,
 		BattleSceneManager.InputLocked += EnableInputLock;
 		BattleSceneManager.InputUnlocked += DisableInputLock;
 
-
-
+		UnitAudioInitialize();
+	}
+	private void UnitAudioInitialize()
+	{
 		attackAudio = gameObject.AddComponent<AudioSource>();
 		attackAudio.clip = attackClip;
 		attackAudio.loop = false;
@@ -191,6 +181,7 @@ public class UnitElementController : BattleElementController,
 			}
 		}
 	}
+
 	public void UpdateHealth(int dynHealth)
 	{
 		battleSceneManager.rotateSequence.InsertCallback(battleSceneManager.sequenceTime,
@@ -208,6 +199,7 @@ public class UnitElementController : BattleElementController,
         healthText.text = dynHealth.ToString();
         healthText.DOColor(new Color(1, (float)dynHealth / maxHealthPoint, (float)dynHealth / maxHealthPoint), duration);
     }
+
 	public void UpdateTarget(int t1, int t2, int t3, IUnitElementController target, int targetIdx, bool mocking, bool cleave)
 	{
 		this.target = target as UnitElementController;
@@ -225,6 +217,7 @@ public class UnitElementController : BattleElementController,
 			}
 		);
 	}
+
 	private void UpdateTarget(int t1, int t2, int t3)
 	{
 		arrowsGroup.alpha = 1;
@@ -232,6 +225,7 @@ public class UnitElementController : BattleElementController,
 		midArrow.DOFade(t2, duration);
 		rightArrow.DOFade(t3, duration);
 	}
+
 	private void UpdateTarget(int targetIdx, bool mocking)
 	{
 		arrowsGroup.alpha = 0;
@@ -268,6 +262,7 @@ public class UnitElementController : BattleElementController,
 			rightArrowMocked.DOFade(mocking ? 1 : 0, duration);
 		}
 	}
+
 	public void UpdateInspectComponent()
 	{
 
@@ -287,6 +282,49 @@ public class UnitElementController : BattleElementController,
 	{
 		inputLock = false;
 	}
+
+
+
+
+	public void PlayerDeploy(int lineIdx, int pos)
+	{
+		//能量判定
+		if (battleSceneManager.energy[0] < cost)
+		{
+			//TODO
+			battleSceneManager.humanEnergy.transform.DOShakePosition(0.3f, 30f);
+			canvas.sortingOrder = handicapOrder;
+			handicap.Insert(this);
+			return;
+		}
+		if (pos < 0 || lineIdx != 0)
+		{
+			canvas.sortingOrder = handicapOrder;
+			handicap.Insert(this);
+			return;
+		}
+
+		battleSceneManager.PlayerDeploy(handicapIdx, lineIdx, pos);
+		handicapIdx = -1;
+	}
+	public void PlayerMove(int lineIdx, int pos)
+	{
+		if (pos < 0 || lineIdx == battleLine.index || Math.Abs(lineIdx - battleLine.index) > moveRange 
+			|| (battleSceneManager.battleLines[lineIdx].ownership != ownership &&  battleSceneManager.battleLines[lineIdx].count > 0))
+		{
+			canvas.sortingOrder = handicapOrder;
+			handicap.Insert(this);
+			return;
+		}
+
+		battleSceneManager.PlayerMove(battleLine.index, resIdx, lineIdx, pos);
+	}
+	public void PlayerRetreat()
+	{
+		battleSceneManager.PlayerRetreat(battleLine.index, resIdx);
+	}
+
+
 
 
 
@@ -325,12 +363,12 @@ public class UnitElementController : BattleElementController,
 	{
 		if (target == null) return;
 
-		float forwardTime = 0.15f;
-        float backlashTime = 0.2f;
+		float forwardTime = 0.2f;
+        float backlashTime = 0.4f;
 		Vector3 oriPosition = battleLineLogicPosition;
 		Vector3 dstPosition = target.battleLineLogicPosition;
 
-		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + nameContent + " attacked " + "line: " + target.battleLine.lineIdx + "res: " + target.resIdx + target.nameContent);
+		Debug.Log("line: " + battleLine.index + "res: " + resIdx + nameContent + " attacked " + "line: " + target.battleLine.index + "res: " + target.resIdx + target.nameContent);
 
 		//安全间隔
 		battleSceneManager.rotateSequence.AppendInterval(BattleLineController.updateTime + 0.2f);
@@ -361,12 +399,12 @@ public class UnitElementController : BattleElementController,
 	{
 		if (target == null) return;
 
-		float forwardTime = 0.15f;
+		float forwardTime = 0.2f;
 		float backlashTime = 0.2f;
 		UnitElementController controller = target as UnitElementController;
 		Vector3 oriPosition = battleLineLogicPosition;
 
-		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + nameContent + " random attacked " + "line: " + controller.battleLine.lineIdx + "res: " + controller.resIdx + controller.nameContent);
+		Debug.Log("line: " + battleLine.index + "res: " + resIdx + nameContent + " random attacked " + "line: " + controller.battleLine.index + "res: " + controller.resIdx + controller.nameContent);
 
 		battleSceneManager.rotateSequence.AppendInterval(BattleLineController.updateTime + 0.2f);
 		battleSceneManager.sequenceTime += BattleLineController.updateTime + 0.2f;
@@ -389,7 +427,7 @@ public class UnitElementController : BattleElementController,
 	{
 		float forwardTime = 0.2f;
 
-		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + nameContent + " damaged " + (healthPoint - health).ToString());
+		Debug.Log("line: " + battleLine.index + "res: " + resIdx + nameContent + " damaged " + (healthPoint - health).ToString());
 		if(method == "append")
 		{
 			battleSceneManager.rotateSequence.Append(
@@ -433,7 +471,7 @@ public class UnitElementController : BattleElementController,
 	{
 		float forwardTime = 0.2f;
 
-		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + nameContent + " healed " + (health - healthPoint).ToString());
+		Debug.Log("line: " + battleLine.index + "res: " + resIdx + nameContent + " healed " + (health - healthPoint).ToString());
 		if (method == "append")
         {
 			battleSceneManager.rotateSequence.Append(
@@ -479,19 +517,22 @@ public class UnitElementController : BattleElementController,
 	/// </summary>
 	public void TerminateAnimationEvent(string method)
 	{
-		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + nameContent + " destroyed!");
+		float fadeTime = 0.25f;
+		Debug.Log("line: " + battleLine.index + "res: " + resIdx + nameContent + " destroyed!");
 
 		if(method == "append")
 		{
-			battleSceneManager.rotateSequence.InsertCallback(battleSceneManager.sequenceTime,
-				() =>
-				{
-					battleLine.ElementRemove(resIdx);
-					battleLine.UpdateElementPosition();
-					gameObject.SetActive(false);
-					input.UpdateManual();
-				}
-			);
+			battleSceneManager.rotateSequence.Append(selfCanvas.DOFade(0, fadeTime)
+				.OnComplete(
+					() =>
+					{
+						battleLine.ElementRemove(resIdx);
+						battleLine.UpdateElementPosition();
+						gameObject.SetActive(false);
+						input.UpdateManual();
+					})
+				);
+			battleSceneManager.sequenceTime += fadeTime;
 		}
 		else
 		{
@@ -515,7 +556,7 @@ public class UnitElementController : BattleElementController,
 		Vector3 oriPosition = battleLineLogicPosition;
 		Vector3 dstPosition = target.battleLineLogicPosition;
 
-		Debug.Log("line: " + battleLine.lineIdx + "res: " + resIdx + nameContent + " CleaveAttacked ");
+		Debug.Log("line: " + battleLine.index + "res: " + resIdx + nameContent + " CleaveAttacked ");
 
 		//安全间隔
 		battleSceneManager.rotateSequence.AppendInterval(BattleLineController.updateTime + 0.2f);
@@ -586,12 +627,14 @@ public class UnitElementController : BattleElementController,
 
 
 
-
-
-	private float timer = 0;
+	public Transform Component;
+	public void Start()
+	{
+		
+	}
 	void Update()
 	{
-		if(globalAnimeLock == false && dataState == ElementState.inBattleLine)
+		if(draggingLock == false && dataState == ElementState.inBattleLine)
 		{
 			transform.DOScale(battleFieldScale, duration);
 		}

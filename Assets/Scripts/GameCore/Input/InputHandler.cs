@@ -68,6 +68,7 @@ namespace InputHandler
 		/// <param name="dstPos"></param>
 		public void Cast(int handicapIdx, int dstLineIdx, int dstPos);
 
+		public void Cast(int handicapIdx);
 		/// <summary>
 		/// 从战场指定战线指定位置移动元素到目标点
 		/// </summary>

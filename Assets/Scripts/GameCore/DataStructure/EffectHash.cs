@@ -2,7 +2,6 @@ using DataCore.BattleElements;
 using DataCore.BattleItems;
 using DataCore.Cards;
 using LogicCore;
-// using PlasticPipe.PlasticProtocol.Messages;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,9 +11,6 @@ namespace EventEffectModels
 {
 
 	internal delegate void BattleEventHandler(BattleElement source, BattleSystem system);
-
-	internal delegate void NonTargetCommandHandler(BattleSystem system);
-	internal delegate void TargetedCommandHandler(UnitElement target, BattleSystem system);
 
 	/// <summary>
 	/// 事件名字符串千万不能写错！！

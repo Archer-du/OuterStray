@@ -12,24 +12,27 @@ using UnityEngine.Rendering;
 using InputHandler;
 using DataCore.BattleElements;
 using System;
+using UnityEngine.SceneManagement;
 
 public class BattleElementController : MonoBehaviour
 {
-	public event System.Action<ElementState> OnElementStateChanged;
+	public event Action<ElementState> OnElementStateChanged;
 
-	public static event System.Action GlobalAnimeLocked;
-	public static event System.Action GlobalAnimeUnlocked;
+	public static event Action GlobalAnimeLocked;
+	public static event Action GlobalAnimeUnlocked;
 
-	public event System.Action AnimeLocked;
-	public event System.Action AnimeUnlocked;
+	public event Action AnimeLocked;
+	public event Action AnimeUnlocked;
 
-	private static bool GlobalAnimeLock;
-	public static bool globalAnimeLock
+	public static bool targetSelectionLock = false;
+
+	private static bool DraggingLock = false;
+	public static bool draggingLock
 	{
-		get => GlobalAnimeLock;
+		get => DraggingLock;
 		set
 		{
-			GlobalAnimeLock = value;
+			DraggingLock = value;
 			if(value == true)
 			{
 				GlobalAnimeLocked?.Invoke();
@@ -40,13 +43,13 @@ public class BattleElementController : MonoBehaviour
 			}
 		}
 	}
-	[SerializeField] private bool AnimeLock;
-	public bool animeLock
+	[SerializeField] private bool InspectLock;
+	public bool inspectLock
 	{
-		get => AnimeLock;
+		get => InspectLock;
 		set
 		{
-			AnimeLock = value;
+			InspectLock = value;
 			if(value == true)
 			{
 				AnimeLocked?.Invoke();
@@ -59,13 +62,16 @@ public class BattleElementController : MonoBehaviour
 	}
 	public bool inputLock;
 
+	[Header("StaticInfo")]
 	public static Vector2 inputOffset = new Vector2(1980, 1080);
-
 	public static int cardWidth = 360;
+
 
 	[Header("BasicInfo")]
 	public Vector3 battleFieldScale;
 	public Vector3 handicapScale;
+	public Vector3 castScale;
+	public Vector3 targetScale;
 
 	public Vector3 targetTextScale;
 	public Vector3 originTextScale;
@@ -110,6 +116,8 @@ public class BattleElementController : MonoBehaviour
 	}
 	public Canvas canvas;
 
+	public CanvasGroup selfCanvas;
+
 	public HandicapController handicap
 	{
 		get => battleSceneManager.handicapController[ownership];
@@ -152,38 +160,26 @@ public class BattleElementController : MonoBehaviour
 	[Header("Inspector")]
 	public CanvasGroup InspectPanel;
 
-	public Image InspectorGround;
-	public Image InspectorFrame;
-	public Image InspectorCategoryIcon;
-	public Image InspectorNameTag;
-	public Image InspectorCostTag;
-
-	public TMP_Text InspectorName;
-	public TMP_Text InspectorCost;
-	public TMP_Text InspectorAttack;
-	public TMP_Text InspectorMaxHealth;
-	public TMP_Text InspectorAttackCounter;
-	public TMP_Text InspectorDescription;
+	public GameObject InspectComponent;
 
 	public GameObject counterIcon;
-
-	public GameObject InspectComponent;
+	public Image categoryIcon;
 	public Image componentFrame;
-	public Image componentCategoryIcon;
 	public TMP_Text componentDescriptionText;
 	public Vector3 componentPosition;
 
 	[Header("Components")]
 	public HandicapInspector handicapInspect;
 
-	public void BasicInfoInit()
-	{
-		animeLock = false;
-		inputLock = false;
-		//输入偏移量
-		inputOffset = new Vector2(1980, 1080);
 
+	public void TransformInfoInit()
+	{
 		componentPosition = InspectComponent.transform.position;
+
+		battleFieldScale = transform.localScale;
+		handicapScale = 1.35f * battleFieldScale;
+		castScale = 1.5f * battleFieldScale;
+		targetScale = 1.25f * battleFieldScale;
 
 		targetTextScale = nameText.transform.localScale * 1.35f;
 		originTextScale = nameText.transform.localScale;
@@ -196,27 +192,30 @@ public class BattleElementController : MonoBehaviour
 
 		normalFontSizeOrigin = 40;
 		normalFontSizeEnlarge = 50;
-
-		canvas = GetComponent<Canvas>();
-
-		battleSceneManager = GameObject.Find("BattleSceneManager").GetComponent<BattleSceneManager>();
-
-		handicapInspect = GetComponent<HandicapInspector>();
-		handicapInspect.Init(handicapScale, this);
 	}
 
 
 	public void Init(string ID, int ownership, string name, string categories, int cost, string description)
 	{
+		//data
 		this.ID = ID;
 		this.ownership = ownership;
 		this.nameContent = name;
 		this.category = categories;
 		this.description = description;
 
-		battleFieldScale = transform.localScale;
-		handicapScale = 1.35f * battleFieldScale;
-		BasicInfoInit();
+		inspectLock = false;
+		inputLock = false;
+		//输入偏移量
+		inputOffset = new Vector2(1980, 1080);
+
+		//transform
+		TransformInfoInit();
+
+		battleSceneManager = GameObject.Find("BattleSceneManager").GetComponent<BattleSceneManager>();
+
+		handicapInspect = GetComponent<HandicapInspector>();
+		handicapInspect.Init(handicapScale, this);
 
 		nameText.text = name;
 		costText.text = cost.ToString();
@@ -225,85 +224,65 @@ public class BattleElementController : MonoBehaviour
 		LoadCardResources(ID);
 	}
 
-
+	public Color color;
+	/// <summary>
+	/// 根据ID索引加载卡牌资源
+	/// </summary>
+	/// <param name="ID"></param>
 	private void LoadCardResources(string ID)
 	{
 		CardImage.sprite = Resources.Load<Sprite>("CardImage/" + ID);
-		//if (ownership == 1)
-		//{
-		//	CardImage.rectTransform.sizeDelta = new Vector2(10, 13);
-		//}
 
-		Color color;
 		switch (category)
 		{
 			case "LightArmor":
-				if (UnityEngine.ColorUtility.TryParseHtmlString("#429656", out color))
-				{
-					elementGround.color = color;
-					elementFrame.color = color;
-					componentFrame.color = color;
-					NameTag.color = color;
-					costTag.color = color;
-					componentCategoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[11];
-				}
+				UnityEngine.ColorUtility.TryParseHtmlString("#429656", out color);
+				categoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[11];
 				break;
 			case "Artillery":
-				if (UnityEngine.ColorUtility.TryParseHtmlString("#CE8849", out color))
-				{
-					elementGround.color = color;
-					elementFrame.color = color;
-					componentFrame.color = color;
-					NameTag.color = color;
-					costTag.color = color;
-					componentCategoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[8];
-				}
+				UnityEngine.ColorUtility.TryParseHtmlString("#CE8849", out color);
+				categoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[8];
 				break;
 			case "Motorized":
-				if (UnityEngine.ColorUtility.TryParseHtmlString("#426A84", out color))
-				{
-					elementGround.color = color;
-					elementFrame.color = color;
-					componentFrame.color = color;
-					NameTag.color = color;
-					costTag.color = color;
-					componentCategoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[9];
-				}
+				UnityEngine.ColorUtility.TryParseHtmlString("#426A84", out color);
+				categoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[9];
 				break;
 			case "Guardian":
-				if (UnityEngine.ColorUtility.TryParseHtmlString("#97A5A4", out color))
-				{
-					elementGround.color = color;
-					elementFrame.color = color;
-					componentFrame.color = color;
-					NameTag.color = color;
-					costTag.color = color;
-					componentCategoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[10];
-				}
+				UnityEngine.ColorUtility.TryParseHtmlString("#97A5A4", out color);
+				categoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[10];
 				break;
 			case "Construction":
-				if (UnityEngine.ColorUtility.TryParseHtmlString("#7855A5", out color))
-				{
-					elementGround.color = color;
-					elementFrame.color = color;
-					componentFrame.color = color;
-					NameTag.color = color;
-					costTag.color = color;
-					componentCategoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[12];
-				}
+				UnityEngine.ColorUtility.TryParseHtmlString("#7855A5", out color);
+				categoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[12];
 				break;
 			case "Command":
-				if (UnityEngine.ColorUtility.TryParseHtmlString("#7855A5", out color))
-				{
-					color = Color.gray;
-					elementGround.color = color;
-					elementFrame.color = color;
-					componentFrame.color = color;
-					NameTag.color = color;
-					costTag.color = color;
-					CardImage.rectTransform.sizeDelta = new Vector2(10, 13);
-				}
+				color = Color.gray;
+				CardImage.rectTransform.sizeDelta = new Vector2(10, 13);
 				break;
 		}
+
+		elementGround.color = color;
+		elementFrame.color = color;
+		componentFrame.color = color;
+		NameTag.color = color;
+		costTag.color = color;
+	}
+
+
+
+
+
+	public int GetBattleLineIdx(float y)
+	{
+		if (y > BattleLineController.fieldLowerBound && y < BattleLineController.fieldUpperBound)
+		{
+			int idx = (int)((y - 180) / (BattleLineController.lineWidth + BattleLineController.lineInterval));
+			if (idx < 0 || idx > battleSceneManager.fieldCapacity - 1)
+			{
+				return -1;
+			}
+			return idx;
+		}
+		return -1;
 	}
 }

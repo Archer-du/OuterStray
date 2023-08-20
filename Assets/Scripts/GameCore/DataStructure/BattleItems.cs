@@ -144,10 +144,8 @@ namespace DataCore.BattleItems
 
 			for (int i = 0; i < count; i++)
 			{
-				//display
 				UnitElement unit = elementList[i];
 				controllerList.Add(unit.controller);
-				//unit.Init();
 			}
 			controller.UpdateElementLogicPosition(controllerList);
 		}
@@ -487,7 +485,7 @@ namespace DataCore.BattleItems
 		/// </summary>
 		/// <param name="list"></param>
 		/// <exception cref="Exception"></exception>
-		internal void Fill(List<BattleElement> list)
+		internal void Fill(List<BattleElement> list, int initialTurn)
 		{
 			List<IBattleElementController> controllerList = new List<IBattleElementController>();
 
@@ -501,17 +499,15 @@ namespace DataCore.BattleItems
 					//display
 					UnitElement unit = list[i] as UnitElement;
 					controllerList.Add(unit.controller);
-					//unit.Init();
 				}
 				else
 				{
 					CommandElement comm = list[i] as CommandElement;
 					controllerList.Add(comm.controller);
-					//comm.Init();
 				}
 			}
 			if(controllerList.Count <= 0) { throw new Exception("list"); }
-			controller.Fill(controllerList);
+			controller.Fill(controllerList, initialTurn);
 		}
 		/// <summary>
 		/// 添加元素到手牌
@@ -528,13 +524,11 @@ namespace DataCore.BattleItems
 			{
 				//display
 				UnitElement unit = element as UnitElement;
-				//unit.Init();
 				controller.Push(unit.controller);
 			}
 			else
 			{
 				CommandElement comm = element as CommandElement;
-				//comm.Init();
 				controller.Push(comm.controller);
 			}
 		}

@@ -11,63 +11,50 @@ using DataCore.BattleElements;
 public class BattleLineController : MonoBehaviour,
     IBattleLineController
 {
-
 	public BattleSceneManager battleSceneManager;
-	/// <summary>
-	/// 战线容量
-	/// </summary>
-	public int capacity;
+
+	public static float updateTime = 0.2f;
+
+	public static float fieldLowerBound = 220f;
+	public static float fieldUpperBound = 1970f;
+	public static float lineInterval = 66f;
+	public static float lineWidth = 400f;
+
 
 	public List<UnitElementController> elementList;
 	public int count { get => elementList.Count; }
 
-
-	public GameObject background;
-	public Image image;
-
-	public int lineIdx;
-	public int ownerShip;
-
-	public float width;
-
-
-	public static float updateTime = 0.2f;
+	[Header("Data")]
+	/// <summary>
+	/// 战线容量
+	/// </summary>
+	public int capacity;
+	public int index;
+	public int ownership;
 
 	public int childNum;
-
 	internal UnitElementController this[int index]
 	{
 		get => elementList[index];
 		set => elementList[index] = value;
 	}
 
-	public static float fieldLowerBound = 220f;
-	public static float fieldUpperBound = 1970f;
-	public static float lineInterval = 66f;
-	public static float lineWidth = 400f;
-	/// <summary>
-	/// 数据层准备好时立刻调用Init
-	/// </summary>
-	/// <param name="capacity"></param>
-	/// <param name="ownership"></param>
+	[Header("Components")]
+	public BattleLineDisplay lineDisplay;
+
+
 	public void Init(int capacity, int ownership)
 	{
 		battleSceneManager = GameObject.Find("BattleSceneManager").GetComponent<BattleSceneManager>();
+
 		elementList = new List<UnitElementController>();
 
 		this.capacity = capacity;
-		this.ownerShip = ownership;
-
-		width = (capacity / 6f) * 2700; //TODO config
-
-		RectTransform size = background.GetComponent<RectTransform>();
-		size.sizeDelta = new Vector2(width, size.sizeDelta.y);
-
-
-		image = background.GetComponent<Image>();
-		image.color = ownership == 0 ? Color.blue : Color.red;
+		this.ownership = ownership;
 
 		childNum = transform.childCount;
+
+		lineDisplay.UpdateInfo();
 	}
 	/// <summary>
 	/// 根据归属权更新战线显示方式
@@ -80,16 +67,10 @@ public class BattleLineController : MonoBehaviour,
 		{ throw new Exception("Data inconsistencies"); }
 
 		UpdateElements();
-		this.ownerShip = ownerShip;
 
-		if (ownerShip == 0)
-		{
-			image.DOColor(Color.blue, 0.5f);
-		}
-		else
-		{
-			image.DOColor(Color.red, 0.5f);
-		}
+		this.ownership = ownerShip;
+
+		lineDisplay.UpdateInfo();
 	}
 
 
@@ -99,7 +80,7 @@ public class BattleLineController : MonoBehaviour,
 	/// </summary>
 	/// <param name="position"></param>
 	/// <returns></returns>
-	public int GetDeployPos(float position)
+	public int GetOperatePos(float position)
 	{
 		float inputOffsetX = 1980f;
 		float interval = 20f;
@@ -213,6 +194,10 @@ public class BattleLineController : MonoBehaviour,
 
 		return controller;
 	}
+	/// <summary>
+	/// 死亡时调用
+	/// </summary>
+	/// <param name="idx"></param>
 	public void ElementRemove(int idx)
 	{
 		elementList.RemoveAt(idx);
@@ -227,21 +212,21 @@ public class BattleLineController : MonoBehaviour,
 	/// </summary>
 	public void UpdateElementPosition()
 	{
-		//updating = true;
 		UpdateElements();
 
 		for(int i = 0; i < elementList.Count; i++)
 		{
-			elementList[i].animeLock = true;
+			elementList[i].inspectLock = true;
 
 			Vector3 oriPos = elementList[i].transform.position;
 			Vector3 dstPos = elementList[i].battleLineLogicPosition;
 
 			int temp = i;
 			elementList[i].transform.DOMove(dstPos, updateTime)
-				.OnComplete(() => elementList[temp].animeLock = false);
+				.OnComplete(() => elementList[temp].inspectLock = false);
 		}
 	}
+
 	private void UpdateElements()
 	{
 		for (int i = 0; i < elementList.Count; i++)
@@ -256,8 +241,6 @@ public class BattleLineController : MonoBehaviour,
 
 
 
-
-
 	public void UpdateElementLogicPosition(List<IUnitElementController> list)
 	{
 		for(int i = 0; i < list.Count; i++)
@@ -269,6 +252,31 @@ public class BattleLineController : MonoBehaviour,
 
 
 
+	/// <summary>
+	/// 显示层位置显示
+	/// </summary>
+	/// <param name="pos"></param>
+	public void PreUpdateElementPosition(int pos)
+	{
+		for (int i = 0; i < elementList.Count; i++)
+		{
+			elementList[i].inspectLock = true;
+			Vector3 dstPos;
+			if (i < pos)
+			{
+				dstPos = GetLogicPosition(i, count + 1);
+			}
+			else
+			{
+				dstPos = GetLogicPosition(i + 1, count + 1);
+			}
+			int temp = i;
+			elementList[i].transform.DOMove(dstPos, updateTime)
+				.OnComplete(() => elementList[temp].inspectLock = false);
+		}
+	}
+
+
 
 
 	public float returnTime = 0.2f;
@@ -277,8 +285,8 @@ public class BattleLineController : MonoBehaviour,
 	{
 		//updating = true;
 		draggingElement = element;
-		draggingElement.animeLock = true;
-		draggingElement.transform.DOScale(draggingElement.battleFieldScale, returnTime).OnComplete(() => draggingElement.animeLock = false);
+		draggingElement.inspectLock = true;
+		draggingElement.transform.DOScale(draggingElement.battleFieldScale, returnTime).OnComplete(() => draggingElement.inspectLock = false);
 		element.transform.DOMove(element.battleLineLogicPosition, returnTime).OnComplete(ResetHierachy);
 	}
 	private void ResetHierachy()
@@ -290,10 +298,10 @@ public class BattleLineController : MonoBehaviour,
 	//TODO config
 	public Vector3 GetLogicPosition(int pos)
 	{
-		return new Vector3(0, -700 + lineIdx * 466, 0) + new Vector3((pos - count / 2) * BattleElementController.cardWidth + BattleElementController.cardWidth / 2 * ((count + 1) % 2), 0, 0);
+		return new Vector3(0, -700 + index * (lineInterval + lineWidth), 0) + new Vector3((pos - count / 2) * BattleElementController.cardWidth + BattleElementController.cardWidth / 2 * ((count + 1) % 2), 0, 0);
 	}
 	public Vector3 GetLogicPosition(int pos, int count)
 	{
-		return new Vector3(0, -700 + lineIdx * 466, 0) + new Vector3((pos - count / 2) * BattleElementController.cardWidth + BattleElementController.cardWidth / 2 * ((count + 1) % 2), 0, 0);
+		return new Vector3(0, -700 + index * (lineInterval + lineWidth), 0) + new Vector3((pos - count / 2) * BattleElementController.cardWidth + BattleElementController.cardWidth / 2 * ((count + 1) % 2), 0, 0);
 	}
 }

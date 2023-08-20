@@ -13,7 +13,11 @@ public class MedicalNodeController : NodeController
 
 		exitButton = panelDisplay.exitButton;
 
-		exitButton.onClick.AddListener(tacticalManager.CampaignCompleted);
+		exitButton.onClick.AddListener(() =>
+		{
+			panelDisplay.PromoteInspector.deckID = -1;
+			tacticalManager.CampaignCompleted();
+		});
 
 		panelDisplay.onceButton.onClick.AddListener(() => MedicalHeal(false, panelDisplay.PromoteInspector.deckID));
 		panelDisplay.fullfillButton.onClick.AddListener(() => MedicalHeal(true, panelDisplay.PromoteInspector.deckID));
