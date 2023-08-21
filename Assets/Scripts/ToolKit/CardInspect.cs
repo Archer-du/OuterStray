@@ -32,6 +32,9 @@ public class CardInspect : MonoBehaviour
 	public TMP_Text attackText;
 	public TMP_Text healthText;
 
+	public Color color;
+
+
 	public void CopyInfo(DeckTagController other)
 	{
 		deckID = other.deckID;
@@ -75,7 +78,76 @@ public class CardInspect : MonoBehaviour
 		healthText.text = other.maxHealthPoint.ToString();
 		counterText.text = other.category == "Construction" ? "" : other.attackCounter.ToString();
 	}
-    public void Start()
+
+	public void SetInfo(string ID, string name, string category, int cost, int attack, int health, int counter, string description)
+	{
+		this.ID = ID;
+		this.category = category;
+		this.cost = cost;
+		this.description = description;
+
+		LoadCardResources(ID);
+
+		nameText.text = name;
+		costText.text = cost.ToString();
+		if (category == "Command")
+		{
+			attackIcon.enabled = false;
+			attackText.enabled = false;
+			healthIcon.enabled = false;
+			healthText.enabled = false;
+		}
+		else
+		{
+			attackText.text = attack.ToString();
+			healthText.text = health.ToString();
+		}
+		counterText.text = counter.ToString();
+		descriptionText.text = description;
+	}
+
+
+	//TODO
+	private void LoadCardResources(string ID)
+	{
+		cardImage.sprite = Resources.Load<Sprite>("CardImage/" + ID);
+
+		switch (category)
+		{
+			case "LightArmor":
+				UnityEngine.ColorUtility.TryParseHtmlString("#429656", out color);
+				categoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[11];
+				break;
+			case "Artillery":
+				UnityEngine.ColorUtility.TryParseHtmlString("#CE8849", out color);
+				categoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[8];
+				break;
+			case "Motorized":
+				UnityEngine.ColorUtility.TryParseHtmlString("#426A84", out color);
+				categoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[9];
+				break;
+			case "Guardian":
+				UnityEngine.ColorUtility.TryParseHtmlString("#97A5A4", out color);
+				categoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[10];
+				break;
+			case "Construction":
+				UnityEngine.ColorUtility.TryParseHtmlString("#7855A5", out color);
+				categoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[12];
+				break;
+			case "Command":
+				color = Color.gray;
+				break;
+		}
+
+		backGround.color = color;
+		frame.color = color;
+		nameTag.color = color;
+		costTag.color = color;
+	}
+
+
+
+	public void Start()
     {
 		deckID = -1;
     }

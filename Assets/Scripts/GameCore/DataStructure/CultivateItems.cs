@@ -20,12 +20,12 @@ namespace DataCore.CultivateItems
 
 		//之后换成hash
 		[JsonProperty("pool")]
-		internal List<Card> cardPool { get; set; }
+		public List<Card> cardPool { get; set; }
 
 		[JsonIgnore]
 		internal Hashtable IDhashPool;
 		[JsonIgnore]
-		internal List<Card> humanCardPool;
+		public List<Card> humanCardPool;
 
 		internal List<Card> humanLightArmorSet;
 		internal List<Card> humanMotorizedSet;
@@ -41,6 +41,11 @@ namespace DataCore.CultivateItems
 		[JsonIgnore]
 		internal List<Card> enemyCards;
 
+
+		public int humanCardNum
+		{
+			get => humanCardPool.Count;
+		}
 		public Pool(IResourceLoader resourceLoader)
 		{
 			cardPool = new List<Card>();
@@ -119,7 +124,10 @@ namespace DataCore.CultivateItems
 							humanCommandSet.Add(card);
 							break;
 					}
-					humanCardPool.Add(card);
+					if (!card.backendID.Contains("base"))
+					{
+						humanCardPool.Add(card);
+					}
 				}
 				else
 				{

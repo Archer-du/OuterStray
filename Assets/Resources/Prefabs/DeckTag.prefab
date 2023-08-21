@@ -612,7 +612,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   active: 1
-  disable: 0
+  fadeDisable: 0
   boundaryCorrection: 1
   upperBound: 700
   lowerBound: -800
@@ -620,11 +620,14 @@ MonoBehaviour:
   rightBound: 2000
   timerValve: 0.8
   duration: 0.2
-  displayOffset: {x: 600, y: 0, z: 0}
+  mainDisplayOffset: {x: 400, y: 0, z: 0}
+  subDisplayOffset: {x: 0, y: 0, z: 0}
   inspectPanel: {fileID: 7791636533920035237}
   SubPanel: {fileID: 0}
   mainPanelEnabled: 1
   subPanelEnabled: 0
+  mainPanelScale: {x: 0, y: 0, z: 0}
+  subPanelScale: {x: 0, y: 0, z: 0}
 --- !u!1 &3465805072880246064
 GameObject:
   m_ObjectHideFlags: 0

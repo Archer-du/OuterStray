@@ -10,6 +10,8 @@ using TMPro;
 using DG.Tweening;
 using UnityEngine.EventSystems;
 using System.IO.Pipes;
+using UnityEngine.SceneManagement;
+using DataCore.Cards;
 
 public class CultivateSceneManager : MonoBehaviour,
     ICultivateSceneController
@@ -26,6 +28,8 @@ public class CultivateSceneManager : MonoBehaviour,
     public Button baseChooseButton;
     public Button customDeckButton;
 
+	public Button panelExitButton;
+
     public CanvasGroup inputMask;
 
     [Header("Text")]
@@ -36,11 +40,19 @@ public class CultivateSceneManager : MonoBehaviour,
 
     [Header("Prototype")]
     public GameObject baseCardPrototype;
+    public GameObject packPrototype;
 
     [Header("Interaction")]
     public Button startExpedition;
 
     public int selectionIndex;
+
+	public GameObject panel;
+	public RectTransform panelMask;
+	//TODO
+	public List<GameObject> Packs;
+
+	public Transform gridGroup;
 
     [Header("Components")]
     public BaseSelection[] selections;
@@ -54,7 +66,8 @@ public class CultivateSceneManager : MonoBehaviour,
         //note: 功能从manager下放到controller
         baseChooseButton.onClick.AddListener(BaseChoose);
         startExpedition.onClick.AddListener(StartExpedition);
-        customDeckButton.onClick.AddListener(ImportPack);
+		//TODO
+        //customDeckButton.onClick.AddListener(ImportPack);
 
         buildingsDisabled = false;
 
@@ -62,7 +75,13 @@ public class CultivateSceneManager : MonoBehaviour,
         startExpedition.enabled = false;
         startExpedition.image.color = Color.gray;
 
+		customDeckButton.onClick.AddListener(EnablePanel);
+		panelExitButton.onClick.AddListener(DisablePanel);
+
 		selections = new BaseSelection[3];
+
+
+
 	}
     public void OnGameStateChanged(GameState state)
     {
@@ -93,9 +112,72 @@ public class CultivateSceneManager : MonoBehaviour,
 
 
 
+	public float finalHeight;
+
+	//TODO remove
+	public void EnablePanel()
+	{
+		for (int i = 0; i < gameManager.pool.humanCardNum; i++)
+		{
+			GameObject pack = Instantiate(packPrototype, gridGroup);
+			PackController controller = pack.GetComponent<PackController>();
+
+			Card card = gameManager.pool.humanCardPool[i];
+			if(card.category != "Command")
+			{
+				UnitCard unit = card as UnitCard;
+				controller.inspector.SetInfo(card.backendID, card.name, card.category, card.cost, unit.attackPoint, unit.healthPoint, unit.attackCounter, unit.description);
+			}
+			else
+			{
+				CommandCard comm = card as CommandCard;
+				controller.inspector.SetInfo(card.backendID, card.name, card.category, card.cost, 0, 0, comm.maxDurability, comm.description);
+			}
+			int temp = i;
+			controller.AddButton.onClick.AddListener(() =>
+			{
+				controller.AddButton.interactable = false;
+				playerDeck.AddDeckTagFromPool(temp);
+			}
+			);
+		}
+		panel.SetActive(true);
+		// 创建一个 Tweener 对象
+		Tweener tweener = DOTween.To(
+			// 获取初始值
+			() => 0,
+			// 设置当前值
+			y => panelMask.sizeDelta = new Vector2(panelMask.sizeDelta.x, y),
+			// 指定最终值
+			finalHeight,
+		// 指定持续时间
+			duration
+		);
+	}
+	public void DisablePanel()
+	{
+		// 创建一个 Tweener 对象
+		Tweener tweener = DOTween.To(
+			// 获取初始值
+			() => finalHeight,
+			// 设置当前值
+			y => panelMask.sizeDelta = new Vector2(panelMask.sizeDelta.x, y),
+			// 指定最终值
+			0,
+			// 指定持续时间
+			duration
+		).OnComplete(() =>
+		{
+			panel.SetActive(false);
+		});
+	}
 
 
-    public float duration;
+
+
+
+
+	public float duration;
     //TEST
 	public void BaseChoose()
     {
@@ -158,12 +240,18 @@ public class CultivateSceneManager : MonoBehaviour,
 
 
 
-
+    //TODO
 	public void ImportPack()
 	{
 		cultivateSystem.FromPackImportDeck(0, 0);
 		customDeckButton.interactable = false;
 	}
+	public void AddDeckTagFromPool(int index)
+	{
+
+	}
+
+
 
 	public IDeckController InstantiateDeck()
 	{

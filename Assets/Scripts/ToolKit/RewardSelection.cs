@@ -144,7 +144,6 @@ public class RewardSelection : MonoBehaviour,
 				break;
 			case "Command":
 				color = Color.gray;
-				cardImage.rectTransform.sizeDelta = new Vector2(10, 13);
 				break;
 		}
 
