@@ -92,7 +92,7 @@ public class HandicapController : MonoBehaviour,
 			UpdateHandicapPosition();
 			if(initialTurn == ownership)
 			{
-				Push(list[list.Count - 1], "append");
+				Push(list[list.Count - 1], "append", 0);
 			}
 		});
 		seq.Play();
@@ -102,7 +102,7 @@ public class HandicapController : MonoBehaviour,
 	/// 播放动画，将element控件加入到手牌列表中
 	/// </summary>
 	/// <param name="element"></param>
-	public void Push(IBattleElementController controller, string method)
+	public void Push(IBattleElementController controller, string method, int position)
 	{
 		if(count >= capacity)
 		{
@@ -112,7 +112,7 @@ public class HandicapController : MonoBehaviour,
 
 		handiCards.Add(element);
 
-		PushAnimation(element, method);
+		PushAnimation(element, method, position);
 	}
 	public void ResetElementDisplay(BattleElementController element)
 	{
@@ -142,7 +142,7 @@ public class HandicapController : MonoBehaviour,
 	/// 解锁
 	/// </summary>
 	/// <param name="element"></param>
-	public void PushAnimation(BattleElementController element, string method)
+	public void PushAnimation(BattleElementController element, string method, int position)
 	{
 		float popTime = 0.3f;
 		float waitTime = 1f;
@@ -156,7 +156,7 @@ public class HandicapController : MonoBehaviour,
 		//移动到屏幕中心
 		if (element.ownership == 0)
 		{
-			seq.Append(element.transform.DOMove(Vector3.zero, popTime));
+			seq.Append(element.transform.DOMove(Vector3.zero + position * 500f * Vector3.right, popTime));
 			seq.Join(element.transform.DOScale(element.showScale, popTime));
 			seq.Join(element.transform.DORotate(new Vector3(0, 0, ownership * 180), popTime));
 	

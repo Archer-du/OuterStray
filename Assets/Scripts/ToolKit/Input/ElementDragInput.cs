@@ -193,8 +193,8 @@ public class ElementDragInput : MonoBehaviour,
 			BattleLineController battleLine = lineIdx >= 0 && lineIdx <= sceneManager.fieldCapacity - 1 ? sceneManager.battleLines[lineIdx] : null;
 			if (battleLine == null)
 			{
-				canvas.sortingOrder = controller.handicapOrder;
-				controller.handicap.Insert(controller);
+				canvas.sortingOrder = unit.battleOrder;
+				unit.battleLine.Insert(unit);
 				return;
 			}
 			int dstPos = battleLine.GetOperatePos(eventData.position.x);

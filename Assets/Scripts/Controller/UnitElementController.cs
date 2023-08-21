@@ -311,8 +311,8 @@ public class UnitElementController : BattleElementController,
 		if (pos < 0 || lineIdx == battleLine.index || Math.Abs(lineIdx - battleLine.index) > moveRange 
 			|| (battleSceneManager.battleLines[lineIdx].ownership != ownership &&  battleSceneManager.battleLines[lineIdx].count > 0))
 		{
-			canvas.sortingOrder = handicapOrder;
-			handicap.Insert(this);
+			canvas.sortingOrder = battleOrder;
+			battleLine.Insert(this);
 			return;
 		}
 

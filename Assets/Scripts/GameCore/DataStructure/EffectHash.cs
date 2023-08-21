@@ -273,7 +273,7 @@ namespace EventEffectModels
 				{
 					//TODO
 					BattleElement unit = system.stacks[BattleSystem.TURN].RandomPop();
-					system.handicaps[BattleSystem.TURN].Push(unit, "immediate");
+					system.handicaps[BattleSystem.TURN].Push(unit, "immediate", i + 1 - num);
 				}
 			}
 		}
@@ -986,7 +986,7 @@ namespace EventEffectModels
 					comm.dynDurability += recover;
 					comm.UpdateInfo();
 
-					system.handicaps[BattleSystem.TURN].Push(comm, "immediate");
+					system.handicaps[BattleSystem.TURN].Push(comm, "immediate", i + 1 - num);
 				}
 			}
 		}
@@ -1024,7 +1024,7 @@ namespace EventEffectModels
 
 				if (system.handicaps[BattleSystem.TURN].count < system.handicaps[BattleSystem.TURN].capacity)
 				{
-					system.handicaps[BattleSystem.TURN].Push(unit, "immediate");
+					system.handicaps[BattleSystem.TURN].Push(unit, "immediate", 0);
 				}
 			}
 
@@ -1048,7 +1048,7 @@ namespace EventEffectModels
 				if (system.handicaps[BattleSystem.TURN].count < system.handicaps[BattleSystem.TURN].capacity)
 				{
 					BattleElement unit = system.stacks[BattleSystem.TURN].RandomPop();
-					system.handicaps[BattleSystem.TURN].Push(unit, "immediate");
+					system.handicaps[BattleSystem.TURN].Push(unit, "immediate", 0);
 				}
 			}
 		}
@@ -1060,7 +1060,7 @@ namespace EventEffectModels
 				if (system.handicaps[BattleSystem.TURN].count < system.handicaps[BattleSystem.TURN].capacity)
 				{
 					BattleElement e = system.stacks[BattleSystem.TURN].RandomPop();
-					system.handicaps[BattleSystem.TURN].Push(e, "immediate");
+					system.handicaps[BattleSystem.TURN].Push(e, "immediate", 0);
 				}
 			}
 

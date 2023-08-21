@@ -529,7 +529,7 @@ namespace DataCore.BattleItems
 		/// 添加元素到手牌
 		/// </summary>
 		/// <param name="element"></param>
-		internal void Push(BattleElement element, string method)
+		internal void Push(BattleElement element, string method, int position)
 		{
 			if (element == null) { return; }
 			handicap.Add(element);
@@ -540,12 +540,12 @@ namespace DataCore.BattleItems
 			{
 				//display
 				UnitElement unit = element as UnitElement;
-				controller.Push(unit.controller, method);
+				controller.Push(unit.controller, method, position);
 			}
 			else
 			{
 				CommandElement comm = element as CommandElement;
-				controller.Push(comm.controller, method);
+				controller.Push(comm.controller, method, position);
 			}
 		}
 		/// <summary>
