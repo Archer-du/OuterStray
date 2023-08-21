@@ -345,6 +345,7 @@ namespace DataCore.BattleItems
 				index = random.Next(0, stack.Count);
 			}
 			BattleElement element = stack[index];
+            element.stackIdx = -1;
 			stack.RemoveAt(index);
 
 			UpdateStackIdx();
@@ -384,7 +385,8 @@ namespace DataCore.BattleItems
 				if (stack[i] is CommandElement)
 				{
 					CommandElement element = stack[i] as CommandElement;
-					stack.RemoveAt(i);
+                    stack[i].stackIdx = -1;
+                    stack.RemoveAt(i);
 					return element;
                 }
 			}

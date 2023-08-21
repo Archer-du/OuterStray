@@ -5,7 +5,7 @@
     "battleLinesCapacity":[
         4, 4, 4, 4
     ],
-    "plantDeckPath": "Assets\\Config\\DeckConfigs\\BattleNode_6.csv",
+    "plantDeckPath": "Config\\DeckConfigs\\BattleNode_6.csv",
     "initialHumanEnergy": 1,
     "initialPlantEnergy": 1,
     "initialHumanHandicaps": 1,

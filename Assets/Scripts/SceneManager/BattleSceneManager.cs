@@ -626,8 +626,8 @@ public class BattleSceneManager : MonoBehaviour,
 
 	IEnumerator AIBehavior()
 	{
-        float waitTime = 2f;
-        yield return new WaitForSeconds(4);
+        float waitTime = 1f;
+        yield return new WaitForSeconds(waitTime * 3);
         AIHandicap = handicapController[1];
 
 		int AISupportLineIdx = fieldCapacity - 1;
@@ -701,8 +701,8 @@ public class BattleSceneManager : MonoBehaviour,
 			break;
 		}
 
-		yield return new WaitForSeconds(waitTime);
-		Skip();
+        yield return new WaitForSeconds(waitTime * 2);
+        Skip();
 	}
 
 	private bool TryCast(string cardID)
