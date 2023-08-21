@@ -153,6 +153,7 @@ public class HandicapController : MonoBehaviour,
 		Sequence seq = DOTween.Sequence();
 
 		seq.AppendInterval(method == "append" ? 1.8f : 0);
+		seq.AppendInterval(battleSceneManager.sequenceTime);
 
 		seq.AppendCallback(() => ResetElementDisplay(element));
 		//移动到屏幕中心
