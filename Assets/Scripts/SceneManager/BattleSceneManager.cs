@@ -136,8 +136,10 @@ public class BattleSceneManager : MonoBehaviour,
 
 		switch (BTindex)
 		{
-			case 0: btBattleNode = new BTBattleNode0();
-				break;
+			case 0: btBattleNode = new BTBattleNode0(); break;
+            case 1: btBattleNode = new BTBattleNode1(); break;
+			case 2: btBattleNode = new BTBattleNode2(); break;
+			case 3:	btBattleNode = new BTBattleNode3();	break;
 		}
 
         //TODO config
@@ -224,7 +226,6 @@ public class BattleSceneManager : MonoBehaviour,
 		//如果是敌方回合，启动行为树
 		else
 		{
-			skipButton.interactable = false;
             // 启动行为树
             // StartCoroutine(AIBehavior());
             StartCoroutine(btBattleNode.BehaviorTree());
@@ -243,7 +244,6 @@ public class BattleSceneManager : MonoBehaviour,
 		//如果是敌方回合，启动行为树
 		else
 		{
-			skipButton.interactable = false;
             // 启动行为树
             // StartCoroutine(AIBehavior());
             StartCoroutine(btBattleNode.BehaviorTree());
@@ -269,8 +269,8 @@ public class BattleSceneManager : MonoBehaviour,
 		seq.Append(turnText[temp].transform.DOBlendableMoveBy(new Vector3(3000, 0, 0), duration / 2)
 			.OnComplete(() =>
 			{
-				updatingTurn = false;
 				inputLock = false;
+				updatingTurn = false;
 				turnText[temp].transform.position = turnTextPosition;
 				skipButton.interactable = temp == 0;
 			}));
@@ -495,9 +495,9 @@ public class BattleSceneManager : MonoBehaviour,
 		{
 			GameObject reward = Instantiate(rewardPrototype, new Vector3(2500, 0, 0), Quaternion.Euler(new Vector3(0, 90, 0)));
 			rewards[i] = reward.GetComponent<RewardSelection>();
-			rewards[i].transform.SetParent(GameObject.Find("UI").transform);
+			rewards[i].transform.SetParent(transform);
 			rewards[i].index = i;
-			rewards[i].transform.DOBlendableMoveBy(new Vector3(-3000 + i * 800, 0, 0), duration);
+			rewards[i].transform.DOBlendableMoveBy(new Vector3(-3500 + i * 1000, 0, 0), duration);
 			rewards[i].transform.DOBlendableRotateBy(new Vector3(0, -90, 0), duration);
 			rewards[i].SetInfo(IDs[i], names[i], categories[i], cost[i], attacks[i], healths[i], counters[i], description[i]);
 		}
@@ -536,7 +536,7 @@ public class BattleSceneManager : MonoBehaviour,
 		{
 			//允许新申请队列
 			inputLock = false;
-			skipButton.enabled = true;
+			skipButton.enabled = Turn == 0;
 		});
 	}
 

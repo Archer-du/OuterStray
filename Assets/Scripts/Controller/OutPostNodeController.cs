@@ -75,7 +75,7 @@ public class OutPostNodeController : NodeController
 			panelDisplay.gasMineCosts = gasMineCosts;
 			for (int j = 0; j < panelDisplay.gasMineCostTexts.Count; j++)
 			{
-				panelDisplay.gasMineCostTexts[j].text = gasMineCosts[j].ToString() + " Purchase";
+				panelDisplay.gasMineCostTexts[j].text = gasMineCosts[j].ToString();
 			}
 
 			panelDisplay.OutPostInspectors[i].cardImage.sprite = Resources.Load<Sprite>("CardImage/" + IDs[i]);

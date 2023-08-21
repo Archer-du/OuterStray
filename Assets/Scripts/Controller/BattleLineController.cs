@@ -223,7 +223,13 @@ public class BattleLineController : MonoBehaviour,
 
 			int temp = i;
 			elementList[i].transform.DOMove(dstPos, updateTime)
-				.OnComplete(() => elementList[temp].inspectLock = false);
+				.OnComplete(() =>
+				{
+                    if (temp <= count - 1)
+					{
+						elementList[temp].inspectLock = false;
+                    }
+                });
 		}
 	}
 

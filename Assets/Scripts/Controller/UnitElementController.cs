@@ -12,7 +12,6 @@ using UnityEngine.Rendering;
 using InputHandler;
 using DataCore.BattleElements;
 using System;
-using static UnityEditor.Rendering.FilterWindow;
 
 
 public class UnitElementController : BattleElementController,

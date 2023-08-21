@@ -10,7 +10,6 @@ using DataCore.CultivateItems;
 using DataCore.TacticalItems;
 using DataCore.BattleElements;
 using DataCore.Cards;
-using UnityEditor.Animations;
 
 namespace LogicCore
 {

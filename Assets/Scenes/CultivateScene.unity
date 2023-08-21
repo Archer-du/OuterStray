@@ -1403,7 +1403,7 @@ MonoBehaviour:
   playerDeck: {fileID: 2046824504}
   buildingController: {fileID: 0}
   baseChooseButton: {fileID: 959816875}
-  testImportButton: {fileID: 492469454}
+  customDeckButton: {fileID: 492469454}
   inputMask: {fileID: 727808611}
   gasMineText: {fileID: 1992509995}
   cardNumText: {fileID: 936259586}

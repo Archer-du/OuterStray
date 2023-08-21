@@ -77,6 +77,7 @@ public class RewardSelection : MonoBehaviour,
 
 	public void Start()
 	{
+		manager = GameManager.GetInstance().battleSceneManager;
 		Frame.SetActive(false);
 
 		originScale = transform.localScale;

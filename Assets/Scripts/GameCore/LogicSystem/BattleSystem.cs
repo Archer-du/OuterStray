@@ -620,8 +620,8 @@ namespace LogicCore
 			//TODO config
 			for(int i = 0; i < 3; i++)
 			{
-				int index = random.Next(0, pool.cardPool.Count);
-				Card card = pool[index];
+				int index = random.Next(0, pool.humanCardPool.Count);
+				Card card = pool.humanCardPool[index];
 				BattleElement reward = null;
 
 				IDs[i] = card.backendID;
@@ -869,7 +869,11 @@ namespace LogicCore
 				if(counter <= 0)
 				{
 					UnitElement unit = battleLines[line][battleLines[line].count - 1 + counter];
-					if(unit.ownership == ownership) throw new InvalidCastException("ownership");
+					//TODO
+					if(unit.ownership == ownership)
+					{
+						return bases[1].state == ElementState.destroyed ? null : bases[1];
+					}
                     return unit;
 				}
 				if(ownership == 0) { line--; }

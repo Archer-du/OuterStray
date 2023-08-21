@@ -63,6 +63,7 @@
     <Compile Include="Assets\Scripts\ToolKit\TargetSelection.cs" />
     <Compile Include="Assets\Scripts\Controller\CommandElementController.cs" />
     <Compile Include="Assets\Scripts\Controller\SupplyNodeController.cs" />
+    <Compile Include="Assets\Scripts\Controller\BTBattleNode\BTBattleNode3.cs" />
     <Compile Include="Assets\Scripts\Controller\BattleElementController.cs" />
     <Compile Include="Assets\Scripts\Controller\DeckController.cs" />
     <Compile Include="Assets\Scripts\ToolKit\InspectPanelController.cs" />

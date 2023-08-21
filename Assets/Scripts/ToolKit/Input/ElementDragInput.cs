@@ -3,6 +3,7 @@ using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Burst.Intrinsics;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
@@ -71,6 +72,8 @@ public class ElementDragInput : MonoBehaviour,
 		if (controller.inputLock) return;
 		if (controller.ownership != 0) return;
 
+		Vector2 localPosition = new Vector2((eventData.position.x / Screen.width - 0.5f) * 3840, (eventData.position.y / Screen.height - 0.5f) * 2160);
+		Vector3 checkPosition = localPosition + BattleElementController.inputOffset;
 		//拖动中每帧更新
 		if (BattleElementController.draggingLock)
 		{
@@ -78,12 +81,13 @@ public class ElementDragInput : MonoBehaviour,
 
 			transform.SetParent(buffer);
 			transform.DOScale(controller.handicapScale, duration);
-			transform.position = eventData.position - BattleElementController.inputOffset;
+            transform.position = localPosition;
+			
 			canvas.sortingOrder = upperOrder;
 
 			//输入预检测
 			sceneManager.DisableAllSelectionFrame();
-			int lineIdx = controller.GetBattleLineIdx(eventData.position.y);
+			int lineIdx = controller.GetBattleLineIdx(checkPosition.y);
 			BattleLineController battleLine = lineIdx >= 0 && lineIdx <= sceneManager.fieldCapacity - 1 ? sceneManager.battleLines[lineIdx] : null;
 
 
@@ -109,7 +113,7 @@ public class ElementDragInput : MonoBehaviour,
 					{
 						return;
 					}
-					int pos = battleLine.GetOperatePos(eventData.position.x);
+					int pos = battleLine.GetOperatePos(checkPosition.x);
 					if (pos < 0) return;
 					battleLine.PreUpdateElementPosition(pos);
 				}
@@ -117,7 +121,7 @@ public class ElementDragInput : MonoBehaviour,
 				{
 					if (battleLine.ownership != 0) return;
 					if (battleLine == unit.battleLine) return;
-					int pos = battleLine.GetOperatePos(eventData.position.x);
+					int pos = battleLine.GetOperatePos(checkPosition.x);
 					if (pos < 0) return;
 					battleLine.PreUpdateElementPosition(pos);
 				}
@@ -136,8 +140,9 @@ public class ElementDragInput : MonoBehaviour,
 		if (controller.ownership != 0) return;
 
 
-		//手牌区输入判定
-		if (controller.dataState == ElementState.inHandicap)
+		Vector2 checkPosition = new Vector2((eventData.position.x / Screen.width) * 3840, (eventData.position.y / Screen.height) * 2160);
+        //手牌区输入判定
+        if (controller.dataState == ElementState.inHandicap)
 		{
 			//允许落地
 			if (inspector != null) { inspector.active = controller.dataState == ElementState.inBattleLine; }
@@ -149,7 +154,7 @@ public class ElementDragInput : MonoBehaviour,
 			{
 				UnitElementController unit = controller as UnitElementController;
 				//解析eventData/通用输入检测
-				int lineIdx = controller.GetBattleLineIdx(eventData.position.y);
+				int lineIdx = controller.GetBattleLineIdx(checkPosition.y);
 				BattleLineController battleLine = lineIdx >= 0 && lineIdx <= sceneManager.fieldCapacity - 1 ? sceneManager.battleLines[lineIdx] : null;
 				if (battleLine == null)
 				{
@@ -157,7 +162,7 @@ public class ElementDragInput : MonoBehaviour,
 					controller.handicap.Insert(controller);
 					return;
 				}
-				int dstPos = battleLine.GetOperatePos(eventData.position.x);
+				int dstPos = battleLine.GetOperatePos(checkPosition.x);
 
 				unit.PlayerDeploy(lineIdx, dstPos);
 			}
@@ -185,14 +190,14 @@ public class ElementDragInput : MonoBehaviour,
 
 			//TODO
 			//撤退判定
-			if (unit.battleLine.index == 0 && eventData.position.x >= 3340 && eventData.position.y <= 1080)
+			if (unit.battleLine.index == 0 && checkPosition.x >= 3340 && checkPosition.y <= 1080)
 			{
 				unit.PlayerRetreat();
 				return;
 			}
 
 			//解析eventData
-			int lineIdx = controller.GetBattleLineIdx(eventData.position.y);
+			int lineIdx = controller.GetBattleLineIdx(checkPosition.y);
 			BattleLineController battleLine = lineIdx >= 0 && lineIdx <= sceneManager.fieldCapacity - 1 ? sceneManager.battleLines[lineIdx] : null;
 			if (battleLine == null)
 			{
@@ -200,7 +205,7 @@ public class ElementDragInput : MonoBehaviour,
 				unit.battleLine.Insert(unit);
 				return;
 			}
-			int dstPos = battleLine.GetOperatePos(eventData.position.x);
+			int dstPos = battleLine.GetOperatePos(checkPosition.x);
 
 			unit.PlayerMove(lineIdx, dstPos);
 		}
