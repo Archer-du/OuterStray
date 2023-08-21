@@ -19,7 +19,6 @@ public class BTBattleNode3 : BTBattleNode
         {
             new ActionNode(() => TryAdjustHalf()),
             new ActionNode(() => TryCastLowCost()),
-            new ActionNode(() => TrySkip()),
         });
     }
 
@@ -93,7 +92,7 @@ public class BTBattleNode3 : BTBattleNode
         }
         else
         {
-            BTCast(minCostPointer, 0, 0);
+            BTNoneTargetCast(minCostPointer);
             return true;
         }
     }

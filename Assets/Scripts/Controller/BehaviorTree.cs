@@ -84,15 +84,18 @@ namespace BehaviorTree
         {
             // 初始化
             Init();
-            yield return new WaitForSeconds(waitTime);
+            yield return new WaitForSeconds(waitTime * 3);
 
             // 循环，直到行为树根节点返回false
             while (loopTimes != 0 && rootNode.Execute())
             {
                 loopTimes--;
-                Debug.Log($"loopTimes:{loopTimes}\nSequenceTime:{SequenceTime}");
+                Debug.Log($"loopTimes:{loopTimes} SequenceTime:{SequenceTime}");
                 yield return new WaitForSeconds(SequenceTime + waitTime);
             }
+
+            yield return new WaitForSeconds(SequenceTime + waitTime);
+            TrySkip();
         }
 
 
@@ -102,9 +105,13 @@ namespace BehaviorTree
             sceneManager.AIDeploy(handicapIdx);
         }
         // TODO
-        protected void BTCast(int handicapIdx, int dstLineIdx, int dstPos)
+        protected void BTTargetCast(int handicapIdx, int dstLineIdx, int dstPos)
         {
             sceneManager.AITargetCast(handicapIdx, dstLineIdx, dstPos);
+        }
+        protected void BTNoneTargetCast(int handicapIdx)
+        {
+            sceneManager.AINoneTargetCast(handicapIdx);
         }
         protected void BTSkip()
         {
@@ -287,7 +294,7 @@ namespace BehaviorTree
         /// </summary>
         /// <param name="lowerBound">费用下界，返回的索引对应卡费用不会低于这个值</param>
         /// <returns>无单位卡或没有足够的能源则返回-1</returns>
-        protected int GetMinCostUnitPointer(int lowerBound = 0)
+        protected int GetMinCostUnitPointer(int lowerBound = -1)
         {
             int minCost = 10000;
             int minPointer = -1;
@@ -387,11 +394,11 @@ namespace BehaviorTree
             return -1;
         }
 
-        protected bool TryCastComm18(int frontLineIdx)
+        protected bool TryCastComm15(int frontLineIdx)
         {
             for (int i = 0; i < AIHandicap.count; i++)
             {
-                if (AIHandicap[i].ID == "comm_mush_18" && Energy >= 3)
+                if (AIHandicap[i].ID == "comm_mush_15" && Energy >= AIHandicap[i].cost)
                 {
 
                     int dstLineIdx = 0;
@@ -407,7 +414,8 @@ namespace BehaviorTree
                             dstPos = lineMaxHealth.Item2;
                         }
                     }
-                    BTCast(i, dstLineIdx, dstPos);
+                    BTTargetCast(i, dstLineIdx, dstPos);
+                    Debug.Log("Cast 'comm_mush_15'");
                     return true;
                 }
             }
@@ -512,7 +520,7 @@ namespace BehaviorTree
             {
                 if (AIHandicap[i].ID == cardID && Energy >= AIHandicap[i].cost)
                 {
-                    BTCast(i, 0, 0);
+                    BTNoneTargetCast(i);
                     return true;
                 }
             }
