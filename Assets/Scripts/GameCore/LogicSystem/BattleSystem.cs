@@ -545,7 +545,7 @@ namespace LogicCore
 			if (handicaps[TURN].count < handicaps[TURN].capacity)
 			{
 				BattleElement element = stacks[TURN].RandomPop();
-				handicaps[TURN].Push(element, "append");
+				handicaps[TURN].Push(element, "append", 0);
 			}
 
 			//TODO config

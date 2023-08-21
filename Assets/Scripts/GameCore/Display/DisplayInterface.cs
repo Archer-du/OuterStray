@@ -170,7 +170,7 @@ namespace DisplayInterface
 	{
 		public void Init(int ownership);
 		public void Fill(List<IBattleElementController> list, int initialTurn);
-		public void Push(IBattleElementController element, string method);
+		public void Push(IBattleElementController element, string method, int position);
 		public IBattleElementController Pop(int handicapIdx);
 	}
 
