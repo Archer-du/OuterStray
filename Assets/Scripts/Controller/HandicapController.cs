@@ -164,7 +164,8 @@ public class HandicapController : MonoBehaviour,
 			seq.AppendInterval(waitTime);
 			//加入手牌
 			Vector3 dstPos = GetLogicPosition(count);
-			seq.Append(element.transform.DOMove(dstPos, popTime)
+			seq.Append(element.transform.DOScale(element.handicapScale, popTime));
+			seq.Join(element.transform.DOMove(dstPos, popTime)
 				.OnComplete(() =>
 				{
 					element.inspectLock = false;
