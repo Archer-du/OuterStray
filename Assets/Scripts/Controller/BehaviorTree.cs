@@ -452,7 +452,6 @@ namespace BehaviorTree
                                     artilleryIdx = j;
                                 }
                             }
-
                             //TODO 若战线没有空，则可移动轰击，但移动轰击的优先级最低
                             else
                             {
