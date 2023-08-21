@@ -16,8 +16,9 @@ public class BTBattleNode2 : BTBattleNode
     {
         rootNode = new SelectorNode(new List<BTNode>()
         {
-            new ActionNode(() => TryAdjustHalf()),
-            new ActionNode(() => TryCastLowCost()),
+            // new ActionNode(() => TryAdjustHalf()),
+            new ActionNode(() => TryAdjustForward(frontLineIdx)),
+            new ActionNode(() => TryCastComm15(frontLineIdx)),
         });
     }
 

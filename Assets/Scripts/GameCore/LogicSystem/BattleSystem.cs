@@ -686,7 +686,9 @@ namespace LogicCore
 
 		internal void BroadCastEvent(string eventName)
 		{
-			for (int i = 0; i < deployQueue.Count; i++)
+			int num = deployQueue.Count;
+
+            for (int i = 0; i < num; i++)
 			{
 				if (deployQueue[i].ownership == TURN && deployQueue[i].state == ElementState.inBattleLine)
 				{

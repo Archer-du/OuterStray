@@ -6,10 +6,10 @@
         5, 6, 6, 5
     ],
     "plantDeckPath": "Config\\DeckConfigs\\BattleNode_2.csv",
-    "initialHumanEnergy": 0,
-    "initialPlantEnergy": 0,
-    "initialHumanHandicaps": 1,
-    "initialPlantHandicaps": 1,
+    "initialHumanEnergy": 3,
+    "initialPlantEnergy": 3,
+    "initialHumanHandicaps": 3,
+    "initialPlantHandicaps": 3,
     "fieldPreset": [
         {
             "cardPreset" : {

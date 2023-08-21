@@ -600,7 +600,7 @@ namespace EventEffectModels
 					case 1:
 						break;
 					case 2:
-						card = system.pool.GetCardByID("mush_101_01") as UnitCard;
+						card = system.pool.GetCardByID("mush_103") as UnitCard;
 						break;
 					default:
 						break;
@@ -1110,15 +1110,18 @@ namespace EventEffectModels
                 {
                     publisher.attackGain[publisher.battleID] = atkGain * num;
                 }
-				if (!publisher.attackGain.ContainsKey(publisher.battleID))
+				if (!publisher.maxHealthGain.ContainsKey(publisher.battleID))
 				{
 					publisher.maxHealthGain.Add(publisher.battleID, mhpGain * num);
-				}
+                    publisher.dynHealth += mhpGain * num;
+                }
 				else
 				{
                     publisher.maxHealthGain[publisher.battleID] = mhpGain * num;
+                    publisher.dynHealth += mhpGain * num;
                 }
                 publisher.UpdateInfo();
+				publisher.UpdateHealth();
             }
 
         }

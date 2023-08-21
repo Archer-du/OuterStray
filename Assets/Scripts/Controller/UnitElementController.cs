@@ -542,7 +542,9 @@ public class UnitElementController : BattleElementController,
 		}
 		else
 		{
-			battleLine.ElementRemove(resIdx);
+			selfCanvas.DOFade(0, fadeTime);
+
+            battleLine.ElementRemove(resIdx);
 			battleSceneManager.rotateSequence.InsertCallback(battleSceneManager.sequenceTime,
 				() =>
 				{
