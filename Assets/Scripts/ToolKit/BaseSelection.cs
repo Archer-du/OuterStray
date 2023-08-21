@@ -84,7 +84,7 @@ public class BaseSelection : MonoBehaviour,
 	public void SetInfo(string ID, string name, string category, int health, string description)
 	{
 		this.ID = ID;
-		this.name = name;
+		this.names = name;
 		this.category = category;
 		this.health = health;
 		this.description = description;

@@ -31,6 +31,8 @@ namespace DataCore.TacticalItems
 
 		BattleSystem battleSystem;
 		TacticalSystem tacticalSystem;
+		CultivationSystem cultivationSystem;
+
 		private List<BattleElement> deck;
 
 		internal Dictionary<int, LightArmorElement> lightArmorSet;
@@ -44,7 +46,7 @@ namespace DataCore.TacticalItems
 
 		internal UnitElement bases;
 		//TODO remove
-		internal Deck(BattleSystem battleSystem, TacticalSystem tacticalSystem, IDeckController controller)
+		internal Deck(BattleSystem battleSystem, TacticalSystem tacticalSystem, CultivationSystem cultivateSystem, IDeckController controller)
 		{
 			deck = new List<BattleElement>();
 			lightArmorSet = new Dictionary<int, LightArmorElement>();
@@ -56,6 +58,8 @@ namespace DataCore.TacticalItems
 
 			this.battleSystem = battleSystem;
 			this.tacticalSystem = tacticalSystem;
+			this.cultivationSystem = cultivateSystem;
+
 			this.controller = controller;
 		}
 		internal BattleElement this[int index]
@@ -71,6 +75,43 @@ namespace DataCore.TacticalItems
 		internal void AddPack(Pack pack)
 		{
 			throw new NotImplementedException();
+		}
+
+		public void AddDeckTagFromPool(int index)
+		{
+			Card card = battleSystem.pool.humanCardPool[index];
+
+			if (card is UnitCard)
+			{
+				string category = (card as UnitCard).category;
+				switch (category)
+				{
+					case "LightArmor":
+						deck.Add(new LightArmorElement(card as UnitCard, battleSystem, null));
+						break;
+					case "Motorized":
+						deck.Add(new MotorizedElement(card as UnitCard, battleSystem, null));
+						break;
+					case "Artillery":
+						deck.Add(new ArtilleryElement(card as UnitCard, battleSystem, null));
+						break;
+					case "Guardian":
+						deck.Add(new GuardianElement(card as UnitCard, battleSystem, null));
+						break;
+					case "Construction":
+						deck.Add(new ConstructionElement(card as UnitCard, battleSystem, null));
+						break;
+				}
+			}
+			else
+			{
+				deck.Add(new CommandElement(card as CommandCard, battleSystem));
+			}
+			deck.Sort();
+			UpdateDeckID();
+			UpdateBattleID();
+			InstantiateDeckTags();
+			cultivationSystem.UpdateBasicInfo();
 		}
 		internal void AddTag(BattleElement element)
 		{
@@ -740,7 +781,7 @@ namespace DataCore.TacticalItems
 			string jsonString = battleSystem.pool.ReadAllText(battleConfigPath);
 			battleConfig = JsonConvert.DeserializeObject<BattleConfigJson>(jsonString);
 
-			plantDeck = new Deck(battleSystem, tacticalSystem, null);
+			plantDeck = new Deck(battleSystem, tacticalSystem, null, null);
 			plantDeck.LoadDeckByPathData(battleConfig.plantDeckPath);
 		}
 		internal override void CastNodeEvent()

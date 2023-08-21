@@ -117,6 +117,13 @@ public class DeckController : MonoBehaviour,
 		}
 	}
 
+
+
+
+	public void AddDeckTagFromPool(int index)
+	{
+		deck.AddDeckTagFromPool(index);
+	}
 	public bool IsEmpty()
 	{
 		return tags.Count == 0;

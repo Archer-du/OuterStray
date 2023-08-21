@@ -20,7 +20,7 @@ namespace LogicCore
 	{
 		IGameManagement gameManagement;
 
-		ICultivateSceneController controller;
+		internal ICultivateSceneController controller;
 
 		internal TacticalSystem tacticalSystem;
 		internal BattleSystem battleSystem;
@@ -66,7 +66,7 @@ namespace LogicCore
 		public void SetSceneController(ICultivateSceneController ctdspl)
 		{
 			this.controller = ctdspl;
-			playerDeck = new Deck(battleSystem, tacticalSystem, controller.InstantiateDeck());
+			playerDeck = new Deck(battleSystem, tacticalSystem, this, controller.InstantiateDeck());
 
 			List<string> IDs = new List<string>();
 			List<string> names = new List<string>();
@@ -90,7 +90,10 @@ namespace LogicCore
 		{
 			playerDeck.bases = bases[index];
 		}
-
+		internal void UpdateBasicInfo()
+		{
+			controller.UpdateBasicInfo(tacticalSystem.gasMineToken, playerDeck.count);
+		}
 
 
 		public void FromPackImportDeck(int buildingID, int packID)

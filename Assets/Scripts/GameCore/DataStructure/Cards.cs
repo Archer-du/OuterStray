@@ -13,13 +13,13 @@ namespace DataCore.Cards
 	/// static information about cards
 	/// </summary>
 	[Serializable]
-	internal abstract class Card : IComparable<Card>
+	public abstract class Card : IComparable<Card>
 	{
-		internal string backendID { get; set; }
-		internal string name { get; set; }
-		internal string description { get; set; }
-		internal int cost { get; set; }
-		internal string category { get; set; }
+		public string backendID { get; set; }
+		public string name { get; set; }
+		public string description { get; set; }
+		public int cost { get; set; }
+		public string category { get; set; }
 
 		internal int ownership;
 
@@ -68,12 +68,12 @@ namespace DataCore.Cards
 	/// Card class: Unit
 	/// </summary>
 	[Serializable]
-	internal sealed class UnitCard : Card
+	public sealed class UnitCard : Card
 	{
 
-		internal int attackPoint { get; set; }
-		internal int healthPoint { get; set; }
-		internal int attackCounter { get; set; }
+		public int attackPoint { get; set; }
+		public int healthPoint { get; set; }
+		public int attackCounter { get; set; }
 
 
 
@@ -141,10 +141,10 @@ namespace DataCore.Cards
 	/// Card class: Command
 	/// </summary>
 	[Serializable]
-	internal sealed class CommandCard : Card
+	public sealed class CommandCard : Card
 	{
 		internal string type;
-		internal int maxDurability { get; set; }
+		public int maxDurability { get; set; }
 
 		//TODO
 		internal CommandCard(string __id, int ownership, string __name, string type, string __description, int __cost, int __maxDurability, int department, int pack, string effects)
