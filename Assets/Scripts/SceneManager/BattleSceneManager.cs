@@ -529,8 +529,15 @@ public class BattleSceneManager : MonoBehaviour,
 		sequenceTime = 0;
 		rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
+		//不允许新申请队列
 		inputLock = true;
-		rotateSequence.OnComplete(() => inputLock = false);
+		skipButton.enabled = false;
+		rotateSequence.OnComplete(() =>
+		{
+			//允许新申请队列
+			inputLock = false;
+			skipButton.enabled = true;
+		});
 	}
 
 

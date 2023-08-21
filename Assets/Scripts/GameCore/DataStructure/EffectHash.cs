@@ -359,7 +359,7 @@ namespace EventEffectModels
 			while (i < num)
 			{
 				UnitElement e = system.battleLines[system.frontLines[(this.source.ownership + 1) % 2]][j];
-				if (e.Damaged(damage, "immediate") > 0)
+				if (e.Damaged(damage, i == 0 ? "append" : "immediate") > 0)
 				{
 					j++;
 				}
@@ -675,7 +675,6 @@ namespace EventEffectModels
 		internal void TargetRetreat(BattleElement source, BattleSystem system)
 		{
 			UnitElement target = source as UnitElement;
-
 
 			target.Retreat("immediate");
 		}
@@ -1277,6 +1276,8 @@ namespace EventEffectModels
 				{"CleaveOnEnable", (BattleEventHandler)CleaveOnEnable },
 				{"Armor", (BattleEventHandler)Armor },
 				{"ArmorOnEnable", (BattleEventHandler)ArmorOnEnable },
+				{"Thorn", (BattleEventHandler)Thorn },
+				{"ThornOnEnable", (BattleEventHandler)ThornOnEnable },
 				{"Parry", (BattleEventHandler)Parry },
 				{"ParryOnEnable", (BattleEventHandler)ParryOnEnable },
 				{"ParryUnload", (BattleEventHandler)ParryUnload },

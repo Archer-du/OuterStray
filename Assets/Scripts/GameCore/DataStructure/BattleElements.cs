@@ -633,11 +633,8 @@ namespace DataCore.BattleElements
 
 			if(this.ownership == BattleSystem.TURN)
 			{
-				if(this.operateCounter > 0)
-				{
-					this.dynAttackCounter -= 1;
-				}
-				this.operateCounter++;
+				this.dynAttackCounter -= operateCounter;
+				this.operateCounter = 1;
 			}
 			//操作计数回复
 
@@ -693,7 +690,7 @@ namespace DataCore.BattleElements
 			controller.DeployAnimationEvent();
 			//战线接收
 			dstLine.Receive(this, dstPos);
-			this.operateCounter--;
+			this.operateCounter = 0;
 
 
 
@@ -717,7 +714,7 @@ namespace DataCore.BattleElements
 
 
 			dstLine.Receive(resLine.Send(resIdx), dstPos);
-			this.operateCounter--;
+			this.operateCounter = 0;
 
 
 			eventTable.RaiseEvent("AfterMove", this, battleSystem);
@@ -1047,7 +1044,7 @@ namespace DataCore.BattleElements
             }
 
 			this.dynAttackCounter -= 1;
-			this.operateCounter--;
+			this.operateCounter = 0;
 
 
 			eventTable.RaiseEvent("AfterMove", this, battleSystem);
