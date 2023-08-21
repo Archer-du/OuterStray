@@ -72,6 +72,7 @@ public class BattleElementController : MonoBehaviour
 	public Vector3 handicapScale;
 	public Vector3 castScale;
 	public Vector3 targetScale;
+	public Vector3 showScale;
 
 	public Vector3 targetTextScale;
 	public Vector3 originTextScale;
@@ -170,6 +171,7 @@ public class BattleElementController : MonoBehaviour
 
 	[Header("Components")]
 	public HandicapInspector handicapInspect;
+	public InspectPanelController inspectPanel;
 
 
 	public void TransformInfoInit()
@@ -180,6 +182,7 @@ public class BattleElementController : MonoBehaviour
 		handicapScale = 1.35f * battleFieldScale;
 		castScale = 2f * battleFieldScale;
 		targetScale = 1.25f * battleFieldScale;
+		showScale = 2f * battleFieldScale;
 
 		targetTextScale = nameText.transform.localScale * 1.35f;
 		originTextScale = nameText.transform.localScale;
@@ -216,6 +219,9 @@ public class BattleElementController : MonoBehaviour
 
 		handicapInspect = GetComponent<HandicapInspector>();
 		handicapInspect.Init(handicapScale, this);
+
+		inspectPanel = GetComponent<InspectPanelController>();
+		inspectPanel.Init();
 
 		nameText.text = name;
 		costText.text = cost.ToString();

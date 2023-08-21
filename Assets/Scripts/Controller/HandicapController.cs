@@ -150,13 +150,14 @@ public class HandicapController : MonoBehaviour,
 		element.inspectLock = true;
 		Sequence seq = DOTween.Sequence();
 
-		seq.AppendInterval(method == "append" ? 2f : 0);
+		seq.AppendInterval(method == "append" ? 1.8f : 0);
 
 		seq.AppendCallback(() => ResetElementDisplay(element));
 		//移动到屏幕中心
 		if (element.ownership == 0)
 		{
 			seq.Append(element.transform.DOMove(Vector3.zero, popTime));
+			seq.Join(element.transform.DOScale(element.showScale, popTime));
 			seq.Join(element.transform.DORotate(new Vector3(0, 0, ownership * 180), popTime));
 	
 			//展示等待
@@ -175,6 +176,7 @@ public class HandicapController : MonoBehaviour,
 			//加入手牌
 			Vector3 dstPos = GetLogicPosition(count);
 			seq.Append(element.transform.DOMove(dstPos, popTime));
+			seq.Join(element.transform.DOScale(element.handicapScale, popTime));
 			seq.Join(element.transform.DORotate(new Vector3(0, 0, ownership * 180), popTime)
 				.OnComplete(() =>
 				{

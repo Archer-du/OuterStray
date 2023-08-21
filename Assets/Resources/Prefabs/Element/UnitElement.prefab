@@ -1438,8 +1438,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u201C\u9EC4 \u8702\u201D"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: ca02bdeb21c26724b935a4d669e55b3a, type: 2}
-  m_sharedMaterial: {fileID: 2404960034371725898, guid: ca02bdeb21c26724b935a4d669e55b3a, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 600236e9df5f4e94dab569f5d8a054c4, type: 2}
+  m_sharedMaterial: {fileID: -3815973376372354358, guid: 600236e9df5f4e94dab569f5d8a054c4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1791,7 +1791,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &-6681870225697412084
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1847,6 +1847,7 @@ MonoBehaviour:
   componentDescriptionText: {fileID: 8775440569564989518}
   componentPosition: {x: 0, y: 0, z: 0}
   handicapInspect: {fileID: 4717429504215175894}
+  inspectPanel: {fileID: 4267143697029492169}
   color: {r: 0, g: 0, b: 0, a: 0}
   attackText: {fileID: 332679753968886912}
   healthText: {fileID: 4824679670394117744}
@@ -1880,7 +1881,6 @@ MonoBehaviour:
   deployClip: {fileID: 8300000, guid: 7111252e7b8d44141bd72636d501a82a, type: 3}
   randomAttackClip: {fileID: 8300000, guid: 1ab9b1c8f96f468478dac0f15f3a1036, type: 3}
   healClip: {fileID: 8300000, guid: b8f106b9b2ab9494191f7a43a92e472e, type: 3}
-  battleLineInspect: {fileID: 4267143697029492169}
   inspector: {fileID: 7591376390527498015}
   Component: {fileID: 0}
 --- !u!114 &4717429504215175894
@@ -1941,12 +1941,14 @@ MonoBehaviour:
   rightBound: 0
   timerValve: 0.6
   duration: 0.2
-  mainDisplayOffset: {x: 400, y: 0, z: 0}
+  mainDisplayOffset: {x: 450, y: 0, z: 0}
   subDisplayOffset: {x: 0, y: 400, z: 0}
   inspectPanel: {fileID: 6590979290978971568}
   SubPanel: {fileID: 8610403419108934566}
   mainPanelEnabled: 0
   subPanelEnabled: 1
+  mainPanelScale: {x: 0, y: 0, z: 0}
+  subPanelScale: {x: 0, y: 0, z: 0}
 --- !u!225 &8489957186278045733
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -3147,11 +3149,11 @@ PrefabInstance:
     - target: {fileID: 6980266231103545695, guid: 4b0120fe8f595c74fa54c70db13e40e0, type: 3}
       propertyPath: m_fontAsset
       value: 
-      objectReference: {fileID: 11400000, guid: ca02bdeb21c26724b935a4d669e55b3a, type: 2}
+      objectReference: {fileID: 11400000, guid: 600236e9df5f4e94dab569f5d8a054c4, type: 2}
     - target: {fileID: 6980266231103545695, guid: 4b0120fe8f595c74fa54c70db13e40e0, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 2404960034371725898, guid: ca02bdeb21c26724b935a4d669e55b3a, type: 2}
+      objectReference: {fileID: -3815973376372354358, guid: 600236e9df5f4e94dab569f5d8a054c4, type: 2}
     - target: {fileID: 6980266231103545695, guid: 4b0120fe8f595c74fa54c70db13e40e0, type: 3}
       propertyPath: m_hasFontAssetChanged
       value: 0

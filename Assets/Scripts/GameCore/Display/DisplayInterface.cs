@@ -1,6 +1,7 @@
 //Author@Archer
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using DataCore.BattleElements;
 using DataCore.Cards;
 using InputHandler;
@@ -28,7 +29,12 @@ namespace DisplayInterface
 	//{
 
 	//}
+	public interface IResourceLoader
+	{
+		public StreamReader OpenText(string path);
 
+		public string ReadAllText(string path);
+	}
 
 
 

@@ -25,7 +25,7 @@ internal class DeserializeMethods
 
 			int durability = int.Parse(cardObject[5]);
 
-			string effects = cardObject[11];
+			string effects = cardObject[10];
 
 			string description = cardObject[9];
 

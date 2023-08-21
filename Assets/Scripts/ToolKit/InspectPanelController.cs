@@ -33,6 +33,9 @@ public class InspectPanelController : MonoBehaviour,
 	public bool mainPanelEnabled;
 	public bool subPanelEnabled;
 
+	public Vector3 mainPanelScale;
+	public Vector3 subPanelScale;
+
 	private float timer;
 
 	public void DisablePanel()
@@ -67,6 +70,13 @@ public class InspectPanelController : MonoBehaviour,
 		if(inspectPanel != null) inspectPanel.alpha = 0f;
 		fadeDisable = false;
 	}
+	public void Init()
+	{
+		if (inspectPanel != null) mainPanelScale = inspectPanel.transform.localScale;
+		if (SubPanel != null) subPanelScale = SubPanel.transform.localScale;
+	}
+
+
     void Update()
     {
         if(timer > 0)
@@ -120,11 +130,17 @@ public class InspectPanelController : MonoBehaviour,
 		{
 			active = true;
 			if(inspectPanel != null) mainPanelEnabled = true;
+
+			subDisplayOffset = new Vector3(1200, 0, 0);
+
+			SubPanel.transform.localScale = subPanelScale * 1.5f;
 		}
 		else
 		{
 			active = true;
 			mainPanelEnabled = false;
+
+			subDisplayOffset = new Vector3(0, 800, 0);
 		}
 	}
 }

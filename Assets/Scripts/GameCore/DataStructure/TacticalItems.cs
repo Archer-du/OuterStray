@@ -82,7 +82,7 @@ namespace DataCore.TacticalItems
 		//TODO controller rebuild
 		internal void LoadDeckByPathDisplay(string path)
 		{
-			StreamReader reader = File.OpenText(path);
+			StreamReader reader = battleSystem.pool.OpenText(path);
 
 			string ID;
 			if (battleSystem.tutorial)
@@ -167,7 +167,7 @@ namespace DataCore.TacticalItems
 		}
 		internal void LoadDeckByPathData(string path)
 		{
-			StreamReader reader = File.OpenText(path);
+			StreamReader reader = battleSystem.pool.OpenText(path);
 
 			string ID = reader.ReadLine();
 
@@ -425,7 +425,7 @@ namespace DataCore.TacticalItems
 					nodeList.Add(new List<Node>(1));
 					BattleNode bn = new(1, 0, this,
 						controller.InstantiateNode(length, 1, 1, 0, "battle"),
-						battleSystem, "Assets\\Config\\NodeConfigs\\TutorialNode.json");
+						battleSystem, "Config\\NodeConfigs\\TutorialNode.json");
 					nodeList[1].Add(bn);
 					return;
 				}
@@ -492,7 +492,7 @@ namespace DataCore.TacticalItems
 					{
 						BattleNode bn = new(i, j, this,
 							controller.InstantiateNode(length, width[i], i, j, "battle"),
-							battleSystem, "Assets\\Config\\NodeConfigs\\BattleNode_" + index + ".json");
+							battleSystem, "Config\\NodeConfigs\\BattleNode_" + index + ".json");
 						nodeList[i].Add(bn);
 					}
 					//以一定权重随机生成 TODO
@@ -737,7 +737,7 @@ namespace DataCore.TacticalItems
 			//TODO config
 			battleConfigPath = configPath;
 
-			string jsonString = File.ReadAllText(battleConfigPath);
+			string jsonString = battleSystem.pool.ReadAllText(battleConfigPath);
 			battleConfig = JsonConvert.DeserializeObject<BattleConfigJson>(jsonString);
 
 			plantDeck = new Deck(battleSystem, tacticalSystem, null);

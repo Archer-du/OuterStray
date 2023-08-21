@@ -16,6 +16,8 @@ namespace DataCore.CultivateItems
 	[Serializable]
 	public class Pool
 	{
+		internal IResourceLoader resourceLoader;
+
 		//之后换成hash
 		[JsonProperty("pool")]
 		internal List<Card> cardPool { get; set; }
@@ -39,7 +41,7 @@ namespace DataCore.CultivateItems
 		[JsonIgnore]
 		internal List<Card> enemyCards;
 
-		public Pool()
+		public Pool(IResourceLoader resourceLoader)
 		{
 			cardPool = new List<Card>();
 			IDhashPool = new Hashtable();
@@ -53,6 +55,8 @@ namespace DataCore.CultivateItems
 			humanGuardianSet = new List<Card>();
 			humanConstructionSet = new List<Card>();
 			humanCommandSet = new List<Card>();
+
+			this.resourceLoader = resourceLoader;
 		}
 		internal Card this[int index]
 		{
@@ -67,7 +71,7 @@ namespace DataCore.CultivateItems
 		/// <returns></returns>
 		public int LoadCardPool()
 		{
-			StreamReader reader = File.OpenText("Assets\\Config\\Pool.csv");
+			StreamReader reader = resourceLoader.OpenText("Config\\Pool.csv");
 
 			string[] data;
 			int num = 0;
@@ -142,45 +146,19 @@ namespace DataCore.CultivateItems
 
 			return num;
 		}
-		internal int LoadCardPool(string path)
-		{
-			StreamReader reader = File.OpenText(path);
 
-			string[] data;
-			int num = 0;
-			string line = reader.ReadLine();
-			int index = 0;
-
-
-			while (line != null)
-			{
-				data = line.Split(',');
-				if (data[1] == "#")
-				{
-					line = reader.ReadLine();
-					continue;
-				}
-
-				DeserializeMethods.CardDeserialize(out Card card, data);
-
-				//TODO
-				cardPool.Add(card);
-
-				if (!IDhashPool.ContainsKey(card.backendID))
-				{
-					IDhashPool.Add(card.backendID, card);
-				}
-
-				line = reader.ReadLine();
-				num++;
-				index++;
-			}
-			reader.Close();
-			return num;
-		}
 		internal Card GetCardByID(string ID)
 		{
 			return IDhashPool[ID] as Card;
+		}
+
+		internal StreamReader OpenText(string path)
+		{
+			return resourceLoader.OpenText(path);
+		}
+		internal string ReadAllText(string path)
+		{
+			return resourceLoader.ReadAllText(path);
 		}
 	}
 
