@@ -1335,6 +1335,8 @@ namespace EventEffectModels
 				{"CleaveOnEnable",	null },
 				{"Armor", null },
 				{"ArmorOnEnable", null },
+				{"Thorn", null },
+				{"ThornOnEnable", null },
 				{"Parry", null },
 				{"ParryOnEnable", null },
 				{"ParryUnload", null },
