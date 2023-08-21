@@ -57,6 +57,7 @@ public class CommandElementController : BattleElementController,
 		}
 		else
 		{
+			handicap.Pop(handicapIdx);
 			TargetCastAnimationEvent();
 		}
 	}

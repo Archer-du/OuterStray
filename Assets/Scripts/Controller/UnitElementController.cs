@@ -76,7 +76,6 @@ public class UnitElementController : BattleElementController,
 	public AudioClip healClip;
 
 	[Header("Components")]
-	public InspectPanelController battleLineInspect;
 	public CardInspect inspector;
 	/// <summary>
 	/// 从牌堆加入手牌或战场时初始化
@@ -97,8 +96,8 @@ public class UnitElementController : BattleElementController,
 
 		inspector.CopyInfo(this);
 
-		battleLineInspect = GetComponent<InspectPanelController>();
-		OnElementStateChanged += battleLineInspect.OnElementStateChanged;
+		inspectPanel = GetComponent<InspectPanelController>();
+		OnElementStateChanged += inspectPanel.OnElementStateChanged;
 
 		BattleSceneManager.InputLocked += EnableInputLock;
 		BattleSceneManager.InputUnlocked += DisableInputLock;
@@ -634,7 +633,7 @@ public class UnitElementController : BattleElementController,
 	}
 	void Update()
 	{
-		if(draggingLock == false && dataState == ElementState.inBattleLine)
+		if(!draggingLock && dataState == ElementState.inBattleLine && !targetSelectionLock)
 		{
 			transform.DOScale(battleFieldScale, duration);
 		}

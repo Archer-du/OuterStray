@@ -78,7 +78,7 @@ namespace LogicCore
 
 		public void FromPackImportDeck(int buildingID, int packID)
 		{
-			playerDeck.LoadDeckByPathDisplay("Assets\\Config\\HumanDeckTest.csv");
+			playerDeck.LoadDeckByPathDisplay("Config\\HumanDeckTest.csv");
 			controller.UpdateBasicInfo(tacticalSystem.gasMineToken, playerDeck.count);
 
 			//if (buildingID < 0 || buildingID > unlockProgress - 1)
@@ -108,7 +108,7 @@ namespace LogicCore
 		public void LoadTutorialHumanDeck()
 		{
 			tutorial = true;
-			playerDeck.LoadDeckByPathDisplay("Assets\\Config\\TutorialData.csv");
+			playerDeck.LoadDeckByPathDisplay("Config\\TutorialData.csv");
 		}
 	}
 }

@@ -16,7 +16,8 @@ using System;
 using System.IO;
 using UnityEngine.Rendering.VirtualTexturing;
 
-public class GameManager : MonoBehaviour, IGameManagement
+public class GameManager : MonoBehaviour, IGameManagement,
+	IResourceLoader
 {
 	private static GameManager instance;
 
@@ -189,14 +190,15 @@ public class GameManager : MonoBehaviour, IGameManagement
 	{
 		DontDestroyOnLoad(gameObject);
 
-		string configPath = "Assets\\Config\\GlobalConfig.json";
-		string jsonContent = File.ReadAllText(configPath);
+		string configPath = "Config\\GlobalConfig.json";
+		TextAsset text = Resources.Load<TextAsset>(configPath);
+		string jsonContent = text.text;
 		config = JsonUtility.FromJson<GlobalConfig>(jsonContent);
 
 		start.onClick.AddListener(StartGame);
 
 		//EXTEND
-		pool = new Pool();
+		pool = new Pool(this);
 		pool.LoadCardPool();
 
 		battleSystem = new BattleSystem(pool, battleSceneManager);
@@ -284,6 +286,19 @@ public class GameManager : MonoBehaviour, IGameManagement
 		seq.OnComplete(() => dialogGround.enabled = true);
 	}
 
+
+	public StreamReader OpenText(string path)
+	{
+		TextAsset text = Resources.Load<TextAsset>(path);
+		MemoryStream memoryStream = new MemoryStream(text.bytes);
+		return new StreamReader(memoryStream);
+	}
+
+	public string ReadAllText(string path)
+	{
+		TextAsset text = Resources.Load<TextAsset>(path);
+		return text.text;
+	}
 
 
 

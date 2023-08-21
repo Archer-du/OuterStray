@@ -123,7 +123,7 @@ RectTransform:
   - {fileID: 789246198600677410}
   - {fileID: 5884751291407983349}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -255,7 +255,8 @@ MonoBehaviour:
   componentFrame: {fileID: 7153628600826682307}
   componentDescriptionText: {fileID: 5557872177618315967}
   componentPosition: {x: 0, y: 0, z: 0}
-  handicapInspect: {fileID: 0}
+  handicapInspect: {fileID: 5301183072029538561}
+  inspectPanel: {fileID: 4443099353950873168}
   color: {r: 0, g: 0, b: 0, a: 0}
   durabilityText: {fileID: 7830084836532847539}
   durability: 0
@@ -331,11 +332,13 @@ MonoBehaviour:
   timerValve: 0.6
   duration: 0.2
   mainDisplayOffset: {x: 0, y: 0, z: 0}
-  subDisplayOffset: {x: 0, y: 400, z: 0}
+  subDisplayOffset: {x: 0, y: 800, z: 0}
   inspectPanel: {fileID: 0}
   SubPanel: {fileID: 3926916785910420400}
   mainPanelEnabled: 0
   subPanelEnabled: 1
+  mainPanelScale: {x: 0, y: 0, z: 0}
+  subPanelScale: {x: 0, y: 0, z: 0}
 --- !u!1 &1714055929003134500
 GameObject:
   m_ObjectHideFlags: 0
@@ -1094,8 +1097,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u201C\u9EC4 \u8702\u201D"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: ca02bdeb21c26724b935a4d669e55b3a, type: 2}
-  m_sharedMaterial: {fileID: 2404960034371725898, guid: ca02bdeb21c26724b935a4d669e55b3a, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 600236e9df5f4e94dab569f5d8a054c4, type: 2}
+  m_sharedMaterial: {fileID: -3815973376372354358, guid: 600236e9df5f4e94dab569f5d8a054c4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

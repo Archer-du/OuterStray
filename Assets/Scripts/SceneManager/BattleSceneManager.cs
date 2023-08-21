@@ -267,18 +267,20 @@ public class BattleSceneManager : MonoBehaviour,
 
 		inputLock = true;
 		updatingTurn = true;
+		skipButton.enabled = false;
 
 		Sequence seq = DOTween.Sequence();
 
 		int temp = TURN;
 		seq.Append(turnText[temp].transform.DOBlendableMoveBy(new Vector3(2500, 0, 0), duration));
 		seq.AppendInterval(waitTime);
-		seq.Append(turnText[temp].transform.DOBlendableMoveBy(new Vector3(2500, 0, 0), duration)
+		seq.Append(turnText[temp].transform.DOBlendableMoveBy(new Vector3(2500, 0, 0), duration / 2)
 			.OnComplete(() =>
 			{
 				updatingTurn = false;
 				inputLock = false;
 				turnText[temp].transform.position = turnTextPosition;
+				skipButton.enabled = true;
 			}));
 	}
 
@@ -592,8 +594,6 @@ public class BattleSceneManager : MonoBehaviour,
 	public void PlayerTargetCast(int handicapIdx, int dstLineIdx, int dstIdx)
 	{
 		AcquireSequence();
-
-		CommandElementController controller = handicapController[0].Pop(handicapIdx) as CommandElementController;
 
 		battleSystem.Cast(handicapIdx, dstLineIdx, dstIdx);
 	}
