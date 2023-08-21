@@ -599,6 +599,9 @@ namespace EventEffectModels
 						break;
 					case 1:
 						break;
+					case 2:
+						card = system.pool.GetCardByID("mush_101_01") as UnitCard;
+						break;
 					default:
 						break;
 				}
@@ -1075,6 +1078,50 @@ namespace EventEffectModels
 				publisher.UpdateInfo();
 			}
 		}
+        internal void AuraSelfGainByID(BattleElement target, BattleSystem system)
+        {
+            UnitElement publisher = this.source as UnitElement;
+            if (!publisher.aura)
+            {
+                return;
+            }
+
+            //第一个参数是对象ID数值域
+            string ID = ((List<int>)argsTable["AuraSelfGainByID"])[0] < 10
+                ? "0" + ((List<int>)argsTable["AuraSelfGainByID"])[0].ToString() : ((List<int>)argsTable["AuraSelfGainByID"])[0].ToString();
+            //TODO
+            ID = publisher.ownership == 0 ? "human_" + ID : "mush_" + ID;
+            //第二个参数是增益数值
+            int atkGain = ((List<int>)argsTable["AuraSelfGainByID"])[1];
+			int mhpGain = ((List<int>)argsTable["AuraSelfGainByID"])[2];
+
+            if (system.UnitIDDic.ContainsKey(ID))
+            {
+                int num = 0;
+                for (int i = 0; i < system.UnitIDDic[ID].Count; i++)
+                {
+                    if (system.UnitIDDic[ID][i].state == ElementState.inBattleLine) num++;
+                }
+                if (!publisher.attackGain.ContainsKey(publisher.battleID))
+                {
+                    publisher.attackGain.Add(publisher.battleID, atkGain * num);
+                }
+                else
+                {
+                    publisher.attackGain[publisher.battleID] = atkGain * num;
+                }
+				if (!publisher.attackGain.ContainsKey(publisher.battleID))
+				{
+					publisher.maxHealthGain.Add(publisher.battleID, mhpGain * num);
+				}
+				else
+				{
+                    publisher.maxHealthGain[publisher.battleID] = mhpGain * num;
+                }
+                publisher.UpdateInfo();
+            }
+
+        }
 
 
 
@@ -1087,8 +1134,8 @@ namespace EventEffectModels
 
 
 
-		//temp
-		internal void DrawCommandCardsRandomAndRecover(BattleElement source, BattleSystem system)
+        //temp
+        internal void DrawCommandCardsRandomAndRecover(BattleElement source, BattleSystem system)
 		{
 			int argsNum = 2;
 
@@ -1304,6 +1351,7 @@ namespace EventEffectModels
 				{"AuraConstantUnitGain", (BattleEventHandler)AuraConstantUnitGain },
 				{"AOEResetAttackCounter", (BattleEventHandler)AOEResetAttackCounter },
 				{"AuraConstantSelfAttackGainByID", (BattleEventHandler)AuraConstantSelfAttackGainByID },
+				{"AuraSelfGainByID", (BattleEventHandler)AuraSelfGainByID },
 				{"SummonTokenAndGain", (BattleEventHandler)SummonTokenAndGain },
 
 				//aura
@@ -1375,8 +1423,10 @@ namespace EventEffectModels
 				{"AuraDoubleRecover", null },
 				{"AuraBaseImmunity", null },
 				{"AuraSelfAttackGainByID", null },
+                {"AuraSelfGainByID", null },
 
-				{"Comm_Mush_07", null },
+
+                {"Comm_Mush_07", null },
 				{"Comm_Mush_08", null },
 				{"Comm_Mush_13", null },
 				{"Comm_Mush_18", null },

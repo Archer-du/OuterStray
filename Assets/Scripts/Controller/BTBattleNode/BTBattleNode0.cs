@@ -2,7 +2,7 @@ using BehaviorTree;
 using System.Collections.Generic;
 
 /// <summary>
-/// boss白菇，策略为大量部署亮顶孢子
+/// boss白菇，策略为狙击加治疗
 /// </summary>
 public class BTBattleNode0 : BTBattleNode
 {

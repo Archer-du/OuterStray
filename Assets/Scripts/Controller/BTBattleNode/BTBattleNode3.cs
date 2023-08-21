@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 
 /// <summary>
-/// boss克隆蘑人，策略为调整战线使得每次克隆的克隆蘑人数量最多
+/// TODO
 /// </summary>
 public class BTBattleNode3 : BTBattleNode
 {

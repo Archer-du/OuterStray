@@ -57,6 +57,8 @@ public class RewardSelection : MonoBehaviour,
 	public void OnPointerClick(PointerEventData eventData)
 	{
 		disableExit = true;
+		Frame.SetActive(true);
+
 		manager.rewardSelectionIndex = index;
 		manager.rewardConfirmButton.interactable = true;
 		manager.ClearOtherSelectionFrame();
