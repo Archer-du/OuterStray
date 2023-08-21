@@ -285,6 +285,10 @@ public class UnitElementController : BattleElementController,
 
 
 
+
+
+
+
 	public void PlayerDeploy(int lineIdx, int pos)
 	{
 		//能量判定
@@ -328,6 +332,10 @@ public class UnitElementController : BattleElementController,
 
 
 
+
+
+
+
 	public void DeployAnimationEvent()
 	{
 		deployAudio.Play();
@@ -362,8 +370,8 @@ public class UnitElementController : BattleElementController,
 	{
 		if (target == null) return;
 
-		float forwardTime = 0.2f;
-        float backlashTime = 0.4f;
+		float forwardTime = 0.12f;
+        float backlashTime = 0.3f;
 		Vector3 oriPosition = battleLineLogicPosition;
 		Vector3 dstPosition = target.battleLineLogicPosition;
 
@@ -474,7 +482,7 @@ public class UnitElementController : BattleElementController,
 		if (method == "append")
         {
 			battleSceneManager.rotateSequence.Append(
-				transform.DOShakeRotation(forwardTime, 20f)
+				transform.DOShakeScale(forwardTime, 8f)
 				.OnComplete(() => healAudio.Play())
 				);
 			battleSceneManager.sequenceTime += forwardTime;
@@ -482,7 +490,7 @@ public class UnitElementController : BattleElementController,
 		else
 		{
 			battleSceneManager.rotateSequence.Join(
-				transform.DOShakeRotation(forwardTime, 20f)
+				transform.DOShakeScale(forwardTime, 8f)
 				);
 			if (battleSceneManager.sequenceTime == 0)
 			{
@@ -593,10 +601,11 @@ public class UnitElementController : BattleElementController,
 		if (method == "append")
 		{
 			battleSceneManager.rotateSequence.Append(
-				transform.DOMove(stack.transform.position + 500 * Vector3.left, retreatTime)
+				transform.DOMove(new Vector3(3500, 1000, 0), retreatTime)
 				.OnComplete(() =>
 				{
 					arrowsGroup.alpha = 0;
+					transform.position = stack.transform.position + 500 * Vector3.left;
 					this.gameObject.SetActive(false);
 				})
 			);

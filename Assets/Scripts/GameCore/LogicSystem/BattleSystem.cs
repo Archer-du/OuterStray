@@ -854,7 +854,7 @@ namespace LogicCore
 		/// 查询敌方随机目标
 		/// </summary>
 		/// <returns></returns>
-		internal UnitElement RandomEnemy(int ownership)
+		internal UnitElement RandomTarget(int ownership)
 		{
 			UpdateUnitNum(ownership);
 			if (enemyNum == 0) return null;
