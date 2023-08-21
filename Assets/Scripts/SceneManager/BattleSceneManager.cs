@@ -227,12 +227,11 @@ public class BattleSceneManager : MonoBehaviour,
 		else
 		{
 			SkipbuttonImage.color = Color.gray;
-
-			// StartCoroutine(AIBehavior());
 			skipButton.enabled = false;
 
-			// 启动行为树
-            StartCoroutine(AIBehavior());
+            // 启动行为树
+            // StartCoroutine(AIBehavior());
+            StartCoroutine(btBattleNode.BehaviorTree());
         }
 	}
 	private void UpdateTurn()
@@ -254,7 +253,8 @@ public class BattleSceneManager : MonoBehaviour,
 			skipButton.enabled = false;
 
             // 启动行为树
-            StartCoroutine(AIBehavior());
+            // StartCoroutine(AIBehavior());
+            StartCoroutine(btBattleNode.BehaviorTree());
         }
 	}
 
@@ -645,6 +645,7 @@ public class BattleSceneManager : MonoBehaviour,
             // 优先使用“蔓延”，补充手牌
             if (TryCast("comm_mush_07"))
 			{
+				Debug.Log($"time: {sequenceTime}");
                 yield return new WaitForSeconds(sequenceTime + waitTime);
                 continue;
             }
@@ -652,6 +653,7 @@ public class BattleSceneManager : MonoBehaviour,
 			// 撤退一些带有部署效果的卡片
 			if (TryRetreatSomeUnits(AISupportLineIdx))
 			{
+				Debug.Log($"time: {sequenceTime}");
                 yield return new WaitForSeconds(sequenceTime + waitTime);
                 continue;
             }
@@ -659,6 +661,7 @@ public class BattleSceneManager : MonoBehaviour,
             // 调整战线
             if (TryAdjustFoward(frontLineIdx))
             {
+				Debug.Log($"time: {sequenceTime}");
                 yield return new WaitForSeconds(sequenceTime + waitTime);
                 continue;
             }
@@ -666,6 +669,7 @@ public class BattleSceneManager : MonoBehaviour,
 			// 部署低费卡
 			if (TryDeployLowCostUnit(AISupportLineIdx))
 			{
+				Debug.Log($"time: {sequenceTime}");
 				yield return new WaitForSeconds(sequenceTime + waitTime);
 				continue;
 			}
@@ -673,6 +677,7 @@ public class BattleSceneManager : MonoBehaviour,
 			// 菇军奋战，铺场
             if (TryCastComm01(AISupportLine))
             {
+				Debug.Log($"time: {sequenceTime}");
                 yield return new WaitForSeconds(sequenceTime + waitTime);
                 continue;
             }
@@ -680,6 +685,7 @@ public class BattleSceneManager : MonoBehaviour,
             // 散播孢子，扩大场面
             if (TryCastComm13(AIAdjacentLine))
             {
+				Debug.Log($"time: {sequenceTime}");
                 yield return new WaitForSeconds(sequenceTime + waitTime);
                 continue;
             }
@@ -687,6 +693,7 @@ public class BattleSceneManager : MonoBehaviour,
             // 增殖，赚卡
             if (TryCast("comm_mush_08"))
             {
+				Debug.Log($"time: {sequenceTime}");
                 yield return new WaitForSeconds(sequenceTime + waitTime);
                 continue;
             }
@@ -694,6 +701,7 @@ public class BattleSceneManager : MonoBehaviour,
             // 腐蚀，攻击血量高的单位
             if (TryCastComm15(frontLineIdx))
             {
+				Debug.Log($"time: {sequenceTime}");
                 yield return new WaitForSeconds(sequenceTime + waitTime);
                 continue;
             }
@@ -701,7 +709,7 @@ public class BattleSceneManager : MonoBehaviour,
 			break;
 		}
 
-        yield return new WaitForSeconds(waitTime * 2);
+        yield return new WaitForSeconds(waitTime * 3);
         Skip();
 	}
 
@@ -751,7 +759,7 @@ public class BattleSceneManager : MonoBehaviour,
 	{
         for (int i = 0; i < AIHandicap.count; i++)
         {
-            if (AIHandicap[i].ID == "comm_mush_01" && energy[Turn] >= AIHandicap[i].cost && AISupportLine.count < AISupportLine.capacity - 1 && AIHandicap[i] is CommandElementController)
+            if (AIHandicap[i].ID == "comm_mush_01" && energy[Turn] >= AIHandicap[i].cost && AISupportLine.count < AISupportLine.capacity - 1)
             {
                 AINoneTargetCast(i);
                 Debug.Log("Cast 'comm_mush_01'");
@@ -766,7 +774,7 @@ public class BattleSceneManager : MonoBehaviour,
 	{
         for (int i = 0; i < AIHandicap.count; i++)
         {
-            if (AIHandicap[i].ID == "comm_mush_13" && energy[Turn] >= AIHandicap[i].cost && AIAdjacentLine.count < AIAdjacentLine.capacity && AIHandicap[i] is CommandElementController)
+            if (AIHandicap[i].ID == "comm_mush_13" && energy[Turn] >= AIHandicap[i].cost && AIAdjacentLine.count < AIAdjacentLine.capacity)
             {
                 AINoneTargetCast(i);
                 Debug.Log("Cast 'comm_mush_13'");
@@ -1012,7 +1020,7 @@ public class BattleSceneManager : MonoBehaviour,
 	/// </summary>
 	/// <param name="lowerBound">下界，返回的索引对应卡费用不会低于这个值</param>
 	/// <returns></returns>
-	private int GetMinCostUnitPointer(int lowerBound = 0)
+	private int GetMinCostUnitPointer(int lowerBound = -1)
 	{
 		int minCost = 10000;
 		int minPointer = -1;
@@ -1112,11 +1120,9 @@ public class BattleSceneManager : MonoBehaviour,
 
 	public void AIMove(int resLineIdx, int resIdx, int dstLineIdx, int dstPos)
 	{
-		sequenceTime = 0;
-		rotateSequence.Kill();
-		rotateSequence = DOTween.Sequence();
+        AcquireSequence();
 
-		battleSystem.Move(resLineIdx, resIdx, dstLineIdx, dstPos);
+        battleSystem.Move(resLineIdx, resIdx, dstLineIdx, dstPos);
 	}
 
 	public void AIRetreat(int resLineIdx, int resPos)
@@ -1124,10 +1130,8 @@ public class BattleSceneManager : MonoBehaviour,
 		BattleLineController battleLine = battleLines[resLineIdx];
 		if(resLineIdx == fieldCapacity - 1 && battleLine[resPos].operateCounter == 1)
 		{
-			sequenceTime = 0;
-			rotateSequence.Kill();
-			rotateSequence = DOTween.Sequence();
-			Debug.Log($"Retreat第{resPos}位{battleLine[resPos].ID}");
+            AcquireSequence();
+            Debug.Log($"Retreat第{resPos}位{battleLine[resPos].ID}");
 			battleSystem.Retreat(resLineIdx, resPos);
 		}
 	}

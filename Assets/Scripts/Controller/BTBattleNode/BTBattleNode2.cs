@@ -93,7 +93,7 @@ public class BTBattleNode3 : BTBattleNode
         }
         else
         {
-            BTCast(minCostPointer, 0, 0);
+            BTNoneTargetCast(minCostPointer);
             return true;
         }
     }

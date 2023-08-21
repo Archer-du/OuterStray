@@ -10,7 +10,11 @@ public class BTBattleNode1 : BTBattleNode
     {
         rootNode = new SelectorNode(new List<BTNode>()
         {
-            new ActionNode(() => TryCast("comm_mush_07")),
+            new SequenceNode(new List<BTNode>()
+            {
+                new ConditionNode(() => AIHandicap.count < AIHandicap.capacity - 2),
+                new ActionNode(() => TryCast("comm_mush_07")),
+            }),
             new SequenceNode(new List<BTNode>()
             {
                 new ConditionNode(() => !GetIsLineAvailable(AISupportLineIdx)),
@@ -18,14 +22,18 @@ public class BTBattleNode1 : BTBattleNode
             }),
             new ActionNode(() => TryAdjustForward(frontLineIdx)),
             new ActionNode(() => TryDeployLowCostUnit(AISupportLineIdx)),
-            new ActionNode(() => TryCast("comm_mush_01")),
+            new SequenceNode(new List<BTNode>
+            {
+                new ConditionNode(() => AISupportLine.count < AISupportLine.capacity - 1),
+                new ActionNode(() => TryCast("comm_mush_01")),
+            }),
+            new ActionNode(() => TryCastComm15(frontLineIdx)),
             new SequenceNode(new List<BTNode>()
             {
                 new ConditionNode(() => GetIsLineAvailable(AIAdjacentLineIdx)),
                 new ActionNode(() => TryCast("comm_mush_13")),
             }),
             new ActionNode(() => TryCast("comm_mush_08")),
-            new ActionNode(() => TryCastComm18(frontLineIdx)),
             new ActionNode(() => TrySkip()),
         });
     }
