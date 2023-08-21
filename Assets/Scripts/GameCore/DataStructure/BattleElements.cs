@@ -712,8 +712,15 @@ namespace DataCore.BattleElements
 
 			controller.MoveAnimationEvent();
 
-
 			dstLine.Receive(resLine.Send(resIdx), dstPos);
+			int lower = resLine.index > dstLine.index ? dstLine.index : resLine.index;
+			int upper = resLine.index > dstLine.index ? resLine.index : dstLine.index;
+			for (int i = lower; i < upper; i++)
+			{
+				battleSystem.battleLines[i].ownerShip = ownership;
+				battleSystem.battleLines[i].UpdateElements();
+				battleSystem.battleLines[i].UpdateInfo();
+			}
 			this.operateCounter = 0;
 
 

@@ -1759,7 +1759,7 @@ MonoBehaviour:
   turnText:
   - {fileID: 628275987}
   - {fileID: 794532478}
-  turnTextPosition: {x: -3000, y: 500, z: 0}
+  turnTextPosition: {x: -3000, y: 200, z: 0}
   baseDisplay: {fileID: 7442338079515085734}
   energyDisplay: {fileID: 0}
   skipButton: {fileID: 957499425}

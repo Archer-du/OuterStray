@@ -25,7 +25,7 @@ public class CultivateSceneManager : MonoBehaviour,
 
 
     public Button baseChooseButton;
-    public Button testImportButton;
+    public Button customDeckButton;
 
     public CanvasGroup inputMask;
 
@@ -55,7 +55,7 @@ public class CultivateSceneManager : MonoBehaviour,
         //note: 功能从manager下放到controller
         baseChooseButton.onClick.AddListener(BaseChoose);
         startExpedition.onClick.AddListener(StartExpedition);
-        testImportButton.onClick.AddListener(ImportPack);
+        customDeckButton.onClick.AddListener(ImportPack);
 
         buildingsDisabled = false;
 
@@ -147,13 +147,13 @@ public class CultivateSceneManager : MonoBehaviour,
     public void DisableAllBuildings()
     {
         buildingsDisabled = true;
-        testImportButton.interactable = false;
+        customDeckButton.interactable = false;
         baseChooseButton.interactable = false;
 	}
     public void EnableAllBuilding()
     {
         buildingsDisabled = false;
-		testImportButton.interactable = true;
+		customDeckButton.interactable = true;
 		baseChooseButton.interactable = true;
 	}
 
@@ -163,7 +163,7 @@ public class CultivateSceneManager : MonoBehaviour,
 	public void ImportPack()
 	{
 		cultivateSystem.FromPackImportDeck(0, 0);
-		testImportButton.interactable = false;
+		customDeckButton.interactable = false;
 	}
 
 	public IDeckController InstantiateDeck()
