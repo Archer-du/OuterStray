@@ -1159,8 +1159,6 @@ namespace DataCore.BattleElements
 			this.DynDurability = __card.maxDurability;
 
 			tempBufferForCommMush07 = 0;
-
-			eventTable.RaiseEvent("Initialize", this, null);
 		}
 
 

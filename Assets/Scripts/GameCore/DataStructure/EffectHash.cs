@@ -496,7 +496,7 @@ namespace EventEffectModels
 
 
 
-		private UnitElement SummonToPosition(UnitElement element, BattleSystem system, int position, UnitCard card)
+		private UnitElement SummonToPosition(BattleElement element, BattleSystem system, int position, UnitCard card)
 		{
 			UnitElement unit = null;
 
@@ -512,10 +512,11 @@ namespace EventEffectModels
 					break;
 				//1：当前战线
 				case 1:
-					if (element.battleLine.Receiveable())
+					UnitElement e = element as UnitElement;
+					if (e.battleLine.Receiveable())
 					{
 						unit = new UnitElement(card, system, system.controller.InstantiateUnitInStack(element.ownership));
-						unit.Deploy(element.battleLine, 0);
+						unit.Deploy(e.battleLine, 0);
 					}
 					break;
 				//2: 前线
@@ -1052,9 +1053,9 @@ namespace EventEffectModels
 				}
 			}
 		}
-		internal void Comm_Mush_13(BattleElement source, BattleSystem system)
+		internal void Comm_Mush_13(BattleElement nullRefer, BattleSystem system)
 		{
-			UnitElement element = source as UnitElement;
+			CommandElement element = this.source as CommandElement;
 			for (int i = 0; i < 3; i++)
 			{
 				if (system.handicaps[BattleSystem.TURN].count < system.handicaps[BattleSystem.TURN].capacity)

@@ -426,6 +426,7 @@ namespace DataCore.BattleItems
 			{
 				return null;
 			}
+			if (UnitIDDic[id].Count == 0) return null;
 			Random random = new Random();
 			int idx = random.Next(0, UnitIDDic[id].Count);
 			UnitElement element = UnitIDDic[id][idx];

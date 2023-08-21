@@ -150,6 +150,7 @@
     <None Include="Assets\PlasticReference.asmref" />
     <None Include="Assets\Resources\Config\NodeConfigs\BattleNode_3.json.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />
+    <None Include="Assets\Resources\Config\DeckConfigs\MushDeckTest.csv.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Sprite.shader" />
   </ItemGroup>
   <ItemGroup>
