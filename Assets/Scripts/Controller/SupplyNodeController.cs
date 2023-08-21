@@ -50,7 +50,7 @@ public class SupplyNodeController : NodeController
 		}
 		tacticalManager.SupplyNodeChoose(index);
 		CardInspect card = panelDisplay.SupplyInspectors[index];
-		tacticalManager.playerDeck.InstantiateDeckTag(card.ID, card.nameText.text, card.category, 0, card.descriptionText.text);
+		tacticalManager.playerDeck.InstantiateDeckTag(card.ID, card.nameText.text, card.category, 0, card.descriptionText.text, "append");
 		if(card.category == "Command")
 		{
 			tacticalManager.playerDeck.UpdateCommandTagInfo(tacticalManager.playerDeck.tags.Count - 1, int.Parse(card.costText.text), int.Parse(card.counterText.text));

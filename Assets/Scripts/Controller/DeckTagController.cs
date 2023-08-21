@@ -76,7 +76,7 @@ public class DeckTagController : MonoBehaviour, IComparable<DeckTagController>,
 	public float initDuration;
 	public void Start()
 	{
-		Component.DOLocalMove(Vector3.zero, initDuration);
+		//Component.DOLocalMove(Vector3.zero, initDuration);
 	}
 	public void UpdateInfo()
 	{
@@ -156,9 +156,11 @@ public class DeckTagController : MonoBehaviour, IComparable<DeckTagController>,
 		if (controller.sceneManager.currentNode is not MedicalNodeController) return;
 		if (category == "Command") return;
 
+		Vector2 localPosition = new Vector2((eventData.position.x / Screen.width) * 3840, (eventData.position.y / Screen.height) * 2160);
+
 		//TODO
 		GetComponent<InspectPanelController>().inspectPanel.alpha = 1.0f;
-		inspector.transform.position = eventData.position - BattleElementController.inputOffset;
+		inspector.transform.position = localPosition - BattleElementController.inputOffset;
 	}
 
 	public void OnEndDrag(PointerEventData eventData)
@@ -169,7 +171,9 @@ public class DeckTagController : MonoBehaviour, IComparable<DeckTagController>,
 		if (controller.sceneManager.currentNode is not MedicalNodeController) return;
 		if (category == "Command") return;
 
-		panel.AddNewTag(eventData.position, this);
+		Vector2 localPosition = new Vector2((eventData.position.x / Screen.width) * 3840, (eventData.position.y / Screen.height) * 2160);
+
+		panel.AddNewTag(localPosition, this);
 
 		GetComponent<InspectPanelController>().inspectPanel.alpha = 0f;
 	}

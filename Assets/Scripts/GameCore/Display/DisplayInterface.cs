@@ -75,7 +75,7 @@ namespace DisplayInterface
 
 		public void UnloadDeckTags();
 
-		public void InstantiateDeckTag(string ID, string name, string category, int index, string description);
+		public void InstantiateDeckTag(string ID, string name, string category, int index, string description, string method);
 
 		public void UpdateUnitTagInfo(string category, int index, int cost, int attack, int health, int maxHealth, int counter);
 
