@@ -110,7 +110,7 @@ public class RewardSelection : MonoBehaviour,
 			attackText.text = attack.ToString();
 			healthText.text = health.ToString();
 		}
-		counterText.text = counter.ToString();
+		counterText.text = category == "Construction" ? "" : counter.ToString();
 		descriptionText.text = description;
 	}
 

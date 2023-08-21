@@ -267,12 +267,6 @@ namespace DataCore.TacticalItems
 		internal void WriteBack(BattleElement reward)
 		{
 			RandomCardStack playerStack = battleSystem.stacks[0];
-			//lightArmorSet.Clear();
-			//motorizedSet.Clear();
-			//artillerySet.Clear();
-			//guardianSet.Clear();
-			//constructionSet.Clear();
-			//commandSet.Clear();
 
 			deck.Clear();
 
@@ -304,13 +298,15 @@ namespace DataCore.TacticalItems
 			deck.Sort();
 			UpdateDeckID();
 			UpdateBattleID();
+
+			InstantiateDeckTags();
 		}
 		internal void InstantiateDeckTags()
 		{
 			controller.UnloadDeckTags();
 			foreach(BattleElement element in deck)
 			{
-				controller.InstantiateDeckTag(element.backendID, element.name, element.category, element.deckID, element.description);
+				controller.InstantiateDeckTag(element.backendID, element.name, element.category, element.deckID, element.description, "immediate");
 				if(element.category == "Command")
 				{
 					CommandElement comm = element as CommandElement;

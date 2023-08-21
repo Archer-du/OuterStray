@@ -1,3 +1,4 @@
+using DG.Tweening;
 using DisplayInterface;
 using InputHandler;
 using System.Collections;
@@ -39,7 +40,7 @@ public class DeckController : MonoBehaviour,
 			Destroy(child.gameObject);
 		}
 	}
-	public void InstantiateDeckTag(string ID, string name, string category, int index, string description)
+	public void InstantiateDeckTag(string ID, string name, string category, int index, string description, string method)
 	{
 		GameObject deckTag = Instantiate(deckTagPrototype, transform);
 		DeckTagController controller = deckTag.GetComponent<DeckTagController>();
@@ -51,6 +52,15 @@ public class DeckController : MonoBehaviour,
 
 		controller.Init(ID);
 		controller.deckID = index;
+
+		if(method == "append")
+		{
+			controller.Component.DOLocalMove(Vector3.zero, controller.initDuration);
+		}
+		else
+		{
+			controller.Component.transform.localPosition = Vector3.zero;
+		}
 
 		tags.Add(controller);
 	}

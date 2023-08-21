@@ -136,7 +136,6 @@ public class CultivateSceneManager : MonoBehaviour,
 			int temp = i;
 			controller.AddButton.onClick.AddListener(() =>
 			{
-				controller.AddButton.interactable = false;
 				playerDeck.AddDeckTagFromPool(temp);
 			}
 			);
