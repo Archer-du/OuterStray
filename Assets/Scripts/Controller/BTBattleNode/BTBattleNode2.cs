@@ -3,98 +3,98 @@ using System;
 using System.Collections.Generic;
 
 /// <summary>
-/// bosså…‹éš†è˜‘äººï¼Œç­–ç•¥ä¸ºè°ƒæ•´æˆ˜çº¿ä½¿å¾—æ¯æ¬¡å…‹éš†çš„å…‹éš†è˜‘äººæ•°é‡æœ€å¤š
+/// boss¿ËÂ¡Ä¢ÈË£¬²ßÂÔÎªµ÷ÕûÕ½ÏßÊ¹µÃÃ¿´Î¿ËÂ¡µÄ¿ËÂ¡Ä¢ÈËÊıÁ¿×î¶à
 /// </summary>
 public class BTBattleNode2 : BTBattleNode
 {
-    protected override void Init()
-    {
-        base.Init();
-    }
+	protected override void Init()
+	{
+		base.Init();
+	}
 
-    protected override void BuildBT()
-    {
-        rootNode = new SelectorNode(new List<BTNode>()
-        {
-            new ActionNode(() => TryAdjustHalf()),
+	protected override void BuildBT()
+	{
+		rootNode = new SelectorNode(new List<BTNode>()
+		{
+			new ActionNode(() => TryAdjustHalf()),
             // new ActionNode(() => TryAdjustForward(frontLineIdx)),
             new ActionNode(() => TryCastComm15(frontLineIdx)),
-        });
-    }
+		});
+	}
 
-    /// <summary>
-    /// æˆ˜çº¿å•ä½æ•°å¤§äºæˆ˜çº¿å®¹é‡ä¸€åŠåˆ™è¿”å›true
-    /// </summary>
-    /// <param name="battleLineIdx"></param>
-    /// <returns></returns>
-    private bool GetIsMoreThanHalf(int battleLineIdx)
-    {
-        return BattleLines[battleLineIdx].count > BattleLines[battleLineIdx].capacity / 2;
-    }
+	/// <summary>
+	/// Õ½Ïßµ¥Î»Êı´óÓÚÕ½ÏßÈİÁ¿Ò»°ëÔò·µ»Øtrue
+	/// </summary>
+	/// <param name="battleLineIdx"></param>
+	/// <returns></returns>
+	private bool GetIsMoreThanHalf(int battleLineIdx)
+	{
+		return BattleLines[battleLineIdx].count > BattleLines[battleLineIdx].capacity / 2;
+	}
 
-    /// <summary>
-    /// æˆ˜çº¿å•ä½æ•°å¤§äºæˆ˜çº¿å®¹é‡ä¸€åŠå‡ä¸€åˆ™è¿”å›true
-    /// </summary>
-    /// <param name="battleLineIdx"></param>
-    /// <returns></returns>
-    private bool GetIsMoreThanHalfMinusOne(int battleLineIdx)
-    {
-        return BattleLines[battleLineIdx].count > (BattleLines[battleLineIdx].capacity / 2 - 1);
-    }
+	/// <summary>
+	/// Õ½Ïßµ¥Î»Êı´óÓÚÕ½ÏßÈİÁ¿Ò»°ë¼õÒ»Ôò·µ»Øtrue
+	/// </summary>
+	/// <param name="battleLineIdx"></param>
+	/// <returns></returns>
+	private bool GetIsMoreThanHalfMinusOne(int battleLineIdx)
+	{
+		return BattleLines[battleLineIdx].count > (BattleLines[battleLineIdx].capacity / 2 - 1);
+	}
 
-    /// <summary>
-    /// å°†æ¯æ¡æˆ˜çº¿è°ƒæ•´è‡³å•ä½æ•°ä¸å¤§äºæˆ˜çº¿å®¹é‡ä¸€åŠ
-    /// </summary>
-    private bool TryAdjustHalf()
-    {
-        for (int i = FieldCapacity - 1; i > frontLineIdx + 1; i--)
-        {
-            // å•ä½æ•°å¤§äºå®¹é‡çš„ä¸€åŠæ—¶ï¼Œå°†æœ¬æˆ˜çº¿è¡€é‡ä½çš„å•ä½å¾€å‰æ¨
-            if (GetIsMoreThanHalf(i) && GetIsLineAvailable(i - 1))
-            {
-                Tuple<int, int> minHealthInfo = GetAvailableMinHealth(i);
-                int minHealthPos = minHealthInfo.Item2;
+	/// <summary>
+	/// ½«Ã¿ÌõÕ½Ïßµ÷ÕûÖÁµ¥Î»Êı²»´óÓÚÕ½ÏßÈİÁ¿Ò»°ë
+	/// </summary>
+	private bool TryAdjustHalf()
+	{
+		for (int i = FieldCapacity - 1; i > frontLineIdx + 1; i--)
+		{
+			// µ¥Î»Êı´óÓÚÈİÁ¿µÄÒ»°ëÊ±£¬½«±¾Õ½ÏßÑªÁ¿µÍµÄµ¥Î»ÍùÇ°ÍÆ
+			if (GetIsMoreThanHalf(i) && GetIsLineAvailable(i - 1))
+			{
+				Tuple<int, int> minHealthInfo = GetAvailableMinHealth(i);
+				int minHealthPos = minHealthInfo.Item2;
 
-                // è‹¥å­˜åœ¨å¯æ“ä½œå¯¹è±¡ï¼Œåˆ™æ‰§è¡Œæ“ä½œ
-                if (minHealthPos > -1)
-                {
-                    BTMove(i, minHealthPos, i - 1, 0);
-                    return true;
-                }
-            }
+				// Èô´æÔÚ¿É²Ù×÷¶ÔÏó£¬ÔòÖ´ĞĞ²Ù×÷
+				if (minHealthPos > -1)
+				{
+					BTMove(i, minHealthPos, i - 1, 0);
+					return true;
+				}
+			}
 
-            // å½“å•ä½æ•°å°äºæˆ–ç­‰äºå®¹é‡çš„ä¸€åŠå‡ä¸€ï¼Œä¸”å‰ä¸€æ¡æˆ˜çº¿å•ä½æ•°å¤§äºå®¹é‡ä¸€åŠæ—¶ï¼Œå°†å‰ä¸€æ¡æˆ˜çº¿è¡€é‡é«˜çš„å¾€åæ’¤
-            if (!GetIsMoreThanHalfMinusOne(i) && GetIsMoreThanHalf(i - 1))
-            {
-                Tuple<int, int> maxHealthInfo = GetAvailableMaxHealth(i - 1);
-                int maxHealthPos = maxHealthInfo.Item2;
+			// µ±µ¥Î»ÊıĞ¡ÓÚ»òµÈÓÚÈİÁ¿µÄÒ»°ë¼õÒ»£¬ÇÒÇ°Ò»ÌõÕ½Ïßµ¥Î»Êı´óÓÚÈİÁ¿Ò»°ëÊ±£¬½«Ç°Ò»ÌõÕ½ÏßÑªÁ¿¸ßµÄÍùºó³·
+			if (!GetIsMoreThanHalfMinusOne(i) && GetIsMoreThanHalf(i - 1))
+			{
+				Tuple<int, int> maxHealthInfo = GetAvailableMaxHealth(i - 1);
+				int maxHealthPos = maxHealthInfo.Item2;
 
-                if (maxHealthPos > -1)
-                {
-                    BTMove(i - 1, maxHealthPos, i, 0);
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+				if (maxHealthPos > -1)
+				{
+					BTMove(i - 1, maxHealthPos, i, 0);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
-    /// <summary>
-    /// å°†æ‰‹ç‰Œä¸­æœ€ä½è´¹çš„æŒ‡ä»¤æ‰“å‡º
-    /// </summary>
-    /// <returns></returns>
-    private bool TryCastLowCost()
-    {
-        int minCostPointer = GetMinCostCommPointer();
-        if (minCostPointer < 0)
-        {
-            return false;
-        }
-        else
-        {
-            BTNoneTargetCast(minCostPointer);
-            return true;
-        }
-    }
+	/// <summary>
+	/// ½«ÊÖÅÆÖĞ×îµÍ·ÑµÄÖ¸Áî´ò³ö
+	/// </summary>
+	/// <returns></returns>
+	private bool TryCastLowCost()
+	{
+		int minCostPointer = GetMinCostCommPointer();
+		if (minCostPointer < 0)
+		{
+			return false;
+		}
+		else
+		{
+			BTNoneTargetCast(minCostPointer);
+			return true;
+		}
+	}
 }
 
