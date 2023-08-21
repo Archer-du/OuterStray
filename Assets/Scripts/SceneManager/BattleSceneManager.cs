@@ -271,8 +271,6 @@ public class BattleSceneManager : MonoBehaviour,
 
 		Sequence seq = DOTween.Sequence();
 
-		seq.AppendInterval(sequenceTime);
-
 		int temp = TURN;
 		seq.Append(turnText[temp].transform.DOBlendableMoveBy(new Vector3(2500, 0, 0), duration));
 		seq.AppendInterval(waitTime);

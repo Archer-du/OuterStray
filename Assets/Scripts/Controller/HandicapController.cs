@@ -138,6 +138,7 @@ public class HandicapController : MonoBehaviour,
 
 		return controller as IBattleElementController;
 	}
+	public static bool pushLock;
 	/// <summary>
 	/// 解锁
 	/// </summary>
@@ -147,7 +148,7 @@ public class HandicapController : MonoBehaviour,
 		float popTime = 0.3f;
 		float waitTime = 1f;
 
-		element.inspectLock = true;
+		pushLock = true;
 		element.inspectPanel.active = false;
 
 		Sequence seq = DOTween.Sequence();
@@ -171,7 +172,7 @@ public class HandicapController : MonoBehaviour,
 			seq.Join(element.transform.DOMove(dstPos, popTime)
 				.OnComplete(() =>
 				{
-					element.inspectLock = false;
+					pushLock = false;
 					element.inspectPanel.active = true;
 					UpdateHandicapPosition();
 				}));
