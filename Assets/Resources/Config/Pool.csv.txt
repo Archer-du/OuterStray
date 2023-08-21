@@ -1,3 +1,4 @@
+base_00,human,基地车,Construction,0,0,30,,,,none,,
 comm_human_01,human,炮击,Target,2,3,,,55,对一个单位造成2点伤害，抽一张牌。,<self:Cast+RandomDamage-2-1-3>|<self:Cast+DrawCardsRandom-1-1>,,todo
 comm_human_02,human,遏制生长,NonTarget,3,4,,,55,压制所有敌人。,,压制,todo
 comm_human_03,human,清理植被,NonTarget,2,3,,,55,对所有处于前线的敌人造成2点伤害。,<self:Cast+AOEDamage-2-2-2>,,
