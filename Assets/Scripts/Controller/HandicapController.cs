@@ -148,6 +148,8 @@ public class HandicapController : MonoBehaviour,
 		float waitTime = 1f;
 
 		element.inspectLock = true;
+		element.inspectPanel.active = false;
+
 		Sequence seq = DOTween.Sequence();
 
 		seq.AppendInterval(method == "append" ? 1.8f : 0);
@@ -169,6 +171,7 @@ public class HandicapController : MonoBehaviour,
 				.OnComplete(() =>
 				{
 					element.inspectLock = false;
+					element.inspectPanel.active = true;
 					UpdateHandicapPosition();
 				}));
 		}

@@ -5,6 +5,7 @@ using LogicCore;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Rendering.VirtualTexturing;
 
 
 namespace EventEffectModels
@@ -111,6 +112,8 @@ namespace EventEffectModels
 				element.operateCounter = 1;
 			}
 		}
+
+
 		internal void Raid(BattleElement source, BattleSystem system)
 		{
 			UnitElement element = source as UnitElement;
@@ -124,6 +127,8 @@ namespace EventEffectModels
 				element.moveRange = 9;
 			}
 		}
+
+
 		internal void Cleave(BattleElement source, BattleSystem system)
 		{
 			UnitElement element = source as UnitElement;
@@ -147,6 +152,24 @@ namespace EventEffectModels
 				system.UpdateAttackRange();
 			}
 		}
+
+
+		internal void Thorn(BattleElement source, BattleSystem system)
+		{
+			UnitElement element = this.source as UnitElement;
+			element.thorn = true;
+		}
+		internal void ThornOnEnable(BattleElement source, BattleSystem system)
+		{
+			UnitElement element = source as UnitElement;
+			if (element.thorn)
+			{
+				element.attackSource.Damaged(element.dynAttackReader, "append");
+				system.UpdateAttackRange();
+			}
+		}
+
+
 		internal void Armor(BattleElement source, BattleSystem system)
 		{
 			UnitElement element = source as UnitElement;
@@ -170,6 +193,8 @@ namespace EventEffectModels
 				element.damage = element.damage - element.armor < 0 ? 0 : element.damage - element.armor;
 			}
 		}
+
+
 		internal void Parry(BattleElement source, BattleSystem system)
 		{
 			UnitElement element = source as UnitElement;
@@ -290,7 +315,7 @@ namespace EventEffectModels
 			switch (range)
 			{
 				case 0:
-					target = system.RandomEnemy(this.source.ownership);
+					target = system.RandomTarget(this.source.ownership);
 					break;
 				case 1:
 					target = system.RandomEnemyAtFrontLine(this.source.ownership);
@@ -299,6 +324,11 @@ namespace EventEffectModels
 
 			target?.Damaged(damage, "append");
 		}
+
+
+
+
+
 
 
 
@@ -311,7 +341,7 @@ namespace EventEffectModels
 			int recover = ((List<int>)argsTable["RandomRecoverDamaged"])[0];
 
 			UnitElement unit = system.DamagedAlly(this.source.ownership);
-			unit?.Recover(recover);
+			unit?.Recover(recover, "append");
 		}
 		internal void DamageAdjacent(BattleElement source, BattleSystem system)
 		{
@@ -638,6 +668,21 @@ namespace EventEffectModels
 			int damage = ((List<int>)argsTable["TargetDamage"])[0];
 			target.Damaged(damage, "immediate");
 		}
+		internal void TargetRecover(BattleElement source, BattleSystem system)
+		{
+
+		}
+		internal void TargetRetreat(BattleElement source, BattleSystem system)
+		{
+			UnitElement target = source as UnitElement;
+
+
+			target.Retreat("immediate");
+		}
+
+
+
+
 
 		internal void AOEDamage(BattleElement source, BattleSystem system)
 		{
@@ -670,11 +715,23 @@ namespace EventEffectModels
 						i++;
 					}
 					break;
+				//3：全图
+				case 3:
+					foreach (UnitElement unit in system.deployQueue)
+					{
+						if(unit.ownership != this.source.ownership && unit.state == ElementState.inBattleLine)
+						{
+							unit.Damaged(damage, "immediate");
+						}
+					}
+					break;
+
 			}
 		}
 		internal void AOERetreat(BattleElement source, BattleSystem system)
 		{
 			int argsNum = 1;
+
 
 			int position = ((List<int>)argsTable["AOERetreat"])[0];
 
@@ -685,14 +742,74 @@ namespace EventEffectModels
 				case 1:
 					break;
 				case 2:
-					int num = system.battleLines[system.frontLines[(BattleSystem.TURN + 1) % 2]].count;
+					int num = system.battleLines[system.frontLines[(this.source.ownership + 1) % 2]].count;
 					for (int i = 0; i < num; i++)
 					{
-						UnitElement unit = system.battleLines[system.frontLines[(BattleSystem.TURN + 1) % 2]][0];
-						system.stacks[(BattleSystem.TURN + 1) % 2].Push(unit);
+						UnitElement unit = system.battleLines[system.frontLines[(this.source.ownership + 1) % 2]][0];
+						system.stacks[(this.source.ownership + 1) % 2].Push(unit);
 						unit.Retreat("immediate");
 					}
 					break;
+			}
+		}
+		internal void AOERecover(BattleElement source, BattleSystem system)
+		{
+			int position = ((List<int>)argsTable["AOERecover"])[0];
+
+			int heal = ((List<int>)argsTable["AOERecover"])[1];
+
+			switch (position)
+			{
+				case 0:
+					break;
+				case 1:
+					break;
+				case 2:
+					break;
+				//全图
+				case 3:
+					foreach (UnitElement unit in system.deployQueue)
+					{
+						if (unit.ownership != this.source.ownership && unit.state == ElementState.inBattleLine)
+						{
+							unit.Recover(heal, "immediate");
+						}
+					}
+					break;
+
+			}
+		}
+		internal void AOEStifle(BattleElement source, BattleSystem system)
+		{
+			int position = ((List<int>)argsTable["AOEStifle"])[0];
+
+			switch (position)
+			{
+				case 0:
+					break;
+				case 1:
+					break;
+				case 2:
+					int num = system.battleLines[system.frontLines[(this.source.ownership + 1) % 2]].count;
+					for (int i = 0; i < num; i++)
+					{
+						UnitElement unit = system.battleLines[system.frontLines[(this.source.ownership + 1) % 2]][i];
+						unit.Stifle();
+					}
+					break;
+			}
+		}
+
+
+
+
+
+		internal void RecoverAll(BattleElement source, BattleSystem system)
+		{
+			int heal = ((List<int>)argsTable["RecoverAll"])[0];
+			foreach (UnitElement unit in system.deployQueue)
+			{
+				unit.Recover(heal, "immediate");
 			}
 		}
 		internal void RecoverBase(BattleElement source, BattleSystem system)
@@ -701,9 +818,9 @@ namespace EventEffectModels
 
 			int value = ((List<int>)argsTable["RecoverBase"])[0];
 
-			system.bases[BattleSystem.TURN].Recover(value);
+			system.bases[BattleSystem.TURN].Recover(value, "append");
 		}
-		
+
 
 
 
@@ -780,7 +897,7 @@ namespace EventEffectModels
 			switch (range)
 			{
 				case 0:
-					target = system.RandomEnemy(this.source.ownership);
+					target = system.RandomTarget(this.source.ownership);
 					break;
 				case 1:
 					target = system.RandomEnemyAtFrontLine(this.source.ownership);
@@ -967,6 +1084,10 @@ namespace EventEffectModels
 
 
 
+
+
+
+
 		//temp
 		internal void DrawCommandCardsRandomAndRecover(BattleElement source, BattleSystem system)
 		{
@@ -998,15 +1119,19 @@ namespace EventEffectModels
 
 
 
+
+
+
+
+
 		internal void Comm_Mush_07(BattleElement source, BattleSystem system)
 		{
 			CommandElement publisher = this.source as CommandElement;
 
-
             int category = 0;
-			int num = 2;
+			int num = 3;
 			//解析完成， 逻辑处理
-			for (int i = 0; i < num + publisher.tempBufferForCommMush07; i++)
+			for (int i = 0; i < num; i++)
 			{
 				UnitCard card = null;
 				switch (category)
@@ -1028,8 +1153,6 @@ namespace EventEffectModels
 					system.handicaps[BattleSystem.TURN].Push(unit, "immediate", 0);
 				}
 			}
-
-			publisher.tempBufferForCommMush07++;
 		}
 		internal void Comm_Mush_08(BattleElement source, BattleSystem system)
 		{
@@ -1167,9 +1290,12 @@ namespace EventEffectModels
 				{"SummonToken", (BattleEventHandler)SummonToken },
 				{"TokenGain", (BattleEventHandler)TokenGain },
 				{"TargetDamage", (BattleEventHandler)TargetDamage },
+				{"TargetRetreat", (BattleEventHandler)TargetRetreat },
 				{"AOEDamage", (BattleEventHandler)AOEDamage },
 				{"AOERetreat", (BattleEventHandler)AOERetreat },
+				{"AOERecover", (BattleEventHandler)AOERecover },
 				{"RecoverBase", (BattleEventHandler)RecoverBase },
+				{"RecoverAll", (BattleEventHandler)RecoverAll },
 				{"DrawCommandCardsRandomAndRecover", (BattleEventHandler)DrawCommandCardsRandomAndRecover },
 				{"StrangeGrowth", (BattleEventHandler)StrangeGrowth },
 				{"StrangeGrowthTutorial", (BattleEventHandler)StrangeGrowthTutorial },
@@ -1221,10 +1347,13 @@ namespace EventEffectModels
 				{"SummonToken", null },
 				{"TokenGain", null },
 				{"TargetDamage", null },
+				{"TargetRetreat", null },
 				{"AOEDamage", null },
 				{"AOERetreat", null },
+				{"AOERecover", null },
 				{"DrawCommandCardsRandomAndRecover", null },
 				{"RecoverBase", null },
+				{"RecoverAll", null },
 				{"StrangeGrowth", null },
 				{"StrangeGrowthTutorial", null },
 				{"AuraConstantUnitGain", null },

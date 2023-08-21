@@ -146,6 +146,9 @@ namespace DataCore.BattleElements
 						case "Cleave":
 							prefabs = "<self:Initialize+Cleave-0>/<self:BeforeAttack+CleaveOnEnable-0>";
 							break;
+						case "Thorn":
+							prefabs = "<self:Initialize+Thorn-0>/<self:AfterAttacked+ThornOnEnable-0>";
+							break;
 					}
 					//将触发块与解除块分离
 					string[] trigger = prefabs.Split('/');
@@ -756,12 +759,14 @@ namespace DataCore.BattleElements
 
 		}
 
+		internal UnitElement attackSource;
 		/// <summary>
 		/// 有来源受击方法: 根据伤害源atk修改damage寄存值
 		/// </summary>
 		/// <param name="source"></param>
 		internal void Attacked(UnitElement source)
 		{
+			attackSource = source;
 			this.damage = source.dynAttackReader;
 
 			eventTable.RaiseEvent("BeforeAttacked", this, battleSystem);
@@ -769,6 +774,8 @@ namespace DataCore.BattleElements
 			Damaged("append");
 
 			eventTable.RaiseEvent("AfterAttacked", this, battleSystem);
+
+			attackSource = null;
 		}
 		/// <summary>
 		/// 无来源受伤方法: 根据damage寄存值受伤
@@ -789,7 +796,6 @@ namespace DataCore.BattleElements
 			controller.DamageAnimationEvent(this.dynHealth, method);
 
 			this.damage = 0;
-
 
             if (this.dynHealth <= 0)
             {
@@ -844,14 +850,14 @@ namespace DataCore.BattleElements
 			eventTable.RaiseEvent("AfterDamaged", this, battleSystem);
 			return 1;
 		}
-		internal void Recover(int heal)
+		internal void Recover(int heal, string method)
 		{
 			this.recover = heal;
 			eventTable.RaiseEvent("BeforeRecover", this, battleSystem);
 			battleSystem.eventTable[ownership].RaiseEvent("UnitHealed", this, battleSystem);
 
 			this.dynHealth += recover;
-			controller.RecoverAnimationEvent(this.dynHealth, "append");
+			controller.RecoverAnimationEvent(this.dynHealth, method);
 
 			this.recover = 0;
 
@@ -893,6 +899,7 @@ namespace DataCore.BattleElements
 		/// </summary>
 		internal void Retreat(string method)
 		{
+			//主将不可以被撤退
 			if (this == battleSystem.bases[ownership])
 			{
 				return;
@@ -910,6 +917,14 @@ namespace DataCore.BattleElements
 			battleSystem.eventTable[ownership].RaiseEvent("UnitRetreated", this, battleSystem);
 			controller.RetreatAnimationEvent(method);
 		}
+		//TODO
+		internal void Stifle()
+		{
+			this.operateCounter = 0;
+
+			UpdateInfo();
+		}
+
 
 
 
@@ -1062,7 +1077,7 @@ namespace DataCore.BattleElements
 
 			if (this.dynAttackCounter <= 0)
 			{
-				tmpTarget = battleSystem.RandomEnemy(this.ownership);
+				tmpTarget = battleSystem.RandomTarget(this.ownership);
 				int result = -1;
 				result = Attack();
 				if (result > 0)
@@ -1149,16 +1164,12 @@ namespace DataCore.BattleElements
 			}
 		}
 
-		[Obsolete]
-		internal int tempBufferForCommMush07;
 
 		internal CommandElement(CommandCard __card, BattleSystem system) : base(__card, system)
 		{
 			this.type = __card.type;
 			this.oriDurability = __card.maxDurability;
 			this.DynDurability = __card.maxDurability;
-
-			tempBufferForCommMush07 = 0;
 		}
 
 
@@ -1191,8 +1202,6 @@ namespace DataCore.BattleElements
 			//由自己修改的状态
 			this.state = ElementState.destroyed;
 
-			//Unload
-			tempBufferForCommMush07 = 0;
 		}
 
 		/// <summary>

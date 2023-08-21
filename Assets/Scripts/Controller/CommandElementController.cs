@@ -121,6 +121,7 @@ public class CommandElementController : BattleElementController,
 		battleSceneManager.castingCommand = this;
 
 		seq.Append(transform.DOMove(inputOffset / 2 + 500 * Vector2.down, castTime));
+		seq.Join(transform.DOScale(castScale, castTime));
 		seq.Join(transform.DORotate(new Vector3(0, 0, 0), castTime));
 	}
 	public void TargetCastAnimationOver()

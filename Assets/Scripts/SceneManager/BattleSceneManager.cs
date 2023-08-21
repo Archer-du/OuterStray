@@ -199,6 +199,7 @@ public class BattleSceneManager : MonoBehaviour,
 		{
 			sequenceTime = 0;
 			InputUnlocked?.Invoke();
+			inputLock = false;
 			UpdateTurn();
 		});
 	}
@@ -208,6 +209,7 @@ public class BattleSceneManager : MonoBehaviour,
 		{
 			sequenceTime = 0;
 			InputUnlocked?.Invoke();
+			inputLock = false;
 		});
 	}
 	public void UpdateTurn(int TURN)
@@ -283,6 +285,9 @@ public class BattleSceneManager : MonoBehaviour,
 				skipButton.enabled = true;
 			}));
 	}
+
+
+
 
 
 
@@ -529,9 +534,12 @@ public class BattleSceneManager : MonoBehaviour,
 
 	public void AcquireSequence()
 	{
+		if (rotateSequence.active) { Debug.LogWarning("正在杀死结算中的序列"); }
 		sequenceTime = 0;
 		rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
+		inputLock = true;
+		rotateSequence.OnComplete(() => inputLock = false);
 	}
 
 
@@ -547,10 +555,7 @@ public class BattleSceneManager : MonoBehaviour,
 	/// </summary>
 	public void Skip()
 	{
-		//分配动画队列
-		InputLocked?.Invoke();
-		rotateSequence.Kill();
-		rotateSequence = DOTween.Sequence();
+		AcquireSequence();
 		battleSystem.Skip();
 	}
 
