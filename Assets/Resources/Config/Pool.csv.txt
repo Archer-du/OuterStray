@@ -2,7 +2,7 @@ base_01,human,“旅者”,Construction,0,0,20,,,战斗开始时获得三点额�
 base_02,human,“决意”,Construction,0,0,15,,,所有手牌的费用减少1点。,,,
 base_03,human,“城塞”,Construction,0,0,30,,,在你的回合结束时，为基地相邻的单位恢复2点耐久。,,,
 comm_human_04,human,整装待发,NonTarget,4,3,,,85,为你的所有单位与基地恢复3点耐久。,<self:Cast+RecoverAll-1-3>,,todo
-comm_human_09,human,撤离,Target,3,3,,,55,撤退一个单位。,<self:TargetRetreat-0>,撤退,todo
+comm_human_09,human,撤离,Target,3,3,,,55,撤退一个单位。,<self:Cast+TargetRetreat-0>,撤退,todo
 comm_human_13,human,机械化部队,NonTarget,6,2,,,165,压制所有处于前线的敌方单位，将1个重装单位招募至前线。,<self:Cast+RecruitByCategory-3-3-2-1>,压制、重装,todo
 human_04,human,“铁颚”开垦车辆,Motorized,4,4,6,4,200,突击/进入前线时，对所有敌人造成2点伤害。,Assault|<self:EnterFrontLine+AOEDamage-2-3-2>,突击，顺劈,todo
 human_06,human,指挥中心,Construction,1,0,2,1,55,所有友方单位获得+1攻击力。,<Aura:ally:UnitDeployed+AuraUnitGain-2-1-0>|<self:AfterDeploy+AuraConstantUnitGain-2-1-0>,,todo

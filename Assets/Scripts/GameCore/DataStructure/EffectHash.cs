@@ -770,7 +770,7 @@ namespace EventEffectModels
 				case 3:
 					foreach (UnitElement unit in system.deployQueue)
 					{
-						if (unit.ownership != this.source.ownership && unit.state == ElementState.inBattleLine)
+						if (unit.ownership == this.source.ownership && unit.state == ElementState.inBattleLine)
 						{
 							unit.Recover(heal, "immediate");
 						}
