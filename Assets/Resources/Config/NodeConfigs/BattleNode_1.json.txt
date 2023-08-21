@@ -1,15 +1,15 @@
 {
     "BTIndex": 1,
-    "initialTurn": 0,
+    "initialTurn": 1,
     "fieldCapacity": 4,
     "battleLinesCapacity":[
         5, 6, 6, 5
     ],
     "plantDeckPath": "Config\\DeckConfigs\\BattleNode_1.csv",
-    "initialHumanEnergy": 3,
-    "initialPlantEnergy": 3,
-    "initialHumanHandicaps": 5,
-    "initialPlantHandicaps": 5,
+    "initialHumanEnergy": 0,
+    "initialPlantEnergy": 0,
+    "initialHumanHandicaps": 3,
+    "initialPlantHandicaps": 3,
     "fieldPreset": [
         {
             "cardPreset" : {

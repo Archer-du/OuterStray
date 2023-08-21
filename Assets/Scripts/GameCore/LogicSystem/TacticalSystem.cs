@@ -96,7 +96,7 @@ namespace LogicCore
 			//init
 
 			//TODO test
-			battleNodeNum = 2;
+			battleNodeNum = 3;
 
 		}
 		public void SetSceneController(ITacticalSceneController tsdspl)
