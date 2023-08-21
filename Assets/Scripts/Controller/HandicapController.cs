@@ -158,7 +158,7 @@ public class HandicapController : MonoBehaviour,
 		//移动到屏幕中心
 		if (element.ownership == 0)
 		{
-			seq.Append(element.transform.DOMove(Vector3.zero + position * 500f * Vector3.right, popTime));
+			seq.Append(element.transform.DOMove(Vector3.zero + position * 800f * Vector3.right, popTime));
 			seq.Join(element.transform.DOScale(element.showScale, popTime));
 			seq.Join(element.transform.DORotate(new Vector3(0, 0, ownership * 180), popTime));
 	

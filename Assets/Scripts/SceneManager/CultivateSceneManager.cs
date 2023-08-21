@@ -178,10 +178,15 @@ public class CultivateSceneManager : MonoBehaviour,
 		//baseHealthText.text = baseHealth.ToString();
 		//baseMaxHealthText.text = baseHealth.ToString();
 	}
-    public void UpdateBaseInfo(int baseHealth)
+    public void UpdateBaseInfo(List<string> IDs, List<string> names, List<string> categories, List<int> healths, List<string> description)
     {
-        baseHealthText.text = baseHealth.ToString();
-        baseMaxHealthText.text = baseHealth.ToString();
+        for(int i = 0; i < IDs.Count; i++)
+        {
+            selections[i].SetInfo(IDs[i], names[i], categories[i], healths[i], description[i]);
+        }
+
+        //baseHealthText.text = baseHealth.ToString();
+        //baseMaxHealthText.text = baseHealth.ToString();
     }
 
 

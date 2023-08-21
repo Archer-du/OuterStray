@@ -44,7 +44,7 @@ namespace DisplayInterface
 	{
 		public IDeckController InstantiateDeck();
 		public void UpdateBasicInfo(int gasMine, int cardNum);
-		public void UpdateBaseInfo(int health);
+		public void UpdateBaseInfo(List<string> IDs, List<string> names, List<string> categories, List<int> healths, List<string> description);
 	}
 
 

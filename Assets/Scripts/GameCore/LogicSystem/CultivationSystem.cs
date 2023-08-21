@@ -67,11 +67,28 @@ namespace LogicCore
 		{
 			this.controller = ctdspl;
 			playerDeck = new Deck(battleSystem, tacticalSystem, controller.InstantiateDeck());
+
+			List<string> IDs = new List<string>();
+			List<string> names = new List<string>();
+			List<string> categories = new List<string>();
+			List<int> health = new List<int>();
+			List<string> descriptions = new List<string>();
+
+			for(int i = 0; i < bases.Length; i++)
+			{
+				IDs.Add(bases[i].backendID);
+				names.Add(bases[i].name);
+				categories.Add(bases[i].category);
+				health.Add(bases[i].oriHealth);
+				descriptions.Add(bases[i].description);
+			}
+
+			controller.UpdateBasicInfo(tacticalSystem.gasMineToken, 0);
+			controller.UpdateBaseInfo(IDs, names, categories, health, descriptions);
 		}
 		public void SetBase(int index)
 		{
 			playerDeck.bases = bases[index];
-			controller.UpdateBaseInfo(playerDeck.bases.oriHealth);
 		}
 
 

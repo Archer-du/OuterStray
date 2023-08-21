@@ -1704,7 +1704,7 @@ MonoBehaviour:
   handicapPrototype: {fileID: 108150961239437055, guid: 71a0c67643b2e344a83f699db9c92e74, type: 3}
   unitPrototype: {fileID: 5613162459952636112, guid: d0be87596100e184cbd70585fc0418fb, type: 3}
   commandPrototype: {fileID: 1308769503806020367, guid: a0845758e8ed58a4fab0b2d1ec40f7a7, type: 3}
-  rewardPrototype: {fileID: 0}
+  rewardPrototype: {fileID: 8998799935164651195, guid: 667dc6482c4d16a49bfdf1a0bcfbde7d, type: 3}
   battleLines: []
   cardStackController: []
   handicapController: []

@@ -509,6 +509,7 @@ public class BattleSceneManager : MonoBehaviour,
 			rewards[i].index = i;
 			rewards[i].transform.DOBlendableMoveBy(new Vector3(-3000 + i * 800, 0, 0), duration);
 			rewards[i].transform.DOBlendableRotateBy(new Vector3(0, -90, 0), duration);
+			rewards[i].SetInfo(IDs[i], names[i], categories[i], cost[i], attacks[i], healths[i], counters[i], description[i]);
 		}
 		rewardConfirmButton.transform.DOMove(new Vector3(0, -800, 0), duration);
 

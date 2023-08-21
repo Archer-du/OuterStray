@@ -131,7 +131,7 @@ public class InspectPanelController : MonoBehaviour,
 			active = true;
 			if(inspectPanel != null) mainPanelEnabled = true;
 
-			subDisplayOffset = new Vector3(1200, 0, 0);
+			subDisplayOffset = new Vector3(1100, 0, 0);
 
 			SubPanel.transform.localScale = subPanelScale * 1.5f;
 		}
