@@ -149,6 +149,7 @@ public class HandicapController : MonoBehaviour,
 		float waitTime = 1f;
 
 		pushLock = true;
+		element.inspectLock = true;
 		element.inspectPanel.active = false;
 
 		Sequence seq = DOTween.Sequence();
@@ -172,6 +173,7 @@ public class HandicapController : MonoBehaviour,
 			seq.Join(element.transform.DOMove(dstPos, popTime)
 				.OnComplete(() =>
 				{
+					element.inspectLock = false;
 					pushLock = false;
 					element.inspectPanel.active = true;
 					UpdateHandicapPosition();
