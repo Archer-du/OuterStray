@@ -62,6 +62,7 @@
     <Compile Include="Assets\Scripts\Controller\UnitElementController.cs" />
     <Compile Include="Assets\Scripts\ToolKit\TargetSelection.cs" />
     <Compile Include="Assets\Scripts\Controller\CommandElementController.cs" />
+    <Compile Include="Assets\QuitGame.cs" />
     <Compile Include="Assets\Scripts\Controller\SupplyNodeController.cs" />
     <Compile Include="Assets\Scripts\Controller\BTBattleNode\BTBattleNode3.cs" />
     <Compile Include="Assets\Scripts\Controller\BattleElementController.cs" />
