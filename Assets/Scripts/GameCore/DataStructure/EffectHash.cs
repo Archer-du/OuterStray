@@ -415,7 +415,7 @@ namespace EventEffectModels
 		/// <exception cref="InvalidOperationException"></exception>
 		internal void RecruitByID(BattleElement source, BattleSystem system)
 		{
-			UnitElement element = source as UnitElement;
+			UnitElement element = this.source as UnitElement;
 			int argsNum = 3;
 			if (!argsTable.ContainsKey("RecruitByID"))
 			{
