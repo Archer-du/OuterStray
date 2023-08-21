@@ -546,7 +546,10 @@ public class BattleSceneManager : MonoBehaviour,
 
 	public void Exit()
 	{
-		battleSystem.Exit();
+		if(skipButton.interactable)
+		{
+			battleSystem.Exit();
+		}
 	}
 	/// <summary>
 	/// 敌我双方公用的输入 结束回合
