@@ -605,14 +605,7 @@ public class BattleSceneManager : MonoBehaviour,
 
 		battleSystem.Cast(handicapIdx);
 	}
-	public void AICast(int handicapIdx, int dstLineIdx, int dstIdx)
-	{
-		AcquireSequence();
 
-		CommandElementController controller = handicapController[0].Pop(handicapIdx) as CommandElementController;
-
-		battleSystem.Cast(handicapIdx, dstLineIdx, dstIdx);
-	}
 
 	public void DisableAllSelectionFrame()
 	{
@@ -644,66 +637,66 @@ public class BattleSceneManager : MonoBehaviour,
 		AIAdjacentLine = battleLines[frontLineIdx + 1];
 
 		int whileCounter = 30;
-	startwhile:
-		whileCounter--;
-        Debug.Log(whileCounter);
-        while (energy[Turn] > 2 && whileCounter != 0)
+
+        while (whileCounter != 0)
 		{
+            Debug.Log(whileCounter--);
+
             // 优先使用“蔓延”，补充手牌
             if (TryCast("comm_mush_07"))
 			{
                 yield return new WaitForSeconds(sequenceTime + waitTime);
-                goto startwhile;
+                continue;
             }
 
 			// 撤退一些带有部署效果的卡片
 			if (TryRetreatSomeUnits(AISupportLineIdx))
 			{
                 yield return new WaitForSeconds(sequenceTime + waitTime);
-                goto startwhile;
+                continue;
             }
 
             // 调整战线
             if (TryAdjustFoward(frontLineIdx))
             {
                 yield return new WaitForSeconds(sequenceTime + waitTime);
-                goto startwhile;
+                continue;
             }
 
 			// 部署低费卡
 			if (TryDeployLowCostUnit(AISupportLineIdx))
 			{
 				yield return new WaitForSeconds(sequenceTime + waitTime);
-				goto startwhile;
+				continue;
 			}
 
 			// 菇军奋战，铺场
-            if (TryCast("comm_mush_01"))
+            if (TryCastComm01(AISupportLine))
             {
                 yield return new WaitForSeconds(sequenceTime + waitTime);
-                goto startwhile;
+                continue;
             }
 
             // 散播孢子，扩大场面
             if (TryCastComm13(AIAdjacentLine))
             {
                 yield return new WaitForSeconds(sequenceTime + waitTime);
-                goto startwhile;
+                continue;
             }
 
             // 增殖，赚卡
             if (TryCast("comm_mush_08"))
             {
                 yield return new WaitForSeconds(sequenceTime + waitTime);
-                goto startwhile;
+                continue;
             }
 
-            //// 腐蚀，攻击血量高的单位
-            //if (TryCastComm18(frontLineIdx))
-            //{
-            //    yield return new WaitForSeconds(sequenceTime + waitTime);
-            //    goto startwhile;
-            //}
+            // 腐蚀，攻击血量高的单位
+            if (TryCastComm15(frontLineIdx))
+            {
+                yield return new WaitForSeconds(sequenceTime + waitTime);
+                continue;
+            }
 
 			break;
 		}
@@ -716,9 +709,9 @@ public class BattleSceneManager : MonoBehaviour,
 	{
 		for (int i = 0; i < AIHandicap.count; i++)
 		{
-			if (AIHandicap[i].ID == cardID && energy[Turn] >= AIHandicap[i].cost)
+			if (AIHandicap[i].ID == cardID && energy[Turn] >= AIHandicap[i].cost && AIHandicap[i] is CommandElementController)
 			{
-				AICast(i, 0, 0);
+				AINoneTargetCast(i);
 				Debug.Log($"Cast '{cardID}'");
 				return true;
 			}
@@ -726,11 +719,11 @@ public class BattleSceneManager : MonoBehaviour,
 		return false;
 	}
 
-    private bool TryCastComm18(int frontLineIdx)
+    private bool TryCastComm15(int frontLineIdx)
 	{
         for (int i = 0; i < AIHandicap.count; i++)
         {
-            if (AIHandicap[i].ID == "comm_mush_18" && energy[Turn] >= 3)
+            if (AIHandicap[i].ID == "comm_mush_15" && energy[Turn] >= AIHandicap[i].cost && AIHandicap[i] is CommandElementController)
             {
 
                 int dstLineIdx = 0;
@@ -746,21 +739,36 @@ public class BattleSceneManager : MonoBehaviour,
                         dstPos = lineMaxHealth.Item2;
                     }
                 }
-                AICast(i, dstLineIdx, dstPos);
-                Debug.Log("Cast 'comm_mush_18'");
+                AITargetCast(i, dstLineIdx, dstPos);
+                Debug.Log("Cast 'comm_mush_15'");
                 return true;
             }
         }
 		return false;
     }
 
-	private bool TryCastComm13(BattleLineController AIAdjacentLine)
+    private bool TryCastComm01(BattleLineController AISupportLine)
 	{
         for (int i = 0; i < AIHandicap.count; i++)
         {
-            if (AIHandicap[i].ID == "comm_mush_13" && energy[Turn] >= 6 && AIAdjacentLine.count < AIAdjacentLine.count)
+            if (AIHandicap[i].ID == "comm_mush_01" && energy[Turn] >= AIHandicap[i].cost && AISupportLine.count < AISupportLine.capacity - 1 && AIHandicap[i] is CommandElementController)
             {
-                AICast(i, 0, 0);
+                AINoneTargetCast(i);
+                Debug.Log("Cast 'comm_mush_01'");
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    private bool TryCastComm13(BattleLineController AIAdjacentLine)
+	{
+        for (int i = 0; i < AIHandicap.count; i++)
+        {
+            if (AIHandicap[i].ID == "comm_mush_13" && energy[Turn] >= AIHandicap[i].cost && AIAdjacentLine.count < AIAdjacentLine.capacity && AIHandicap[i] is CommandElementController)
+            {
+                AINoneTargetCast(i);
                 Debug.Log("Cast 'comm_mush_13'");
                 return true;
             }
@@ -845,7 +853,6 @@ public class BattleSceneManager : MonoBehaviour,
                 if (idx >= 0)
                 {
                     AIDeploy(idx); 
-					Debug.Log("Deploy");
                     return true;
                 }
             }
@@ -856,7 +863,6 @@ public class BattleSceneManager : MonoBehaviour,
                 if (idx >= 0)
                 {
                     AIDeploy(idx);
-                    Debug.Log("Deploy");
                     return true;
                 }
             }
@@ -1125,4 +1131,21 @@ public class BattleSceneManager : MonoBehaviour,
 			battleSystem.Retreat(resLineIdx, resPos);
 		}
 	}
+    public void AITargetCast(int handicapIdx, int dstLineIdx, int dstIdx)
+    {
+        AcquireSequence();
+
+        CommandElementController controller = handicapController[1].Pop(handicapIdx) as CommandElementController;
+
+        battleSystem.Cast(handicapIdx, dstLineIdx, dstIdx);
+    }
+
+    public void AINoneTargetCast(int handicapIdx)
+    {
+        AcquireSequence();
+
+        CommandElementController controller = handicapController[1].Pop(handicapIdx) as CommandElementController;
+
+        battleSystem.Cast(handicapIdx);
+    }
 }

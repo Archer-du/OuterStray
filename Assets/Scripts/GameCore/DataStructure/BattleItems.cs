@@ -239,7 +239,7 @@ namespace DataCore.BattleItems
 		{
 			int num = deck.count;
 			//TODO
-			for (int i = 1; i < num; i++)
+			for (int i = 0; i < num; i++)
 			{
 				stack.Add(deck[i]);
 

@@ -101,9 +101,10 @@ namespace BehaviorTree
         {
             sceneManager.AIDeploy(handicapIdx);
         }
+        // TODO
         protected void BTCast(int handicapIdx, int dstLineIdx, int dstPos)
         {
-            sceneManager.AICast(handicapIdx, dstLineIdx, dstPos);
+            sceneManager.AITargetCast(handicapIdx, dstLineIdx, dstPos);
         }
         protected void BTSkip()
         {
