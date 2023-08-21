@@ -34,7 +34,6 @@ public class BTBattleNode0 : BTBattleNode
                 new ActionNode(() => TryCast("comm_mush_13")),
             }),
             new ActionNode(() => TryCast("comm_mush_08")),
-            new ActionNode(() => TrySkip()),
         });
     }
 }

@@ -91,8 +91,11 @@ namespace BehaviorTree
             {
                 loopTimes--;
                 Debug.Log($"loopTimes:{loopTimes} SequenceTime:{SequenceTime}");
-                yield return new WaitForSeconds(SequenceTime + waitTime * 2);
+                yield return new WaitForSeconds(SequenceTime + waitTime);
             }
+
+            yield return new WaitForSeconds(SequenceTime + waitTime);
+            TrySkip();
         }
 
 

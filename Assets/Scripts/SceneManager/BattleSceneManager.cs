@@ -115,7 +115,7 @@ public class BattleSceneManager : MonoBehaviour,
 
 	[Header("Sequence")]
 	public Sequence rotateSequence;
-	public float sequenceTime = 0;
+	public float sequenceTime;
 
 	//结算锁
 	public static bool settlement = false;
@@ -197,7 +197,6 @@ public class BattleSceneManager : MonoBehaviour,
 		//结算攻击动画
 		rotateSequence.InsertCallback(sequenceTime, () =>
 		{
-			sequenceTime = 0;
 			InputUnlocked?.Invoke();
 			inputLock = false;
 			UpdateTurn();
@@ -207,7 +206,6 @@ public class BattleSceneManager : MonoBehaviour,
 	{
 		rotateSequence.InsertCallback(sequenceTime, () =>
 		{
-			sequenceTime = 0;
 			InputUnlocked?.Invoke();
 			inputLock = false;
 		});
@@ -218,18 +216,18 @@ public class BattleSceneManager : MonoBehaviour,
 		Turn = TURN;
 		turnNum++;
 
-		TurnUpdateAnimation(TURN);
+        skipButton.enabled = false;
+
+        TurnUpdateAnimation(TURN);
 		
 		if (Turn == 0)
 		{
 			SkipbuttonImage.color = Color.white;
-			skipButton.enabled = true;
 		}
 		//如果是敌方回合，启动行为树
 		else
 		{
 			SkipbuttonImage.color = Color.gray;
-			skipButton.enabled = false;
 
             // 启动行为树
             // StartCoroutine(AIBehavior());
@@ -241,24 +239,24 @@ public class BattleSceneManager : MonoBehaviour,
 		Turn = (Turn + 1) % 2;
 		turnNum++;
 
+        skipButton.enabled = false;
+
 		TurnUpdateAnimation(Turn);
 
 		if (Turn == 0)
 		{
 			SkipbuttonImage.color = Color.white;
-			skipButton.enabled = true;
 		}
 		//如果是敌方回合，启动行为树
 		else
 		{
 			SkipbuttonImage.color = Color.gray;
-			skipButton.enabled = false;
 
             // 启动行为树
             // StartCoroutine(AIBehavior());
             StartCoroutine(btBattleNode.BehaviorTree());
         }
-	}
+    }
 
 
 	public bool updatingTurn;
@@ -272,6 +270,8 @@ public class BattleSceneManager : MonoBehaviour,
 		skipButton.enabled = false;
 
 		Sequence seq = DOTween.Sequence();
+
+		seq.AppendInterval(sequenceTime);
 
 		int temp = TURN;
 		seq.Append(turnText[temp].transform.DOBlendableMoveBy(new Vector3(2500, 0, 0), duration));
@@ -534,7 +534,7 @@ public class BattleSceneManager : MonoBehaviour,
 
 	public void AcquireSequence()
 	{
-		if (rotateSequence.active) { Debug.LogWarning("正在杀死结算中的序列"); }
+		if (rotateSequence != null && rotateSequence.active) { Debug.LogWarning("正在杀死结算中的序列"); }
 		sequenceTime = 0;
 		rotateSequence.Kill();
 		rotateSequence = DOTween.Sequence();
@@ -556,6 +556,7 @@ public class BattleSceneManager : MonoBehaviour,
 	public void Skip()
 	{
 		AcquireSequence();
+
 		battleSystem.Skip();
 	}
 
@@ -649,40 +650,35 @@ public class BattleSceneManager : MonoBehaviour,
 
             // 优先使用“蔓延”，补充手牌
             if (TryCast("comm_mush_07"))
-			{
-				Debug.Log($"time: {sequenceTime}");
+			{				
                 yield return new WaitForSeconds(sequenceTime + waitTime);
                 continue;
             }
 
 			// 撤退一些带有部署效果的卡片
 			if (TryRetreatSomeUnits(AISupportLineIdx))
-			{
-				Debug.Log($"time: {sequenceTime}");
+			{				
                 yield return new WaitForSeconds(sequenceTime + waitTime);
                 continue;
             }
 
             // 调整战线
             if (TryAdjustFoward(frontLineIdx))
-            {
-				Debug.Log($"time: {sequenceTime}");
+            {				
                 yield return new WaitForSeconds(sequenceTime + waitTime);
                 continue;
             }
 
 			// 部署低费卡
 			if (TryDeployLowCostUnit(AISupportLineIdx))
-			{
-				Debug.Log($"time: {sequenceTime}");
+			{				
 				yield return new WaitForSeconds(sequenceTime + waitTime);
 				continue;
 			}
 
 			// 菇军奋战，铺场
             if (TryCastComm01(AISupportLine))
-            {
-				Debug.Log($"time: {sequenceTime}");
+            {				
                 yield return new WaitForSeconds(sequenceTime + waitTime);
                 continue;
             }
@@ -690,33 +686,30 @@ public class BattleSceneManager : MonoBehaviour,
             // 散播孢子，扩大场面
             if (TryCastComm13(AIAdjacentLine))
             {
-				Debug.Log($"time: {sequenceTime}");
+				
                 yield return new WaitForSeconds(sequenceTime + waitTime);
                 continue;
             }
 
             // 增殖，赚卡
             if (TryCast("comm_mush_08"))
-            {
-				Debug.Log($"time: {sequenceTime}");
+            {				
                 yield return new WaitForSeconds(sequenceTime + waitTime);
                 continue;
             }
 
             // 腐蚀，攻击血量高的单位
             if (TryCastComm15(frontLineIdx))
-            {
-				Debug.Log($"time: {sequenceTime}");
+            {				
                 yield return new WaitForSeconds(sequenceTime + waitTime);
                 continue;
             }
 
 			break;
 		}
-
-        yield return new WaitForSeconds(waitTime * 3);
-        Skip();
-	}
+        yield return new WaitForSeconds(waitTime * 1.5f);
+        AISkip();        
+    }
 
 	private bool TryCast(string cardID)
 	{
@@ -1092,20 +1085,7 @@ public class BattleSceneManager : MonoBehaviour,
 	//{
 
 	//}
-	public void AIDeploy(int handicapIdx)
-	{
-		int lineidx = 3;//supportline
-		UnitElementController controller = handicapController[1].Pop(handicapIdx) as UnitElementController;
 
-
-		sequenceTime = 0;
-		rotateSequence.Kill();
-		rotateSequence = DOTween.Sequence();
-
-
-		//data input 显示层检查完了再动数据层！！！
-		battleSystem.Deploy(handicapIdx, lineidx, 0);
-	}
 	//public void AICast(int handicapIdx, int dstLineIdx, int dstPos)
 	//{
 	//	UnitElementController controller = AIHandicap.Pop(handicapIdx) as UnitElementController;
@@ -1156,5 +1136,15 @@ public class BattleSceneManager : MonoBehaviour,
         CommandElementController controller = handicapController[1].Pop(handicapIdx) as CommandElementController;
 
         battleSystem.Cast(handicapIdx);
+    }
+    public void AIDeploy(int handicapIdx)
+    {
+        AcquireSequence();
+
+        int lineidx = 3;//supportline
+        UnitElementController controller = handicapController[1].Pop(handicapIdx) as UnitElementController;
+
+        //data input 显示层检查完了再动数据层！！！
+        battleSystem.Deploy(handicapIdx, lineidx, 0);
     }
 }

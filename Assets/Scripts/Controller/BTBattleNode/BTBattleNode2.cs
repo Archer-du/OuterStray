@@ -19,7 +19,6 @@ public class BTBattleNode3 : BTBattleNode
         {
             new ActionNode(() => TryAdjustHalf()),
             new ActionNode(() => TryCastLowCost()),
-            new ActionNode(() => TrySkip()),
         });
     }
 
