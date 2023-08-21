@@ -108,7 +108,7 @@ namespace EventEffectModels
 			UnitElement element = source as UnitElement;
 			if (element.assault)
 			{
-				element.moveRange = 9;
+				element.operateCounter = 1;
 			}
 		}
 		internal void Raid(BattleElement source, BattleSystem system)
@@ -121,7 +121,7 @@ namespace EventEffectModels
 			UnitElement element = source as UnitElement;
 			if (element.raid)
 			{
-				element.operateCounter = 1;
+				element.moveRange = 9;
 			}
 		}
 		internal void Cleave(BattleElement source, BattleSystem system)
