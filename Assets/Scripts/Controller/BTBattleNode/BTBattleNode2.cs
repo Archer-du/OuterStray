@@ -16,8 +16,8 @@ public class BTBattleNode2 : BTBattleNode
     {
         rootNode = new SelectorNode(new List<BTNode>()
         {
-            // new ActionNode(() => TryAdjustHalf()),
-            new ActionNode(() => TryAdjustForward(frontLineIdx)),
+            new ActionNode(() => TryAdjustHalf()),
+            // new ActionNode(() => TryAdjustForward(frontLineIdx)),
             new ActionNode(() => TryCastComm15(frontLineIdx)),
         });
     }
@@ -50,7 +50,7 @@ public class BTBattleNode2 : BTBattleNode
         for (int i = FieldCapacity - 1; i > frontLineIdx + 1; i--)
         {
             // 单位数大于容量的一半时，将本战线血量低的单位往前推
-            if (GetIsMoreThanHalf(i))
+            if (GetIsMoreThanHalf(i) && GetIsLineAvailable(i - 1))
             {
                 Tuple<int, int> minHealthInfo = GetAvailableMinHealth(i);
                 int minHealthPos = minHealthInfo.Item2;
@@ -58,7 +58,7 @@ public class BTBattleNode2 : BTBattleNode
                 // 若存在可操作对象，则执行操作
                 if (minHealthPos > -1)
                 {
-                    BTMove(i, minHealthPos, i + 1, 0);
+                    BTMove(i, minHealthPos, i - 1, 0);
                     return true;
                 }
             }
