@@ -114,8 +114,6 @@ public class CultivateSceneManager : MonoBehaviour,
 
         for(int i = 0; i < 3; i++)
         {
-            GameObject bases = Instantiate(baseCardPrototype, new Vector3(2500, 0, 0), Quaternion.Euler(new Vector3(0, 90, 0)));
-			selections[i] = bases.GetComponent<BaseSelection>();
             selections[i].transform.SetParent(transform.Find("UI"));
             selections[i].index = i;
             selections[i].transform.DOBlendableMoveBy(new Vector3(-3000 + i * 800, 0, 0), duration);
@@ -128,6 +126,8 @@ public class CultivateSceneManager : MonoBehaviour,
 		inputMask.alpha = 0;
 
 		cultivateSystem.SetBase(selectionIndex);
+
+        playerDeck.EnableAllDeckTags();
         startExpedition.transform.position = new Vector3(0, -1200, 0);
 		// 查找同类型的所有游戏对象
 		BaseSelection[] otherInstances = Object.FindObjectsOfType<BaseSelection>();
@@ -182,6 +182,8 @@ public class CultivateSceneManager : MonoBehaviour,
     {
         for(int i = 0; i < IDs.Count; i++)
         {
+            GameObject bases = Instantiate(baseCardPrototype, new Vector3(2500, 0, 0), Quaternion.Euler(new Vector3(0, 90, 0)));
+            selections[i] = bases.GetComponent<BaseSelection>();
             selections[i].SetInfo(IDs[i], names[i], categories[i], healths[i], description[i]);
         }
 

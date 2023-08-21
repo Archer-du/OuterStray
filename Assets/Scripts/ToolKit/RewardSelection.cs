@@ -85,7 +85,7 @@ public class RewardSelection : MonoBehaviour,
 	public void SetInfo(string ID, string name, string category, int cost, int attack, int health, int counter, string description)
 	{
 		this.ID = ID;
-		this.name = name;
+		this.names = name;
 		this.category = category;
 		this.cost = cost;
 		this.attack = attack;

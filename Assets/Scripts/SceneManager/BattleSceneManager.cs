@@ -216,19 +216,15 @@ public class BattleSceneManager : MonoBehaviour,
 		Turn = TURN;
 		turnNum++;
 
-        skipButton.enabled = false;
-
         TurnUpdateAnimation(TURN);
 		
 		if (Turn == 0)
 		{
-			SkipbuttonImage.color = Color.white;
 		}
 		//如果是敌方回合，启动行为树
 		else
 		{
-			SkipbuttonImage.color = Color.gray;
-
+			skipButton.interactable = false;
             // 启动行为树
             // StartCoroutine(AIBehavior());
             StartCoroutine(btBattleNode.BehaviorTree());
@@ -239,19 +235,15 @@ public class BattleSceneManager : MonoBehaviour,
 		Turn = (Turn + 1) % 2;
 		turnNum++;
 
-        skipButton.enabled = false;
-
 		TurnUpdateAnimation(Turn);
 
 		if (Turn == 0)
 		{
-			SkipbuttonImage.color = Color.white;
 		}
 		//如果是敌方回合，启动行为树
 		else
 		{
-			SkipbuttonImage.color = Color.gray;
-
+			skipButton.interactable = false;
             // 启动行为树
             // StartCoroutine(AIBehavior());
             StartCoroutine(btBattleNode.BehaviorTree());
@@ -267,7 +259,7 @@ public class BattleSceneManager : MonoBehaviour,
 
 		inputLock = true;
 		updatingTurn = true;
-		skipButton.enabled = false;
+		skipButton.interactable = false;
 
 		Sequence seq = DOTween.Sequence();
 
@@ -280,7 +272,7 @@ public class BattleSceneManager : MonoBehaviour,
 				updatingTurn = false;
 				inputLock = false;
 				turnText[temp].transform.position = turnTextPosition;
-				skipButton.enabled = true;
+				skipButton.interactable = temp == 0;
 			}));
 	}
 
@@ -503,7 +495,7 @@ public class BattleSceneManager : MonoBehaviour,
 		{
 			GameObject reward = Instantiate(rewardPrototype, new Vector3(2500, 0, 0), Quaternion.Euler(new Vector3(0, 90, 0)));
 			rewards[i] = reward.GetComponent<RewardSelection>();
-			rewards[i].transform.SetParent(transform.Find("UI"));
+			rewards[i].transform.SetParent(GameObject.Find("UI").transform);
 			rewards[i].index = i;
 			rewards[i].transform.DOBlendableMoveBy(new Vector3(-3000 + i * 800, 0, 0), duration);
 			rewards[i].transform.DOBlendableRotateBy(new Vector3(0, -90, 0), duration);
