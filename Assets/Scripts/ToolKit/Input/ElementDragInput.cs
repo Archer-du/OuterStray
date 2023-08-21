@@ -36,6 +36,7 @@ public class ElementDragInput : MonoBehaviour,
 		if (BattleElementController.targetSelectionLock) return;
 		if (BattleSceneManager.Turn != 0) return;
 		if (BattleSceneManager.inputLock) return;
+		if (HandicapController.pushLock) return;
 		if (controller.inspectLock) return;
 		if (controller.inputLock) return;
 		if (controller.ownership != 0) return;
@@ -65,6 +66,7 @@ public class ElementDragInput : MonoBehaviour,
 		if (BattleElementController.targetSelectionLock) return;
 		if (BattleSceneManager.Turn != 0) return;
 		if (BattleSceneManager.inputLock) return;
+		if (HandicapController.pushLock) return;
 		if (controller.inspectLock) return;
 		if (controller.inputLock) return;
 		if (controller.ownership != 0) return;
@@ -128,6 +130,7 @@ public class ElementDragInput : MonoBehaviour,
 		if (BattleElementController.targetSelectionLock) return;
 		if (BattleSceneManager.Turn != 0) return;
 		if (BattleSceneManager.inputLock) return;
+		if (HandicapController.pushLock) return;
 		if (controller.inspectLock) return;
 		if (controller.inputLock) return;
 		if (controller.ownership != 0) return;
