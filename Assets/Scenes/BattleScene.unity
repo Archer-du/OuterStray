@@ -938,6 +938,7 @@ GameObject:
   - component: {fileID: 638559879}
   - component: {fileID: 638559878}
   - component: {fileID: 638559877}
+  - component: {fileID: 638559881}
   m_Layer: 5
   m_Name: RewardConfirm
   m_TagString: Untagged
@@ -1047,6 +1048,29 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -1200}
   m_SizeDelta: {x: 490.2195, y: 178.3875}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!223 &638559881
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 638559876}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 1
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: -1617472571
+  m_SortingOrder: 1000
+  m_TargetDisplay: 0
 --- !u!1 &653876282
 GameObject:
   m_ObjectHideFlags: 0
@@ -1402,7 +1426,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 236460db53497ab4c8c143c2f0bb86ea, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 487f52a4424c8814c93744901fd47ec1, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
