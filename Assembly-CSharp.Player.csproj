@@ -82,11 +82,15 @@
      <Compile Include="Assets\Scripts\ToolKit\RewardSelection.cs" />
      <Compile Include="Assets\Scripts\Controller\BTBattleNode\BTBattleNode0.cs" />
      <Compile Include="Assets\Scripts\ToolKit\Button\ButtonAudio.cs" />
+     <Compile Include="Assets\Scripts\Controller\BTBattleNode\BTBattleNode2.cs" />
      <Compile Include="Assets\Scripts\Controller\HandicapController.cs" />
      <Compile Include="Assets\Scripts\SceneManager\TacticalSceneManager.cs" />
      <Compile Include="Assets\Scripts\Controller\CardStackController.cs" />
      <Compile Include="Assets\Scripts\ToolKit\TacticalPanelDisplay.cs" />
+<<<<<<< Updated upstream
      <Compile Include="Assets\PackController.cs" />
+=======
+>>>>>>> Stashed changes
      <Compile Include="Assets\Scripts\ToolKit\BaseSelection.cs" />
      <Compile Include="Assets\Scripts\ToolKit\BattleLineDisplay.cs" />
      <Compile Include="Assets\Scripts\Controller\BattleLineController.cs" />
