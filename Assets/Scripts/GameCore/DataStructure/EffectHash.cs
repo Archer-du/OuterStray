@@ -679,6 +679,7 @@ namespace EventEffectModels
 		{
 			UnitElement target = source as UnitElement;
 
+			system.stacks[target.ownership].Push(target);
 			target.Retreat("immediate");
 		}
 

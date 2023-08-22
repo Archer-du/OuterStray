@@ -14,6 +14,7 @@ using UnityEditor;
 using JetBrains.Annotations;
 using System.Linq;
 using BehaviorTree;
+using UnityEngine.SceneManagement;
 
 public class BattleSceneManager : MonoBehaviour,
 	IBattleSceneController
@@ -326,6 +327,17 @@ public class BattleSceneManager : MonoBehaviour,
 			+ index * (BattleLineController.lineWidth + BattleLineController.lineInterval), 0);
 		FrontLine.transform.DOMove(dstPos, shiftTime);
 	}
+	public void UpdateAllBattleLine()
+	{
+		foreach (BattleLineController line in battleLines)
+		{
+			line.UpdateElementPosition();
+		}
+	}
+
+
+
+
 
 
 
@@ -414,6 +426,9 @@ public class BattleSceneManager : MonoBehaviour,
 		}
 		return -1;
 	}
+
+
+
 
 
 
@@ -539,6 +554,9 @@ public class BattleSceneManager : MonoBehaviour,
 			skipButton.enabled = Turn == 0;
 		});
 	}
+
+
+
 
 
 

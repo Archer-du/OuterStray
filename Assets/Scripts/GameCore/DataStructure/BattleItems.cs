@@ -430,7 +430,7 @@ namespace DataCore.BattleItems
 			Random random = new Random();
 			int idx = random.Next(0, UnitIDDic[id].Count);
 			UnitElement element = UnitIDDic[id][idx];
-			UnitIDDic.Remove(id);
+			UnitIDDic[id].RemoveAt(idx);
 
 			return element;
 		}
