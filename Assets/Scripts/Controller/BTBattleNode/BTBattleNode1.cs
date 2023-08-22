@@ -9,7 +9,7 @@ public class BTBattleNode1 : BTBattleNode
     protected override void BuildBT()
     {
         rootNode = new SelectorNode(new List<BTNode>()
-        {
+        {   
             new SequenceNode(new List<BTNode>()
             {
                 new ConditionNode(() => AIHandicap.count < AIHandicap.capacity - 2),

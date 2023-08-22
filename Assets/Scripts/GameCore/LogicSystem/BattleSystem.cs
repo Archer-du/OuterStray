@@ -49,7 +49,10 @@ namespace LogicCore
 		/// </summary>
 		public static int TURN;
 
-		public bool tutorial;
+		public bool tutorial
+		{
+			get => tacticalSystem.tutorial;
+		}
 
 		/// <summary>
 		/// 战线
@@ -142,6 +145,7 @@ namespace LogicCore
 			int initialTurn, int initialHumanEnergy, int initialPlantEnergy, int initialHumanHandicaps, int initialPlantHandicaps,
 			List<BattleNode.FieldPreset> fieldPresets, bool final)
 		{
+			//TODO
 			this.final = final;
 			eventTable = new EventTable[2] { new EventTable(), new EventTable() };
 
@@ -874,7 +878,13 @@ namespace LogicCore
 					//TODO
 					if(unit.ownership == ownership)
 					{
-						return bases[1].state == ElementState.destroyed ? null : bases[1];
+						for(int i = 0; i < linesCapacity - 1; i++)
+						{
+							if (battleLines[i].count != 0 && battleLines[i].ownerShip != ownership)
+							{
+								return battleLines[0][0];
+							}
+						}
 					}
                     return unit;
 				}

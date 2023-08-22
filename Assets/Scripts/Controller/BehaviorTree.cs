@@ -13,27 +13,33 @@ namespace BehaviorTree
     /// </summary>
     public abstract class BTBattleNode
     {
-        protected BattleSceneManager sceneManager;
-
+        protected BattleSceneManager SceneManager
+        {
+            get => GameManager.GetInstance().battleSceneManager;
+        }
+        protected int TurnNum
+        {
+            get => SceneManager.turnNum;
+        }
         protected HandicapController AIHandicap
         {
-            get => sceneManager.handicapController[1];
+            get => SceneManager.handicapController[1];
         }
         protected int FieldCapacity
         {
-            get => sceneManager.fieldCapacity;
+            get => SceneManager.fieldCapacity;
         }
         protected BattleLineController[] BattleLines
         {
-            get => sceneManager.battleLines;
+            get => SceneManager.battleLines;
         }
         protected int Energy
         {
-            get => sceneManager.energy[1];
+            get => SceneManager.energy[1];
         }
         protected float SequenceTime
         {
-            get => sceneManager.sequenceTime;
+            get => SceneManager.sequenceTime;
         }
 
         // 战线索引 & 战线
@@ -57,8 +63,6 @@ namespace BehaviorTree
 
         protected virtual void Init()
         {
-            sceneManager = GameObject.Find("BattleSceneManager").GetComponent<BattleSceneManager>();
-
             AISupportLineIdx = FieldCapacity - 1;
             AISupportLine = BattleLines[AISupportLineIdx];
 
@@ -100,30 +104,30 @@ namespace BehaviorTree
 
 
         // 行为树可执行的基本操作
-        protected void BTDeploy(int handicapIdx)
+        protected void BTDeploy(int handicapIdx, int dstIdx = 3, int dstPos = 0)
         {
-            sceneManager.AIDeploy(handicapIdx);
+            SceneManager.AIDeploy(handicapIdx, dstIdx, dstPos);
         }
         // TODO
         protected void BTTargetCast(int handicapIdx, int dstLineIdx, int dstPos)
         {
-            sceneManager.AITargetCast(handicapIdx, dstLineIdx, dstPos);
+            SceneManager.AITargetCast(handicapIdx, dstLineIdx, dstPos);
         }
         protected void BTNoneTargetCast(int handicapIdx)
         {
-            sceneManager.AINoneTargetCast(handicapIdx);
+            SceneManager.AINoneTargetCast(handicapIdx);
         }
         protected void BTSkip()
         {
-            sceneManager.AISkip();
+            SceneManager.AISkip();
         }
         protected void BTMove(int resLineIdx, int resIdx, int dstLineIdx, int dstPos)
         {
-            sceneManager.AIMove(resLineIdx, resIdx, dstLineIdx, dstPos);
+            SceneManager.AIMove(resLineIdx, resIdx, dstLineIdx, dstPos);
         }
         protected void BTRetreat(int resLineIdx, int resPos)
         {
-            sceneManager.AIRetreat(resLineIdx, resPos);
+            SceneManager.AIRetreat(resLineIdx, resPos);
         }
 
 
@@ -566,6 +570,11 @@ namespace BehaviorTree
             return false;
         }
 
+        /// <summary>
+        /// 按卡名来释放手牌中的指令卡
+        /// </summary>
+        /// <param name="cardID"></param>
+        /// <returns></returns>
         protected bool TryCast(string cardID)
         {
             for (int i = 0; i < AIHandicap.count; i++)

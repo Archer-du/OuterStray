@@ -59,7 +59,7 @@ public class BattleSceneManager : MonoBehaviour,
 
 	public HandicapController[] handicapController;
 
-	//public TurnMappedDialogger dialogController;
+	public TurnMappedDialogger dialogController;
 	public TMP_Text[] energyText;
 	public TMP_Text[] energySupplyText;
 
@@ -131,7 +131,6 @@ public class BattleSceneManager : MonoBehaviour,
 	public void FieldInitialize(IBattleSystemInput handler, int fieldCapacity, int BTindex)
 	{
 		gameManager = GameManager.GetInstance();
-
 		battleSystem = handler;
 
 		switch (BTindex)
@@ -140,7 +139,13 @@ public class BattleSceneManager : MonoBehaviour,
             case 1: btBattleNode = new BTBattleNode1(); break;
 			case 2: btBattleNode = new BTBattleNode2(); break;
 			case 3:	btBattleNode = new BTBattleNode3();	break;
+			case 100: 
+				btBattleNode = new BTBattleNode100();
+                dialogController = transform.GetComponent<TurnMappedDialogger>();
+                dialogController.StartDialog();
+                break;
 		}
+
 
         //TODO config
         //data
@@ -226,8 +231,6 @@ public class BattleSceneManager : MonoBehaviour,
 		//如果是敌方回合，启动行为树
 		else
 		{
-            // 启动行为树
-            // StartCoroutine(AIBehavior());
             StartCoroutine(btBattleNode.BehaviorTree());
         }
 	}
@@ -244,8 +247,6 @@ public class BattleSceneManager : MonoBehaviour,
 		//如果是敌方回合，启动行为树
 		else
 		{
-            // 启动行为树
-            // StartCoroutine(AIBehavior());
             StartCoroutine(btBattleNode.BehaviorTree());
         }
     }
@@ -1138,14 +1139,13 @@ public class BattleSceneManager : MonoBehaviour,
 
         battleSystem.Cast(handicapIdx);
     }
-    public void AIDeploy(int handicapIdx)
+    public void AIDeploy(int handicapIdx, int dstIdx = 3, int dstPos = 0)
     {
         AcquireSequence();
 
-        int lineidx = 3;//supportline
         UnitElementController controller = handicapController[1].Pop(handicapIdx) as UnitElementController;
 
         //data input 显示层检查完了再动数据层！！！
-        battleSystem.Deploy(handicapIdx, lineidx, 0);
+        battleSystem.Deploy(handicapIdx, dstIdx, dstPos);
     }
 }

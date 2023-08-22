@@ -179,7 +179,7 @@ namespace LogicCore
 				throw new InvalidOperationException();
 			}
 			Node targetNode = terrains[terrainIdx][hrztIdx][vtcIdx];
-			if (!currentNode.IsReachable(targetNode))
+			if (!tutorial && !currentNode.IsReachable(targetNode))
 			{
 				throw new InvalidOperationException();
 			}

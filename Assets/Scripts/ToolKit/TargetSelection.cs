@@ -40,7 +40,7 @@ public class TargetSelection : MonoBehaviour,
 
 	public void OnPointerClick(PointerEventData eventData)
 	{
-		if (BattleElementController.targetSelectionLock)
+		if (BattleElementController.targetSelectionLock && controller.dataState == DataCore.BattleElements.ElementState.inBattleLine)
 		{
 			controller.battleSceneManager.PlayerTargetCast(castingCommand.handicapIdx, controller.battleLine.index, controller.resIdx);
 

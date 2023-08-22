@@ -91,7 +91,7 @@ public class GameManager : MonoBehaviour, IGameManagement,
 			case GameState.Cultivate:
 				async = SceneManager.LoadSceneAsync("CultivateScene");
 				StartCoroutine(LoadingNewScene(async, "CultivateScene"));
-				break;
+				return async;
 
 			case GameState.Tactical:
 				async = SceneManager.LoadSceneAsync("TacticalScene");
@@ -269,12 +269,17 @@ public class GameManager : MonoBehaviour, IGameManagement,
 		float duration = 2f;
 
 		dialogGround.gameObject.SetActive(true);
-		dialogGround.enabled = false;
+        for (int i = 0; i < dialogTexts.Length; i++)
+        {
+			dialogTexts[i].gameObject.SetActive(false);
+        }
+        dialogGround.enabled = false;
 		dialogGround.onClick.AddListener(BuildTutorial);
 
 		Sequence seq = DOTween.Sequence();
 		for(int i = 0; i < dialogTexts.Length; i++)
 		{
+			dialogTexts[i].gameObject.SetActive(true);
 			int temp = i;
 			seq.Append(dialogTexts[temp].DOFade(1, start));
 			seq.AppendInterval(duration);
