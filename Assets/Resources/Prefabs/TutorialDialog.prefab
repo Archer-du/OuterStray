@@ -829,7 +829,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5781910737554327054}
   m_Layer: 5
-  m_Name: Dialog
+  m_Name: TutorialDialog
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

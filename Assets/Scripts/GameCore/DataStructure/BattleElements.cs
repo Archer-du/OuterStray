@@ -831,6 +831,10 @@ namespace DataCore.BattleElements
 			{
 				eventTable.RaiseEvent("Meticulous", this, battleSystem);
 			}
+			if (this == battleSystem.bases[ownership])
+			{
+				battleSystem.eventTable[ownership].RaiseEvent("BaseAttacked", this, battleSystem);
+			}
 
 			this.dynHealth -= this.damage;
 			controller.DamageAnimationEvent(this.dynHealth, method);
