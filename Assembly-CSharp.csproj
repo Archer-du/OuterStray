@@ -49,13 +49,9 @@
      <Compile Include="Assets\Scripts\Controller\UnitElementController.cs" />
      <Compile Include="Assets\Scripts\ToolKit\TargetSelection.cs" />
      <Compile Include="Assets\Scripts\Controller\CommandElementController.cs" />
-<<<<<<< Updated upstream
      <Compile Include="Assets\QuitGame.cs" />
      <Compile Include="Assets\Scripts\Controller\SupplyNodeController.cs" />
      <Compile Include="Assets\Scripts\Controller\BTBattleNode\BTBattleNode3.cs" />
-=======
-     <Compile Include="Assets\Scripts\Controller\SupplyNodeController.cs" />
->>>>>>> Stashed changes
      <Compile Include="Assets\Scripts\Controller\BattleElementController.cs" />
      <Compile Include="Assets\Scripts\Controller\DeckController.cs" />
      <Compile Include="Assets\Scripts\ToolKit\InspectPanelController.cs" />
@@ -86,18 +82,12 @@
      <Compile Include="Assets\Scripts\ToolKit\RewardSelection.cs" />
      <Compile Include="Assets\Scripts\Controller\BTBattleNode\BTBattleNode0.cs" />
      <Compile Include="Assets\Scripts\ToolKit\Button\ButtonAudio.cs" />
-<<<<<<< Updated upstream
-=======
      <Compile Include="Assets\Scripts\Controller\BTBattleNode\BTBattleNode2.cs" />
->>>>>>> Stashed changes
      <Compile Include="Assets\Scripts\Controller\HandicapController.cs" />
      <Compile Include="Assets\Scripts\SceneManager\TacticalSceneManager.cs" />
      <Compile Include="Assets\Scripts\Controller\CardStackController.cs" />
      <Compile Include="Assets\Scripts\ToolKit\TacticalPanelDisplay.cs" />
-<<<<<<< Updated upstream
      <Compile Include="Assets\PackController.cs" />
-=======
->>>>>>> Stashed changes
      <Compile Include="Assets\Scripts\ToolKit\BaseSelection.cs" />
      <Compile Include="Assets\Scripts\ToolKit\BattleLineDisplay.cs" />
      <Compile Include="Assets\Scripts\Controller\BattleLineController.cs" />
@@ -105,10 +95,7 @@
      <Compile Include="Assets\Scripts\Controller\OutPostNodeController.cs" />
      <Compile Include="Assets\Scripts\SceneState.cs" />
      <Folder Include="Assets" />
-<<<<<<< Updated upstream
      <Folder Include="Assets\Resources\Config" />
-=======
->>>>>>> Stashed changes
      <None Include="Library\PackageCache\com.unity.settings-manager@2.0.1\package.json" />
      <None Include="Library\PackageCache\com.unity.modules.subsystems@1.0.0\package.json" />
      <None Include="Library\PackageCache\com.unity.render-pipelines.universal@14.0.8\package.json" />
@@ -126,10 +113,7 @@
      <Folder Include="Assets\TextMesh Pro\Sprites" />
      <None Include="Library\PackageCache\com.unity.modules.unitywebrequesttexture@1.0.0\package.json" />
      <None Include="Library\PackageCache\com.unity.modules.ai@1.0.0\package.json" />
-<<<<<<< Updated upstream
      <None Include="Assets\Resources\Config\DeckConfigs\BattleNode_3.csv.txt" />
-=======
->>>>>>> Stashed changes
      <Folder Include="Library\PackageCache\com.unity.modules.animation@1.0.0" />
      <None Include="Library\PackageCache\com.unity.ugui@1.0.0\package.json" />
      <Folder Include="Library\PackageCache\com.unity.modules.xr@1.0.0" />
@@ -144,10 +128,7 @@
      <Folder Include="Assets\Scripts\Controller\BTBattleNode" />
      <Folder Include="Library\PackageCache\com.unity.ide.rider@3.0.24\Rider" />
      <None Include="Library\PackageCache\com.unity.vectorgraphics@2.0.0-preview.21\package.json" />
-<<<<<<< Updated upstream
      <None Include="Assets\Resources\Config\NodeConfigs\TutorialNode.json.txt" />
-=======
->>>>>>> Stashed changes
      <Folder Include="Library\PackageCache\com.unity.textmeshpro@3.0.6\Editor Resources" />
      <None Include="Library\PackageCache\com.unity.modules.assetbundle@1.0.0\package.json" />
      <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />
@@ -157,18 +138,12 @@
      <Folder Include="Assets\Resources\Audio" />
      <Folder Include="Library\PackageCache\com.unity.visualscripting@1.8.0\Graphics" />
      <None Include="Library\PackageCache\com.unity.modules.tilemap@1.0.0\package.json" />
-<<<<<<< Updated upstream
      <None Include="Assets\Resources\Config\DeckConfigs\BattleNode_1.csv.txt" />
      <Folder Include="Library\PackageCache\com.unity.modules.assetbundle@1.0.0" />
      <Folder Include="Library\PackageCache\com.unity.burst@1.8.7\Tests" />
      <None Include="Library\PackageCache\com.elringus.spriteglow@05442994ff\Resources\SpriteGlow\Shaders\SpriteOutline.shader" />
      <Folder Include="Assets\Resources\Config\NodeConfigs" />
      <None Include="Assets\Resources\Config\DeckConfigs\BattleNode_6.csv.txt" />
-=======
-     <Folder Include="Library\PackageCache\com.unity.modules.assetbundle@1.0.0" />
-     <Folder Include="Library\PackageCache\com.unity.burst@1.8.7\Tests" />
-     <None Include="Library\PackageCache\com.elringus.spriteglow@05442994ff\Resources\SpriteGlow\Shaders\SpriteOutline.shader" />
->>>>>>> Stashed changes
      <None Include="Library\PackageCache\com.unity.burst@1.8.7\ValidationConfig.json" />
      <None Include="Library\PackageCache\com.unity.timeline@1.7.4\package.json" />
      <Folder Include="Library\PackageCache\com.unity.ext.nunit@1.0.6\net35\unity-custom" />
@@ -195,11 +170,8 @@
      <None Include="Library\PackageCache\com.unity.editorcoroutines@1.0.0\package.json" />
      <None Include="Library\PackageCache\com.unity.timeline@1.7.4\ValidationExceptions.json" />
      <None Include="Library\PackageCache\com.unity.collab-proxy@2.0.5\package.json" />
-<<<<<<< Updated upstream
      <None Include="Assets\Resources\Config\NodeConfigs\BattleNode_1.json.txt" />
      <None Include="Assets\Resources\Config\NodeConfigs\BattleNode_10.json.txt" />
-=======
->>>>>>> Stashed changes
      <Folder Include="Library\PackageCache\com.unity.timeline@1.7.4" />
      <None Include="Assets\Config\NodeConfigs\BattleNode_2.json" />
      <Folder Include="Library\PackageCache\com.unity.modules.cloth@1.0.0" />
@@ -219,10 +191,7 @@
      <Folder Include="Library\PackageCache\com.unity.modules.imageconversion@1.0.0" />
      <Folder Include="Library\PackageCache\com.unity.modules.terrainphysics@1.0.0" />
      <None Include="Library\PackageCache\com.unity.modules.imageconversion@1.0.0\package.json" />
-<<<<<<< Updated upstream
      <None Include="Assets\Resources\Config\DeckConfigs\BattleNode_0.csv.txt" />
-=======
->>>>>>> Stashed changes
      <Folder Include="Library\PackageCache\com.unity.modules.unitywebrequest@1.0.0" />
      <None Include="Library\PackageCache\com.unity.textmeshpro@3.0.6\ValidationExceptions.json" />
      <Folder Include="Library\PackageCache\com.unity.modules.unitywebrequestassetbundle@1.0.0" />
@@ -246,11 +215,8 @@
      <Folder Include="Library\PackageCache\com.unity.textmeshpro@3.0.6\Scripts" />
      <Folder Include="Library\PackageCache\com.unity.visualscripting@1.8.0\Runtime" />
      <Folder Include="Library\PackageCache\com.unity.modules.vr@1.0.0" />
-<<<<<<< Updated upstream
      <None Include="Assets\Resources\Config\NodeConfigs\BattleNode_4.json.txt" />
      <None Include="Assets\Resources\Config\DeckConfigs\BattleNode_2.csv.txt" />
-=======
->>>>>>> Stashed changes
      <Folder Include="Library\PackageCache\com.unity.testtools.codecoverage@1.2.4" />
      <Folder Include="Library\PackageCache\com.unity.modules.physics2d@1.0.0" />
      <None Include="Library\PackageCache\com.unity.performance.profile-analyzer@1.2.2\package.json" />
@@ -313,7 +279,6 @@
      <None Include="Library\PackageCache\com.unity.modules.unitywebrequestwww@1.0.0\package.json" />
      <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
      <Folder Include="Library\PackageCache\com.unity.render-pipelines.core@14.0.8" />
-<<<<<<< Updated upstream
      <None Include="Assets\Resources\Config\GlobalConfig.json.txt" />
      <Folder Include="Assets\Resources\SoundEffect\collection and map" />
      <None Include="Library\PackageCache\com.unity.modules.unitywebrequestaudio@1.0.0\package.json" />
@@ -328,24 +293,11 @@
      <None Include="Library\PackageCache\com.unity.collab-proxy@2.0.5\ValidationConfig.json" />
      <None Include="Assets\Resources\Config\DeckConfigs\TutorialNode.csv.txt" />
      <None Include="Assets\Resources\Config\HumanDeckTest.csv.txt" />
-=======
-     <Folder Include="Assets\Resources\SoundEffect\collection and map" />
-     <None Include="Library\PackageCache\com.unity.modules.unitywebrequestaudio@1.0.0\package.json" />
-     <Folder Include="Library\PackageCache\com.unity.searcher@4.9.2\Tests" />
-     <Folder Include="Assets\Scripts\ToolKit\Input" />
-     <Folder Include="Assets\Resources\SoundEffect\unit" />
-     <None Include="Library\PackageCache\com.unity.textmeshpro@3.0.6\Editor Resources\Shaders\TMP_SDF_SSD.cginc" />
-     <Folder Include="Library\PackageCache\com.unity.render-pipelines.universal@14.0.8\Textures\BlueNoise16" />
-     <None Include="Library\PackageCache\com.unity.collab-proxy@2.0.5\ValidationConfig.json" />
->>>>>>> Stashed changes
      <Folder Include="Library\PackageCache\com.unity.ide.vscode@1.2.5" />
      <Folder Include="Library\PackageCache\com.unity.modules.vehicles@1.0.0" />
      <None Include="Library\PackageCache\com.unity.modules.xr@1.0.0\package.json" />
      <Folder Include="Library\PackageCache\com.unity.textmeshpro@3.0.6\Tests" />
-<<<<<<< Updated upstream
      <None Include="Assets\Resources\Config\Pool.csv.txt" />
-=======
->>>>>>> Stashed changes
      <None Include="Library\PackageCache\com.unity.textmeshpro@3.0.6\Editor Resources\Shaders\TMP_Properties.cginc" />
      <Folder Include="Library\PackageCache\com.unity.render-pipelines.core@14.0.8\Tests" />
      <None Include="Library\PackageCache\com.unity.textmeshpro@3.0.6\Editor Resources\Shaders\TMP_SDF Internal Editor.shader" />
@@ -353,10 +305,7 @@
      <Folder Include="Library\PackageCache\com.elringus.spriteglow@05442994ff\Resources" />
      <Folder Include="Assets\Resources\Prefabs\NodePanels" />
      <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
-<<<<<<< Updated upstream
      <None Include="Assets\Resources\Config\NodeConfigs\BattleNode_5.json.txt" />
-=======
->>>>>>> Stashed changes
      <None Include="Assets\Config\NodeConfigs\TutorialNode.json" />
      <Folder Include="Library\PackageCache\com.unity.modules.unitywebrequestwww@1.0.0" />
      <Folder Include="Library\PackageCache\com.unity.collab-proxy@2.0.5\Lib" />
@@ -372,23 +321,15 @@
      <Folder Include="Library\PackageCache\com.unity.modules.audio@1.0.0" />
      <Folder Include="Library\PackageCache\com.elringus.spriteglow@05442994ff" />
      <Folder Include="Library\PackageCache\com.unity.settings-manager@2.0.1\Content" />
-<<<<<<< Updated upstream
      <None Include="Assets\Resources\Config\NodeConfigs\BattleNode_6.json.txt" />
      <None Include="Library\PackageCache\com.unity.modules.terrain@1.0.0\package.json" />
      <None Include="Library\PackageCache\com.unity.2d.sprite@1.0.0\package.json" />
      <None Include="Assets\Resources\Config\DeckConfigs\mush99.csv.txt" />
-=======
-     <None Include="Library\PackageCache\com.unity.modules.terrain@1.0.0\package.json" />
-     <None Include="Library\PackageCache\com.unity.2d.sprite@1.0.0\package.json" />
->>>>>>> Stashed changes
      <Folder Include="Library\PackageCache\com.unity.ide.visualstudio@2.0.18" />
      <None Include="Library\PackageCache\com.unity.modules.androidjni@1.0.0\package.json" />
      <None Include="Assets\Fonts\zh-cn_Commonly_used.txt" />
      <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
-<<<<<<< Updated upstream
      <None Include="Assets\Resources\Config\NodeConfigs\BattleNode_0.json.txt" />
-=======
->>>>>>> Stashed changes
      <Folder Include="Library\PackageCache\com.unity.modules.video@1.0.0" />
      <Folder Include="Library\PackageCache\com.unity.modules.ai@1.0.0" />
      <None Include="Assets\Config\GlobalConfig.json" />
@@ -408,17 +349,11 @@
      <Folder Include="Assets\TextMesh Pro\Documentation" />
      <Folder Include="Assets\Resources\Prefabs\Element" />
      <Folder Include="Library\PackageCache\com.unity.testtools.codecoverage@1.2.4\lib" />
-<<<<<<< Updated upstream
      <None Include="Assets\Resources\Config\NodeConfigs\BattleNode_3.json.txt" />
      <Folder Include="Assets\Resources\Illstrate\back-origin" />
      <Folder Include="Assets\Fonts" />
      <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />
      <None Include="Assets\Resources\Config\DeckConfigs\MushDeckTest.csv.txt" />
-=======
-     <Folder Include="Assets\Resources\Illstrate\back-origin" />
-     <Folder Include="Assets\Fonts" />
-     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />
->>>>>>> Stashed changes
      <None Include="Library\PackageCache\com.unity.burst@1.8.7\Unity.Burst.Unsafe.xml" />
      <Folder Include="Library\PackageCache\com.unity.vectorgraphics@2.0.0-preview.21" />
      <None Include="Library\PackageCache\com.unity.render-pipelines.universal@14.0.8\ValidationConfig.json" />
