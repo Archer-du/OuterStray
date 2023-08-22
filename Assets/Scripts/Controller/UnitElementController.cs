@@ -139,6 +139,8 @@ public class UnitElementController : BattleElementController,
 		costText.text = cost.ToString();
 		descriptionText.text = description;
 
+		//TODO
+		operateMask.DOColor(new Color(0, 0, 0, 0), duration);
 		if (operateCounter == 0)
 		{
 			operateMask.DOColor(new Color(0, 0, 0, 0.5f), duration);
@@ -295,12 +297,15 @@ public class UnitElementController : BattleElementController,
 		{
 			//TODO
 			battleSceneManager.humanEnergy.transform.DOShakePosition(0.3f, 30f);
+
+			battleSceneManager.UpdateAllBattleLine();
 			canvas.sortingOrder = handicapOrder;
 			handicap.Insert(this);
 			return;
 		}
 		if (pos < 0 || lineIdx != 0)
 		{
+			battleSceneManager.UpdateAllBattleLine();
 			canvas.sortingOrder = handicapOrder;
 			handicap.Insert(this);
 			return;
@@ -314,6 +319,7 @@ public class UnitElementController : BattleElementController,
 		if (pos < 0 || lineIdx == battleLine.index || Math.Abs(lineIdx - battleLine.index) > moveRange 
 			|| (battleSceneManager.battleLines[lineIdx].ownership != ownership &&  battleSceneManager.battleLines[lineIdx].count > 0))
 		{
+			battleSceneManager.UpdateAllBattleLine();
 			canvas.sortingOrder = battleOrder;
 			battleLine.Insert(this);
 			return;
@@ -337,6 +343,7 @@ public class UnitElementController : BattleElementController,
 
 	public void DeployAnimationEvent()
 	{
+		UnitAudioInitialize();
 		deployAudio.Play();
 		NameTag.gameObject.SetActive(false);
 		nameText.gameObject.SetActive(false);

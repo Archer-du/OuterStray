@@ -90,10 +90,11 @@ public class ElementDragInput : MonoBehaviour,
 			int lineIdx = controller.GetBattleLineIdx(checkPosition.y);
 			BattleLineController battleLine = lineIdx >= 0 && lineIdx <= sceneManager.fieldCapacity - 1 ? sceneManager.battleLines[lineIdx] : null;
 
-
+			//如果是单位卡
 			if (controller.category != "Command")
 			{
 				UnitElementController unit = controller as UnitElementController;
+				//每帧更新除目标战线和自身当前战线的所有战线元素位置
 				foreach(BattleLineController line in sceneManager.battleLines)
 				{
 					if (line != battleLine && line != unit.battleLine)
@@ -156,8 +157,10 @@ public class ElementDragInput : MonoBehaviour,
 				//解析eventData/通用输入检测
 				int lineIdx = controller.GetBattleLineIdx(checkPosition.y);
 				BattleLineController battleLine = lineIdx >= 0 && lineIdx <= sceneManager.fieldCapacity - 1 ? sceneManager.battleLines[lineIdx] : null;
+
 				if (battleLine == null)
 				{
+					sceneManager.UpdateAllBattleLine();
 					canvas.sortingOrder = controller.handicapOrder;
 					controller.handicap.Insert(controller);
 					return;
@@ -201,6 +204,7 @@ public class ElementDragInput : MonoBehaviour,
 			BattleLineController battleLine = lineIdx >= 0 && lineIdx <= sceneManager.fieldCapacity - 1 ? sceneManager.battleLines[lineIdx] : null;
 			if (battleLine == null)
 			{
+				sceneManager.UpdateAllBattleLine();
 				canvas.sortingOrder = unit.battleOrder;
 				unit.battleLine.Insert(unit);
 				return;
