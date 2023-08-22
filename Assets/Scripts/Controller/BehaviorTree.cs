@@ -179,7 +179,12 @@ namespace BehaviorTree
             }
             return Tuple.Create(minHealth, minHealthPointer);
         }
-        protected Tuple<int, int> GetAvailableMaxHealth(int battleLineIdx)
+
+		/// <summary>
+		/// 获取某条战线上可操作的单位中生命值最大的单位的生命值和索引
+		/// </summary>
+		/// <returns>返回一个元组，包含生命值最大单位的生命值和索引</returns>
+		protected Tuple<int, int> GetAvailableMaxHealth(int battleLineIdx)
         {
             BattleLineController battleLine = BattleLines[battleLineIdx];
             int maxHealth = 0;
@@ -355,7 +360,21 @@ namespace BehaviorTree
             return Energy >= cost;
         }
 
-        protected int GetMinCostUnitPointerExcConstr()
+        protected bool GetExistUnavailable(int battleLineIdx)
+        {
+            BattleLineController battleLine = BattleLines[battleLineIdx];
+            for (int i = 0; i < battleLine.count; i++)
+            {
+                if (battleLine[i].operateCounter == 0)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+		protected int GetMinCostUnitPointerExcConstr()
         {
             int minCost = 10000;
             int minPointer = -1;
@@ -400,70 +419,104 @@ namespace BehaviorTree
             {
                 if (AIHandicap[i].ID == "comm_mush_15" && Energy >= AIHandicap[i].cost)
                 {
+                    int dstLineIdx;
+                    int dstPos;
+					(_, dstLineIdx, dstPos) = GetFieldMaxHealth(frontLineIdx);
 
-                    int dstLineIdx = 0;
-                    int dstPos = 0;
-                    int maxHealth = 0;
-                    Tuple<int, int> lineMaxHealth = Tuple.Create(0, 0);
-                    for (int j = 0; j < frontLineIdx + 1; j++)
-                    {
-                        lineMaxHealth = GetLineMaxHealth(j);
-                        if (maxHealth > lineMaxHealth.Item1)
-                        {
-                            dstLineIdx = j;
-                            dstPos = lineMaxHealth.Item2;
-                        }
-                    }
                     BTTargetCast(i, dstLineIdx, dstPos);
-                    Debug.Log("Cast 'comm_mush_15'");
                     return true;
                 }
             }
             return false;
         }
 
+        /// <summary>
+        /// 整体向前调整战线
+        /// </summary>
+        /// <param name="frontLineIdx"></param>
+        /// <returns>若调整过任意卡，则返回true</returns>
         protected bool TryAdjustForward(int frontLineIdx)
         {
-            for (int i = FieldCapacity - 1; i > frontLineIdx + 1; i--)
+            for (int j = FieldCapacity - 1; j > frontLineIdx + 1; j--)
             {
-                BattleLineController battleLine = BattleLines[i];
-
-                // 前一条线有空位则尝试前移
-                if (GetIsLineAvailable(i - 1))
+                if (TryMoveForward(j))
                 {
-                    int artilleryIdx = -1;
-
-                    // 遍历该战线
-                    for (int j = 0; j < battleLine.count; j++)
-                    {
-                        // 判断规则上能移动的卡（轰击boss || 建筑 || 移动次数为0）
-                        if (battleLine[j].ID != "mush_102" && battleLine[j].category != "Construction" && battleLine[j].operateCounter == 1)
-                        {
-                            // 若该战线有空，则不会移动轰击
-                            if (GetIsLineAvailable(i))
-                            {
-                                if (battleLine[j].category != "Artillery")
-                                {
-                                    BTMove(i, j, i - 1, 0);
-                                    return true;
-                                }
-                                else
-                                {
-                                    artilleryIdx = j;
-                                }
-                            }
-                            //TODO 若战线没有空，则可移动轰击，但移动轰击的优先级最低
-                            else
-                            {
-                                BTMove(i, j, i - 1, 0);
-                                return true;
-                            }
-                        }
-                    }
+                    return true;
                 }
             }
             return false;
         }
+
+        /// <summary>
+        /// 将战线上推进优先级最高的卡向前推，同优先级攻击力高者优先
+        /// </summary>
+        /// <param name="battleLineIdx"></param>
+        /// <returns></returns>
+        protected bool TryMoveForward(int battleLineIdx)
+        {
+            // 前一条战线已满，直接返回false
+			if (!GetIsLineAvailable(battleLineIdx - 1))
+			{
+				return false;
+			}
+
+            BattleLineController battleLine = BattleLines[battleLineIdx];
+			int highestPriority = -1;
+			int priority;
+            int highestPriorityPos = 0;
+
+			// 遍历该战线，给每张卡赋优先级
+			for (int i = 0; i < battleLine.count; i++)
+			{
+				// 规则上不能移动的卡（轰击boss || 建筑 || 移动次数为0）优先级为-1
+				if (battleLine[i].ID == "mush_102" || battleLine[i].category == "Construction" || battleLine[i].operateCounter == 0)
+				{
+                    continue;
+				}
+                // 对轰击卡，若战线已满且所有卡均可操作
+                else if (battleLine[i].category == "Artillery")
+                {
+                    priority = !GetIsLineAvailable(battleLineIdx) && !GetExistUnavailable(battleLineIdx) ? 1 : 0;
+                }
+                // 攻击计数器为0的优先级为4
+				else if (battleLine[i].attackCounter == 0)
+				{
+					priority = 4;
+				}
+                // 机动卡优先级为3
+				else if (battleLine[i].category == "Motorized")
+                {
+                    priority = 3;
+                }
+                // 其余卡优先级为2
+                else
+                {
+                    priority = 2;
+                }
+
+                // 更新最大优先级以及对应卡
+                if (priority > highestPriority)
+                {
+                    highestPriority = priority;
+                    highestPriorityPos = i;
+                }
+                else if (priority == highestPriority)
+                {
+                    highestPriorityPos = battleLine[i].attackPoint > battleLine[highestPriorityPos].attackPoint ? i : highestPriorityPos;
+				}
+			}
+
+            // 有优先级大于0的才移动
+            if (highestPriority > 0)
+            {
+                BTMove(battleLineIdx, highestPriorityPos, battleLineIdx - 1, 0);
+                return true;
+            }
+            else
+            {
+				return false;
+			}
+		}
 
         protected bool TryRetreatSomeUnits(int AISupportLineIdx)
         {
