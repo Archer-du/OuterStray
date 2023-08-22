@@ -47,8 +47,11 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\ToolKit\TurnMappedDialogger.cs" />
      <Compile Include="Assets\Scripts\Controller\UnitElementController.cs" />
+     <Compile Include="Assets\Scripts\ToolKit\TargetSelection.cs" />
      <Compile Include="Assets\Scripts\Controller\CommandElementController.cs" />
+     <Compile Include="Assets\QuitGame.cs" />
      <Compile Include="Assets\Scripts\Controller\SupplyNodeController.cs" />
+     <Compile Include="Assets\Scripts\Controller\BTBattleNode\BTBattleNode3.cs" />
      <Compile Include="Assets\Scripts\Controller\BattleElementController.cs" />
      <Compile Include="Assets\Scripts\Controller\DeckController.cs" />
      <Compile Include="Assets\Scripts\ToolKit\InspectPanelController.cs" />
@@ -61,6 +64,7 @@
      <Compile Include="Assets\Scripts\SceneManager\CultivateSceneManager.cs" />
      <Compile Include="Assets\Scripts\Controller\LegacyNodeController.cs" />
      <Compile Include="Assets\CustomRenderPassFeature.cs" />
+     <Compile Include="Assets\Scripts\Controller\BTBattleNode\BTBattleNode1.cs" />
      <Compile Include="Assets\Scripts\Controller\DepartmentController.cs" />
      <Compile Include="Assets\Scripts\ToolKit\CardInspect.cs" />
      <Compile Include="Assets\Scripts\GameManager.cs" />
@@ -75,13 +79,15 @@
      <Compile Include="Assets\MainButton.cs" />
      <Compile Include="Assets\Scripts\Controller\PromoteNodeController.cs" />
      <Compile Include="Assets\Scripts\Controller\TerrainController.cs" />
-     <Compile Include="Assets\Scripts\ToolKit\TargetInspector.cs" />
+     <Compile Include="Assets\Scripts\ToolKit\RewardSelection.cs" />
      <Compile Include="Assets\Scripts\Controller\BTBattleNode\BTBattleNode0.cs" />
      <Compile Include="Assets\Scripts\ToolKit\Button\ButtonAudio.cs" />
      <Compile Include="Assets\Scripts\Controller\HandicapController.cs" />
      <Compile Include="Assets\Scripts\SceneManager\TacticalSceneManager.cs" />
      <Compile Include="Assets\Scripts\Controller\CardStackController.cs" />
      <Compile Include="Assets\Scripts\ToolKit\TacticalPanelDisplay.cs" />
+     <Compile Include="Assets\PackController.cs" />
+     <Compile Include="Assets\Scripts\ToolKit\BaseSelection.cs" />
      <Compile Include="Assets\Scripts\ToolKit\BattleLineDisplay.cs" />
      <Compile Include="Assets\Scripts\Controller\BattleLineController.cs" />
      <Compile Include="Assets\Scripts\Controller\DeckTagController.cs" />
