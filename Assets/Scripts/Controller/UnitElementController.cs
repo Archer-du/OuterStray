@@ -52,6 +52,9 @@ public class UnitElementController : BattleElementController,
 	public int operateCounter;
 	public int moveRange;
 
+	public Image attackIcon;
+	public Vector3 localCounterPosition;
+
 	public Vector3 battleLineLogicPosition;
 
 	public float duration = 0.2f;
@@ -86,7 +89,9 @@ public class UnitElementController : BattleElementController,
 
 		healthText.text = maxHealthPoint.ToString();
 
-		this.input = input;
+        localCounterPosition = attackIcon.transform.localPosition;
+
+        this.input = input;
 		Arrows.transform.localScale = new Vector3(1, (1 - ownership * 2) * 1, 1);
 
 		arrowsGroup = Arrows.GetComponent<CanvasGroup>();
@@ -122,6 +127,7 @@ public class UnitElementController : BattleElementController,
 		healAudio.loop = false;
 		healAudio.playOnAwake = false;
 	}
+	public Tween loopTween;
 	public void UpdateInfo(int cost, int attackPoint, int maxHealthPoint, int attackCounter, int operateCounter,
 		ElementState state, int moveRange, bool aura, int attackBuff, int maxHealthBuff)
 	{
@@ -136,6 +142,16 @@ public class UnitElementController : BattleElementController,
 		nameText.text = nameContent;
 		attackText.text = attackPoint.ToString();
 		attackCounterText.text = attackCounter > 100 ? "" : attackCounter.ToString();
+
+		if(attackCounter == 1)
+		{
+			loopTween = attackIcon.transform.DOShakePosition(1).SetLoops(-1);
+		}
+		if (attackCounter == 0)
+		{
+			attackIcon.transform.localPosition = localCounterPosition;
+			loopTween.Kill();
+		}
 		costText.text = cost.ToString();
 		descriptionText.text = description;
 

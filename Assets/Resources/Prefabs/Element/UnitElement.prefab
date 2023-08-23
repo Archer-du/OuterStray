@@ -1875,6 +1875,8 @@ MonoBehaviour:
   attackCounter: 0
   operateCounter: 0
   moveRange: 0
+  attackIcon: {fileID: 2169937505017133593}
+  localCounterPosition: {x: 0, y: 0, z: 0}
   battleLineLogicPosition: {x: 0, y: 0, z: 0}
   duration: 0.2
   attackOrder: 0
