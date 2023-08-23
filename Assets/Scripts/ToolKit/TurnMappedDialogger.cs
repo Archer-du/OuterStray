@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -12,6 +13,10 @@ public class TurnMappedDialogger : MonoBehaviour
 	private BattleSceneManager manager;
 
 	private bool running = false;
+
+    private GameObject guide;
+    private Dictionary<int, List<GameObject>> TurnGuide;
+    private int GuideNum = 0;
 
 	private GameObject dialogFrame;
 	private TMP_Text dialogText;
@@ -25,23 +30,30 @@ public class TurnMappedDialogger : MonoBehaviour
 	}
     private int lastTurnNum = -1;
 
-    public void StartDialog()
+    public void StartTutorial()
     {
         running = true;
         manager = GetComponent<BattleSceneManager>();
         dialogFrame = transform.Find("Dialog").gameObject;
+        guide = transform.Find("Guide").gameObject;
         dialogText = dialogFrame.transform.Find("DialogText").GetComponent<TMP_Text>();
+
         dialogFrame.SetActive(false);
+        guide.SetActive(false);
 
         lastTurnNum = TurnNum;
         LoadDialogs();
+
+        TurnGuide = GetAllChildren(guide);
+        StartCoroutine(UpdateGuide());
         StartCoroutine(CheckTurnNum());
     }
-    public void EndDialog()
+    public void EndTutorial()
     {
         running = false;
         manager = null;
         dialogFrame.SetActive(false);
+        guide.SetActive(false);
     }
 
     /// <summary>
@@ -124,4 +136,52 @@ public class TurnMappedDialogger : MonoBehaviour
         }
         dialogFrame.SetActive(false);
     }
+
+    private Dictionary<int, List<GameObject>> GetAllChildren(GameObject parent)
+    {
+        Dictionary<int, List<GameObject>> TurnGuide = new Dictionary<int, List<GameObject>>();
+        Regex regex = new Regex(@"Turn(\d+)Guide(\d+)");
+
+        for (int i = 0; i < parent.transform.childCount; i++)
+        {
+            GameObject child = parent.transform.GetChild(i).gameObject;
+            Match match = regex.Match(child.name);
+
+            if (match.Success)
+            {
+                int turn = int.Parse(match.Groups[1].Value);
+                if (!TurnGuide.ContainsKey(turn))
+                {
+                    TurnGuide[turn] = new List<GameObject>();
+                }
+                TurnGuide[turn].Add(child);
+            }
+        }
+        return TurnGuide;
+    }
+
+
+
+    private IEnumerator UpdateGuide()
+    {
+        guide.SetActive(true);
+        foreach (var guideList in TurnGuide.Values)
+        {
+            foreach (var guide in guideList)
+            {
+                guide.SetActive(false);
+            }
+        }
+
+        while (running)
+        {
+            if (TurnGuide.ContainsKey(TurnNum))
+            {
+                TurnGuide[TurnNum][GuideNum].SetActive(true);
+            }
+        }
+
+        yield return null;
+    }
+
 }

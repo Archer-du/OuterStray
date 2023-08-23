@@ -153,7 +153,7 @@ public class BattleSceneManager : MonoBehaviour,
 			case 100: 
 				btBattleNode = new BTBattleNode100();
                 dialogController = transform.GetComponent<TurnMappedDialogger>();
-                dialogController.StartDialog();
+                dialogController.StartTutorial();
                 break;
 		}
 
