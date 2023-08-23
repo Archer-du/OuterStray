@@ -43,6 +43,8 @@ public class DeckTagController : MonoBehaviour, IComparable<DeckTagController>,
 
 		deckNameText.text = inspector.nameContent;
 		deckCategoryIcon.sprite = inspector.categoryIcon.sprite;
+
+
 	}
 	public void Init(string ID)
 	{

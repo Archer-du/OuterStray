@@ -1926,7 +1926,8 @@ MonoBehaviour:
   rewardSelectionIndex: 0
   rewards: []
   sequenceTime: 0
-  result: 0
+  result: 2
+  dialog: {fileID: 1305404728}
   updatingTurn: 0
   shiftTime: 0
   duration: 0
@@ -2666,6 +2667,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 790c0d1b0e804a54e89d2d2cbf077742, type: 3}
+--- !u!1 &1305404728 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6080639099249231917, guid: 790c0d1b0e804a54e89d2d2cbf077742, type: 3}
+  m_PrefabInstance: {fileID: 1305404727}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &1305404729 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5781910737554327054, guid: 790c0d1b0e804a54e89d2d2cbf077742, type: 3}

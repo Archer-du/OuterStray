@@ -46,6 +46,7 @@ public class NodeController : MonoBehaviour,
 	[Header("Components")]
 	public PanelController panel;
 
+	public CanvasGroup selfCanvas;
 
 
 	public virtual void CastEvent()
@@ -69,6 +70,7 @@ public class NodeController : MonoBehaviour,
 		Icon = transform.Find("Image/Icon").GetComponent<Image>();
 		descriptionText = transform.Find("NameBar/Mask/Name").GetComponent<TMP_Text>();
 		panel = transform.Find("Panel").GetComponent<PanelController>();
+		selfCanvas = GetComponent<CanvasGroup>();
 
 		castButton.onClick.AddListener(CastEvent);
 

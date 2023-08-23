@@ -103,9 +103,6 @@ namespace LogicCore
 		{
 			controller = tsdspl;
 
-			//playerDeck = new Deck(battleSystem, this, controller.InstantiateDeck());
-			////TODO remove
-			//playerDeck.LoadDeckByPathHuman("Assets\\Config\\HumanDeckTest.csv");
 			isInNode = false;
 			terrains = new List<Terrain>(battleNodeNum);
 
@@ -117,7 +114,6 @@ namespace LogicCore
 
 			//TODO
 			gasMineToken = 100;
-			//TODO
 
 			BuildTerrains();
 		}
@@ -161,9 +157,6 @@ namespace LogicCore
 
 			//显示层：当前节点更新
 			controller.UpdateCurrentNode(currentNode.controller);
-
-			//显示层：当前terrain生成线网
-			currentTerrain.controller.GenerateLineNetFromSource();
 		}
 		/// <summary>
 		/// 进入节点
@@ -205,7 +198,7 @@ namespace LogicCore
 		{
 			isInNode = false;
 			Random random = new Random();
-			int gasMineGain = random.Next(20, 30);
+			int gasMineGain = random.Next(75, 125);
 			GasMineToken += gasMineGain;
 
 			controller.LateUpdateTacticalLayer(currentNode.controller, gasMineGain, playerBase.dynHealth);

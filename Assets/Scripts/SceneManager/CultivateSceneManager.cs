@@ -47,7 +47,10 @@ public class CultivateSceneManager : MonoBehaviour,
 
     public Button startExpedition;
 
-    [Header("Components")]
+	public RectTransform gasMineMask;
+
+
+	[Header("Components")]
     public BaseSelection[] selections;
 	public PanelController[] Panels;
 

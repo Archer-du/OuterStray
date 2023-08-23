@@ -137,6 +137,7 @@ public class BattleSceneManager : MonoBehaviour,
 		Settler.gameObject.transform.position = new Vector3(0, 2160, 0);
 		SettleButton.onClick.AddListener(BattleOverChecked);
     }
+	public GameObject dialog;
 	public void FieldInitialize(IBattleSystemInput handler, int fieldCapacity, int BTindex)
 	{
 		gameManager = GameManager.GetInstance();
@@ -144,6 +145,10 @@ public class BattleSceneManager : MonoBehaviour,
 
 		result = Result.normal;
 
+		if (!gameManager.config.tutorial)
+		{
+			dialog.SetActive(false);
+		}
 		switch (BTindex)
 		{
 			case 0: btBattleNode = new BTBattleNode0(); break;

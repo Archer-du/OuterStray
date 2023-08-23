@@ -116,6 +116,8 @@ public class DeckController : MonoBehaviour,
 	{
 		tags[deckID].inspector.health = health;
 		tags[deckID].inspector.healthText.text = health.ToString();
+		tags[deckID].inspector.healthText.color = 
+			new Color(1, (float)tags[deckID].inspector.health / tags[deckID].inspector.maxHealth, (float)tags[deckID].inspector.health / tags[deckID].inspector.maxHealth);
 	}
 
 
