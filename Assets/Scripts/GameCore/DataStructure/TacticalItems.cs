@@ -977,7 +977,7 @@ namespace DataCore.TacticalItems
 		{
 			Random random = new Random();
 			//TODO
-			legacy = random.Next(5, 10);
+			legacy = random.Next(30, 80);
 			controller.SetBasicInfo(legacy, 0);
 		}
 		internal override void CastNodeEvent()

@@ -48,6 +48,9 @@ public class PanelController : MonoBehaviour,
 
 	public Image detailedImage;
 
+	public string backGroundStory;
+	public TMP_Text backGroundStoryText;
+
 	public Image detailedMask;
 
 	public TMP_Text attackText;
@@ -156,6 +159,8 @@ public class PanelController : MonoBehaviour,
 		}
 		content.sizeDelta = new Vector2(670 * IDs.Count, content.sizeDelta.y);
 	}
+	float textTime = 0.4f;
+
 	public void OpenPanel()
 	{
 		gameObject.SetActive(true);
@@ -167,7 +172,6 @@ public class PanelController : MonoBehaviour,
 
 		float moveUpTime = 0.4f;
 		float fadeTime = 0.3f;
-		float textTime = 0.4f;
 
 		Sequence seq = DOTween.Sequence();
 		seq.AppendInterval(0.2f);
@@ -245,8 +249,8 @@ public class PanelController : MonoBehaviour,
 	{
 		if ((localPosition.y > bottomBound && localPosition.y < topBound) && (localPosition.x > leftBound && localPosition.x < rightBound))
 		{
-			mainConfirmButton.enabled = false;
-			subConfirmButton.enabled = false;
+			mainConfirmButton.enabled = true;
+			subConfirmButton.enabled = true;
 
 			selection.RenderInspector(ID, dynInfo);
 			selection.deckID = deckID;
@@ -261,16 +265,35 @@ public class PanelController : MonoBehaviour,
 			detailShowing = false;
 			DisableDetailInfo();
 		}
+		if(eventData.position.y > Screen.height / 2)
+		{
+			dialogger.text.gameObject.SetActive(true);
+			DOTween.To(
+				() => "",
+				value => dialogger.text.text = value,
+				"Hello World!",
+				textTime
+			).SetEase(Ease.Linear);
+		}
+		foreach(PackController pack in packs)
+		{
+			pack.explainCanvas.DOFade(0, 0.2f);
+		}
 	}
 	public void EnableDetailedInfo(int index)
 	{
 		float duration = 0.3f;
 
+		foreach (PackController pack in packs)
+		{
+			pack.explainCanvas.DOFade(0, 0.2f);
+		}
+
 		detailedCard.gameObject.SetActive(true);
 		detailedInfo.gameObject.SetActive(true);
 		detailedMask.gameObject.SetActive(true);
 
-		detailedMask.DOFade(0.5f, duration);
+		detailedMask.DOFade(0.75f, duration);
 
 		detailedCard.alpha = 0f;
 		detailedInfo.alpha = 0f;
@@ -294,6 +317,13 @@ public class PanelController : MonoBehaviour,
 
 		seq.Append(detailedCard.DOFade(1, duration));
 		seq.Append(detailedInfo.DOFade(1, duration));
+		backGroundStoryText.gameObject.SetActive(true);
+		DOTween.To(
+			() => "",
+			value => backGroundStoryText.text = value,
+			"背景故事：\n",
+			duration
+		).SetEase(Ease.Linear);
 	}
 	public void DisableDetailInfo()
 	{
@@ -303,12 +333,14 @@ public class PanelController : MonoBehaviour,
 
 		seq.Append(detailedCard.DOFade(0, duration));
 		seq.Join(detailedMask.DOFade(0, duration));
+		seq.Join(backGroundStoryText.DOFade(0, duration));
 		seq.Join(detailedInfo.DOFade(0, duration))
 			.OnComplete(() =>
 			{
 				detailedCard.gameObject.SetActive(false);
 				detailedInfo.gameObject.SetActive(false);
 				detailedMask.gameObject.SetActive(false);
+				backGroundStoryText.gameObject .SetActive(false);
 			});
 	}
 }

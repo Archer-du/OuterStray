@@ -31,6 +31,8 @@ namespace DataCore.Cards
 
 		public int gasMineCost;
 
+		public string story;
+
 		protected Card(string __id, string __name, string __description, int __cost, int ownership, int department, int pack, string effects)
 		{
 			this.backendID = __id;

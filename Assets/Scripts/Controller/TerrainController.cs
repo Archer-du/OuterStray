@@ -2,6 +2,7 @@ using DG.Tweening;
 using DisplayInterface;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -141,7 +142,7 @@ public class TerrainController : MonoBehaviour,
 		Vector3 euler = GetDegreeEuler(resNode.transform.position, dstNode.transform.position);
 		line.transform.rotation = Quaternion.Euler(euler);
 
-		float duration = 0.3f;
+		float duration = 0.5f;
 		Tweener tweener = DOTween.To(
 			// 获取初始值
 			() => 0,
@@ -155,7 +156,7 @@ public class TerrainController : MonoBehaviour,
 		{
 			dstNode.gameObject.SetActive(true);
 			dstNode.selfCanvas.alpha = 0;
-			dstNode.selfCanvas.DOFade(1, duration);
+			dstNode.selfCanvas.DOFade(1, duration).OnComplete(() => dstNode.castButton.enabled = true);
 		});
 	}
 

@@ -81,9 +81,10 @@
     <Compile Include="Assets\Scripts\Controller\LegacyNodeController.cs" />
     <Compile Include="Assets\CustomRenderPassFeature.cs" />
     <Compile Include="Assets\Scripts\Controller\BTBattleNode\BTBattleNode1.cs" />
-    <Compile Include="Assets\Scripts\Controller\DepartmentController.cs" />
     <Compile Include="Assets\Scripts\Controller\BTBattleNode\BTBattleNode100.cs" />
+    <Compile Include="Assets\Scripts\Controller\DepartmentController.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
+    <Compile Include="Assets\ExplanationController.cs" />
     <Compile Include="Assets\Scripts\Controller\BehaviorTree.cs" />
     <Compile Include="Assets\Scripts\ToolKit\BaseInfoDisplay.cs" />
     <Compile Include="Assets\Scripts\Controller\SourceNodeController.cs" />

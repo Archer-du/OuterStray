@@ -144,6 +144,8 @@ public class BattleElementController : MonoBehaviour
 	public string description;
 	public int cost;
 
+	public List<string> explanations;
+
 	[Header("Image")]
 	public Image CardImage;
 	public Image InspectorImage;
@@ -207,6 +209,9 @@ public class BattleElementController : MonoBehaviour
 		this.category = categories;
 		this.description = description;
 
+		explanations = new List<string>();
+		ExplanationParse(category, description, ref explanations);
+
 		inspectLock = false;
 		inputLock = false;
 		//输入偏移量
@@ -222,6 +227,8 @@ public class BattleElementController : MonoBehaviour
 
 		inspectPanel = GetComponent<InspectPanelController>();
 		inspectPanel.Init();
+
+		inspectPanel.AddExplanation(explanations);
 
 		nameText.text = name;
 		costText.text = cost.ToString();
@@ -291,4 +298,77 @@ public class BattleElementController : MonoBehaviour
 		}
 		return -1;
 	}
+
+
+
+
+
+
+
+
+	public static void ExplanationParse(string category, string description, ref List<string> explanations)
+	{
+		switch(category)
+		{
+			case "LightArmor":
+				explanations.Add("<b>兵种：轻装</b>\n无效果");
+				break;
+			case "Motorized":
+				explanations.Add("<b>兵种：轻装</b>\n移动时减少攻击计数器");
+				break;
+			case "Artillery":
+				explanations.Add("<b>兵种：轻装</b>\n随机攻击敌方目标");
+				break;
+			case "Guardian":
+				explanations.Add("<b>兵种：轻装</b>\n嘲讽攻击范围内的单位");
+				break;
+			case "Construction":
+				explanations.Add("<b>兵种：建筑</b>\n无法移动");
+				break;
+			case "Command":
+				explanations.Add("<b>指令</b>\n产生即时效果");
+				break;
+		}
+		if (description.Contains("部署"))
+		{
+			explanations.Add("<b>部署</b>\n自身部署后触发的效果");
+		}
+		if (description.Contains("招募"))
+		{
+			explanations.Add("<b>招募</b>\n从牌堆招募指定单位到战场");
+		}
+		if (description.Contains("突击"))
+		{
+			explanations.Add("<b>突击</b>\n部署后可以立即行动");
+		}
+		if (description.Contains("越野"))
+		{
+			explanations.Add("<b>越野</b>\n可以移动至不相邻的战线");
+		}
+		if (description.Contains("反击"))
+		{
+			explanations.Add("<b>反击</b>\n受击后对攻击者造成等同于自身攻击力的伤害");
+		}
+		if (description.Contains("阵亡"))
+		{
+			explanations.Add("<b>阵亡</b>\n自身阵亡后触发的效果");
+		}
+		if (description.Contains("护甲(x)"))
+		{
+			explanations.Add("<b>护甲(x)</b>\n减少受到的伤害x点");
+		}
+		if (description.Contains("格挡"))
+		{
+			explanations.Add("<b>格挡</b>\n免疫下次受到的伤害");
+		}
+		if (description.Contains("压制"))
+		{
+			explanations.Add("<b>压制</b>\n使目标在本回合内无法行动");
+		}
+		if (description.Contains("召唤"))
+		{
+			explanations.Add("<b>召唤</b>\n生成特定单位到战场");
+		}
+	}
+
 }

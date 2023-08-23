@@ -43,7 +43,7 @@ public class BaseBuildingButton : MonoBehaviour,
 
 		aura.DOFade(1f, duration);
 		canvasGroup.DOFade(1f, duration);
-		nameContent.gameObject.SetActive(true);
+		nameContent.DOFade(1f, duration);
 		transform.DOScale(inspectScale, duration);
 	}
 
@@ -64,15 +64,15 @@ public class BaseBuildingButton : MonoBehaviour,
 
 		aura.DOFade(0.5f, duration);
 		canvasGroup.DOFade(0.5f, duration);
-		nameContent.gameObject.SetActive(false);
+		nameContent.DOFade(0.5f, duration);
 		transform.DOScale(originScale, duration);
 	}
 	public void Start()
 	{
 		canvasGroup = nameBar.gameObject.GetComponent<CanvasGroup>();
 
-		nameContent.gameObject.SetActive(false);
-		aura.DOFade(0.5f, 0.01f);
+		nameContent.DOFade(0.5f, 0);
+		aura.DOFade(0.5f, 0);
 		canvasGroup.alpha = 0.5f;
 
 		originScale = transform.localScale;

@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,11 +12,20 @@ public class PackController : MonoBehaviour
 
 	public CardInspector inspector;
 
-	public Button detailInfoButton;
+	public GameObject explanationPrototype;
+
+	public CanvasGroup explainCanvas;
+	public Button explainButton;
+	public GridLayoutGroup textGroup;
 
 	public Button SelectButton;
-
 	public TMP_Text text;
+
+
+	[Header("External")]
+	public Button detailInfoButton;
+
+
 
 	public int gasMineCost
 	{
@@ -35,18 +45,35 @@ public class PackController : MonoBehaviour
 		}
 	}
 
+	public float duration;
 	public void Init()
 	{
 		num = 0;
 		SelectButton.onClick.AddListener(() => num++);
 
-		detailInfoButton = inspector.nameTag.gameObject.AddComponent<Button>();
+
+		explainButton = inspector.nameTag.gameObject.AddComponent<Button>();
+		explainButton.onClick.AddListener(() => explainCanvas.DOFade(explainCanvas.alpha == 0 ? 1 : 0, duration));
+
+		detailInfoButton = inspector.cardImage.gameObject.AddComponent<Button>();
 	}
 
 	public void RenderInspector(string ID)
 	{
 		inspector.RenderInspector(ID);
+		AddExplanations(inspector.explanations);
 	}
+	public void AddExplanations(List<string> explanations)
+	{
+		foreach (string explanation in explanations)
+		{
+			ExplanationController explain = Instantiate(explanationPrototype, textGroup.transform).GetComponent<ExplanationController>();
+			explain.text.text = explanation;
+		}
+	}
+
+
+
 	public void DisplayGasMineCost()
 	{
 	}

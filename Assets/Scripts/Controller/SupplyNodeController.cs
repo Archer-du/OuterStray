@@ -41,7 +41,7 @@ public class SupplyNodeController : NodeController
 				Icon.sprite = Resources.LoadAll<Sprite>("Map-icon")[6];
 				break;
 		}
-		descriptionText.text = "空投点";
+		descriptionText.text = "空投点\n<size=12>从特定种类卡牌中选择一张获得</size>\n\n<size=10><i>\"来自Setinel7的馈赠\"</i></size>";
 	}
 	public override void CastEvent()
 	{

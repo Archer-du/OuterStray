@@ -22,7 +22,7 @@ public class MedicalNodeController : NodeController
 	public override void LoadResource()
 	{
 		Icon.sprite = Resources.LoadAll<Sprite>("Map-icon")[5];
-		descriptionText.text = "医疗节点";
+		descriptionText.text = "医疗站\n<size=12>消耗气矿为已有卡牌回复耐久</size>\n\n<size=10><i>\"她不是自己人吗？为什么要收费\"</i></size>";
 	}
 	public override void CastEvent()
 	{

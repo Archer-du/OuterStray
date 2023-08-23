@@ -229,20 +229,22 @@ MonoBehaviour:
   active: 1
   fadeDisable: 0
   boundaryCorrection: 1
-  upperBound: 700
+  upperBound: 500
   lowerBound: -800
   leftBound: -2000
   rightBound: 2000
   timerValve: 0.8
   duration: 0.2
-  mainDisplayOffset: {x: 600, y: 0, z: 0}
+  mainDisplayOffset: {x: 700, y: 0, z: 0}
   subDisplayOffset: {x: 0, y: 0, z: 0}
   inspectPanel: {fileID: 7791636533920035237}
   SubPanel: {fileID: 0}
+  textGroup: {fileID: 0}
   mainPanelEnabled: 1
   subPanelEnabled: 0
   mainPanelScale: {x: 0, y: 0, z: 0}
   subPanelScale: {x: 0, y: 0, z: 0}
+  explanationPrototype: {fileID: 0}
 --- !u!1 &3465805072880246064
 GameObject:
   m_ObjectHideFlags: 0

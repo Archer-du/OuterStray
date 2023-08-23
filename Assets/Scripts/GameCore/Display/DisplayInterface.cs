@@ -29,8 +29,11 @@ namespace DisplayInterface
 	public interface ICultivateSceneController
 	{
 		public IDeckController InstantiateDeck();
-		public void UpdateBasicInfo(int gasMine, int cardNum);
+		public void InitializeBasicInfo(int gasMine, int cardNum);
 		public void UpdateBaseInfo(List<string> IDs, List<string> names, List<string> categories, List<int> healths, List<string> description);
+		public void UpdateGasMineToken(int gasMineToken);
+		public void UpdateBaseHealth(int health, int maxHealth);
+		public void UpdateCardNum(int cardNum);
 	}
 
 
@@ -47,10 +50,6 @@ namespace DisplayInterface
 		public IDeckController InstantiateDeck();
 		public void EnterNextTerrain();
 		public void UpdateCurrentNode(INodeController controller);
-
-		public void UpdateGasMineToken(int gasMineToken);
-		public void UpdateCardNum(int cardNum);
-		public void UpdateBaseHealth(int baseHealth, int baseMaxHealth);
 
 		public void CampaignCompleted();
 		public void CampaignFailed();

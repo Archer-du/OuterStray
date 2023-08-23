@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class InspectPanelController : MonoBehaviour,
     IPointerEnterHandler, IPointerExitHandler
@@ -29,6 +30,7 @@ public class InspectPanelController : MonoBehaviour,
 	public CanvasGroup inspectPanel;
 
 	public CanvasGroup SubPanel;
+	public GridLayoutGroup textGroup;
 
 	public bool mainPanelEnabled;
 	public bool subPanelEnabled;
@@ -119,6 +121,20 @@ public class InspectPanelController : MonoBehaviour,
 			}
 		}
     }
+
+	public GameObject explanationPrototype;
+	public void AddExplanation(List<string> explanations)
+	{
+		foreach(string explanation in explanations)
+		{
+			ExplanationController explain = Instantiate(explanationPrototype, textGroup.transform).GetComponent<ExplanationController>();
+			explain.text.text = explanation;
+		}
+	}
+
+
+
+
 
 
 
