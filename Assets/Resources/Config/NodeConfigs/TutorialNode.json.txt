@@ -44,7 +44,7 @@
         {
             "cardPreset" : {
                 "boss": false,
-                "backendID": "human_27",
+                "backendID": "tutorial_27",
                 "attack": 4,
                 "health": 15,
                 "attackCounter": 0
