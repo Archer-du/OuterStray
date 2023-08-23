@@ -24,7 +24,7 @@ public class OutPostNodeController : NodeController
 	public override void LoadResource()
 	{
 		Icon.sprite = Resources.LoadAll<Sprite>("Map-icon")[4];
-		descriptionText.text = "前哨站";
+		descriptionText.text = "前哨站\n<size=12>消耗气矿购买商品卡牌</size>\n\n<size=10><i>\"商人是从哪里搞来的货？\"</i></size>";
 	}
 	public override void CastEvent()
 	{

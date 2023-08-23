@@ -37,6 +37,9 @@ public class CultivateSceneManager : MonoBehaviour,
 	public TMP_Text baseHealthText;
 	public TMP_Text baseMaxHealthText;
 
+	public TMP_Text warningText;
+	public CanvasGroup warningCanvas;
+
     [Header("Prototype")]
     public GameObject baseCardPrototype;
     public GameObject packPrototype;
@@ -148,6 +151,16 @@ public class CultivateSceneManager : MonoBehaviour,
     {
 		if (playerDeck.IsEmpty())
 		{
+			warningCanvas.alpha = 0f;
+			warningText.DOFade(0, 0);
+
+			Sequence seq = DOTween.Sequence();
+
+			seq.Append(warningCanvas.DOFade(1, 0.2f));
+			seq.Join(warningText.DOFade(1, 0.2f));
+			seq.AppendInterval(1f);
+			seq.Append(warningCanvas.DOFade(0, 0.2f));
+			seq.Join(warningText.DOFade(0, 0.2f));
 			Debug.LogWarning("你还没有导入卡组！");
 			return;
 		}
@@ -155,7 +168,7 @@ public class CultivateSceneManager : MonoBehaviour,
 
         DisableAllBuildings();
         playerDeck.DisableAllDeckTags();
-		inputMask.DOFade(0.3f, duration);
+		inputMask.DOFade(0.6f, duration);
 
         for(int i = 0; i < 3; i++)
         {
@@ -227,12 +240,82 @@ public class CultivateSceneManager : MonoBehaviour,
 		return playerDeck;
 	}
 
-	public void UpdateBasicInfo(int gasMine, int cardNum)
+
+
+	public int gasMineToken = 0;
+	public void UpdateGasMineToken(int gasMineToken)
+	{
+		float initHeight = this.gasMineToken / 300f * 360;
+		float finalHeight = gasMineToken / 300f * 360;
+		float duration = 0.4f;
+
+		Tweener tweener1 = DOTween.To(
+			// 获取初始值
+			() => initHeight,
+			// 设置当前值
+			y => gasMineMask.sizeDelta = new Vector2(gasMineMask.sizeDelta.x, y),
+			// 指定最终值
+			finalHeight,
+			// 指定持续时间
+			duration
+		);
+		this.gasMineToken = gasMineToken;
+		gasMineText.text = gasMineToken.ToString();
+
+		Tweener tweener2 = DOTween.To(
+			// 获取初始值
+			() => 50,
+			// 设置当前值
+			y => gasMineText.fontSize = y,
+			// 指定最终值
+			80,
+			// 指定持续时间
+			duration
+		);
+		Tweener tweener3 = DOTween.To(
+			// 获取初始值
+			() => 80,
+			// 设置当前值
+			y => gasMineText.fontSize = y,
+			// 指定最终值
+			50,
+			// 指定持续时间
+			duration
+		);
+	}
+
+
+	public int baseHealth;
+	public int baseMaxHealth;
+	public void UpdateBaseHealth(int health, int maxHealth)
+	{
+		this.baseHealth = health;
+		this.baseMaxHealth = maxHealth;
+
+		baseHealthText.text = baseHealth.ToString();
+
+		baseHealthText.color = new Color(1, (float)baseHealth / baseMaxHealth, (float)baseHealth / baseMaxHealth);
+
+		baseMaxHealthText.text = baseMaxHealth.ToString();
+	}
+	public int cardNum;
+	public void UpdateCardNum(int cardNum)
+	{
+		this.cardNum = cardNum;
+		cardNumText.text = cardNum.ToString();
+	}
+
+
+
+
+
+
+
+	public void InitializeBasicInfo(int gasMine, int cardNum)
 	{
 		gasMineText.text = gasMine.ToString();
 		cardNumText.text = cardNum.ToString();
-		//baseHealthText.text = baseHealth.ToString();
-		//baseMaxHealthText.text = baseHealth.ToString();
+		gasMineMask.sizeDelta = new Vector2(gasMineMask.sizeDelta.x, gasMine / 300f * 360);
 	}
     public void UpdateBaseInfo(List<string> IDs, List<string> names, List<string> categories, List<int> healths, List<string> description)
     {
@@ -243,9 +326,6 @@ public class CultivateSceneManager : MonoBehaviour,
             selections[i] = bases.GetComponent<BaseSelection>();
             selections[i].SetInfo(IDs[i], names[i], categories[i], healths[i], description[i]);
         }
-
-        //baseHealthText.text = baseHealth.ToString();
-        //baseMaxHealthText.text = baseHealth.ToString();
     }
 
 

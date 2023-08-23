@@ -21,6 +21,10 @@ public class CardInspector : MonoBehaviour
 	public int health;
 	public int maxHealth;
 
+	public List<string> explanations;
+
+	public string story;
+
 	[Header("Display")]
 	public Image cardImage;
 	public Image categoryIcon;
@@ -67,6 +71,8 @@ public class CardInspector : MonoBehaviour
 		costText.text = card.cost.ToString();
 		descriptionText.text = description;
 
+		explanations = new List<string>();
+		BattleElementController.ExplanationParse(category, description, ref explanations);
 
 		if (category == "Command")
 		{
@@ -106,6 +112,9 @@ public class CardInspector : MonoBehaviour
 		this.cost = card.cost;
 		this.nameContent = card.name;
 		this.description = card.description;
+
+		explanations = new List<string>();
+		BattleElementController.ExplanationParse(category, description, ref explanations);
 
 		LoadCardResources(ID);
 		nameText.text = card.name;

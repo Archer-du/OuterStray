@@ -74,7 +74,7 @@ namespace LogicCore
 			set
 			{
 				GasMineToken = value;
-				controller.UpdateGasMineToken(value);
+				cultivationSystem.controller.UpdateGasMineToken(value);
 			}
 		}
 
@@ -109,8 +109,8 @@ namespace LogicCore
 			controller.TerrrainsInitialize(this, battleNodeNum);
 			playerBase = playerDeck.bases;
 
-			controller.UpdateCardNum(cardNum);
-			controller.UpdateBaseHealth(baseHealth, playerBase.maxHealthWriter);
+			cultivationSystem.controller.UpdateCardNum(cardNum);
+			cultivationSystem.controller.UpdateBaseHealth(baseHealth, playerBase.maxHealthWriter);
 
 			//TODO
 			gasMineToken = 100;
@@ -256,7 +256,7 @@ namespace LogicCore
 			}
 
 			playerDeck.AddTag(outPost.Purchase(index));
-			controller.UpdateCardNum(cardNum);
+			cultivationSystem.controller.UpdateCardNum(cardNum);
 		}
 
 		public void SupplyNodeChoose(int index)
@@ -268,7 +268,7 @@ namespace LogicCore
 			SupplyNode supply = currentNode as SupplyNode;
 
 			playerDeck.AddTag(supply.Choose(index));
-			controller.UpdateCardNum(cardNum);
+			cultivationSystem.controller.UpdateCardNum(cardNum);
 		}
 	}
 }

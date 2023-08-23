@@ -48,19 +48,6 @@ namespace LogicCore
 			bases[0] = new ConstructionElement(pool.GetCardByID("base_00") as UnitCard, battleSystem, null);
 			bases[1] = new ConstructionElement(pool.GetCardByID("base_00") as UnitCard, battleSystem, null);
 			bases[2] = new ConstructionElement(pool.GetCardByID("base_00") as UnitCard, battleSystem, null);
-
-			//departments = new List<Department>(SystemConfig.buildingNum);
-			//for(int i = 0; i < SystemConfig.buildingNum; i++)
-			//{
-			//	departments.Add(new Department());
-			//}
-			//foreach (var department in departments)
-			//{
-			//	department.Fill(pool);
-			//}
-			//unlockProgress = 1;
-
-			
 		}
 		public void SetSceneController(ICultivateSceneController ctdspl)
 		{
@@ -82,7 +69,7 @@ namespace LogicCore
 				descriptions.Add(bases[i].description);
 			}
 
-			controller.UpdateBasicInfo(tacticalSystem.gasMineToken, 0);
+			controller.InitializeBasicInfo(tacticalSystem.gasMineToken, 0);
 			controller.UpdateBaseInfo(IDs, names, categories, health, descriptions);
 		}
 		public void SetBase(int index)
@@ -91,14 +78,14 @@ namespace LogicCore
 		}
 		internal void UpdateBasicInfo()
 		{
-			controller.UpdateBasicInfo(tacticalSystem.gasMineToken, playerDeck.count);
+			controller.InitializeBasicInfo(tacticalSystem.gasMineToken, playerDeck.count);
 		}
 
 
 		public void FromPackImportDeck(int buildingID, int packID)
 		{
 			playerDeck.LoadDeckByPathDisplay("Config\\HumanDeckTest.csv");
-			controller.UpdateBasicInfo(tacticalSystem.gasMineToken, playerDeck.count);
+			controller.InitializeBasicInfo(tacticalSystem.gasMineToken, playerDeck.count);
 
 			//if (buildingID < 0 || buildingID > unlockProgress - 1)
 			//{

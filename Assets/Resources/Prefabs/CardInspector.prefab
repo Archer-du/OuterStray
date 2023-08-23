@@ -271,7 +271,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1011,6 +1011,8 @@ MonoBehaviour:
   attack: 0
   health: 0
   maxHealth: 0
+  explanations: []
+  story: 
   cardImage: {fileID: 6457693006099063089}
   categoryIcon: {fileID: 1754402871127699207}
   costTag: {fileID: 5519420684560711146}
