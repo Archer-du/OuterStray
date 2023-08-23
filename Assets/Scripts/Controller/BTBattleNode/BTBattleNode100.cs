@@ -59,7 +59,7 @@ public class BTBattleNode100 : BTBattleNode
                 BTDeploy(0);
                 yield return new WaitForSeconds(1f);
                 BTDeploy(0);
-                yield return new WaitForSeconds(2f);
+                yield return new WaitForSeconds(1.5f);
                 BTSkip();
                 break;
             // 蘑菇上前
@@ -70,7 +70,7 @@ public class BTBattleNode100 : BTBattleNode
                 BTMove(3, 0, 2, 0);
                 yield return new WaitForSeconds(1f);
                 BTMove(3, 0, 2, 0);
-                yield return new WaitForSeconds(2f);
+                yield return new WaitForSeconds(1.5f);
                 BTSkip();
                 break;
             case 17:
@@ -88,7 +88,7 @@ public class BTBattleNode100 : BTBattleNode
                 BTTargetCast(GetHandicapIdx("comm_mush_15"), 1, 0);
                 yield return new WaitForSeconds(1f);
                 BTTargetCast(GetHandicapIdx("comm_mush_15"), 1, 0);
-                yield return new WaitForSeconds(3f);
+                yield return new WaitForSeconds(5f);
                 BTSkip();
                 break;
             case 23:

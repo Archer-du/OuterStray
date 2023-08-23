@@ -16,6 +16,7 @@ public class TurnMappedDialogger : MonoBehaviour
 
     private GameObject guide;
     private Dictionary<int, List<GameObject>> TurnGuide;
+    private GameObject currentActiveGuide;
     private int GuideNum = 0;
 
 	private GameObject dialogFrame;
@@ -44,9 +45,21 @@ public class TurnMappedDialogger : MonoBehaviour
         lastTurnNum = TurnNum;
         LoadDialogs();
 
+        manager.Retreat += OnRetreat;
+        manager.Deploy += OnDeploy;
+        manager.Cast += OnCast;
+        manager.Move += OnMove;
+        manager.TurnChanged += OnTurnChanged;
+
+        guide.SetActive(true);
         TurnGuide = GetAllChildren(guide);
-        StartCoroutine(UpdateGuide());
-        StartCoroutine(CheckTurnNum());
+        foreach (var guideList in TurnGuide.Values)
+        {
+            foreach (var guide in guideList)
+            {
+                guide.SetActive(false);
+            }
+        }
     }
     public void EndTutorial()
     {
@@ -71,21 +84,6 @@ public class TurnMappedDialogger : MonoBehaviour
             int turnNum = int.Parse(values[0]);
             List<string> dialogParts = new(values[1].Split('/'));
             dialogDict[turnNum] = dialogParts;
-        }
-    }
-
-
-
-    private IEnumerator CheckTurnNum()
-    {
-        while (running)
-        {
-            if (TurnNum != lastTurnNum)
-            {
-                lastTurnNum = TurnNum;
-                UpdateDialog();
-            }
-            yield return null;
         }
     }
 
@@ -160,28 +158,95 @@ public class TurnMappedDialogger : MonoBehaviour
         return TurnGuide;
     }
 
-
-
-    private IEnumerator UpdateGuide()
+    public void OnRetreat(string cardID)
     {
-        guide.SetActive(true);
-        foreach (var guideList in TurnGuide.Values)
+        if (cardID == "human_02")
         {
-            foreach (var guide in guideList)
-            {
-                guide.SetActive(false);
-            }
+            StartCoroutine(UpdateGuide());
         }
 
-        while (running)
+    }
+    public void OnDeploy(string cardID)
+    {
+        if (cardID == "human_21_01" || cardID == "human_05_01" || cardID == "human_27")
         {
-            if (TurnGuide.ContainsKey(TurnNum))
-            {
-                TurnGuide[TurnNum][GuideNum].SetActive(true);
-            }
+            StartCoroutine(UpdateGuide());
         }
-
-        yield return null;
+    }
+    public void OnCast(string cardID)
+    {
+        if (cardID == "comm_human_01" || cardID == "comm_human_03")
+        {
+            StartCoroutine(UpdateGuide());
+        }
+    }
+    public void OnMove(string cardID)
+    {
+        if (cardID == "human_21_01" || cardID == "human_05_01" || cardID == "human_27")
+        {
+            StartCoroutine(UpdateGuide());
+        }
     }
 
+    public void OnTurnChanged(int turnNum)
+    {
+        UpdateDialog();
+        StartCoroutine(UpdateTurnGuide());
+    }
+
+    private IEnumerator UpdateTurnGuide()
+    {
+        GuideNum = 0;
+        if (currentActiveGuide != null)
+        {
+            currentActiveGuide.SetActive(false);
+        }
+        if(TurnGuide.ContainsKey(TurnNum))
+        {
+            if (TurnNum == 1 || TurnNum == 9)
+            {
+                yield return new WaitForSeconds(2);
+
+            }
+            else if (TurnNum == 12)
+            {
+                yield return new WaitForSeconds(4.5f);
+            }
+            else
+            {
+                yield return new WaitForSeconds(3.5f);
+            }
+
+            currentActiveGuide = TurnGuide[TurnNum][GuideNum];
+            currentActiveGuide.SetActive(true);
+
+            if (TurnNum == 14)
+            {
+                yield return new WaitForSeconds(5);
+                StartCoroutine(UpdateGuide());
+                yield break;
+            }
+            if (TurnNum == 18)
+            {
+                yield return new WaitForSeconds(3);
+                StartCoroutine(UpdateGuide());
+                yield break;
+            }
+        }
+    }
+    private IEnumerator UpdateGuide()
+    {
+        currentActiveGuide.SetActive(false);
+        GuideNum++;
+        if (TurnGuide.ContainsKey(TurnNum) && TurnGuide[TurnNum][GuideNum])
+        {
+            currentActiveGuide = TurnGuide[TurnNum][GuideNum];
+            if (TurnNum == 10 && GuideNum == 1)
+            {
+                yield return new WaitForSeconds(2f);
+            }
+            currentActiveGuide.SetActive(true);
+        }
+        yield break;
+    }
 }

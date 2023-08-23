@@ -78,6 +78,7 @@ public class BattleSceneManager : MonoBehaviour,
 	/// <summary>
 	/// dialog trigger & counter
 	/// </summary>
+	public event Action<int> TurnChanged;
 	private int TurnNum;
 	public int turnNum
 	{
@@ -85,9 +86,10 @@ public class BattleSceneManager : MonoBehaviour,
 		set
 		{
 			TurnNum = value;
-			//dialogController.UpdateDialog();
+			TurnChanged?.Invoke(value);
 		}
 	}
+
 	public int[] energy;
 	public int[] energySupply;
 
@@ -621,6 +623,7 @@ public class BattleSceneManager : MonoBehaviour,
 
 	public int PlayerDeploy(int handicapIdx, int lineIdx, int pos)
 	{
+		Deploy?.Invoke(handicapController[0][handicapIdx].ID);
 		AcquireSequence();
 
 		UnitElementController controller = handicapController[0].Pop(handicapIdx) as UnitElementController;
@@ -629,41 +632,38 @@ public class BattleSceneManager : MonoBehaviour,
 
 		return 1;
 	}
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="position"></param>
-	/// <param name="resLine"></param>
-	/// <param name="element"></param>
-	/// <returns></returns>
 	public int PlayerMove(int resLineIdx, int resIdx, int dstLineIdx, int dstPos)
 	{
+		Move?.Invoke(battleLines[resLineIdx][resIdx].ID);
 		AcquireSequence();
 
-		battleSystem.Move(resLineIdx, resIdx, dstLineIdx, dstPos);
+        battleSystem.Move(resLineIdx, resIdx, dstLineIdx, dstPos);
 
 		return 1;
 	}
 
 	public int PlayerRetreat(int resLineIdx, int resIdx)
 	{
+		Retreat?.Invoke(battleLines[resLineIdx][resIdx].ID);
 		AcquireSequence();
 
-		battleSystem.Retreat(resLineIdx, resIdx);
+        battleSystem.Retreat(resLineIdx, resIdx);
 
 		return 1;
 	}
 	public void PlayerTargetCast(int handicapIdx, int dstLineIdx, int dstIdx)
 	{
+		Cast?.Invoke(castingCommand.ID);
 		AcquireSequence();
 
 		battleSystem.Cast(handicapIdx, dstLineIdx, dstIdx);
 	}
 	public void PlayerNonTargetCast(int handicapIdx)
 	{
+		Cast?.Invoke(handicapController[0][handicapIdx].ID);
 		AcquireSequence();
 
-		CommandElementController controller = handicapController[0].Pop(handicapIdx) as CommandElementController;
+        CommandElementController controller = handicapController[0].Pop(handicapIdx) as CommandElementController;
 
 		battleSystem.Cast(handicapIdx);
 	}
@@ -1202,4 +1202,14 @@ public class BattleSceneManager : MonoBehaviour,
         //data input 显示层检查完了再动数据层！！！
         battleSystem.Deploy(handicapIdx, dstIdx, dstPos);
     }
+
+
+
+
+
+
+	public event Action<string> Retreat;
+	public event Action<string> Deploy;
+	public event Action<string> Cast;
+	public event Action<string> Move;
 }

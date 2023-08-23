@@ -265,6 +265,7 @@ public class GameManager : MonoBehaviour, IGameManagement,
 	public void BuildTutorial()
 	{
 		dialogGround.gameObject.SetActive(false);
+		tacticalSceneManager.currentNode.gameObject.SetActive(true);
 		tacticalSceneManager.currentNode.CastEvent();
 	}
 

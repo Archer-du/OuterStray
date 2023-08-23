@@ -47,7 +47,7 @@ public class PackController : MonoBehaviour
 	{
 		inspector.RenderInspector(ID);
 	}
-	public void DisplayGasMineCost()
-	{
-	}
+	//public void DisplayGasMineCost()
+	//{
+	//}
 }
