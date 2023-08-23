@@ -2,6 +2,7 @@ using DG.Tweening;
 using DisplayInterface;
 using InputHandler;
 using SceneState;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -71,6 +72,8 @@ public class TacticalSceneManager : MonoBehaviour,
     public Color originOrange;
 
 
+
+
 	public void OnGameStateChanged(GameState state)
     {
 		if (state == GameState.Cultivate || state == GameState.Start)
@@ -87,7 +90,7 @@ public class TacticalSceneManager : MonoBehaviour,
 	public void DestroyOtherInstancesOfType()
 	{
 		// 查找同类型的所有游戏对象
-		TacticalSceneManager[] otherInstances = Object.FindObjectsOfType<TacticalSceneManager>();
+		TacticalSceneManager[] otherInstances = UnityEngine.Object.FindObjectsOfType<TacticalSceneManager>();
 
 		// 遍历并销毁除自身以外的同类型游戏对象
 		foreach (TacticalSceneManager instance in otherInstances)
@@ -98,11 +101,17 @@ public class TacticalSceneManager : MonoBehaviour,
 			}
 		}
 	}
+
+
+
+
 	public void Exit()
 	{
         DOTween.Clear();
         gameManager.UpdateGameState(GameState.Start);
 	}
+
+
 
 
 
@@ -113,7 +122,11 @@ public class TacticalSceneManager : MonoBehaviour,
 
 		ColorUtility.TryParseHtmlString("#F6921E", out originOrange);
 		terrains = new List<TerrainController>();
+
+        PanelController.PanelEnabled += () => panelEnabled = true;
+        PanelController.PanelDisabled += () => panelEnabled = false;
 	}
+    [Obsolete]
 	public void TerrrainsInitialize(ITacticalSystemInput handler, int terrainsLength)
 	{
         Init();
@@ -134,6 +147,9 @@ public class TacticalSceneManager : MonoBehaviour,
     {
         //InputMask.raycastTarget = false;
     }
+
+
+
     //TODO
 	public void CampaignCompleted()
 	{
@@ -158,6 +174,10 @@ public class TacticalSceneManager : MonoBehaviour,
     {
         tacticalSystem.SupplyNodeChoose(index);
     }
+
+
+
+
 	/// <summary>
 	/// 生成Terrain控件，返回句柄
 	/// </summary>
@@ -178,6 +198,8 @@ public class TacticalSceneManager : MonoBehaviour,
 	{
         return playerDeck;
 	}
+
+
 
 	/// <summary>
 	/// 进入下一层（此时当前节点已更新）
@@ -231,18 +253,26 @@ public class TacticalSceneManager : MonoBehaviour,
             StartCoroutine(ArrowCaster(adjNode));
         }
 	}
+
+
+
+
+
+    [Obsolete("交由CultivateSceneManager处理")]
 	public void UpdateGasMineToken(int gasMineToken)
 	{
         this.gasMineToken = gasMineToken;
         gasMineText.text = gasMineToken.ToString();
 	}
 
+    [Obsolete("交由CultivateSceneManager处理")]
 	public void UpdateCardNum(int cardNum)
 	{
         this.cardNum = cardNum;
         cardNumText.text = cardNum.ToString();
 	}
 
+    [Obsolete("交由CultivateSceneManager处理")]
 	public void UpdateBaseHealth(int baseHealth, int baseMaxHealth)
 	{
         this.baseMaxHealth = baseMaxHealth;
@@ -250,6 +280,8 @@ public class TacticalSceneManager : MonoBehaviour,
         baseHealthText.text = baseHealth.ToString();
         baseMaxHealthText.text = baseMaxHealth.ToString();
 	}
+
+
 
 	private void DisableArrowCaster()
     {
@@ -260,7 +292,6 @@ public class TacticalSceneManager : MonoBehaviour,
 			obj.SetActive(false);
 		}
 	}
-
     /// <summary>
     /// 从当前节点发射箭头的动画协程
     /// </summary>
@@ -307,10 +338,14 @@ public class TacticalSceneManager : MonoBehaviour,
 
 
 
+
+
     public void EnterNode(int terrainIdx, int hrztIdx, int vtcIdx)
     {
         tacticalSystem.EnterNode(terrainIdx, hrztIdx, vtcIdx);
     }
+
+
 
 
 
@@ -339,18 +374,6 @@ public class TacticalSceneManager : MonoBehaviour,
         {
             DisableNode(adj);
         }
-		//foreach (NodeController node in currentTerrain.nodes)
-  //      {
-  //          if(node != currentNode && node.casted)
-  //          {
-  //              node.DisableLines();
-
-  //              foreach(NodeController adj in node.adjNodes)
-  //              {
-  //                  DisableNode(adj);
-  //              }
-  //          }
-  //      }
 	}
     public float fadeDuration = 0.3f;
     public void DisableNode(NodeController node)
@@ -371,6 +394,8 @@ public class TacticalSceneManager : MonoBehaviour,
 		    }
         }
 	}
+
+
 
 
 

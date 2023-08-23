@@ -50,7 +50,7 @@ public class BaseSelection : MonoBehaviour,
 		disableExit = true;
 		Frame.SetActive(true);
 
-		manager.selectionIndex = index;
+		manager.baseSelectionIndex = index;
 		manager.startExpedition.enabled = true;
 		manager.startExpedition.image.color = Color.white;
 		manager.ClearOtherSelectionFrame();

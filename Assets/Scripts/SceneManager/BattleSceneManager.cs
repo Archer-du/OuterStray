@@ -16,6 +16,12 @@ using System.Linq;
 using BehaviorTree;
 using UnityEngine.SceneManagement;
 
+public enum Result
+{
+	win,
+	fail,
+	normal
+}
 public class BattleSceneManager : MonoBehaviour,
 	IBattleSceneController
 {
@@ -124,6 +130,8 @@ public class BattleSceneManager : MonoBehaviour,
 	// 行为树
 	public BTBattleNode btBattleNode;
 
+	public Result result;
+
     public void Start()
 	{
 		Settler.gameObject.transform.position = new Vector3(0, 2160, 0);
@@ -134,6 +142,8 @@ public class BattleSceneManager : MonoBehaviour,
 		gameManager = GameManager.GetInstance();
 
 		battleSystem = handler;
+
+		result = Result.normal;
 
 		switch (BTindex)
 		{
@@ -433,8 +443,20 @@ public class BattleSceneManager : MonoBehaviour,
 
 
 
-
-
+	public void Surrender()
+	{
+		StopAllCoroutines();
+		SettleText.text = "Failure";
+		SettleText.gameObject.SetActive(true);
+		float duration = 0.4f;
+		Settler.transform.DOMove(new Vector3(0, 0, 0), duration)
+			.OnComplete(() =>
+			{
+				SettleText.DOFade(1f, duration);
+			});
+		completed = true;
+		result = Result.fail;
+	}
 	public void BattleFailed()
 	{
 		StopAllCoroutines();
@@ -449,6 +471,7 @@ public class BattleSceneManager : MonoBehaviour,
 			})
 		);
 		completed = true;
+		result = Result.fail;
 	}
 	public void BattleWinned()
 	{
@@ -465,6 +488,7 @@ public class BattleSceneManager : MonoBehaviour,
 			})
 		);
 		completed = false;
+		result = Result.win;
 	}
 	public void BattleOverChecked()
 	{
@@ -484,7 +508,14 @@ public class BattleSceneManager : MonoBehaviour,
 				gameManager.BattleBGM.Stop();
 				gameManager.TacticalBGM.Play();
 
-				AsyncOperation async = gameManager.UpdateGameState(SceneState.GameState.Tactical);
+				if(result == Result.win)
+				{
+					AsyncOperation async = gameManager.UpdateGameState(SceneState.GameState.Tactical);
+				}
+				else
+				{
+					gameManager.UpdateGameState(SceneState.GameState.Start);
+				}
 			}
 		}
 		else

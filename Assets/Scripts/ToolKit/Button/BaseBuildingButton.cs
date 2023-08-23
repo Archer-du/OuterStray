@@ -1,6 +1,7 @@
 using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -12,6 +13,12 @@ public class BaseBuildingButton : MonoBehaviour,
 	{
 		get => GameManager.GetInstance().cultivateSceneManager;
 	}
+	public RectTransform nameBar;
+	public TMP_Text nameContent;
+	[HideInInspector] public CanvasGroup canvasGroup;
+
+	public string nameText;
+	public float finalLength;
 
 	public Image aura;
 	public float inspectFactor;
@@ -22,19 +29,52 @@ public class BaseBuildingButton : MonoBehaviour,
 	public void OnPointerEnter(PointerEventData eventData)
 	{
 		if (manager.buildingsDisabled) return;
+
+		Tweener tweener = DOTween.To(
+			// 获取初始值
+			() => 0,
+			// 设置当前值
+			x => nameBar.sizeDelta = new Vector2(x, nameBar.sizeDelta.y),
+			// 指定最终值
+			finalLength,
+			// 指定持续时间
+			duration
+		);
+
 		aura.DOFade(1f, duration);
+		canvasGroup.DOFade(1f, duration);
+		nameContent.gameObject.SetActive(true);
 		transform.DOScale(inspectScale, duration);
 	}
 
 	public void OnPointerExit(PointerEventData eventData)
 	{
 		if (manager.buildingsDisabled) return;
-		aura.DOFade(0f, duration);
+
+		Tweener tweener = DOTween.To(
+			// 获取初始值
+			() => finalLength,
+			// 设置当前值
+			x => nameBar.sizeDelta = new Vector2(x, nameBar.sizeDelta.y),
+			// 指定最终值
+			0,
+			// 指定持续时间
+			duration
+		);
+
+		aura.DOFade(0.5f, duration);
+		canvasGroup.DOFade(0.5f, duration);
+		nameContent.gameObject.SetActive(false);
 		transform.DOScale(originScale, duration);
 	}
 	public void Start()
 	{
-		aura.DOFade(0f, 0.01f);
+		canvasGroup = nameBar.gameObject.GetComponent<CanvasGroup>();
+
+		nameContent.gameObject.SetActive(false);
+		aura.DOFade(0.5f, 0.01f);
+		canvasGroup.alpha = 0.5f;
+
 		originScale = transform.localScale;
 		inspectScale = transform.localScale * inspectFactor;
 	}

@@ -1,6 +1,7 @@
 using DG.Tweening;
 using DisplayInterface;
 using InputHandler;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting.Antlr3.Runtime.Tree;
@@ -21,12 +22,17 @@ public class DeckController : MonoBehaviour,
 
 	[Header("Prototype")]
 	public GameObject deckTagPrototype;
+
+
 	public void Init(IDeckInput deck)
 	{
 		deckTagLock = false;
 		tags = new List<DeckTagController>();
 		this.deck = deck;
 	}
+
+
+
 	public void UnloadDeckTags()
 	{
 		tags = new List<DeckTagController>();
@@ -40,72 +46,76 @@ public class DeckController : MonoBehaviour,
 			Destroy(child.gameObject);
 		}
 	}
-	public void InstantiateDeckTag(string ID, string name, string category, int index, string description, string method)
+	public void InstantiateDeckTag(int index, string ID, int dynInfo, string method)
 	{
 		GameObject deckTag = Instantiate(deckTagPrototype, transform);
-		DeckTagController controller = deckTag.GetComponent<DeckTagController>();
-		controller.controller = this;
+		DeckTagController tag = deckTag.GetComponent<DeckTagController>();
 
-		controller.nameContent = name;
-		controller.category = category;
-		controller.description = description;
+		tag.controller = this;
 
-		controller.Init(ID);
-		controller.deckID = index;
+		tag.Init(ID, dynInfo);
 
-		if(method == "append")
-		{
-			controller.Component.DOLocalMove(Vector3.zero, controller.initDuration);
-		}
-		else
-		{
-			controller.Component.transform.localPosition = Vector3.zero;
-		}
+		tag.Component.transform.localPosition = Vector3.zero;
 
-		tags.Add(controller);
+		tags.Add(tag);
 	}
-
-	public void UpdateCommandTagInfo(int index, int cost, int durability)
+	public void AddNewTag(string ID)
 	{
-		DeckTagController controller = tags[index];
+		GameObject deckTag = Instantiate(deckTagPrototype, transform);
+		DeckTagController tag = deckTag.GetComponent<DeckTagController>();
 
-		controller.cost = cost;
-		controller.counter = durability;
-		controller.UpdateInfo();
+		tag.controller = this;
+
+		tag.Component.DOLocalMove(Vector3.zero, tag.initDuration);
+
+		tag.Init(ID);
+		AddDeckTagFromPool(ID);
+		tags.Add(tag);
+
+		UpdateHierachy();
 	}
-
-
-	public void UpdateUnitTagInfo(string category, int index, int cost, int attack, int health, int maxHealth, int attackCounter)
-	{
-		DeckTagController controller = null;
-
-		controller = tags[index];
-		controller.cost = cost;
-		controller.attack = attack;
-		controller.health = health;
-		controller.maxHealth = maxHealth;
-		controller.counter = attackCounter;
-
-		controller.UpdateInfo();
-	}
-
 	public void UpdateHierachy()
 	{
 		tags.Sort();
-		for(int i = 0; i < tags.Count; i++)
+		for (int i = 0; i < tags.Count; i++)
 		{
 			tags[i].deckID = i;
 		}
-		foreach(var tag in tags)
+		foreach (var tag in tags)
 		{
 			tag.transform.SetSiblingIndex(tag.deckID);
 		}
 	}
+	//public void UpdateCommandTagInfo(int index, int cost, int durability)
+	//{
+	//	DeckTagController controller = tags[index];
 
-	public void UpdateHealth(int index, int health)
+	//	controller.cost = cost;
+	//	controller.counter = durability;
+	//	controller.UpdateInfo();
+	//}
+	//public void UpdateUnitTagInfo(string category, int index, int cost, int attack, int health, int maxHealth, int attackCounter)
+	//{
+	//	DeckTagController controller = null;
+
+	//	controller = tags[index];
+	//	controller.cost = cost;
+	//	controller.attack = attack;
+	//	controller.health = health;
+	//	controller.maxHealth = maxHealth;
+	//	controller.counter = attackCounter;
+
+	//	controller.UpdateInfo();
+	//}
+
+
+
+
+	[Obsolete]
+	public void UpdateHealthDisplay(int deckID, int health)
 	{
-		tags[index].health = health;
-		tags[index].healthText.text = health.ToString();
+		tags[deckID].inspector.health = health;
+		tags[deckID].inspector.healthText.text = health.ToString();
 	}
 
 
@@ -129,10 +139,9 @@ public class DeckController : MonoBehaviour,
 
 
 
-
-	public void AddDeckTagFromPool(int index)
+	public void AddDeckTagFromPool(string ID)
 	{
-		deck.AddDeckTagFromPool(index);
+		deck.AddDeckTagFromPool(ID);
 	}
 	public bool IsEmpty()
 	{

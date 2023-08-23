@@ -15,21 +15,13 @@ public class DeckTagController : MonoBehaviour, IComparable<DeckTagController>,
 		IPointerEnterHandler, IPointerExitHandler
 {
 	public DeckController controller;
-	public TacticalPanelDisplay panel
+	public PanelController panel
 	{
-		get => controller.sceneManager.currentNode.GetComponent<TacticalPanelDisplay>();
+		get => controller.sceneManager.currentNode.panel;
 	}
 
 	[Header("Data")]
 	public int deckID;
-	public string nameContent;
-	public string category;
-	public int cost;
-	public int attack;
-	public int health;
-	public int maxHealth;
-	public int counter;
-	public string description;
 
 	[Header("DeckTag")]
 	public TMP_Text deckNameText;
@@ -43,107 +35,36 @@ public class DeckTagController : MonoBehaviour, IComparable<DeckTagController>,
 	public float duration;
 
 	[Header("Inspector")]
-	public GameObject inspector;
+	public CardInspector inspector; 
 
-	public Image costTag;
-	public Image nameTag;
-	public Image backGround;
-	public Image frame;
-	public Image cardImage;
-	public Image categoryIcon;
+	public void Init(string ID, int dynInfo)
+	{
+		inspector.RenderInspector(ID, dynInfo);
 
-	public TMP_Text descriptionText;
-
-	public TMP_Text nameText;
-	public TMP_Text costText;
-	public TMP_Text counterText;
-
-	public Image attackIcon;
-	public Image healthIcon;
-	public TMP_Text attackText;
-	public TMP_Text healthText;
-
+		deckNameText.text = inspector.nameContent;
+		deckCategoryIcon.sprite = inspector.categoryIcon.sprite;
+	}
 	public void Init(string ID)
 	{
-		LoadCardResources(ID);
+		inspector.RenderInspector(ID);
 
-		deckNameText.text = nameContent;
-		nameText.text = nameContent;
-		descriptionText.text = description;
-
+		deckNameText.text = inspector.nameContent;
+		deckCategoryIcon.sprite = inspector.categoryIcon.sprite;
 	}
+
+
 	public Transform Component;
 	public float initDuration;
-	public void Start()
-	{
-		//Component.DOLocalMove(Vector3.zero, initDuration);
-	}
-	public void UpdateInfo()
-	{
-		if (category == "Command")
-		{
-			attackIcon.enabled = false;
-			attackText.enabled = false;
-			healthIcon.enabled = false;
-			healthText.enabled = false;
-		}
-		else
-		{
-			attackText.text = attack.ToString();
-			healthText.text = health.ToString();
-		}
-		costText.text = cost.ToString();
-		counterText.text = category == "Construction" ? "" : counter.ToString();
-	}
 
 	public Color color;
-	private void LoadCardResources(string ID)
-	{
-		cardImage.sprite = Resources.Load<Sprite>("CardImage/" + ID);
 
-		switch (category)
-		{
-			case "LightArmor":
-				UnityEngine.ColorUtility.TryParseHtmlString("#429656", out color);
-				deckCategoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[11];
-				categoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[11];
-				break;
-			case "Artillery":
-				UnityEngine.ColorUtility.TryParseHtmlString("#CE8849", out color);
-				deckCategoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[8];
-				categoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[8];
-				break;
-			case "Motorized":
-				UnityEngine.ColorUtility.TryParseHtmlString("#426A84", out color);
-				deckCategoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[9];
-				categoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[9];
-				break;
-			case "Guardian":
-				UnityEngine.ColorUtility.TryParseHtmlString("#97A5A4", out color);
-				deckCategoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[10];
-				categoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[10];
-				break;
-			case "Construction":
-				UnityEngine.ColorUtility.TryParseHtmlString("#7855A5", out color);
-				deckCategoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[12];
-				categoryIcon.sprite = Resources.LoadAll<Sprite>("CardFrame/Atlas-Icon")[12];
-				break;
-			case "Command":
-				color = Color.gray;
-				break;
-		}
-		backGround.color = color;
-		frame.color = color;
-		nameTag.color = color;
-		costTag.color = color;
-	}
 
 	public void OnBeginDrag(PointerEventData eventData)
 	{
 		if (GameManager.GetInstance().gameState != SceneState.GameState.Tactical) return;
 		if (!controller.sceneManager.panelEnabled) return;
 		if (controller.sceneManager.currentNode is not MedicalNodeController) return;
-		if (category == "Command") return;
+		if (inspector.category == "Command") return;
 		GetComponent<InspectPanelController>().fadeDisable = true;
 		GetComponent<InspectPanelController>().inspectPanel.alpha = 1.0f;
 
@@ -154,7 +75,7 @@ public class DeckTagController : MonoBehaviour, IComparable<DeckTagController>,
 		if (GameManager.GetInstance().gameState != SceneState.GameState.Tactical) return;
 		if (!controller.sceneManager.panelEnabled) return;
 		if (controller.sceneManager.currentNode is not MedicalNodeController) return;
-		if (category == "Command") return;
+		if (inspector.category == "Command") return;
 
 		Vector2 localPosition = new Vector2((eventData.position.x / Screen.width) * 3840, (eventData.position.y / Screen.height) * 2160);
 
@@ -169,11 +90,13 @@ public class DeckTagController : MonoBehaviour, IComparable<DeckTagController>,
 		if (GameManager.GetInstance().gameState != SceneState.GameState.Tactical) return;
 		if (!controller.sceneManager.panelEnabled) return;
 		if (controller.sceneManager.currentNode is not MedicalNodeController) return;
-		if (category == "Command") return;
+		if (inspector.category == "Command") return;
 
 		Vector2 localPosition = new Vector2((eventData.position.x / Screen.width) * 3840, (eventData.position.y / Screen.height) * 2160);
+		inspector.transform.localPosition = originPosition;
 
-		panel.AddNewTag(localPosition, this);
+		Debug.Log(localPosition);
+		panel.AddNewTag(localPosition, inspector.ID, inspector.category == "Command" ? inspector.counter : inspector.health, deckID);
 
 		GetComponent<InspectPanelController>().inspectPanel.alpha = 0f;
 	}
@@ -193,12 +116,18 @@ public class DeckTagController : MonoBehaviour, IComparable<DeckTagController>,
 
 
 
+	private Vector3 originPosition;
+	public void Start()
+	{
+		originPosition = inspector.transform.localPosition;
+	}
+	//TODO
 	public int CompareTo(DeckTagController other)
 	{
-		if(category == other.category)
+		if(inspector.category == other.inspector.category)
 		{
-			return cost.CompareTo(other.cost);
+			return inspector.cost.CompareTo(other.inspector.cost);
 		}
-		else return category.CompareTo(other.category);
+		else return inspector.category.CompareTo(other.inspector.category);
 	}
 }

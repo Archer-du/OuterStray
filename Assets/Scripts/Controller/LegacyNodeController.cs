@@ -4,11 +4,15 @@ using UnityEngine;
 
 public class LegacyNodeController : NodeController
 {
-	int legacy;
+	public int legacy;
+
+	//public ParticleSystem particleSystem;
 	public override void Init()
 	{
 		base.Init();
 		LoadResource();
+
+		//particleSystem.Stop();
 	}
 	public override void LoadResource()
 	{
@@ -18,8 +22,10 @@ public class LegacyNodeController : NodeController
 	public override void CastEvent()
 	{
 		base.CastEvent();
+
+		//particleSystem.Play();
 	}
-	public override void UpdateBasicInfo(int legacy, int medicalPrice)
+	public override void SetBasicInfo(int legacy, int medicalPrice)
 	{
 		this.legacy = legacy;
 	}

@@ -1,97 +1,69 @@
+using DataCore.Cards;
+using DataCore.CultivateItems;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CardInspect : MonoBehaviour
+[Obsolete]
+public class DeckTagInspector : MonoBehaviour
 {
-	public int deckID;
-
+	[Header("Data")]
 	public string ID;
 	public string category;
 	public int cost;
-
+	public string nameContent;
 	public string description;
+	public int counter;
+	public int attack;
+	public int health;
 
-	public Image costTag;
-	public Image nameTag;
-	public Image backGround;
-	public Image frame;
+	[Header("Display")]
 	public Image cardImage;
 	public Image categoryIcon;
+	public Image costTag;
+	public Image nameTag;
 
-	public TMP_Text nameText;
-	public TMP_Text descriptionText;
+	public Color color;
+	public Image backGround;
+	public Image frame;
 
 	public TMP_Text costText;
+	public TMP_Text nameText;
+	public TMP_Text descriptionText;
 	public TMP_Text counterText;
-
-	public Image attackIcon;
-	public Image healthIcon;
 	public TMP_Text attackText;
 	public TMP_Text healthText;
 
-	public Color color;
+	public Image counterIcon;
+	public Image attackIcon;
+	public Image healthIcon;
 
-
-	public void CopyInfo(DeckTagController other)
+	public void RenderInspector(string ID, int dynHealth)
 	{
-		deckID = other.deckID;
+		Pool pool = GameManager.GetInstance().pool;
+		Card card = pool.GetCardByID(ID);
 
-		costTag.color = other.costTag.color;
-		nameTag.color = other.nameTag.color;
-		backGround.color = other.backGround.color;
-		frame.color = other.frame.color;
-		cardImage.sprite = other.cardImage.sprite;
-		categoryIcon.sprite = other.categoryIcon.sprite;
-
-		nameText.text = other.nameText.text;
-		descriptionText.text = other.descriptionText.text;
-
-		costText.text = other.costText.text;
-		counterText.text = other.counterText.text;
-
-		attackIcon.enabled = other.attackIcon.enabled;
-		healthIcon.enabled = other.healthIcon.enabled;
-
-		if(other.category != "Command")
-		{
-			attackText.text = other.attackText.text;
-			healthText.text = other.healthText.text;
-		}
-	}
-	public void CopyInfo(UnitElementController other)
-	{
-		cardImage.sprite = other.CardImage.sprite;
-		//TODO
-		backGround.color = other.color;
-		frame.color = other.color;
-		nameTag.color = other.color;
-		costTag.color = other.color;
-		categoryIcon.sprite = other.categoryIcon.sprite;
-
-		nameText.text = other.nameContent;
-		costText.text = other.cost.ToString();
-		descriptionText.text = other.description;
-		attackText.text = other.attackText.text;
-		healthText.text = other.maxHealthPoint.ToString();
-		counterText.text = other.category == "Construction" ? "" : other.attackCounter.ToString();
-	}
-
-	public void SetInfo(string ID, string name, string category, int cost, int attack, int health, int counter, string description)
-	{
 		this.ID = ID;
-		this.category = category;
-		this.cost = cost;
-		this.description = description;
+		this.category = card.category;
+		this.cost = card.cost;
+		this.nameContent = card.name;
+		this.description = card.description;
 
 		LoadCardResources(ID);
+		nameText.text = card.name;
+		costText.text = card.cost.ToString();
+		descriptionText.text = description;
 
-		nameText.text = name;
-		costText.text = cost.ToString();
+
 		if (category == "Command")
 		{
+			categoryIcon.enabled = false;
+			CommandCard comm = card as CommandCard;
+			this.counter = comm.maxDurability;
+
 			attackIcon.enabled = false;
 			attackText.enabled = false;
 			healthIcon.enabled = false;
@@ -99,15 +71,20 @@ public class CardInspect : MonoBehaviour
 		}
 		else
 		{
+			UnitCard unit = card as UnitCard;
+			this.counter = unit.attackCounter;
+			this.attack = unit.attackPoint;
+			this.health = unit.healthPoint;
+
 			attackText.text = attack.ToString();
-			healthText.text = health.ToString();
+			//TODO
+			//healthText.text = health.ToString();
 		}
+
+		counterIcon.enabled = category != "Construction";
 		counterText.text = category == "Construction" ? "" : counter.ToString();
-		descriptionText.text = description;
 	}
 
-
-	//TODO
 	private void LoadCardResources(string ID)
 	{
 		cardImage.sprite = Resources.Load<Sprite>("CardImage/" + ID);
@@ -144,11 +121,4 @@ public class CardInspect : MonoBehaviour
 		nameTag.color = color;
 		costTag.color = color;
 	}
-
-
-
-	public void Start()
-    {
-		deckID = -1;
-    }
 }

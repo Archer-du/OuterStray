@@ -226,6 +226,9 @@ public class GameManager : MonoBehaviour, IGameManagement,
 
 
 
+
+
+
 	//Tutorial
 	public void StartGame()
 	{

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -6,11 +7,20 @@ using UnityEngine.UI;
 
 public class PackController : MonoBehaviour
 {
-	public Button AddButton;
+	public PanelController panel;
+
+	public CardInspector inspector;
+
+	public Button detailInfoButton;
+
+	public Button SelectButton;
+
 	public TMP_Text text;
 
-	public CardInspect inspector;
-
+	public int gasMineCost
+	{
+		get => inspector.gasMineCost;
+	}
 	private int Num;
 	public int num
 	{
@@ -20,13 +30,24 @@ public class PackController : MonoBehaviour
 			Num = value;
 			if(Num >= 3)
 			{
-				AddButton.interactable = false;
+				SelectButton.interactable = false;
 			}
 		}
 	}
-	public void Start()
+
+	public void Init()
 	{
 		num = 0;
-		AddButton.onClick.AddListener(() => num++);
+		SelectButton.onClick.AddListener(() => num++);
+
+		detailInfoButton = inspector.nameTag.gameObject.AddComponent<Button>();
+	}
+
+	public void RenderInspector(string ID)
+	{
+		inspector.RenderInspector(ID);
+	}
+	public void DisplayGasMineCost()
+	{
 	}
 }

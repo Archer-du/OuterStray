@@ -222,8 +222,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManager: {fileID: 0}
-  UIPrototype: {fileID: 8904729411466628887, guid: 040921f1810312745b271c2ed82650f9, type: 3}
-  UI: {fileID: 771613501}
   InputMask: {fileID: 242767693}
   arrowPrototype: {fileID: 5970103261286443056, guid: 0dd044ab28f4be6479c38df0d6799e76, type: 3}
   terrainPrototype: {fileID: 8752344673338651891, guid: e32836607ab5d0d4fa13ebd9c9a75c51, type: 3}

@@ -572,12 +572,16 @@ namespace LogicCore
 		/// <returns></returns>
 		public void Exit()
 		{
-			BattleFailed();
+			Surrender();
 		}
 
 
 
-
+		public void Surrender()
+		{
+			controller.Surrender();
+			UnloadBattleField();
+		}
 		public void BattleFailed()
 		{
 			controller.BattleFailed();

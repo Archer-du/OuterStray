@@ -6,22 +6,23 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+[Obsolete]
 public class TacticalPanelDisplay : MonoBehaviour
 {
 	public TacticalSceneManager sceneManager;
 
 
 	public GameObject OutPostPanel;
-	public CardInspect[] OutPostInspectors;
+	public CardInspector[] OutPostInspectors;
 	public List<int> gasMineCosts;
 	public List<TMP_Text> gasMineCostTexts;
 	public Button[] OutPostButtons;
 	public GameObject PromotePanel;
-	public CardInspect PromoteInspector;
+	public CardInspector PromoteInspector;
 	public Button onceButton;
 	public Button fullfillButton;
 	public GameObject SupplyPanel;
-	public CardInspect[] SupplyInspectors;
+	public CardInspector[] SupplyInspectors;
 	public Button[] SupplyButtons;
 
 	public GameObject Panel;
@@ -95,16 +96,16 @@ public class TacticalPanelDisplay : MonoBehaviour
 		});
 	}
 	//TODO
-	public bool AddNewTag(Vector3 position, DeckTagController deckTag)
+	public bool AddNewTag(Vector3 position, int ID, int dynHealth, int durability)
 	{
-		if((category != "Promote" && category != "OutPost") || !sceneManager.panelEnabled)
+		if ((category != "Promote" && category != "OutPost") || !sceneManager.panelEnabled)
 		{
 			return false;
 		}
 		if ((position.y > 350 && position.y < 1250) && (position.x > 1900 && position.x < 2600))
 		{
 			PromoteInspector.gameObject.SetActive(true);
-			PromoteInspector.CopyInfo(deckTag);
+
 		}
 		return false;
 	}

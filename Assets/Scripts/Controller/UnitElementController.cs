@@ -75,7 +75,7 @@ public class UnitElementController : BattleElementController,
 	public AudioClip healClip;
 
 	[Header("Components")]
-	public CardInspect inspector;
+	public CardInspector inspector;
 	/// <summary>
 	/// 从牌堆加入手牌或战场时初始化
 	/// </summary>
@@ -93,7 +93,7 @@ public class UnitElementController : BattleElementController,
 		arrowsGroup.alpha = 0;
 		InspectPanel.alpha = 0f;
 
-		inspector.CopyInfo(this);
+		inspector.RenderInspector(this.ID);
 
 		inspectPanel = GetComponent<InspectPanelController>();
 		OnElementStateChanged += inspectPanel.OnElementStateChanged;

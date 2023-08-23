@@ -8,19 +8,16 @@ public class MedicalNodeController : NodeController
 	public override void Init()
 	{
 		base.Init();
+
+		panel.BuildPanel(PanelType.Medical);
+		panel.MainConfirm += MedicalHeal;
+		panel.SubConfirm += MedicalHeal;
+		castButton.onClick.AddListener(panel.OpenPanel);
+
 		LoadResource();
-		panelDisplay.Init("Promote");
 
-		exitButton = panelDisplay.exitButton;
-
-		exitButton.onClick.AddListener(() =>
-		{
-			panelDisplay.PromoteInspector.deckID = -1;
-			tacticalManager.CampaignCompleted();
-		});
-
-		panelDisplay.onceButton.onClick.AddListener(() => MedicalHeal(false, panelDisplay.PromoteInspector.deckID));
-		panelDisplay.fullfillButton.onClick.AddListener(() => MedicalHeal(true, panelDisplay.PromoteInspector.deckID));
+		exitButton = panel.ExitButton;
+		exitButton.onClick.AddListener(tacticalManager.CampaignCompleted);
 	}
 	public override void LoadResource()
 	{
@@ -31,33 +28,38 @@ public class MedicalNodeController : NodeController
 	{
 		base.CastEvent();
 	}
-	public void MedicalHeal(bool fullfill, int deckID)
+	public void MedicalHeal(int deckID)
 	{
 		if (deckID == -1) return;
-		if (tacticalManager.playerDeck.tags[deckID].maxHealth == tacticalManager.playerDeck.tags[deckID].health) return;
-		if(fullfill)
+		if (tacticalManager.playerDeck.tags[deckID].inspector.maxHealth == tacticalManager.playerDeck.tags[deckID].inspector.health) return;
+		if(pricePerHealth > tacticalManager.gasMineToken)
 		{
-			if (pricePerHealth * (tacticalManager.playerDeck.tags[deckID].maxHealth - tacticalManager.playerDeck.tags[deckID].health) > tacticalManager.gasMineToken)
-			{
-				return;
-			}
-			tacticalManager.MedicalNodeHeal(fullfill, deckID);
+			return;
 		}
-		else
-		{
-			if(pricePerHealth > tacticalManager.gasMineToken)
-			{
-				return;
-			}
-			tacticalManager.MedicalNodeHeal(fullfill, deckID);
-		}
-
+		tacticalManager.MedicalNodeHeal(false, deckID);
 	}
+	public void MedicalHealFullFill(int deckID)
+	{
+		if (deckID == -1) return;
+		if (tacticalManager.playerDeck.tags[deckID].inspector.maxHealth == tacticalManager.playerDeck.tags[deckID].inspector.health) return;
+		if (pricePerHealth * (tacticalManager.playerDeck.tags[deckID].inspector.maxHealth - tacticalManager.playerDeck.tags[deckID].inspector.health) > tacticalManager.gasMineToken)
+		{
+			return;
+		}
+		tacticalManager.MedicalNodeHeal(true, deckID);
+	}
+
+
+
+
+
 	public override void UpdateHealth(int health)
 	{
-		panelDisplay.PromoteInspector.healthText.text = health.ToString();
+		panel.selection.healthText.text = health.ToString();
 	}
-	public override void UpdateBasicInfo(int legacy, int medicalPrice)
+
+
+	public override void SetBasicInfo(int legacy, int medicalPrice)
 	{
 		this.pricePerHealth = medicalPrice;
 	}
