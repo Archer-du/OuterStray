@@ -484,7 +484,15 @@ public class BattleSceneManager : MonoBehaviour,
 	public void BattleWinned()
 	{
 		StopAllCoroutines();
-		SettleText.text = "Victory";
+
+		if (gameManager.config.tutorial)
+		{
+			gameManager.config.tutorial = false;
+			string modifiedConfig = JsonUtility.ToJson(gameManager.config, true);
+			//TODO
+		}
+
+		SettleText.text = gameManager.config.tutorial ? "Failure" : "Victory";
 		SettleText.gameObject.SetActive(true);
 		float duration = 0.4f;
 		rotateSequence.Append(

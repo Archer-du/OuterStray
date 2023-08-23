@@ -92,6 +92,11 @@ namespace DataCore.CultivateItems
 					line = reader.ReadLine();
 					continue;
 				}
+				if (data[0].Contains("tutorial"))
+				{
+					line = reader.ReadLine();
+					continue;
+				}
 
 				DeserializeMethods.CardDeserialize(out Card card, data);
 

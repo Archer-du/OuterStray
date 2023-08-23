@@ -8,6 +8,8 @@ using UnityEngine.UI;
 
 public class PackController : MonoBehaviour
 {
+	public static event Action<int> CloseOtherExplanation;
+
 	public PanelController panel;
 
 	public CardInspector inspector;
@@ -21,6 +23,7 @@ public class PackController : MonoBehaviour
 	public Button SelectButton;
 	public TMP_Text text;
 
+	public int index;
 
 	[Header("External")]
 	public Button detailInfoButton;
@@ -46,18 +49,31 @@ public class PackController : MonoBehaviour
 	}
 
 	public float duration;
-	public void Init()
+	public void Init(PanelController controller)
 	{
+		panel = controller;
+
 		num = 0;
 		SelectButton.onClick.AddListener(() => num++);
 
 
 		explainButton = inspector.nameTag.gameObject.AddComponent<Button>();
-		explainButton.onClick.AddListener(() => explainCanvas.DOFade(explainCanvas.alpha == 0 ? 1 : 0, duration));
+		explainButton.onClick.AddListener(ExplainButtonClick);
 
 		detailInfoButton = inspector.cardImage.gameObject.AddComponent<Button>();
 	}
 
+	public void ExplainButtonClick()
+	{
+		explainCanvas.DOFade(explainCanvas.alpha == 0 ? 1 : 0, duration);
+		foreach(PackController pack in panel.packs)
+		{
+			if(pack != this)
+			{
+				pack.explainCanvas.DOFade(0, duration);
+			}
+		}
+	}
 	public void RenderInspector(string ID)
 	{
 		inspector.RenderInspector(ID);

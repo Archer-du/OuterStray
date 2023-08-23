@@ -138,7 +138,7 @@ public class PanelController : MonoBehaviour,
 		{
 			GameObject pack = Instantiate(packPrototype, GridGroup);
 			PackController controller = pack.GetComponent<PackController>();
-			controller.Init();
+			controller.Init(this);
 			packs.Add(controller);
 
 			controller.RenderInspector(IDs[i]);
@@ -306,6 +306,7 @@ public class PanelController : MonoBehaviour,
 		{
 			attackText.text = card.attackText.text;
 			healthText.text = card.healthText.text;
+			detailedImage.rectTransform.sizeDelta = new Vector2(18, 19);
 		}
 		else
 		{

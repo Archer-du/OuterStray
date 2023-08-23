@@ -89,7 +89,7 @@ public class UnitElementController : BattleElementController,
 
 		healthText.text = maxHealthPoint.ToString();
 
-        localCounterPosition = attackIcon.transform.localPosition;
+        localCounterPosition = attackCounterText.transform.localPosition;
 
         this.input = input;
 		Arrows.transform.localScale = new Vector3(1, (1 - ownership * 2) * 1, 1);
@@ -145,11 +145,11 @@ public class UnitElementController : BattleElementController,
 
 		if(attackCounter == 1)
 		{
-			loopTween = attackIcon.transform.DOShakePosition(1).SetLoops(-1);
+			loopTween = attackCounterText.transform.DOShakePosition(1, 0.4f).SetLoops(-1);
 		}
-		if (attackCounter == 0)
+		else
 		{
-			attackIcon.transform.localPosition = localCounterPosition;
+			attackCounterText.transform.localPosition = localCounterPosition;
 			loopTween.Kill();
 		}
 		costText.text = cost.ToString();
