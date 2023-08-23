@@ -29,7 +29,7 @@ namespace DataCore.Cards
 
 		internal string effects;
 
-		internal int gasMineCost;
+		public int gasMineCost;
 
 		protected Card(string __id, string __name, string __description, int __cost, int ownership, int department, int pack, string effects)
 		{

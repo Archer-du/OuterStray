@@ -1,6 +1,7 @@
 using DataCore.BattleElements;
 using DG.Tweening;
 using DisplayInterface;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -25,8 +26,8 @@ public class NodeController : MonoBehaviour,
 	public int disabledInd;
 
 	public string description;
-	public List<NodeController> adjNodes;
 
+	public List<NodeController> adjNodes;
 
 	[Header("Event")]
 	public Button castButton;
@@ -43,7 +44,8 @@ public class NodeController : MonoBehaviour,
 	public Vector3 originScale;
 
 	[Header("Components")]
-	public TacticalPanelDisplay panelDisplay;
+	public PanelController panel;
+
 
 
 	public virtual void CastEvent()
@@ -62,11 +64,11 @@ public class NodeController : MonoBehaviour,
 		adjNodes = new List<NodeController>();
 		lines = new List<Image>();
 
-		castButton = GetComponent<Button>();
-		panelDisplay = GetComponent<TacticalPanelDisplay>();
 
+		castButton = GetComponent<Button>();
 		Icon = transform.Find("Image/Icon").GetComponent<Image>();
-		descriptionText = transform.Find("InspectPanel/Inspector/DescriptionText").GetComponent<TMP_Text>();
+		descriptionText = transform.Find("NameBar/Mask/Name").GetComponent<TMP_Text>();
+		panel = transform.Find("Panel").GetComponent<PanelController>();
 
 		castButton.onClick.AddListener(CastEvent);
 
@@ -76,6 +78,7 @@ public class NodeController : MonoBehaviour,
 
 
 	public virtual void LoadResource() { }
+
 	public void SetAdjacentNode(List<INodeController> adjList)
 	{
 		foreach (INodeController node in adjList)
@@ -101,7 +104,8 @@ public class NodeController : MonoBehaviour,
 	}
 
 
-	public virtual void DisplayElement(List<string> IDs, List<string> names, List<string> category, List<int> costs, List<int> attacks, List<int> healths, List<int> counters, List<int> gasMineCosts, List<string> descriptions) { }
-	public virtual void UpdateBasicInfo(int legacy, int medicalPrice) { }
+
+	public virtual void DisplayPacks(List<string> IDs) { }
+	public virtual void SetBasicInfo(int legacy, int medicalPrice) { }
 	public virtual void UpdateHealth(int health) { }
 }

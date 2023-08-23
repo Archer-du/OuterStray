@@ -275,11 +275,19 @@ namespace LogicCore
 			//初始化手牌
 			for(int i = 0; i < initialHumanHandicaps + (initialTurn == 0 ? 1 : 0); i++)
 			{
-				list[0].Add(stacks[0].RandomPop());
+				BattleElement element = stacks[0].RandomPop();
+				if (element != null)
+				{
+					list[0].Add(element);
+				}
 			}
 			for (int i = 0; i < initialPlantHandicaps + (initialTurn == 1 ? 1 : 0); i++)
 			{
-				list[1].Add(stacks[1].RandomPop());
+				BattleElement element = stacks[1].RandomPop();
+				if (element != null)
+				{
+					list[1].Add(element);
+				}
 			}
 			handicaps[0].Fill(list[0], initialTurn);
 			handicaps[1].Fill(list[1], initialTurn);
@@ -568,12 +576,16 @@ namespace LogicCore
 		/// <returns></returns>
 		public void Exit()
 		{
-			BattleFailed();
+			Surrender();
 		}
 
 
 
-
+		public void Surrender()
+		{
+			controller.Surrender();
+			UnloadBattleField();
+		}
 		public void BattleFailed()
 		{
 			controller.BattleFailed();

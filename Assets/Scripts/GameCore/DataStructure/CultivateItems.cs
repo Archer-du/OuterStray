@@ -155,10 +155,12 @@ namespace DataCore.CultivateItems
 			return num;
 		}
 
-		internal Card GetCardByID(string ID)
+		public Card GetCardByID(string ID)
 		{
 			return IDhashPool[ID] as Card;
 		}
+
+
 
 		internal StreamReader OpenText(string path)
 		{
@@ -169,6 +171,8 @@ namespace DataCore.CultivateItems
 			return resourceLoader.ReadAllText(path);
 		}
 	}
+
+
 
 
 

@@ -1,4 +1,5 @@
 //Author@Archer
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -13,22 +14,7 @@ namespace DisplayInterface
 	{
 
 	}
-	//public interface IPoolDisplay
-	//{
 
-	//}
-	//public interface IBuildingDisplay
-	//{
-
-	//}
-	//public interface ICardDisplay
-	//{
-	//	//public void TextDisplay(string __name, CardCategories __categories, int __attackPoint, int __cost, int __maxHealthPoint);
-	//}
-	//public interface ICommodityDisplay
-	//{
-
-	//}
 	public interface IResourceLoader
 	{
 		public StreamReader OpenText(string path);
@@ -46,6 +32,9 @@ namespace DisplayInterface
 		public void UpdateBasicInfo(int gasMine, int cardNum);
 		public void UpdateBaseInfo(List<string> IDs, List<string> names, List<string> categories, List<int> healths, List<string> description);
 	}
+
+
+
 
 
 
@@ -75,15 +64,13 @@ namespace DisplayInterface
 
 		public void UnloadDeckTags();
 
-		public void InstantiateDeckTag(string ID, string name, string category, int index, string description, string method);
-
-		public void UpdateUnitTagInfo(string category, int index, int cost, int attack, int health, int maxHealth, int counter);
-
-		public void UpdateCommandTagInfo(int index, int cost, int durability);
-
-		public void UpdateHealth(int index, int health);
-
+		public void InstantiateDeckTag(int index, string ID, int dynInfo, string method);
 		public void UpdateHierachy();
+
+		[Obsolete]
+
+		public void UpdateHealthDisplay(int index, int health);
+
 	}
 	public interface ITerrainController
 	{
@@ -97,10 +84,12 @@ namespace DisplayInterface
 		public void Init();
 		public void SetAdjacentNode(List<INodeController> adjList);
 		public void CastEvent();
-		public void DisplayElement(List<string> IDs, List<string> names, List<string> category, List<int> costs, List<int> attacks, List<int> healths, List<int> counters, List<int> gasMineCosts, List<string> descriptions);
-		public void UpdateBasicInfo(int legacy, int medicalPrice) { }
+		public void DisplayPacks(List<string> IDs);
+		public void SetBasicInfo(int legacy, int medicalPrice) { }
 		public void UpdateHealth(int health) { }
 	}
+
+
 
 
 
@@ -138,7 +127,7 @@ namespace DisplayInterface
 
 		public IUnitElementController InstantiateUnitInStack(int turn);
 
-
+		public void Surrender();
 		public void BattleFailed();
 		public void BattleWinned();
 
@@ -163,8 +152,6 @@ namespace DisplayInterface
 		public IUnitElementController InstantiateUnitElementInBattle();
 		public ICommandElementController InstantiateCommandElementInBattle();
 	}
-
-
 
 	public interface IHandicapController
 	{

@@ -77,9 +77,9 @@ namespace DataCore.TacticalItems
 			throw new NotImplementedException();
 		}
 
-		public void AddDeckTagFromPool(int index)
+		public void AddDeckTagFromPool(string ID)
 		{
-			Card card = battleSystem.pool.humanCardPool[index];
+			Card card = battleSystem.pool.GetCardByID(ID);
 
 			if (card is UnitCard)
 			{
@@ -110,7 +110,6 @@ namespace DataCore.TacticalItems
 			deck.Sort();
 			UpdateDeckID();
 			UpdateBattleID();
-			InstantiateDeckTags();
 			cultivationSystem.UpdateBasicInfo();
 		}
 		internal void AddTag(BattleElement element)
@@ -270,13 +269,19 @@ namespace DataCore.TacticalItems
 		internal void WriteBack(BattleElement reward)
 		{
 			RandomCardStack playerStack = battleSystem.stacks[0];
+			RedemptionZone playerHandicap = battleSystem.handicaps[0];
 
 			deck.Clear();
 
 			deck.Add(reward);
+
 			for(int i = 0; i < playerStack.count; i++)
 			{
 				deck.Add(playerStack.stack[i]);
+			}
+			for(int i = 0; i < playerHandicap.count; i++)
+			{
+				deck.Add(playerHandicap[i]);
 			}
 			for(int i = 0; i < battleSystem.linesCapacity; i++)
 			{
@@ -307,39 +312,31 @@ namespace DataCore.TacticalItems
 		internal void InstantiateDeckTags()
 		{
 			controller.UnloadDeckTags();
+
 			foreach(BattleElement element in deck)
 			{
-				controller.InstantiateDeckTag(element.backendID, element.name, element.category, element.deckID, element.description, "immediate");
 				if(element.category == "Command")
 				{
 					CommandElement comm = element as CommandElement;
-					controller.UpdateCommandTagInfo(comm.deckID, comm.cost, comm.dynDurability);
+					controller.InstantiateDeckTag(0, element.backendID, comm.dynDurability, "immediate");
 				}
 				else
 				{
 					UnitElement unit = element as UnitElement;
-					//TODO check
-					controller.UpdateUnitTagInfo(unit.category, unit.deckID, unit.cost, unit.dynAttackWriter, unit.dynHealth, unit.oriHealth, unit.oriAttackCounter);
+					controller.InstantiateDeckTag(0, element.backendID, unit.dynHealth, "immediate");
 				}
 			}
 			controller.UpdateHierachy();
 		}
-		public void UnitHealed(int deckID)
+
+		/// <summary>
+		/// display
+		/// </summary>
+		/// <param name="deckID"></param>
+		public void UpdateHealthDisplay(int deckID)
 		{
 			UnitElement unit = deck[deckID] as UnitElement;
-			controller.UpdateHealth(deckID, unit.dynHealth);
-		}
-
-		public void UpdateManual()
-		{
-			//foreach(BattleElement element in deck)
-			//{
-			//	if(element is UnitElement)
-			//	{
-			//		UnitElement unit = element as UnitElement;
-			//		controller.UpdateUnitTagInfo(unit.deckID, unit.cost, )
-			//	}
-			//}
+			controller.UpdateHealthDisplay(deckID, unit.dynHealth);
 		}
 	}
 
@@ -913,14 +910,6 @@ namespace DataCore.TacticalItems
 		internal void BuildCommercials()
 		{
 			List<string> IDs = new List<string>();
-			List<string> names = new List<string>();
-			List<string> categories = new List<string>();
-			List<int> costs = new List<int>();
-			List<int> attacks = new List<int>();
-			List<int> healths = new List<int>();
-			List<int> counters = new List<int>();
-			List<int> gasMineCosts = new List<int>();
-			List<string> descriptions = new List<string>();
 
 			Random random = new Random();
 			//TODO config
@@ -934,11 +923,6 @@ namespace DataCore.TacticalItems
 				Card card = tacticalSystem.pool.humanCardPool[index];
 
 				IDs.Add(card.backendID);
-				names.Add(card.name);
-				categories.Add(card.category);
-				costs.Add(card.cost);
-				gasMineCosts.Add(card.gasMineCost);
-				descriptions.Add(card.description);
 
 				string category = tacticalSystem.pool.humanCardPool[index].category;
 				switch (category)
@@ -947,55 +931,36 @@ namespace DataCore.TacticalItems
 						LightArmorElement lightArmor = new(tacticalSystem.pool.humanCardPool[index] as UnitCard,
 							tacticalSystem.battleSystem, null);
 						commercials.Add(lightArmor);
-						attacks.Add(lightArmor.oriAttack);
-						healths.Add(lightArmor.oriHealth);
-						counters.Add(lightArmor.oriAttackCounter);
 						break;
 					case "Motorized":
 						MotorizedElement motorized = new(tacticalSystem.pool.humanCardPool[index] as UnitCard,
 							tacticalSystem.battleSystem, null);
 						commercials.Add(motorized);
-						attacks.Add(motorized.oriAttack);
-						healths.Add(motorized.oriHealth);
-						counters.Add(motorized.oriAttackCounter);
 						break;
 					case "Artillery":
 						ArtilleryElement artillery = new(tacticalSystem.pool.humanCardPool[index] as UnitCard,
 							tacticalSystem.battleSystem, null);
 						commercials.Add(artillery);
-						attacks.Add(artillery.oriAttack);
-						healths.Add(artillery.oriHealth);
-						counters.Add(artillery.oriAttackCounter);
 						break;
 					case "Guardian":
 						GuardianElement guardian = new(tacticalSystem.pool.humanCardPool[index] as UnitCard,
 							tacticalSystem.battleSystem, null);
 						commercials.Add(guardian);
-						attacks.Add(guardian.oriAttack);
-						healths.Add(guardian.oriHealth);
-						counters.Add(guardian.oriAttackCounter);
 						break;
 					case "Construction":
 						ConstructionElement construction = new(tacticalSystem.pool.humanCardPool[index] as UnitCard,
 							tacticalSystem.battleSystem, null);
 						commercials.Add(construction);
-						attacks.Add(construction.oriAttack);
-						healths.Add(construction.oriHealth);
-						counters.Add(construction.oriAttackCounter);
 						break;
 					case "Command":
 						CommandElement command = new(tacticalSystem.pool.humanCardPool[index] as CommandCard,
 							tacticalSystem.battleSystem);
 						commercials.Add(command);
-						//防止错位
-						attacks.Add(0);
-						healths.Add(0);
-						counters.Add(command.oriDurability);
 						break;
 				}
 			}
 
-			controller.DisplayElement(IDs, names, categories, costs, attacks, healths, counters, gasMineCosts, descriptions);
+			controller.DisplayPacks(IDs);
 		}
 		internal BattleElement Purchase(int index)
 		{
@@ -1012,7 +977,7 @@ namespace DataCore.TacticalItems
 			Random random = new Random();
 			//TODO
 			legacy = random.Next(5, 10);
-			controller.UpdateBasicInfo(legacy, 0);
+			controller.SetBasicInfo(legacy, 0);
 		}
 		internal override void CastNodeEvent()
 		{
@@ -1029,7 +994,7 @@ namespace DataCore.TacticalItems
 		{
 			//TODO config
 			pricePerHealth = 4;
-			controller.UpdateBasicInfo(0, pricePerHealth);
+			controller.SetBasicInfo(0, pricePerHealth);
 		}
 		internal void HealElement(bool fullfill, UnitElement unit)
 		{
@@ -1038,14 +1003,14 @@ namespace DataCore.TacticalItems
 			{
 				tacticalSystem.gasMineToken -= gasMineCost;
 				unit.dynHealth = unit.maxHealthWriter;
-				tacticalSystem.playerDeck.UnitHealed(unit.deckID);
+				tacticalSystem.playerDeck.UpdateHealthDisplay(unit.deckID);
 				controller.UpdateHealth(unit.dynHealth);
 			}
 			else
 			{
 				tacticalSystem.gasMineToken -= pricePerHealth;
 				unit.dynHealth += 1;
-				tacticalSystem.playerDeck.UnitHealed(unit.deckID);
+				tacticalSystem.playerDeck.UpdateHealthDisplay(unit.deckID);
 				controller.UpdateHealth(unit.dynHealth);
 			}
 		}
@@ -1070,14 +1035,6 @@ namespace DataCore.TacticalItems
 		internal void BuildSupply()
 		{
 			List<string> IDs = new List<string>();
-			List<string> names = new List<string>();
-			List<string> categories = new List<string>();
-			List<int> costs = new List<int>();
-			List<int> attacks = new List<int>();
-			List<int> healths = new List<int>();
-			List<int> counters = new List<int>();
-			List<int> gasMineCosts = new List<int>();
-			List<string> descriptions = new List<string>();
 
 			Random random = new Random();
 			int categoryEnum = random.Next(0, 6);
@@ -1134,28 +1091,9 @@ namespace DataCore.TacticalItems
 				BattleElement element = supply[i];
 
 				IDs.Add(element.backendID);
-				names.Add(element.name);
-				categories.Add(element.category);
-				costs.Add(element.cost);
-				gasMineCosts.Add(element.gasMineCost);
-				descriptions.Add(element.description);
-				if(element is UnitElement)
-				{
-					UnitElement unit = element as UnitElement;
-					attacks.Add(unit.oriAttack);
-					healths.Add(unit.oriHealth);
-					counters.Add(unit.oriAttackCounter);
-				}
-				else
-				{
-					CommandElement comm = element as CommandElement;
-					attacks.Add(0);
-					healths.Add(0);
-					counters.Add(comm.oriDurability);
-				}
 			}
 
-			controller.DisplayElement(IDs, names, categories, costs, attacks, healths, counters, gasMineCosts, descriptions);
+			controller.DisplayPacks(IDs);
 		}
 		internal BattleElement Choose(int index)
 		{

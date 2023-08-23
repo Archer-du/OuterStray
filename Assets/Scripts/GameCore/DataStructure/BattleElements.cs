@@ -718,7 +718,7 @@ namespace DataCore.BattleElements
 
 			eventTable.RaiseEvent("AfterDeploy", this, battleSystem);
 			battleSystem.eventTable[ownership].RaiseEvent("UnitDeployed", this, battleSystem);
-			if (dstLine.index == battleSystem.frontLines[ownership])
+			if (dstLine.index == battleSystem.frontLines[0] || dstLine.index == battleSystem.frontLines[1])
 			{
 				battleSystem.eventTable[ownership].RaiseEvent("EnterFrontLine", this, battleSystem);
 				eventTable.RaiseEvent("EnterFrontLine", this, battleSystem);
@@ -747,7 +747,7 @@ namespace DataCore.BattleElements
 
 
 			eventTable.RaiseEvent("AfterMove", this, battleSystem);
-			if (dstLine.index == battleSystem.frontLines[ownership])
+			if (dstLine.index == battleSystem.frontLines[0] || dstLine.index == battleSystem.frontLines[1])
 			{
 				battleSystem.eventTable[ownership].RaiseEvent("EnterFrontLine", this, battleSystem);
 				eventTable.RaiseEvent("EnterFrontLine", this, battleSystem);
@@ -852,6 +852,10 @@ namespace DataCore.BattleElements
 			if (this.dynHealth == this.maxHealthReader)
 			{
 				eventTable.RaiseEvent("Meticulous", this, battleSystem);
+			}
+			if (this == battleSystem.bases[ownership])
+			{
+				battleSystem.eventTable[ownership].RaiseEvent("BaseAttacked", this, battleSystem);
 			}
 
 			this.dynHealth -= this.damage;
@@ -1077,7 +1081,7 @@ namespace DataCore.BattleElements
 
 
 			eventTable.RaiseEvent("AfterMove", this, battleSystem);
-			if (dstLine.index == battleSystem.frontLines[ownership])
+			if (dstLine.index == battleSystem.frontLines[0] || dstLine.index == battleSystem.frontLines[1])
 			{
 				battleSystem.eventTable[ownership].RaiseEvent("EnterFrontLine", this, battleSystem);
 				eventTable.RaiseEvent("EnterFrontLine", this, battleSystem);

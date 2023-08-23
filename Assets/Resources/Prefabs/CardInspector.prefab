@@ -246,7 +246,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.0052012, y: 1.8183212}
+  m_AnchoredPosition: {x: 0.0052012, y: 0.75}
   m_SizeDelta: {x: 18.326, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2560947059741495726
@@ -277,7 +277,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: c3cd4f8f0b00be544ad6265104112eec, type: 3}
+  m_Sprite: {fileID: 21300000, guid: b1da5849eff506b49b0cb914dbcf535b, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -527,7 +527,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 538314988615966204}
   m_Father: {fileID: 8107065775523644728}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -558,7 +559,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -640,7 +641,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 1235793471, guid: a48d1e44cd2151742b375843765558b6, type: 3}
+  m_Sprite: {fileID: 1276010982, guid: 95eec1bb444b9ae4bb1276e88f13b50a, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -968,7 +969,6 @@ RectTransform:
   m_Children:
   - {fileID: 633392758765427613}
   - {fileID: 9161615295426165082}
-  - {fileID: 5572338325025610981}
   - {fileID: 7852610723593651388}
   - {fileID: 2761897799720719715}
   - {fileID: 6013667979854009931}
@@ -976,19 +976,19 @@ RectTransform:
   - {fileID: 4219550485236034041}
   - {fileID: 4635966443445594830}
   - {fileID: 6507535579296023759}
-  - {fileID: 538314988615966204}
   - {fileID: 3646357249762808558}
   - {fileID: 5486476392387336883}
   - {fileID: 2026286310461762337}
   - {fileID: 7716969158347361592}
   - {fileID: 7210605920013217146}
+  - {fileID: 5572338325025610981}
   m_Father: {fileID: 0}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_SizeDelta: {x: 25.6016, y: 34.5009}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &-7917182421558431459
 MonoBehaviour:
@@ -1002,25 +1002,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 084c64761b1f53a4ba33682f4851d0e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deckID: 0
   ID: 
   category: 
   cost: 0
+  nameContent: 
   description: 
-  costTag: {fileID: 5519420684560711146}
-  nameTag: {fileID: 317252702258225113}
-  backGround: {fileID: 9131940407866800689}
-  frame: {fileID: 5059424584137817424}
+  counter: 0
+  attack: 0
+  health: 0
+  maxHealth: 0
   cardImage: {fileID: 6457693006099063089}
   categoryIcon: {fileID: 1754402871127699207}
+  costTag: {fileID: 5519420684560711146}
+  nameTag: {fileID: 317252702258225113}
+  color: {r: 0, g: 0, b: 0, a: 0}
+  backGround: {fileID: 9131940407866800689}
+  frame: {fileID: 5059424584137817424}
+  costText: {fileID: 681677438073482813}
   nameText: {fileID: 6980266231103545695}
   descriptionText: {fileID: 1847070815219468943}
-  costText: {fileID: 681677438073482813}
   counterText: {fileID: 7399607136736801674}
-  attackIcon: {fileID: 1613188530834143709}
-  healthIcon: {fileID: 6963171865064785216}
   attackText: {fileID: 2316427717766137366}
   healthText: {fileID: 458069806043956951}
+  counterIcon: {fileID: 5169676521724994793}
+  attackIcon: {fileID: 1613188530834143709}
+  healthIcon: {fileID: 6963171865064785216}
+  deckID: 0
+  gasMineCost: 0
 --- !u!1 &6446096636886482413
 GameObject:
   m_ObjectHideFlags: 0
@@ -1203,12 +1211,12 @@ RectTransform:
   m_LocalScale: {x: 0.05, y: 0.05, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8107065775523644728}
+  m_Father: {fileID: 5572338325025610981}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.12574852, y: 15.065562}
+  m_AnchoredPosition: {x: -1.9389077, y: 0}
   m_SizeDelta: {x: 335.00015, y: 83.75004}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8552352274950358161

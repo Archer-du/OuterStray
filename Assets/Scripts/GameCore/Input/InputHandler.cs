@@ -99,8 +99,7 @@ namespace InputHandler
 
 	public interface IDeckInput
 	{
-		public void AddDeckTagFromPool(int index);
-		public void UpdateManual();
+		public void AddDeckTagFromPool(string ID);
 	}
 
 
