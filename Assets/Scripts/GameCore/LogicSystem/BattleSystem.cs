@@ -329,7 +329,7 @@ namespace LogicCore
 				element.dynAttackWriter = fieldPreset.cardPreset.attackPreset;
 				element.dynAttackCounter = fieldPreset.cardPreset.attackCounterPreset;
 				//TODO
-				element.Deploy(battleLines[lineIdx], 0);
+				element.InitialDeploy(battleLines[lineIdx], 0);
 
 				UpdateFrontLine();
 				UpdateAttackRange();

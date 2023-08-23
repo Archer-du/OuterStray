@@ -104,14 +104,20 @@ namespace BehaviorTree
 
 
         // 行为树可执行的基本操作
-        protected void BTDeploy(int handicapIdx, int dstIdx = 3, int dstPos = 0)
+        protected void BTDeploy(int handicapIdx, int dstLineIdx = 3, int dstPos = 0)
         {
-            SceneManager.AIDeploy(handicapIdx, dstIdx, dstPos);
+            if (AIHandicap[handicapIdx] is UnitElementController && AIHandicap[handicapIdx].cost <= Energy && BattleLines[dstLineIdx].count < BattleLines[dstLineIdx].capacity)
+            {
+                SceneManager.AIDeploy(handicapIdx, dstLineIdx, dstPos);
+            }
         }
         // TODO
         protected void BTTargetCast(int handicapIdx, int dstLineIdx, int dstPos)
         {
-            SceneManager.AITargetCast(handicapIdx, dstLineIdx, dstPos);
+            if (AIHandicap[handicapIdx] is CommandElementController && AIHandicap[handicapIdx].cost <= Energy && BattleLines[dstLineIdx][dstPos] != null)
+            {
+                SceneManager.AITargetCast(handicapIdx, dstLineIdx, dstPos);
+            }
         }
         protected void BTNoneTargetCast(int handicapIdx)
         {
@@ -377,6 +383,14 @@ namespace BehaviorTree
             return false;
         }
 
+        protected int GetHandicapIdx(string ID)
+        {
+            for(int i = 0; i < AIHandicap.count; i++)
+            {
+                if (AIHandicap[i].ID == ID) { return i; }
+            }
+            return -1;
+        }
 
 		protected int GetMinCostUnitPointerExcConstr()
         {

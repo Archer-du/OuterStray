@@ -664,7 +664,29 @@ namespace DataCore.BattleElements
 
 
 
+		internal void InitialDeploy(BattleLine dstLine, int dstPos)
+		{
+            //部署前解析效果
+            EffectsReParse();
 
+            //加入部署队列
+            battleSystem.deployQueue.Add(this);
+            //加入ID字典
+            if (!battleSystem.UnitIDDic.ContainsKey(this.backendID))
+            {
+                battleSystem.UnitIDDic.Add(this.backendID, new List<UnitElement>());
+            }
+            battleSystem.UnitIDDic[this.backendID].Add(this);
+
+            UpdateHealth();
+            UpdateTarget();
+            controller.DeployAnimationEvent();
+            //战线接收
+            dstLine.Receive(this, dstPos);
+            this.operateCounter = 0;
+
+            UpdateInfo();
+        }
 		/// <summary>
 		/// 
 		/// </summary>

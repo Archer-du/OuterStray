@@ -6,10 +6,10 @@
         4, 4, 4, 4
     ],
     "plantDeckPath": "Config\\DeckConfigs\\TutorialNode.csv",
-    "initialHumanEnergy": 10,
-    "initialPlantEnergy": 10,
+    "initialHumanEnergy": 15,
+    "initialPlantEnergy": 15,
     "initialHumanHandicaps": 1,
-    "initialPlantHandicaps": 3,
+    "initialPlantHandicaps": 1,
     "fieldPreset": [
         {
             "cardPreset" : {
@@ -34,32 +34,22 @@
         {
             "cardPreset" : {
                 "boss": false,
-                "backendID": "human_03",
-                "attack": 1,
-                "health": 1,
-                "attackCounter": 2
+                "backendID": "human_02",
+                "attack": 2,
+                "health": 3,
+                "attackCounter": 1
             },
             "position": 0
         },
         {
             "cardPreset" : {
                 "boss": false,
-                "backendID": "human_02",
-                "attack": 2,
-                "health": 1,
-                "attackCounter": 1
+                "backendID": "human_27",
+                "attack": 4,
+                "health": 15,
+                "attackCounter": 0
             },
             "position": 0
         },
-                {
-            "cardPreset" : {
-                "boss": false,
-                "backendID": "human_03",
-                "attack": 1,
-                "health": 1,
-                "attackCounter": 2
-            },
-            "position": 0
-        }
     ]
 }

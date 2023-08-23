@@ -168,7 +168,10 @@ namespace DataCore.TacticalItems
 			reader.Close();
 
 			//CRITICAL
-			deck.Sort();
+			if (!battleSystem.tutorial)
+			{
+				deck.Sort();
+			}
 			UpdateDeckID();
 
 			for(int i = 0; i < deck.Count; i++)

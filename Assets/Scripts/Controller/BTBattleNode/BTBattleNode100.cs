@@ -31,16 +31,16 @@ public class BTBattleNode100 : BTBattleNode
             case 5:
                 yield return new WaitForSeconds(3f);
                 BTDeploy(0);
-                yield return new WaitForSeconds(3f);
+                yield return new WaitForSeconds(1.5f);
                 BTSkip();
                 break;
             // 第七回合移动菇母和亮顶孢子
             case 7:
                 yield return new WaitForSeconds(3f);
                 BTMove(3, 0, 2, 0);
-                yield return new WaitForSeconds(3f);
+                yield return new WaitForSeconds(1f);
                 BTMove(3, 0, 2, 0);
-                yield return new WaitForSeconds(3f);
+                yield return new WaitForSeconds(1.5f);
                 BTSkip();
                 break;
             // 空过让孢子丛攻击
@@ -59,18 +59,18 @@ public class BTBattleNode100 : BTBattleNode
                 BTDeploy(0);
                 yield return new WaitForSeconds(1f);
                 BTDeploy(0);
-                yield return new WaitForSeconds(3f);
+                yield return new WaitForSeconds(2f);
                 BTSkip();
                 break;
             // 蘑菇上前
             case 15:
                 yield return new WaitForSeconds(3f);
-                BTMove(3, 0, 2, 0);
+                BTMove(3, 2, 2, 0);
                 yield return new WaitForSeconds(1f);
                 BTMove(3, 0, 2, 0);
                 yield return new WaitForSeconds(1f);
                 BTMove(3, 0, 2, 0);
-                yield return new WaitForSeconds(3f);
+                yield return new WaitForSeconds(2f);
                 BTSkip();
                 break;
             case 17:
@@ -82,6 +82,12 @@ public class BTBattleNode100 : BTBattleNode
                 BTSkip();
                 break;
             case 21:
+                yield return new WaitForSeconds(1f);
+                BTTargetCast(GetHandicapIdx("comm_mush_15"), 1, 0);
+                yield return new WaitForSeconds(3f);
+                BTTargetCast(GetHandicapIdx("comm_mush_15"), 1, 0);
+                yield return new WaitForSeconds(1f);
+                BTTargetCast(GetHandicapIdx("comm_mush_15"), 1, 0);
                 yield return new WaitForSeconds(3f);
                 BTSkip();
                 break;

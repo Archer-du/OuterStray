@@ -365,14 +365,20 @@ public class UnitElementController : BattleElementController,
 	/// 攻击动画加入结算队列
 	/// </summary>
 	/// <param name="target"></param>
+	public Vector3 oriPosition
+	{
+		get => battleLineLogicPosition;
+	}
+	public Vector3 dstPosition
+	{
+		get => target.battleLineLogicPosition;
+	}
 	public void AttackAnimationEvent(int resIdx, int count)
 	{
 		if (target == null) return;
 
 		float forwardTime = 0.12f;
         float backlashTime = 0.3f;
-		Vector3 oriPosition = battleLineLogicPosition;
-		Vector3 dstPosition = target.battleLineLogicPosition;
 
 		Debug.Log("line: " + battleLine.index + "res: " + resIdx + nameContent + " attacked " + "line: " + target.battleLine.index + "res: " + target.resIdx + target.nameContent);
 
@@ -408,7 +414,6 @@ public class UnitElementController : BattleElementController,
 		float forwardTime = 0.2f;
 		float backlashTime = 0.2f;
 		UnitElementController controller = target as UnitElementController;
-		Vector3 oriPosition = battleLineLogicPosition;
 
 		Debug.Log("line: " + battleLine.index + "res: " + resIdx + nameContent + " random attacked " + "line: " + controller.battleLine.index + "res: " + controller.resIdx + controller.nameContent);
 
@@ -528,11 +533,17 @@ public class UnitElementController : BattleElementController,
 
 		if(method == "append")
 		{
-			battleSceneManager.rotateSequence.Append(selfCanvas.DOFade(0, fadeTime)
+            battleSceneManager.rotateSequence.InsertCallback(battleSceneManager.sequenceTime,
+				() =>
+				{
+					battleLine.ElementRemove(resIdx);
+					battleLine.UpdateElementPosition();
+				}
+			);
+            battleSceneManager.rotateSequence.Append(selfCanvas.DOFade(0, fadeTime)
 				.OnComplete(
 					() =>
 					{
-						battleLine.ElementRemove(resIdx);
 						battleLine.UpdateElementPosition();
 						gameObject.SetActive(false);
 						input.UpdateManual();
@@ -542,14 +553,12 @@ public class UnitElementController : BattleElementController,
 		}
 		else
 		{
-			selfCanvas.DOFade(0, fadeTime);
-
-            battleLine.ElementRemove(resIdx);
 			battleSceneManager.rotateSequence.InsertCallback(battleSceneManager.sequenceTime,
 				() =>
 				{
+					battleLine.ElementRemove(resIdx);
+					selfCanvas.DOFade(0, fadeTime).OnComplete(() => gameObject.SetActive(false));
 					battleLine.UpdateElementPosition();
-					gameObject.SetActive(false);
 					input.UpdateManual();
 				}
 			);
@@ -557,34 +566,34 @@ public class UnitElementController : BattleElementController,
 	}
 	public void CleaveAttackAnimationEvent(int resIdx, int count)
 	{
-		if (target == null) return;
+		//if (target == null) return;
 
-		float forwardTime = 0.15f;
-		float backlashTime = 0.2f;
-		Vector3 oriPosition = battleLineLogicPosition;
-		Vector3 dstPosition = target.battleLineLogicPosition;
+		//float forwardTime = 0.15f;
+		//float backlashTime = 0.2f;
+		//Vector3 oriPosition = battleLineLogicPosition;
+		//Vector3 dstPosition = target.battleLineLogicPosition;
 
-		Debug.Log("line: " + battleLine.index + "res: " + resIdx + nameContent + " CleaveAttacked ");
+		//Debug.Log("line: " + battleLine.index + "res: " + resIdx + nameContent + " CleaveAttacked ");
 
-		//安全间隔
-		battleSceneManager.rotateSequence.AppendInterval(BattleLineController.updateTime + 0.2f);
-		battleSceneManager.sequenceTime += BattleLineController.updateTime + 0.2f;
-		//TODO time config
-		//层级设置
-		battleSceneManager.rotateSequence.InsertCallback(battleSceneManager.sequenceTime,
-			() =>
-			{
-				canvas.sortingOrder = attackOrder;
-			});
-		//动画设置
-		battleSceneManager.rotateSequence.Append(
-			transform.DOMove(dstPosition, forwardTime).OnComplete(() =>
-			{
-				transform.DOMove(oriPosition, backlashTime).OnComplete(() => battleLine.UpdateElementPosition());
-				input.UpdateManual();
-			})
-		);
-		battleSceneManager.sequenceTime += forwardTime;
+		////安全间隔
+		//battleSceneManager.rotateSequence.AppendInterval(BattleLineController.updateTime + 0.2f);
+		//battleSceneManager.sequenceTime += BattleLineController.updateTime + 0.2f;
+		////TODO time config
+		////层级设置
+		//battleSceneManager.rotateSequence.InsertCallback(battleSceneManager.sequenceTime,
+		//	() =>
+		//	{
+		//		canvas.sortingOrder = attackOrder;
+		//	});
+		////动画设置
+		//battleSceneManager.rotateSequence.Append(
+		//	transform.DOMove(dstPosition, forwardTime).OnComplete(() =>
+		//	{
+		//		transform.DOMove(oriPosition, backlashTime).OnComplete(() => battleLine.UpdateElementPosition());
+		//		input.UpdateManual();
+		//	})
+		//);
+		//battleSceneManager.sequenceTime += forwardTime;
 	}
 	public void RetreatAnimationEvent(string method)
 	{
