@@ -2299,8 +2299,8 @@ MonoBehaviour:
   panelEnabled: 0
   gasMineText: {fileID: 1992509995}
   cardNumText: {fileID: 936259586}
-  baseDashBoard: {fileID: 0}
-  baseComponent: {fileID: 0}
+  baseDashBoard: {fileID: 2410456141618401109}
+  baseComponent: {fileID: 2410456141618401108}
   baseHealthText: {fileID: 1212789906}
   baseMaxHealthText: {fileID: 1905132251}
   baseCardPrototype: {fileID: 5778786378618105013, guid: 6f7a29840cd5fb54980341eb7df8fc72, type: 3}
@@ -3509,6 +3509,28 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c565a10978b4d9646b19c68531def20e, type: 3}
+--- !u!114 &2410456141618401108 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7448949729150075989, guid: c565a10978b4d9646b19c68531def20e, type: 3}
+  m_PrefabInstance: {fileID: 2410456141618401107}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2410456141618401109 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6922515903245823796, guid: c565a10978b4d9646b19c68531def20e, type: 3}
+  m_PrefabInstance: {fileID: 2410456141618401107}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &7442353667554032170
 PrefabInstance:
   m_ObjectHideFlags: 0

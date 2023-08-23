@@ -248,9 +248,20 @@ public class GameManager : MonoBehaviour, IGameManagement,
 		{
 			yield return null;
 		}
-		TutorialDialogAnimation();
-		UpdateGameState(GameState.Tactical);
-	}
+        dialogGround.gameObject.SetActive(true);
+
+		readyText.gameObject.SetActive(false);
+		readyText.DOFade(0, 0);
+        for (int i = 0; i < dialogTexts.Length; i++)
+        {
+            dialogTexts[i].gameObject.SetActive(false);
+			dialogTexts[i].DOFade(0, 0);
+        }
+        AsyncOperation asyncNew = UpdateGameState(GameState.Tactical);
+
+        StartCoroutine(TutorialDialogAnimation(asyncNew));
+
+    }
 	public void BuildTutorial()
 	{
 		dialogGround.gameObject.SetActive(false);
@@ -264,18 +275,17 @@ public class GameManager : MonoBehaviour, IGameManagement,
 
 	public TMP_Text[] dialogTexts;
 	public TMP_Text readyText;
-	public void TutorialDialogAnimation()
+	IEnumerator TutorialDialogAnimation(AsyncOperation async)
 	{
+		yield return async;
+
+		yield return new WaitForSeconds(1);
 
 		float start = 0.5f;
 		float end = 0.5f;
 		float duration = 2f;
 
-		dialogGround.gameObject.SetActive(true);
-        for (int i = 0; i < dialogTexts.Length; i++)
-        {
-			dialogTexts[i].gameObject.SetActive(false);
-        }
+
         dialogGround.enabled = false;
 		dialogGround.onClick.AddListener(BuildTutorial);
 
@@ -286,9 +296,9 @@ public class GameManager : MonoBehaviour, IGameManagement,
 			int temp = i;
 			seq.Append(dialogTexts[temp].DOFade(1, start));
 			seq.AppendInterval(duration);
-			seq.Append(dialogTexts[temp].DOFade(1, end));
+			seq.Append(dialogTexts[temp].DOFade(0, end));
 		}
-
+		readyText.gameObject.SetActive(true);
 		seq.Append(readyText.DOFade(1, start));
 
 		seq.OnComplete(() => dialogGround.enabled = true);

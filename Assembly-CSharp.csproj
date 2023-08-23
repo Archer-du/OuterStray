@@ -67,12 +67,15 @@
     <Compile Include="Assets\Scripts\Controller\BTBattleNode\BTBattleNode3.cs" />
     <Compile Include="Assets\Scripts\Controller\BattleElementController.cs" />
     <Compile Include="Assets\Scripts\Controller\DeckController.cs" />
+    <Compile Include="Assets\Scripts\ToolKit\MainButton.cs" />
+    <Compile Include="Assets\Scripts\ToolKit\ToolKitAdvanced\DialogController.cs" />
     <Compile Include="Assets\Scripts\ToolKit\InspectPanelController.cs" />
     <Compile Include="Assets\Scripts\ToolKit\HandicapInspector.cs" />
     <Compile Include="Assets\Scripts\ToolKit\NodeInspector.cs" />
     <Compile Include="Assets\Scripts\ToolKit\LoaderAudio.cs" />
     <Compile Include="Assets\Scripts\SceneManager\StartSceneManager.cs" />
     <Compile Include="Assets\Scripts\Controller\BattleNodeController.cs" />
+    <Compile Include="Assets\DeckTagInspector.cs" />
     <Compile Include="Assets\Scripts\Controller\NodeController.cs" />
     <Compile Include="Assets\Scripts\SceneManager\CultivateSceneManager.cs" />
     <Compile Include="Assets\Scripts\Controller\LegacyNodeController.cs" />
@@ -80,7 +83,6 @@
     <Compile Include="Assets\Scripts\Controller\BTBattleNode\BTBattleNode1.cs" />
     <Compile Include="Assets\Scripts\Controller\BTBattleNode\BTBattleNode100.cs" />
     <Compile Include="Assets\Scripts\Controller\DepartmentController.cs" />
-    <Compile Include="Assets\Scripts\ToolKit\CardInspect.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\Controller\BehaviorTree.cs" />
     <Compile Include="Assets\Scripts\ToolKit\BaseInfoDisplay.cs" />
@@ -90,9 +92,9 @@
     <Compile Include="Assets\Scripts\SceneManager\BattleSceneManager.cs" />
     <Compile Include="Assets\Scripts\ToolKit\Input\ElementDragInput.cs" />
     <Compile Include="Assets\Scripts\ToolKit\EnergyDisplay.cs" />
-    <Compile Include="Assets\MainButton.cs" />
     <Compile Include="Assets\Scripts\Controller\PromoteNodeController.cs" />
     <Compile Include="Assets\Scripts\Controller\TerrainController.cs" />
+    <Compile Include="Assets\Scripts\ToolKit\CardInspector.cs" />
     <Compile Include="Assets\Scripts\ToolKit\RewardSelection.cs" />
     <Compile Include="Assets\Scripts\Controller\BTBattleNode\BTBattleNode0.cs" />
     <Compile Include="Assets\Scripts\ToolKit\Button\ButtonAudio.cs" />
@@ -101,13 +103,14 @@
     <Compile Include="Assets\Scripts\SceneManager\TacticalSceneManager.cs" />
     <Compile Include="Assets\Scripts\Controller\CardStackController.cs" />
     <Compile Include="Assets\Scripts\ToolKit\TacticalPanelDisplay.cs" />
-    <Compile Include="Assets\PackController.cs" />
     <Compile Include="Assets\Scripts\ToolKit\BaseSelection.cs" />
     <Compile Include="Assets\Scripts\ToolKit\BattleLineDisplay.cs" />
     <Compile Include="Assets\Scripts\Controller\BattleLineController.cs" />
+    <Compile Include="Assets\Scripts\ToolKit\PackController.cs" />
     <Compile Include="Assets\Scripts\Controller\DeckTagController.cs" />
     <Compile Include="Assets\Scripts\Controller\OutPostNodeController.cs" />
     <Compile Include="Assets\Scripts\SceneState.cs" />
+    <Compile Include="Assets\Scripts\ToolKit\ToolKitAdvanced\PanelController.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
