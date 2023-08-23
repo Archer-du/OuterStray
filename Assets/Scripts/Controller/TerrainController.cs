@@ -1,3 +1,4 @@
+using DG.Tweening;
 using DisplayInterface;
 using System.Collections;
 using System.Collections.Generic;
@@ -66,6 +67,9 @@ public class TerrainController : MonoBehaviour,
 		nodes.Add(controller);
 		controller.tacticalManager = tacticalManager;
 		SetPosition(controller, length, width, hrztIdx, vtcIdx);
+
+		Node.gameObject.SetActive(false);
+
 		return controller;
 	}
 	public void SetPosition(NodeController controller, int length, int width, int hrztIdx, int vtcIdx)
@@ -106,7 +110,7 @@ public class TerrainController : MonoBehaviour,
 		foreach(NodeController adj in node.adjNodes)
 		{
 			InstantiateLine(node, adj);
-			GenerateLineNet(adj);
+			//GenerateLineNet(adj);
 		}
 	}
 	/// <summary>
@@ -126,7 +130,8 @@ public class TerrainController : MonoBehaviour,
 	private void InstantiateLine(NodeController resNode, NodeController dstNode)
 	{
 		GameObject line = Instantiate(linePrototype, resNode.transform);
-		resNode.lines.Add(line.GetComponent<Image>());
+		Image image = line.GetComponent<Image>();
+		resNode.lines.Add(image);
 
 		Vector3 vector = dstNode.transform.position - resNode.transform.position;
 		
@@ -136,7 +141,22 @@ public class TerrainController : MonoBehaviour,
 		Vector3 euler = GetDegreeEuler(resNode.transform.position, dstNode.transform.position);
 		line.transform.rotation = Quaternion.Euler(euler);
 
-		line.GetComponent<RectTransform>().sizeDelta = new Vector2(vector.magnitude, 10);
+		float duration = 0.3f;
+		Tweener tweener = DOTween.To(
+			// 获取初始值
+			() => 0,
+			// 设置当前值
+			x => image.rectTransform.sizeDelta = new Vector2(x, image.rectTransform.sizeDelta.y),
+			// 指定最终值
+			vector.magnitude,
+			// 指定持续时间
+			duration
+		).OnComplete(() =>
+		{
+			dstNode.gameObject.SetActive(true);
+			dstNode.selfCanvas.alpha = 0;
+			dstNode.selfCanvas.DOFade(1, duration);
+		});
 	}
 
 

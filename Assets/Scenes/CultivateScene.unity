@@ -1038,7 +1038,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5709721240537470937, guid: b4fb08bf5108b9c418622119d13ef09c, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -1620.0004
+      value: -1619.9998
       objectReference: {fileID: 0}
     - target: {fileID: 7523926529505693730, guid: b4fb08bf5108b9c418622119d13ef09c, type: 3}
       propertyPath: m_AnchorMax.x
@@ -2308,6 +2308,7 @@ MonoBehaviour:
   apron: {fileID: 959816875}
   govern: {fileID: 492469454}
   startExpedition: {fileID: 187824387}
+  gasMineMask: {fileID: 2410456141618401110}
   selections: []
   Panels:
   - {fileID: 489322118}
@@ -3416,6 +3417,30 @@ PrefabInstance:
       propertyPath: m_AnchorMin.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7782738933248924400, guid: c565a10978b4d9646b19c68531def20e, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7782738933248924400, guid: c565a10978b4d9646b19c68531def20e, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7782738933248924400, guid: c565a10978b4d9646b19c68531def20e, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7782738933248924400, guid: c565a10978b4d9646b19c68531def20e, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7782738933248924400, guid: c565a10978b4d9646b19c68531def20e, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7782738933248924400, guid: c565a10978b4d9646b19c68531def20e, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -199.82568
+      objectReference: {fileID: 0}
     - target: {fileID: 8156504591978595446, guid: c565a10978b4d9646b19c68531def20e, type: 3}
       propertyPath: m_Name
       value: ConstantUI
@@ -3531,6 +3556,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!224 &2410456141618401110 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 7782738933248924400, guid: c565a10978b4d9646b19c68531def20e, type: 3}
+  m_PrefabInstance: {fileID: 2410456141618401107}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7442353667554032170
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -109,6 +109,7 @@ public class PanelController : MonoBehaviour,
 				break;
 			case PanelType.Supply:
 				BackGround.sprite = Resources.Load<Sprite>("Ilustrate/back/supply");
+				BackGround.color = Color.white;
 				NPCImage.enabled = false;
 				dialogger.gameObject.SetActive(false);
 				scrollBar.SetActive(false);
@@ -173,8 +174,7 @@ public class PanelController : MonoBehaviour,
 		seq.Append(OperateBar.DOLocalMove(new Vector3(0, -466, 0), moveUpTime));
 		seq.Append(BackGround.DOFade(1f, fadeTime));
 		seq.Append(NPCImage.DOFade(1f, fadeTime));
-		seq.AppendInterval(fadeTime);
-		seq.Append(dialogger.canvas.DOFade(1, 0.2f));
+		seq.Append(dialogger.canvas.DOFade(1, fadeTime));
 		//TODO
 		if(type != PanelType.Supply)
 		{

@@ -62,17 +62,36 @@ public class TacticalSceneManager : MonoBehaviour,
     public Transform terrainsGroup;
     public float terrainLength = 2700f;
 
-    public TMP_Text gasMineText;
-    public TMP_Text cardNumText;
-    public TMP_Text baseHealthText;
-    public TMP_Text baseMaxHealthText;
 
-    public float switchDuration = 1f;
+	public float switchDuration = 1f;
 
-    public Color originOrange;
+	public Color originOrange;
 
-
-
+	public Vector2 gasMineMask
+    {
+        get => gameManager.cultivateSceneManager.gasMineMask.sizeDelta;
+        set => gameManager.cultivateSceneManager.gasMineMask.sizeDelta = value;
+    }
+    public string gasMineText
+    {
+        set => gameManager.cultivateSceneManager.gasMineText.text = value;
+    }
+    public string cardNumText
+    {
+		set => gameManager.cultivateSceneManager.cardNumText.text = value;
+	}
+	public string baseHealthText
+    {
+        set => gameManager.cultivateSceneManager.baseHealthText.text = value;
+    }
+    public Color baseHealthColor
+    {
+        set => gameManager.cultivateSceneManager.baseHealthText.color = value;
+    }
+    public string baseMaxHealthText
+    {
+        set => gameManager.cultivateSceneManager.baseMaxHealthText.text = value;
+    }
 
 	public void OnGameStateChanged(GameState state)
     {
@@ -131,11 +150,6 @@ public class TacticalSceneManager : MonoBehaviour,
 	{
         Init();
 		tacticalSystem = handler;
-
-        gasMineText = gameManager.cultivateSceneManager.gasMineText;
-        cardNumText = gameManager.cultivateSceneManager.cardNumText;
-        baseHealthText = gameManager.cultivateSceneManager.baseHealthText;
-        baseMaxHealthText = gameManager.cultivateSceneManager.baseMaxHealthText;
 	}
 
 
@@ -178,6 +192,8 @@ public class TacticalSceneManager : MonoBehaviour,
 
 
 
+
+
 	/// <summary>
 	/// 生成Terrain控件，返回句柄
 	/// </summary>
@@ -198,6 +214,9 @@ public class TacticalSceneManager : MonoBehaviour,
 	{
         return playerDeck;
 	}
+
+
+
 
 
 
@@ -246,7 +265,16 @@ public class TacticalSceneManager : MonoBehaviour,
         NodeController prevNode = currentNode;
 		currentNode = controller as NodeController;
 
+        if(currentTerrain.index == 0)
+        {
+            currentNode.gameObject.SetActive(true);
+            currentNode.selfCanvas.alpha = 1;
+            currentTerrain.GenerateLineNetFromSource();
+        }
+
         UpdateNodesDisplay(prevNode);
+
+        currentTerrain.GenerateLineNet(currentNode);
 
         foreach(NodeController adjNode in currentNode.adjNodes)
         {
@@ -261,15 +289,29 @@ public class TacticalSceneManager : MonoBehaviour,
     [Obsolete("交由CultivateSceneManager处理")]
 	public void UpdateGasMineToken(int gasMineToken)
 	{
+        float initHeight = this.gasMineToken / 300 * 360;
+        float finalHeight = gasMineToken / 300 * 360;
+        float duration = 0.4f;
+
+		Tweener tweener = DOTween.To(
+			// 获取初始值
+			() => 0,
+			// 设置当前值
+			y => gasMineMask = new Vector2(gasMineMask.x, y),
+			// 指定最终值
+			finalHeight,
+			// 指定持续时间
+			duration
+		);
         this.gasMineToken = gasMineToken;
-        gasMineText.text = gasMineToken.ToString();
+        gasMineText = gasMineToken.ToString();
 	}
 
     [Obsolete("交由CultivateSceneManager处理")]
 	public void UpdateCardNum(int cardNum)
 	{
         this.cardNum = cardNum;
-        cardNumText.text = cardNum.ToString();
+        cardNumText = cardNum.ToString();
 	}
 
     [Obsolete("交由CultivateSceneManager处理")]
@@ -277,9 +319,15 @@ public class TacticalSceneManager : MonoBehaviour,
 	{
         this.baseMaxHealth = baseMaxHealth;
         this.baseHealth = baseHealth;
-        baseHealthText.text = baseHealth.ToString();
-        baseMaxHealthText.text = baseMaxHealth.ToString();
+        baseHealthText = baseHealth.ToString();
+
+        baseHealthColor = new Color(1, (float)baseHealth / baseMaxHealth, (float)baseHealth / baseMaxHealth);
+
+		baseMaxHealthText = baseMaxHealth.ToString();
 	}
+
+
+
 
 
 
@@ -365,7 +413,11 @@ public class TacticalSceneManager : MonoBehaviour,
         //只有当前节点的邻接节点可用
         foreach(NodeController adj in currentNode.adjNodes)
         {
-            adj.castButton.enabled = true;
+            float duration = 0.4f;
+            adj.gameObject.SetActive(true);
+            adj.selfCanvas.alpha = 0;
+            var temp = adj;
+            adj.selfCanvas.DOFade(1f, duration).OnComplete(() => temp.castButton.enabled = true);
         }
 
         if(prevNode == null) { return; }

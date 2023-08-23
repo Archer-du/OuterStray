@@ -574,6 +574,7 @@ namespace DataCore.TacticalItems
 							SupplyNode sn = new SupplyNode(i, j, this,
 								controller.InstantiateNode(length, width[i], i, j, "supply"));
 							nodeList[i].Add(sn);
+							//TODO
 							switch (randSeed)
 							{
 								case 0:
@@ -993,7 +994,7 @@ namespace DataCore.TacticalItems
 			: base(horizontalIdx, verticalIdx, terrain, controller)
 		{
 			//TODO config
-			pricePerHealth = 4;
+			pricePerHealth = 10;
 			controller.SetBasicInfo(0, pricePerHealth);
 		}
 		internal void HealElement(bool fullfill, UnitElement unit)
