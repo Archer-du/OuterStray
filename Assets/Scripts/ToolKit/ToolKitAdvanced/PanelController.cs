@@ -138,7 +138,7 @@ public class PanelController : MonoBehaviour,
 		{
 			GameObject pack = Instantiate(packPrototype, GridGroup);
 			PackController controller = pack.GetComponent<PackController>();
-			controller.Init();
+			controller.Init(this);
 			packs.Add(controller);
 
 			controller.RenderInspector(IDs[i]);
@@ -164,6 +164,7 @@ public class PanelController : MonoBehaviour,
 	public void OpenPanel()
 	{
 		gameObject.SetActive(true);
+		transform.position = new Vector3(300, 0, 0);
 		OperateBar.localPosition = new Vector3(0, -1300f, 0);
 		BackGround.DOFade(0, 0.01f);
 		NPCImage.DOFade(0, 0.01f);
@@ -306,6 +307,7 @@ public class PanelController : MonoBehaviour,
 		{
 			attackText.text = card.attackText.text;
 			healthText.text = card.healthText.text;
+			detailedImage.rectTransform.sizeDelta = new Vector2(18, 19);
 		}
 		else
 		{

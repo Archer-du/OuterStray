@@ -103,7 +103,6 @@ public class CardInspector : MonoBehaviour
 	}
 	public void RenderInspector(string ID, int dynInfo)
 	{
-
 		Pool pool = GameManager.GetInstance().pool;
 		Card card = pool.GetCardByID(ID);
 

@@ -719,6 +719,11 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3969659323522216748, guid: d15a9be81514b914e9d97cc2adba8959, type: 3}
   m_PrefabInstance: {fileID: 245655607}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &245655609 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3279057978892813870, guid: d15a9be81514b914e9d97cc2adba8959, type: 3}
+  m_PrefabInstance: {fileID: 245655607}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &309730572
 GameObject:
   m_ObjectHideFlags: 0
@@ -2034,6 +2039,7 @@ MonoBehaviour:
   sequenceTime: 0
   result: 2
   dialog: {fileID: 1305404728}
+  guide: {fileID: 245655609}
   updatingTurn: 0
   shiftTime: 0
   duration: 0

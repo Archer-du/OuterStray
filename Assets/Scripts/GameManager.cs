@@ -186,11 +186,12 @@ public class GameManager : MonoBehaviour, IGameManagement,
 	public Button start;
 
 	public GlobalConfig config;
+	public string configPath;
 	private void Start()
 	{
 		DontDestroyOnLoad(gameObject);
 
-		string configPath = "Config\\GlobalConfig.json";
+		configPath = "Config\\GlobalConfig.json";
 		TextAsset text = Resources.Load<TextAsset>(configPath);
 		string jsonContent = text.text;
 		config = JsonUtility.FromJson<GlobalConfig>(jsonContent);

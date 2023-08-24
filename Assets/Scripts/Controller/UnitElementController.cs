@@ -89,7 +89,8 @@ public class UnitElementController : BattleElementController,
 
 		healthText.text = maxHealthPoint.ToString();
 
-        localCounterPosition = attackIcon.transform.localPosition;
+        localCounterPosition = new Vector2 (0, -9.3f);
+		attackCounterText.transform.localPosition = localCounterPosition;
 
         this.input = input;
 		Arrows.transform.localScale = new Vector3(1, (1 - ownership * 2) * 1, 1);
@@ -143,14 +144,17 @@ public class UnitElementController : BattleElementController,
 		attackText.text = attackPoint.ToString();
 		attackCounterText.text = attackCounter > 100 ? "" : attackCounter.ToString();
 
-		if(attackCounter == 1)
+		if(attackCounter <= 1 && state == ElementState.inBattleLine)
 		{
-			loopTween = attackIcon.transform.DOShakePosition(1).SetLoops(-1);
+			attackCounterText.DOColor(Color.red, 0.2f);
+			//loopTween = attackCounterText.transform.DOShakePosition(1, 0.2f).SetLoops(-1);
+			attackCounterText.transform.localPosition = localCounterPosition;
 		}
-		if (attackCounter == 0)
+		else
 		{
-			attackIcon.transform.localPosition = localCounterPosition;
+			attackCounterText.DOColor(Color.white, 0.2f);
 			loopTween.Kill();
+			attackCounterText.transform.localPosition = localCounterPosition;
 		}
 		costText.text = cost.ToString();
 		descriptionText.text = description;

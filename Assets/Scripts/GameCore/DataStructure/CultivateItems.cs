@@ -93,6 +93,7 @@ namespace DataCore.CultivateItems
 					continue;
 				}
 
+
 				DeserializeMethods.CardDeserialize(out Card card, data);
 
 				//TODO
@@ -124,7 +125,7 @@ namespace DataCore.CultivateItems
 							humanCommandSet.Add(card);
 							break;
 					}
-					if (!card.backendID.Contains("base"))
+					if (!card.backendID.Contains("base") && !card.backendID.Contains("tutorial"))
 					{
 						humanCardPool.Add(card);
 					}

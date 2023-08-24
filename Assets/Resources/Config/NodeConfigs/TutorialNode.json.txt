@@ -6,8 +6,8 @@
         4, 4, 4, 4
     ],
     "plantDeckPath": "Config\\DeckConfigs\\TutorialNode.csv",
-    "initialHumanEnergy": 15,
-    "initialPlantEnergy": 15,
+    "initialHumanEnergy": 3,
+    "initialPlantEnergy": 3,
     "initialHumanHandicaps": 1,
     "initialPlantHandicaps": 1,
     "fieldPreset": [

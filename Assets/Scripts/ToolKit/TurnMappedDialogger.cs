@@ -168,7 +168,7 @@ public class TurnMappedDialogger : MonoBehaviour
     }
     public void OnDeploy(string cardID)
     {
-        if (cardID == "human_21_01" || cardID == "human_05_01" || cardID == "human_27")
+        if (cardID == "tutorial_21" || cardID == "tutorial_05" || cardID == "tutorial_27")
         {
             StartCoroutine(UpdateGuide());
         }
@@ -182,7 +182,7 @@ public class TurnMappedDialogger : MonoBehaviour
     }
     public void OnMove(string cardID)
     {
-        if (cardID == "human_21_01" || cardID == "human_05_01" || cardID == "human_27")
+        if (cardID == "tutorial_21" || cardID == "tutorial_05" || cardID == "tutorial_27")
         {
             StartCoroutine(UpdateGuide());
         }
