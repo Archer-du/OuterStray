@@ -3,6 +3,7 @@ using LogicCore;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.IO.LowLevel.Unsafe;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -272,34 +273,44 @@ namespace BehaviorTree
             return Tuple.Create(fieldMaxHealth, lineIdx, pos);
         }
 
-        protected int GetMaxCost()
+        /// <summary>
+        /// 获取手牌中费用最高（低于上界）的指令卡
+        /// </summary>
+        /// <param name="Upperbound">费用上界，不取等</param>
+        /// <returns>返回手牌索引</returns>
+        protected int GetMaxCostCommandIndex(int Upperbound = 16)
         {
             int maxCost = 0;
-            int maxPointer = -1;
+            int maxCostCommandIndex = -1;
             for (int i = 0; i < AIHandicap.count; i++)
             {
-                if (AIHandicap[i].cost > maxCost)
+                if (AIHandicap[i].cost > maxCost && AIHandicap[i].cost < Upperbound)
                 {
                     maxCost = AIHandicap[i].cost;
-                    maxPointer = i;
+                    maxCostCommandIndex = i;
                 }
             }
             return maxCost;
         }
 
-        protected int GetMinCost()
+        /// <summary>
+        /// 获取手牌中费用最高（低于上界）的单位卡
+        /// </summary>
+        /// <param name="Upperbound">费用上界，不取等</param>
+        /// <returns>返回手牌索引</returns>
+        protected int GetMaxCostUnitIndex(int Upperbound = 16)
         {
-            int minCost = 100;
-            int minPointer = -1;
+            int maxCost = 0;
+            int maxCostUnitIndex = -1;
             for (int i = 0; i < AIHandicap.count; i++)
             {
-                if (AIHandicap[i].cost < minCost)
+                if (AIHandicap[i].cost > maxCost && AIHandicap[i].cost < Upperbound)
                 {
-                    minCost = AIHandicap[i].cost;
-                    minPointer = i;
+                    maxCost = AIHandicap[i].cost;
+                    maxCostUnitIndex = i;
                 }
             }
-            return minCost;
+            return maxCost;
         }
 
         protected int GetMaxCostUnitPointer()
@@ -400,7 +411,7 @@ namespace BehaviorTree
             return false;
         }
 
-        protected int GetHandicapIdx(string ID)
+        protected int GetHandicapIndexByCardID(string ID)
         {
             for(int i = 0; i < AIHandicap.count; i++)
             {
@@ -553,24 +564,51 @@ namespace BehaviorTree
 			}
 		}
 
-        protected bool TryRetreatSomeUnits(int AISupportLineIdx)
+        /// <summary>
+        /// 撤退某些单位
+        /// </summary>
+        /// <param name="AISupportLineIdx"></param>
+        /// <returns></returns>
+        protected bool TryRetreatUnits(int AISupportLineIdx)
         {
             BattleLineController battleLine = BattleLines[AISupportLineIdx];
-            if (battleLine.count == battleLine.capacity)
+            int highestPriority = -1;
+            int priority;
+            int highestPriorityPos = 0;
+
+            // 遍历该战线，给每张卡赋优先级
+            for (int i = 0; i < battleLine.count; i++)
             {
-                for (int i = 0; i < battleLine.count; i++)
+                if (battleLine[i].ID == "mush_04" || battleLine[i].ID == "mush_10" || battleLine[i].ID == "mush_11" || battleLine[i].ID == "mush_13")
                 {
-                    if (battleLine[i].operateCounter == 1)
-                    {
-                        if (battleLine[i].ID == "mush_04" || battleLine[i].ID == "mush_10" || battleLine[i].ID == "mush_11" || battleLine[i].ID == "mush_13")
-                        {
-                            BTRetreat(AISupportLineIdx, i);
-                            return true;
-                        }
-                    }
+                    priority = 2;
+                }
+                else if (battleLine[i].ID == "mush_04" && frontLineIdx == AISupportLineIdx - 1)
+                {
+                    priority = 5;
+                }
+                else
+                {
+                    priority = -1;
+                }
+
+                // 更新最大优先级以及对应卡
+                if (priority > highestPriority)
+                {
+                    highestPriority = priority;
+                    highestPriorityPos = i;
                 }
             }
-            return false;
+
+            if (highestPriority > 0)
+            {
+                BTRetreat(AISupportLineIdx, highestPriorityPos);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         protected bool TryDeployLowCostUnit(int AISupportLineIdx)

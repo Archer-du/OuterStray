@@ -725,7 +725,7 @@ public class BattleSceneManager : MonoBehaviour,
             }
 
 			// 撤退一些带有部署效果的卡片
-			if (TryRetreatSomeUnits(AISupportLineIdx))
+			if (TryRetreatUnits(AISupportLineIdx))
 			{				
                 yield return new WaitForSeconds(sequenceTime + waitTime);
                 continue;
@@ -897,7 +897,7 @@ public class BattleSceneManager : MonoBehaviour,
 		return false;
     }
 
-	private bool TryRetreatSomeUnits(int AISupportLineIdx)
+	private bool TryRetreatUnits(int AISupportLineIdx)
 	{
         BattleLineController battleLine = battleLines[AISupportLineIdx];
         if (battleLine.count == battleLine.capacity)
