@@ -52,7 +52,7 @@ namespace BehaviorTree
         protected static float waitTime = 1f;
 
         // 教程
-        public bool guideRunning = false;
+        public bool guideRunning = true;
         public void EndGuideRunning()
         {
             guideRunning = false;

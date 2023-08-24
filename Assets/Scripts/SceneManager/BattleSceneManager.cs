@@ -653,8 +653,7 @@ public class BattleSceneManager : MonoBehaviour,
 		AcquireSequence();
 
         battleSystem.Move(resLineIdx, resIdx, dstLineIdx, dstPos);
-
-		return 1;
+        return 1;
 	}
 
 	public int PlayerRetreat(int resLineIdx, int resIdx)
