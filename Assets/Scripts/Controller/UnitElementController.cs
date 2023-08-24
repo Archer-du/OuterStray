@@ -337,7 +337,7 @@ public class UnitElementController : BattleElementController,
 	public void PlayerMove(int lineIdx, int pos)
 	{
 		if (pos < 0 || lineIdx == battleLine.index || Math.Abs(lineIdx - battleLine.index) > moveRange 
-			|| (battleSceneManager.battleLines[lineIdx].ownership != ownership &&  battleSceneManager.battleLines[lineIdx].count > 0))
+			|| (battleSceneManager.battleLines[lineIdx].ownership != ownership &&  battleSceneManager.battleLines[lineIdx].count > 0 || lineIdx == battleSceneManager.fieldCapacity - 1))
 		{
 			battleSceneManager.UpdateAllBattleLine();
 			canvas.sortingOrder = battleOrder;

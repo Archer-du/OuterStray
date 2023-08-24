@@ -9,7 +9,7 @@
     "initialHumanEnergy": 3,
     "initialPlantEnergy": 3,
     "initialHumanHandicaps": 1,
-    "initialPlantHandicaps": 1,
+    "initialPlantHandicaps": 5,
     "fieldPreset": [
         {
             "cardPreset" : {

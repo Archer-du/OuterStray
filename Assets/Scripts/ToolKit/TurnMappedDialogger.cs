@@ -25,11 +25,18 @@ public class TurnMappedDialogger : MonoBehaviour
 	private float time = 3;
 	private Dictionary<int, List<string>> dialogDict;
     private Tween currentTween;
+
+    private AudioSource audioSource;
+    [SerializeField]public List<AudioClip> tutorialAudioClips;
+    int audioIdx = 0;
+
+    private Coroutine coroutine;
     public int TurnNum
 	{
 		get => manager.turnNum;
 	}
-    private int lastTurnNum = -1;
+
+    // private int lastTurnNum = -1;
 
 /*    Queue<Action> guideEventQueue = new Queue<Action>();
     void EnqueueGuideEvent()
@@ -48,8 +55,10 @@ public class TurnMappedDialogger : MonoBehaviour
         dialogFrame.SetActive(false);
         guide.SetActive(false);
 
-        lastTurnNum = TurnNum;
+        // lastTurnNum = TurnNum;
         LoadDialogs();
+
+        audioSource = GetComponent<AudioSource>();
 
         manager.Retreat += OnRetreat;
         manager.Deploy += OnDeploy;
@@ -66,13 +75,6 @@ public class TurnMappedDialogger : MonoBehaviour
                 guide.SetActive(false);
             }
         }
-    }
-    public void EndTutorial()
-    {
-        running = false;
-        manager = null;
-        dialogFrame.SetActive(false);
-        guide.SetActive(false);
     }
 
     /// <summary>
@@ -107,7 +109,7 @@ public class TurnMappedDialogger : MonoBehaviour
 
         if (dialogDict.ContainsKey(TurnNum))
         {
-            StartCoroutine(DisplayDialog(dialogDict[TurnNum]));
+            coroutine = StartCoroutine(DisplayDialog(dialogDict[TurnNum]));
             dialogDict.Remove(TurnNum);
         }
         else
@@ -126,9 +128,11 @@ public class TurnMappedDialogger : MonoBehaviour
         yield return new WaitForSeconds(1.5f);
         dialogFrame.SetActive(true);
 
+        PlayDialogAudio(tutorialAudioClips[audioIdx]);
+        audioIdx++;
         foreach (string dialog in dialogParts)
         {
-            time = dialog.Length * 0.1f;
+            time = dialog.Length * 0.15f;
             currentTween = DOTween.To(
                 () => "",
                 value => dialogText.text = value,
@@ -136,38 +140,43 @@ public class TurnMappedDialogger : MonoBehaviour
                 time
             ).SetEase(Ease.Linear);
             yield return currentTween.WaitForCompletion();
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(3f);
         }
         dialogFrame.SetActive(false);
     }
 
-    private Dictionary<int, List<GameObject>> GetAllChildren(GameObject parent)
-    {
-        Dictionary<int, List<GameObject>> TurnGuide = new Dictionary<int, List<GameObject>>();
-        Regex regex = new Regex(@"Turn(\d+)Guide(\d+)");
 
-        for (int i = 0; i < parent.transform.childCount; i++)
-        {
-            GameObject child = parent.transform.GetChild(i).gameObject;
-            Match match = regex.Match(child.name);
-
-            if (match.Success)
-            {
-                int turn = int.Parse(match.Groups[1].Value);
-                if (!TurnGuide.ContainsKey(turn))
-                {
-                    TurnGuide[turn] = new List<GameObject>();
-                }
-                TurnGuide[turn].Add(child);
-            }
-        }
-        return TurnGuide;
-    }
 
     private void StopGuide()
     {
         manager.btBattleNode.EndGuideRunning();
+        StopCoroutine(coroutine);
+        dialogFrame.SetActive(false);
+        StartCoroutine(EndDialog());
+
         guide.SetActive(false);
+        guide = null;
+        dialogFrame.SetActive(false);
+        running = false;
+    }
+
+    private IEnumerator EndDialog()
+    {
+        Debug.Log("EndDialog Coroutine started");
+        yield return new WaitForSeconds(0.5f);
+        dialogFrame.SetActive(true);
+        string dialog = "看来您很熟悉战斗方式，不需要我来提醒，请您自己战斗吧";
+
+        time = dialog.Length * 0.1f;
+        currentTween = DOTween.To(
+            () => "",
+            value => dialogText.text = value,
+            dialog,
+            time
+        ).SetEase(Ease.Linear);
+        yield return currentTween.WaitForCompletion();
+        yield return new WaitForSeconds(5f);
+        dialogFrame.SetActive(false);
     }
 
     public void OnRetreat(string cardID)
@@ -234,15 +243,19 @@ public class TurnMappedDialogger : MonoBehaviour
             return;
         }
 
-        if (cardID == "tutorial_21" && TurnNum == 8)
+        if (cardID == "tutorial_21" && TurnNum == 8 && GuideNum == 0)
         {
             StartCoroutine(UpdateGuide());
         }
-        else if (cardID == "turorial_05" && TurnNum == 16 && GuideNum == 2)
+        else if (cardID == "tutorial_21" && TurnNum == 16 && GuideNum == 0)
         {
-            StartCoroutine(UpdateGuide());
+             StartCoroutine(UpdateGuide());
         }
         else if (cardID == "tutorial_27" && TurnNum == 16 && GuideNum == 1)
+        {
+            StartCoroutine(UpdateGuide());
+        }
+        else if (cardID == "tutorial_05" && TurnNum == 16 && GuideNum == 2)
         {
             StartCoroutine(UpdateGuide());
         }
@@ -254,13 +267,12 @@ public class TurnMappedDialogger : MonoBehaviour
 
     public void OnTurnChanged(int turnNum)
     {
-        UpdateDialog();
-
         if (!guide)
         {
             return;
         }
 
+        UpdateDialog();
         StartCoroutine(UpdateTurnGuide());
     }
 
@@ -269,6 +281,54 @@ public class TurnMappedDialogger : MonoBehaviour
         if (!guide)
         {
             yield break;
+        }
+
+        switch(TurnNum)
+        {
+            case 5:
+                if (GuideNum != 1)
+                {
+                    StopGuide();
+                }
+                break;
+            case 7:
+                if (GuideNum != 1)
+                {
+                    StopGuide();
+                }
+                break;
+            case 9:
+                if (GuideNum != 1)
+                {
+                    StopGuide();
+                }
+                break;
+            case 11:
+                if (GuideNum != 2)
+                {
+                    StopGuide();
+                }
+                break;
+            case 13:
+                if (GuideNum != 1)
+                {
+                    StopGuide();
+                }
+                break;
+            case 15:
+                if (GuideNum != 2)
+                {
+                    StopGuide();
+                }
+                break;
+            case 17:
+                if (GuideNum != 3)
+                {
+                    StopGuide();
+                }
+                break;
+            default:
+                break;
         }
 
         GuideNum = 0;
@@ -281,11 +341,10 @@ public class TurnMappedDialogger : MonoBehaviour
             if (TurnNum == 1 || TurnNum == 9)
             {
                 yield return new WaitForSeconds(2);
-
             }
             else if (TurnNum == 12)
             {
-                yield return new WaitForSeconds(4.5f);
+                yield return new WaitForSeconds(3.5f);
             }
             else
             {
@@ -323,5 +382,35 @@ public class TurnMappedDialogger : MonoBehaviour
             currentActiveGuide.SetActive(true);
         }
         yield break;
+    }
+
+    private Dictionary<int, List<GameObject>> GetAllChildren(GameObject parent)
+    {
+        Dictionary<int, List<GameObject>> TurnGuide = new Dictionary<int, List<GameObject>>();
+        Regex regex = new Regex(@"Turn(\d+)Guide(\d+)");
+
+        for (int i = 0; i < parent.transform.childCount; i++)
+        {
+            GameObject child = parent.transform.GetChild(i).gameObject;
+            Match match = regex.Match(child.name);
+
+            if (match.Success)
+            {
+                int turn = int.Parse(match.Groups[1].Value);
+                if (!TurnGuide.ContainsKey(turn))
+                {
+                    TurnGuide[turn] = new List<GameObject>();
+                }
+                TurnGuide[turn].Add(child);
+            }
+        }
+        return TurnGuide;
+    }
+
+    private void PlayDialogAudio(AudioClip audioClip)
+    {
+        audioSource.clip = audioClip;
+        audioSource.volume = 1.0f;
+        audioSource.Play();
     }
 }
