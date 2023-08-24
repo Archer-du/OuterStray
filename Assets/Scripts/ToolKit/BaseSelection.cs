@@ -101,6 +101,7 @@ public class BaseSelection : MonoBehaviour,
 	private void LoadCardResources(string ID)
 	{
 		cardImage.sprite = Resources.Load<Sprite>("CardImage/" + ID);
+		cardImage.rectTransform.sizeDelta = new Vector2(18, 24);
 
 		switch (category)
 		{

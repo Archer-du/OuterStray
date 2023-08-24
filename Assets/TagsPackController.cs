@@ -79,9 +79,12 @@ public class TagsPackController : MonoBehaviour,
 	}
 	public void OnPointerClick(PointerEventData eventData)
 	{
-		panel.packSelectionIndex = index;
-		panel.FinalConfirmButton.interactable = true;
 		inspectorCanvas.DOFade(0, 0.1f);
+		if (panel.FinalConfirmButton.enabled)
+		{
+			panel.packSelectionIndex = index;
+			panel.FinalConfirmButton.interactable = true;
+		}
 	}
 	public void DisplayInspector(string ID)
 	{

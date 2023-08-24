@@ -59,7 +59,7 @@ public class DeckController : MonoBehaviour,
 
 		tags.Add(tag);
 
-		content.sizeDelta = new Vector2(content.sizeDelta.x, 135 * tags.Count);
+		content.sizeDelta = new Vector2(content.sizeDelta.x, 125 * tags.Count);
 	}
 	public void AddNewTag(string ID)
 	{
@@ -76,7 +76,7 @@ public class DeckController : MonoBehaviour,
 
 		UpdateHierachy();
 
-		content.sizeDelta = new Vector2(content.sizeDelta.x, 135 * tags.Count);
+		content.sizeDelta = new Vector2(content.sizeDelta.x, 125 * tags.Count);
 	}
 	public void UpdateHierachy()
 	{

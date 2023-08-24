@@ -4,6 +4,7 @@ using DG.Tweening.Core.Easing;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Security.Cryptography;
 using TMPro;
 using UnityEditor.Rendering;
@@ -107,6 +108,7 @@ public class PanelController : MonoBehaviour,
 	{
 		packSelectionIndex = -1;
 		FinalConfirmButton.interactable = false;
+		FinalConfirmButton.onClick.AddListener(DisableAllTagsPackButtons);
 
 		gameObject.SetActive(false);
 		transform.position = new Vector3(300, 0, 0);
@@ -138,9 +140,11 @@ public class PanelController : MonoBehaviour,
 
 
 
-
+	public List<AudioSource> voices;
+	public List<string> dialogs;
 	public void BuildPanel(PanelType type)
 	{
+
 		this.type = type;
 		switch (type)
 		{
@@ -152,6 +156,9 @@ public class PanelController : MonoBehaviour,
 				scrollRect.enabled = true;
 				scrollBar.SetActive(false);
 				FinalConfirmButton.gameObject.SetActive(false);
+
+				LoadDialogResource("Config\\Dialogs\\admin");
+				LoadAudioResource("Config\\Voices\\admin\\", ".wav");
 				break;
 			case PanelType.CloningLab:
 				tagsPacks = new List<TagsPackController>();
@@ -160,6 +167,9 @@ public class PanelController : MonoBehaviour,
 				scrollRect.enabled = true;
 				scrollBar.SetActive(false);
 				FinalConfirmButton.gameObject.SetActive(true);
+
+				LoadDialogResource("Config\\Dialogs\\clone");
+				LoadAudioResource("Config\\Voices\\clone\\", ".mp3");
 				break;
 			case PanelType.WorkShop:
 				tagsPacks = new List<TagsPackController>();
@@ -168,12 +178,18 @@ public class PanelController : MonoBehaviour,
 				scrollRect.enabled = true;
 				scrollBar.SetActive(false);
 				FinalConfirmButton.gameObject.SetActive(true);
+
+				LoadDialogResource("Config\\Dialogs\\fac");
+				LoadAudioResource("Config\\Voices\\fac\\", ".mp3");
 				break;
 			case PanelType.OutPost:
 				cardPacks = new List<CardPackController>();
 				BackGround.sprite = Resources.Load<Sprite>("Ilustrate/back/outpost");
 				NPCImage.sprite = Resources.Load<Sprite>("Ilustrate/chara/merchant");
 				scrollRect.enabled = true;
+
+				LoadDialogResource("Config\\Dialogs\\merchant");
+				LoadAudioResource("Config\\Voices\\merchant\\", ".wav");
 				break;
 			case PanelType.Supply:
 				cardPacks = new List<CardPackController>();
@@ -195,9 +211,50 @@ public class PanelController : MonoBehaviour,
 				selection.gameObject.SetActive(false);
 				mainConfirmButton.gameObject.SetActive(true);
 				subConfirmButton.gameObject.SetActive(true);
+
+
+				LoadDialogResource("Config\\Dialogs\\healer");
+				LoadAudioResource("Config\\Voices\\healer\\", ".wav");
 				break;
 		}
 	}
+	public void LoadDialogResource(string path)
+	{
+		dialogs = new List<string>();
+		StreamReader reader = GameManager.GetInstance().OpenText(path);
+		string dialog = reader.ReadLine();
+		while (dialog != null)
+		{
+			dialogs.Add(dialog);
+			dialog = reader.ReadLine();
+		}
+	}
+	public void LoadAudioResource(string path, string format)
+	{
+		voices = new List<AudioSource>();
+		int i = 0;
+
+		string audioPath = path + i.ToString();
+
+		AudioClip audioClip = Resources.Load<AudioClip>(audioPath);
+		while (audioClip != null)
+		{
+			AudioSource audioSource = gameObject.AddComponent<AudioSource>();
+
+			audioSource.clip = audioClip;
+			audioSource.playOnAwake = false;
+			audioSource.loop = false;
+
+			voices.Add(audioSource);
+			i++;
+			audioClip = Resources.Load<AudioClip>(path + i.ToString());
+		}
+	}
+
+
+
+
+
 	public void FillTagPack(List<List<string>> IDPacks)
 	{
 		for(int i = 0; i < IDPacks.Count; i++)
@@ -243,7 +300,7 @@ public class PanelController : MonoBehaviour,
 				EnableDetailedInfo(temp);
 			});
 		}
-		content.sizeDelta = new Vector2(670 * IDs.Count, content.sizeDelta.y);
+		content.sizeDelta = new Vector2(660 * IDs.Count, content.sizeDelta.y);
 	}
 
 
@@ -280,13 +337,14 @@ public class PanelController : MonoBehaviour,
 		//TODO
 		if(type != PanelType.Supply)
 		{
+			seq.AppendCallback(() => voices[0].Play());
 			seq.AppendCallback(() =>
 			{
 				dialogger.text.gameObject.SetActive(true);
 				DOTween.To(
 					() => "",
 					value => dialogger.text.text = value,
-					"Hello World!",
+					dialogs[0],
 					textTime
 				).SetEase(Ease.Linear);
 			});
@@ -322,12 +380,16 @@ public class PanelController : MonoBehaviour,
 		{
 			gameObject.SetActive(false);
 		});
+		foreach (var tagsPack in tagsPacks)
+		{
+			tagsPack.inspectorCanvas.alpha = 0;
+		}
 	}
 	public void DisablePackButton(int index)
 	{
 		cardPacks[index].SelectButton.interactable = false;
 	}
-	public void DisableAllPackButtons()
+	public void DisableAllCardPackButtons()
 	{
 		foreach(var cardPack in cardPacks)
 		{
@@ -338,7 +400,13 @@ public class PanelController : MonoBehaviour,
 			}
 		}
 	}
-
+	public void DisableAllTagsPackButtons()
+	{
+		foreach (var tagsPack in tagsPacks)
+		{
+			tagsPack.frameCanvas.alpha = 0;
+		}
+	}
 
 
 
@@ -371,7 +439,6 @@ public class PanelController : MonoBehaviour,
 
 
 
-
 	public void OnPointerClick(PointerEventData eventData)
 	{
 		if(detailShowing)
@@ -379,15 +446,29 @@ public class PanelController : MonoBehaviour,
 			detailShowing = false;
 			DisableDetailInfo();
 		}
-		if(eventData.position.y > Screen.height / 2)
+		if(type != PanelType.Supply)
 		{
-			dialogger.text.gameObject.SetActive(true);
-			DOTween.To(
-				() => "",
-				value => dialogger.text.text = value,
-				"Hello World!",
-				textTime
-			).SetEase(Ease.Linear);
+			foreach(AudioSource source in voices)
+			{
+				source.Stop();
+			}
+
+			if(eventData.position.y > Screen.height / 2)
+			{
+				dialogger.text.gameObject.SetActive(true);
+
+				int index = UnityEngine.Random.Range(1, voices.Count);
+				voices[index].Play();
+
+				string dialog = dialogs[index];
+
+				DOTween.To(
+					() => "",
+					value => dialogger.text.text = value,
+					dialog,
+					textTime
+				).SetEase(Ease.Linear);
+			}
 		}
 		foreach(CardPackController pack in cardPacks)
 		{
@@ -395,6 +476,11 @@ public class PanelController : MonoBehaviour,
 		}
 		ClearAllOtherInspector(-1);
 	}
+
+
+
+
+
 	public void EnableDetailedInfo(int index)
 	{
 		float duration = 0.3f;

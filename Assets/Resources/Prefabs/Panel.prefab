@@ -156,6 +156,8 @@ MonoBehaviour:
   BackGround: {fileID: 2650376086193105007}
   NPCImage: {fileID: 6431506341066632942}
   dialogger: {fileID: 4295559036482143617}
+  voices: []
+  dialogs: []
   selectionCanvas: {fileID: 6641680999610506562}
   selection: {fileID: 6286264872181230300}
   scrollBar: {fileID: 8179587284806506896}
@@ -3370,7 +3372,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 7523926529505693730}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.1782075
+  m_Size: 0.17821129
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -3679,7 +3681,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -1619.9996, y: 512.7508}
+  m_AnchoredPosition: {x: -1620.0002, y: 512.7508}
   m_SizeDelta: {x: 18176.71, y: 1025.5}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &8590057312170141476
@@ -4313,6 +4315,26 @@ PrefabInstance:
     - target: {fileID: 2846269039607301472, guid: 1ccaf80a6ba4d8c438e51c179d9a48bc, type: 3}
       propertyPath: m_Name
       value: NPCDialog
+      objectReference: {fileID: 0}
+    - target: {fileID: 4731988653861599680, guid: 1ccaf80a6ba4d8c438e51c179d9a48bc, type: 3}
+      propertyPath: m_fontSize
+      value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 4731988653861599680, guid: 1ccaf80a6ba4d8c438e51c179d9a48bc, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 600236e9df5f4e94dab569f5d8a054c4, type: 2}
+    - target: {fileID: 4731988653861599680, guid: 1ccaf80a6ba4d8c438e51c179d9a48bc, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 4731988653861599680, guid: 1ccaf80a6ba4d8c438e51c179d9a48bc, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: -3815973376372354358, guid: 600236e9df5f4e94dab569f5d8a054c4, type: 2}
+    - target: {fileID: 4731988653861599680, guid: 1ccaf80a6ba4d8c438e51c179d9a48bc, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

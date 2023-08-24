@@ -130,6 +130,8 @@ public class InspectPanelController : MonoBehaviour,
 			ExplanationController explain = Instantiate(explanationPrototype, textGroup.transform).GetComponent<ExplanationController>();
 			explain.text.text = explanation;
 		}
+		RectTransform rectTransform = textGroup.gameObject.GetComponent<RectTransform>();
+		rectTransform.sizeDelta = new Vector2(25, explanations.Count * 10 < 20 ? 20 : explanations.Count * 10);
 	}
 
 
