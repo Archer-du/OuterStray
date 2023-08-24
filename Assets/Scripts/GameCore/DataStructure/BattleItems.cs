@@ -230,7 +230,11 @@ namespace DataCore.BattleItems
 
 			this.controller = controller;
 		}
-
+		internal BattleElement this[int index]
+		{
+			get => stack[index];
+			set => stack[index] = value;
+		}
 		/// <summary>
 		/// fill stack with battle element reference in deck
 		/// </summary>
