@@ -79,6 +79,7 @@ public class CultivateSceneManager : MonoBehaviour,
 
 		LoadBuildingResouce();
 
+		governCounter = 0;
 
 		PanelController.PanelEnabled += () => panelEnabled = true;
 		PanelController.PanelDisabled += () => panelEnabled = false;
@@ -137,6 +138,7 @@ public class CultivateSceneManager : MonoBehaviour,
 		Panels[0].FillCardPack(ID);
 
 		Panels[0].PackChosen += AddDeckTag;
+		Panels[0].PackChosen += CountGovernChoice;
 
 		//building cloningLab
 		StreamReader reader = gameManager.OpenText("Config\\CloningLabPack.csv");
@@ -161,7 +163,11 @@ public class CultivateSceneManager : MonoBehaviour,
 		cloningLab.onClick.AddListener(Panels[1].OpenPanel);
 
 		Panels[1].FillTagPack(IDPacks);
-		Panels[1].FinalConfirmButton.onClick.AddListener(() => AddDeckPack(Panels[1].packSelectionIndex));
+		Panels[1].FinalConfirmButton.onClick.AddListener(() =>
+		{
+			Panels[1].FinalConfirmButton.interactable = false;
+			AddDeckPack(Panels[1].packSelectionIndex);
+		});
 
 
 		//building WorkShop
@@ -187,7 +193,23 @@ public class CultivateSceneManager : MonoBehaviour,
 		workshop.onClick.AddListener(Panels[2].OpenPanel);
 
 		Panels[2].FillTagPack(IDPacks);
-		Panels[2].FinalConfirmButton.onClick.AddListener(() => AddDeckPack(Panels[2].packSelectionIndex));
+		Panels[2].FinalConfirmButton.onClick.AddListener(() =>
+		{
+			Panels[2].FinalConfirmButton.interactable = false;
+			AddDeckPack(Panels[2].packSelectionIndex);
+		});
+	}
+
+	public int governCounter;
+	public void CountGovernChoice(int n)
+	{
+		governCounter++;
+		if(governCounter > 4)
+		{
+			governCounter = 0;
+			Panels[0].DisableAllPackButtons();
+			LogWarning("在行政中心最多只能选择三张卡牌");
+		}
 	}
 
 
@@ -201,17 +223,7 @@ public class CultivateSceneManager : MonoBehaviour,
     {
 		if (playerDeck.IsEmpty())
 		{
-			warningCanvas.alpha = 0f;
-			warningText.DOFade(0, 0);
-
-			Sequence seq = DOTween.Sequence();
-
-			seq.Append(warningCanvas.DOFade(1, 0.2f));
-			seq.Join(warningText.DOFade(1, 0.2f));
-			seq.AppendInterval(1f);
-			seq.Append(warningCanvas.DOFade(0, 0.2f));
-			seq.Join(warningText.DOFade(0, 0.2f));
-			Debug.LogWarning("你还没有导入卡组！");
+			LogWarning("你还没有导入卡组");
 			return;
 		}
 		duration = 0.5f;
@@ -268,7 +280,21 @@ public class CultivateSceneManager : MonoBehaviour,
 
 
 
+	public void LogWarning(string message)
+	{
+		warningCanvas.alpha = 0f;
+		warningText.DOFade(0, 0);
 
+		warningText.text = message;
+
+		Sequence seq = DOTween.Sequence();
+
+		seq.Append(warningCanvas.DOFade(1, 0.2f));
+		seq.Join(warningText.DOFade(1, 0.2f));
+		seq.AppendInterval(1f);
+		seq.Append(warningCanvas.DOFade(0, 0.2f));
+		seq.Join(warningText.DOFade(0, 0.2f));
+	}
 
 
 	public void AddDeckPack(int index)
