@@ -9,7 +9,7 @@ public class BTBattleNode1 : BTBattleNode
     protected override void BuildBT()
     {
         rootNode = new SelectorNode(new List<BTNode>()
-        {   
+        {
             new SequenceNode(new List<BTNode>()
             {
                 new ConditionNode(() => AIHandicap.count < AIHandicap.capacity - 2),
@@ -17,10 +17,15 @@ public class BTBattleNode1 : BTBattleNode
             }),
             new SequenceNode(new List<BTNode>()
             {
-                new ConditionNode(() => !GetIsLineAvailable(AISupportLineIdx)),
+                new ConditionNode(() => !GetIsLineAvailable(AISupportLineIdx) || frontLineIdx == AISupportLineIdx - 1),
                 new ActionNode(() => TryRetreatUnits(AISupportLineIdx)),
             }),
             new ActionNode(() => TryAdjustForward(frontLineIdx)),
+            new SequenceNode(new List<BTNode>()
+            {
+                new ConditionNode(() => Energy > 8),
+                new ActionNode(() => TryDeployHighCostUnit(AISupportLineIdx)),
+            }),
             new ActionNode(() => TryDeployLowCostUnit(AISupportLineIdx)),
             new SequenceNode(new List<BTNode>
             {

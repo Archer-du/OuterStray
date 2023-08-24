@@ -611,6 +611,21 @@ namespace BehaviorTree
             }
         }
 
+        protected bool TryDeployHighCostUnit(int AISupportLineIdx)
+        {
+            BattleLineController battleLine = BattleLines[AISupportLineIdx];
+            int idx = GetMaxCostUnitIndex(Energy);
+            if (battleLine.count < battleLine.capacity)
+            {
+                if (GetMaxCostUnitIndex() > 0)
+                {
+                    BTDeploy(idx);
+                    return true;
+                }
+            }
+            return false;
+        }
+
         protected bool TryDeployLowCostUnit(int AISupportLineIdx)
         {
             if (AISupportLine.count < AISupportLine.capacity)
