@@ -51,6 +51,14 @@ namespace BehaviorTree
 
         protected static float waitTime = 1f;
 
+        // 教程
+        public bool guideRunning = false;
+        public void EndGuideRunning()
+        {
+            guideRunning = false;
+        }
+
+
         /// <summary>
         /// 循环执行行为树的最大次数
         /// </summary>
@@ -132,7 +140,7 @@ namespace BehaviorTree
         }
         protected void BTMove(int resLineIdx, int resPos, int dstLineIdx, int dstPos)
         {
-            if (BattleLines[resLineIdx][resPos].operateCounter == 1 && BattleLines[resLineIdx][resPos].category != "Construction" && BattleLines[dstLineIdx].count < BattleLines[dstLineIdx].capacity)
+            if (BattleLines[resLineIdx][resPos].ownership == 1 && BattleLines[resLineIdx][resPos].operateCounter == 1 && BattleLines[resLineIdx][resPos].category != "Construction" && BattleLines[dstLineIdx].count < BattleLines[dstLineIdx].capacity)
             {
                 SceneManager.AIMove(resLineIdx, resPos, dstLineIdx, dstPos);
             }

@@ -14,7 +14,7 @@ public class TurnMappedDialogger : MonoBehaviour
 
 	private bool running = false;
 
-    private GameObject guide;
+    public GameObject guide;
     private Dictionary<int, List<GameObject>> TurnGuide;
     private GameObject currentActiveGuide;
     private int GuideNum = 0;
@@ -30,6 +30,12 @@ public class TurnMappedDialogger : MonoBehaviour
 		get => manager.turnNum;
 	}
     private int lastTurnNum = -1;
+
+/*    Queue<Action> guideEventQueue = new Queue<Action>();
+    void EnqueueGuideEvent()
+    {
+        guideEventQueue.Enqueue(() => OnRetreat("human_02"));
+    }*/
 
     public void StartTutorial()
     {
@@ -158,44 +164,113 @@ public class TurnMappedDialogger : MonoBehaviour
         return TurnGuide;
     }
 
+    private void StopGuide()
+    {
+        manager.btBattleNode.EndGuideRunning();
+        guide.SetActive(false);
+    }
+
     public void OnRetreat(string cardID)
     {
-        if (cardID == "human_02")
+        if (!guide)
+        {
+            return;
+        }
+
+        if (cardID == "human_02" && TurnNum == 4)
         {
             StartCoroutine(UpdateGuide());
+        }
+        else
+        {
+            StopGuide();
         }
 
     }
     public void OnDeploy(string cardID)
     {
-        if (cardID == "tutorial_21" || cardID == "tutorial_05" || cardID == "tutorial_27")
+        if (!guide)
+        {
+            return;
+        }
+
+        if (cardID == "tutorial_21" && TurnNum == 6)
         {
             StartCoroutine(UpdateGuide());
+        }
+        else if (cardID == "tutorial_05" && TurnNum == 14)
+        {
+            StartCoroutine(UpdateGuide());
+        }
+        else
+        {
+            StopGuide();
         }
     }
     public void OnCast(string cardID)
     {
-        if (cardID == "comm_human_01" || cardID == "comm_human_03")
+        if (!guide)
+        {
+            return;
+        }
+
+        if (cardID == "comm_human_01" && TurnNum == 10)
         {
             StartCoroutine(UpdateGuide());
+        }
+        else if (cardID == "comm_human_03" && TurnNum == 12)
+        {
+            StartCoroutine(UpdateGuide());
+        }
+        else
+        {
+            StopGuide();
         }
     }
     public void OnMove(string cardID)
     {
-        if (cardID == "tutorial_21" || cardID == "tutorial_05" || cardID == "tutorial_27")
+        if (!guide)
+        {
+            return;
+        }
+
+        if (cardID == "tutorial_21" && TurnNum == 8)
         {
             StartCoroutine(UpdateGuide());
+        }
+        else if (cardID == "turorial_05" && TurnNum == 16 && GuideNum == 2)
+        {
+            StartCoroutine(UpdateGuide());
+        }
+        else if (cardID == "tutorial_27" && TurnNum == 16 && GuideNum == 1)
+        {
+            StartCoroutine(UpdateGuide());
+        }
+        else
+        {
+            StopGuide();
         }
     }
 
     public void OnTurnChanged(int turnNum)
     {
         UpdateDialog();
+
+        if (!guide)
+        {
+            return;
+        }
+
         StartCoroutine(UpdateTurnGuide());
     }
 
     private IEnumerator UpdateTurnGuide()
     {
+        if (!guide)
+        {
+            yield break;
+        }
+
         GuideNum = 0;
         if (currentActiveGuide != null)
         {

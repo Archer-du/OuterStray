@@ -193,7 +193,7 @@ public class ElementDragInput : MonoBehaviour,
 
 			//TODO
 			//撤退判定
-			if (unit.battleLine.index == 0 && checkPosition.x >= 3340 && checkPosition.y <= 1080)
+			if (unit.ID != "tutorial_27" && unit.battleLine.index == 0 && checkPosition.x >= 3340 && checkPosition.y <= 1080)
 			{
 				unit.PlayerRetreat();
 				return;

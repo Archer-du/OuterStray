@@ -9,6 +9,12 @@ using UnityEngine;
 /// </summary>
 public class BTBattleNode100 : BTBattleNode
 {
+    protected override void Init()
+    {
+        base.Init();
+        guideRunning = true;
+    }
+
     protected override void BuildBT()
     {
         return;
@@ -16,6 +22,7 @@ public class BTBattleNode100 : BTBattleNode
 
     public override IEnumerator BehaviorTree()
     {
+        
         switch(TurnNum)
         {
             // 第一回合空过
@@ -30,17 +37,23 @@ public class BTBattleNode100 : BTBattleNode
                 break;
             // 第五回合部署菇母
             case 5:
-                yield return new WaitForSeconds(3f);
-                BTDeploy(0);
+                if (guideRunning)
+                {
+                    yield return new WaitForSeconds(3f);
+                    BTDeploy(0);
+                }
                 yield return new WaitForSeconds(1.5f);
                 BTSkip();
                 break;
             // 第七回合移动菇母和亮顶孢子
             case 7:
-                yield return new WaitForSeconds(3f);
-                BTMove(3, 0, 2, 0);
-                yield return new WaitForSeconds(1f);
-                BTMove(3, 0, 2, 0);
+                if (guideRunning)
+                {
+                    yield return new WaitForSeconds(3f);
+                    BTMove(3, 0, 2, 0);
+                    yield return new WaitForSeconds(1f);
+                    BTMove(3, 0, 2, 0);
+                }
                 yield return new WaitForSeconds(1.5f);
                 BTSkip();
                 break;
@@ -56,21 +69,27 @@ public class BTBattleNode100 : BTBattleNode
                 break;
             // 部署两个菇母
             case 13:
-                yield return new WaitForSeconds(3f);
-                BTDeploy(0);
-                yield return new WaitForSeconds(1f);
-                BTDeploy(0);
+                if (guideRunning)
+                {
+                    yield return new WaitForSeconds(3f);
+                    BTDeploy(0);
+                    yield return new WaitForSeconds(1f);
+                    BTDeploy(0);
+                }
                 yield return new WaitForSeconds(1.5f);
                 BTSkip();
                 break;
             // 蘑菇上前
             case 15:
-                yield return new WaitForSeconds(3f);
-                BTMove(3, 2, 2, 0);
-                yield return new WaitForSeconds(1f);
-                BTMove(3, 0, 2, 0);
-                yield return new WaitForSeconds(1f);
-                BTMove(3, 0, 2, 0);
+                if(guideRunning)
+                {
+                    yield return new WaitForSeconds(3f);
+                    BTMove(3, 2, 2, 0);
+                    yield return new WaitForSeconds(1f);
+                    BTMove(3, 0, 2, 0);
+                    yield return new WaitForSeconds(1f);
+                    BTMove(3, 0, 2, 0);
+                }
                 yield return new WaitForSeconds(1.5f);
                 BTSkip();
                 break;
