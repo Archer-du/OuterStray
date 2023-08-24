@@ -659,8 +659,7 @@ public class BattleSceneManager : MonoBehaviour,
 	{
 		Retreat?.Invoke(battleLines[resLineIdx][resIdx].ID);
 		AcquireSequence();
-
-        battleSystem.Retreat(resLineIdx, resIdx);
+		battleSystem.Retreat(resLineIdx, resIdx);
 
 		return 1;
 	}
