@@ -32,7 +32,7 @@ public class DeckController : MonoBehaviour,
 	}
 
 
-
+	public RectTransform content;
 	public void UnloadDeckTags()
 	{
 		tags = new List<DeckTagController>();
@@ -58,6 +58,8 @@ public class DeckController : MonoBehaviour,
 		tag.Component.transform.localPosition = Vector3.zero;
 
 		tags.Add(tag);
+
+		content.sizeDelta = new Vector2(content.sizeDelta.x, 135 * tags.Count);
 	}
 	public void AddNewTag(string ID)
 	{
@@ -73,6 +75,8 @@ public class DeckController : MonoBehaviour,
 		tags.Add(tag);
 
 		UpdateHierachy();
+
+		content.sizeDelta = new Vector2(content.sizeDelta.x, 135 * tags.Count);
 	}
 	public void UpdateHierachy()
 	{

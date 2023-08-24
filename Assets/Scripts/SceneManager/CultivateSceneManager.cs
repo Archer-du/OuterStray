@@ -13,6 +13,7 @@ using System.IO.Pipes;
 using UnityEngine.SceneManagement;
 using DataCore.Cards;
 using System;
+using System.IO;
 
 public class CultivateSceneManager : MonoBehaviour,
     ICultivateSceneController
@@ -47,6 +48,8 @@ public class CultivateSceneManager : MonoBehaviour,
 	[Header("Interaction")]
     public Button apron;
     public Button govern;
+	public Button cloningLab;
+	public Button workshop;
 
     public Button startExpedition;
 
@@ -65,9 +68,6 @@ public class CultivateSceneManager : MonoBehaviour,
 
         GameManager.OnGameStateChanged += OnGameStateChanged;
 
-        //note: 功能从manager下放到controller
-        apron.onClick.AddListener(BaseChoose);
-
         startExpedition.onClick.AddListener(StartExpedition);
 
         buildingsDisabled = false;
@@ -75,17 +75,10 @@ public class CultivateSceneManager : MonoBehaviour,
         startExpedition.enabled = false;
         startExpedition.image.color = Color.gray;
 
-		//TODO
-		List<string> ID = new List<string>();
-		for(int i = 0; i < gameManager.pool.humanCardNum; i++)
-		{
-			ID.Add(gameManager.pool.humanCardPool[i].backendID);
-		}
-		Panels[0].BuildPanel(PanelType.Base);
-		govern.onClick.AddListener(Panels[0].OpenPanel);
-		Panels[0].InitializePanel(ID);
+		apron.onClick.AddListener(BaseChoose);
 
-		Panels[0].PackChosen += AddDeckTagFromPool;
+		LoadBuildingResouce();
+
 
 		PanelController.PanelEnabled += () => panelEnabled = true;
 		PanelController.PanelDisabled += () => panelEnabled = false;
@@ -128,16 +121,73 @@ public class CultivateSceneManager : MonoBehaviour,
 
 
 
-	public float finalHeight;
-	//TODO remove
-	public void EnablePanel()
-	{
 
-	}
-	public void DisablePanel()
-	{
-		// 创建一个 Tweener 对象
 
+
+	public void LoadBuildingResouce()
+	{
+		//building govern
+		List<string> ID = new List<string>();
+		for (int k = 0; k < gameManager.pool.humanCardNum; k++)
+		{
+			ID.Add(gameManager.pool.humanCardPool[k].backendID);
+		}
+		Panels[0].BuildPanel(PanelType.Govern);
+		govern.onClick.AddListener(Panels[0].OpenPanel);
+		Panels[0].FillCardPack(ID);
+
+		Panels[0].PackChosen += AddDeckTag;
+
+		//building cloningLab
+		StreamReader reader = gameManager.OpenText("Config\\CloningLabPack.csv");
+		List<List<string>> IDPacks = new List<List<string>>();
+		string line = reader.ReadLine();
+
+		int i = -1;
+		while(line != null)
+		{
+			if(line == "#")
+			{
+				line = reader.ReadLine();
+				IDPacks.Add(new List<string>());
+				i++;
+			}
+			IDPacks[i].Add(line);
+			line = reader.ReadLine();
+		}
+		Panels[1].BuildPanel(PanelType.CloningLab);
+
+		//note: 功能从manager下放到controller
+		cloningLab.onClick.AddListener(Panels[1].OpenPanel);
+
+		Panels[1].FillTagPack(IDPacks);
+		Panels[1].FinalConfirmButton.onClick.AddListener(() => AddDeckPack(Panels[1].packSelectionIndex));
+
+
+		//building WorkShop
+		reader = gameManager.OpenText("Config\\WorkShopPack.csv");
+		IDPacks = new List<List<string>>();
+		line = reader.ReadLine();
+
+		i = -1;
+		while (line != null)
+		{
+			if (line == "#")
+			{
+				line = reader.ReadLine();
+				IDPacks.Add(new List<string>());
+				i++;
+			}
+			IDPacks[i].Add(line);
+			line = reader.ReadLine();
+		}
+		Panels[2].BuildPanel(PanelType.WorkShop);
+
+		//note: 功能从manager下放到controller
+		workshop.onClick.AddListener(Panels[2].OpenPanel);
+
+		Panels[2].FillTagPack(IDPacks);
+		Panels[2].FinalConfirmButton.onClick.AddListener(() => AddDeckPack(Panels[2].packSelectionIndex));
 	}
 
 
@@ -217,21 +267,28 @@ public class CultivateSceneManager : MonoBehaviour,
 
 
 
-	//TODO
-	[Obsolete]
-	public void ImportPack()
+
+
+
+
+	public void AddDeckPack(int index)
 	{
-		cultivateSystem.FromPackImportDeck(0, 0);
-		govern.interactable = false;
+		foreach (PackTagController tag in Panels[1].tagsPacks[index].tags)
+		{
+			playerDeck.AddNewTag(tag.ID);
+		}
 	}
-
-
-	public void AddDeckTagFromPool(int index)
+	public void AddDeckTag(int index)
 	{
-		CardInspector card = Panels[0].packs[index].inspector;
+		CardInspector card = Panels[0].cardPacks[index].inspector;
 
 		playerDeck.AddNewTag(card.ID);
 	}
+
+
+
+
+
 
 
 
@@ -239,6 +296,9 @@ public class CultivateSceneManager : MonoBehaviour,
 	{
 		return playerDeck;
 	}
+
+
+
 
 
 

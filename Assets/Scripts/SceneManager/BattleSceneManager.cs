@@ -634,6 +634,8 @@ public class BattleSceneManager : MonoBehaviour,
 
 
 
+
+
 	public int PlayerDeploy(int handicapIdx, int lineIdx, int pos)
 	{
 		Deploy?.Invoke(handicapController[0][handicapIdx].ID);

@@ -932,6 +932,7 @@ MonoBehaviour:
   start: {fileID: 1182092236}
   config:
     tutorial: 0
+  configPath: 
   dialogGround: {fileID: 1484443845}
   dialogTexts:
   - {fileID: 2007656382}

@@ -100,18 +100,20 @@
     <Compile Include="Assets\Scripts\Controller\TerrainController.cs" />
     <Compile Include="Assets\Scripts\ToolKit\CardInspector.cs" />
     <Compile Include="Assets\Scripts\ToolKit\RewardSelection.cs" />
+    <Compile Include="Assets\Scripts\ToolKit\CardPackController.cs" />
     <Compile Include="Assets\Scripts\Controller\BTBattleNode\BTBattleNode0.cs" />
     <Compile Include="Assets\Scripts\ToolKit\Button\ButtonAudio.cs" />
     <Compile Include="Assets\Scripts\Controller\BTBattleNode\BTBattleNode2.cs" />
     <Compile Include="Assets\Scripts\Controller\HandicapController.cs" />
     <Compile Include="Assets\Scripts\SceneManager\TacticalSceneManager.cs" />
+    <Compile Include="Assets\PackTagController.cs" />
     <Compile Include="Assets\Scripts\Controller\CardStackController.cs" />
     <Compile Include="Assets\Scripts\ToolKit\TacticalPanelDisplay.cs" />
     <Compile Include="Assets\Scripts\ToolKit\BaseSelection.cs" />
     <Compile Include="Assets\Scripts\ToolKit\BattleLineDisplay.cs" />
     <Compile Include="Assets\Scripts\Controller\BattleLineController.cs" />
-    <Compile Include="Assets\Scripts\ToolKit\PackController.cs" />
     <Compile Include="Assets\Scripts\Controller\DeckTagController.cs" />
+    <Compile Include="Assets\TagsPackController.cs" />
     <Compile Include="Assets\Scripts\Controller\OutPostNodeController.cs" />
     <Compile Include="Assets\Scripts\SceneState.cs" />
     <Compile Include="Assets\Scripts\ToolKit\ToolKitAdvanced\PanelController.cs" />
@@ -120,6 +122,7 @@
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
     <None Include="Assets\Resources\Config\DeckConfigs\BattleNode_3.csv.txt" />
+    <None Include="Assets\Resources\Config\WorkShopPack.csv.txt" />
     <None Include="Assets\Resources\Config\NodeConfigs\TutorialNode.json.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />
     <None Include="Assets\Resources\Config\DeckConfigs\BattleNode_1.csv.txt" />
@@ -141,6 +144,7 @@
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
     <None Include="Assets\Scripts\JsonDll\Unity.Plastic.Newtonsoft.Json.dll" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Properties.cginc" />
+    <None Include="Assets\Resources\Config\CloningLabPack.csv.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Surface.cginc" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
     <None Include="Assets\Resources\Config\GlobalConfig.json.txt" />

@@ -74,6 +74,7 @@ namespace DataCore.BattleElements
 		/// <summary>
 		/// 费用
 		/// </summary>
+		internal int oriCost;
 		internal int cost { get; set; }
 		/// <summary>
 		/// 气矿消耗
@@ -107,6 +108,7 @@ namespace DataCore.BattleElements
 			this.backendID = card.backendID;
 			this.name = card.name;
 			this.description = card.description;
+			this.oriCost = card.cost;
 			this.cost = card.cost;
 			this.category = card.category;
 			this.ownership = card.ownership;
@@ -125,7 +127,7 @@ namespace DataCore.BattleElements
 		/// </summary>
 		/// <param name="effects"></param>
 		/// <exception cref="Exception"></exception>
-		protected void EffectsParse(string effects)
+		internal void EffectsParse(string effects)
 		{
 			if (effects != "none" && effects != "")
 			{
@@ -175,8 +177,6 @@ namespace DataCore.BattleElements
 						}
 						//注册委托参数
 						effectsTable.RegisterArgs(triggerDelegate[0], argList);
-
-
 
 						//解析分离 事件
 						string[] triggerEvent = tuple[0].Split(':');
@@ -664,7 +664,7 @@ namespace DataCore.BattleElements
 
 
 
-		internal void InitialDeploy(BattleLine dstLine, int dstPos)
+		internal void PresetDeploy(BattleLine dstLine, int dstPos)
 		{
             //部署前解析效果
             EffectsReParse();
@@ -837,7 +837,7 @@ namespace DataCore.BattleElements
                 {
                     battleSystem.result = BattleResult.win;
                 }
-                Terminate(method);
+                Terminate("append");
                 return -1;
             }
 
@@ -881,7 +881,7 @@ namespace DataCore.BattleElements
 				{
 					battleSystem.result = BattleResult.win;
 				}
-				Terminate(method);
+				Terminate("append");
 				return -1;
 			}
 
@@ -942,7 +942,7 @@ namespace DataCore.BattleElements
 		internal void Retreat(string method)
 		{
 			//主将不可以被撤退
-			if (this == battleSystem.bases[ownership])
+			if (this == battleSystem.bases[0] && this == battleSystem.bases[1])
 			{
 				return;
 			}
@@ -1033,6 +1033,11 @@ namespace DataCore.BattleElements
 		{
 			controller.UpdateInfo(cost, dynAttackReader, maxHealthReader, dynAttackCounter, operateCounter, 
 				state, moveRange, aura, dynAttackReader - oriAttack, maxHealthReader - oriHealth);
+			controller.UpdateBuff(parry);
+		}
+		internal void UpdateBuff()
+		{
+			controller.UpdateBuff(parry);
 		}
 		internal override void UpdateState()
 		{

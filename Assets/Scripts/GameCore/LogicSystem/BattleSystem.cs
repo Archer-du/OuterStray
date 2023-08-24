@@ -136,6 +136,8 @@ namespace LogicCore
 
 		internal BattleResult result;
 		internal bool final;
+
+		internal List<BattleElement>[] presetHandicaps;
 		/// <summary>
 		/// 由战术层指定参数构建战场
 		/// </summary>
@@ -156,6 +158,11 @@ namespace LogicCore
 
 			stacks = new RandomCardStack[2];
 			handicaps = new RedemptionZone[2];
+
+			presetHandicaps = new List<BattleElement>[2];
+
+			presetHandicaps[0] = new List<BattleElement>();
+			presetHandicaps[1] = new List<BattleElement>();
 
 			linesCapacity = fieldCapacity;
 
@@ -182,9 +189,10 @@ namespace LogicCore
 			BuildHumanStack(playerDeck);
 			BuildPlantStack(enemyDeck);
 
-			BuildHandicaps(initialHumanHandicaps, initialPlantHandicaps, initialTurn);
 
 			FieldPreset(playerDeck.bases ,fieldPresets);
+
+			BuildHandicaps(initialHumanHandicaps, initialPlantHandicaps, initialTurn);
 
 			//渲染控件初始化
 			controller.UpdateEnergy(0, energy[0]);
@@ -268,17 +276,14 @@ namespace LogicCore
 			handicaps[1].controller = controller.InstantiateHandicap(1);
 			handicaps[1].controller.Init(1);
 
-			List<BattleElement>[] list;
-			list = new List<BattleElement>[2];
-			list[0] = new List<BattleElement>();
-			list[1] = new List<BattleElement>();
+
 			//初始化手牌
 			for(int i = 0; i < initialHumanHandicaps + (initialTurn == 0 ? 1 : 0); i++)
 			{
 				BattleElement element = stacks[0].RandomPop();
 				if (element != null)
 				{
-					list[0].Add(element);
+					presetHandicaps[0].Add(element);
 				}
 			}
 			for (int i = 0; i < initialPlantHandicaps + (initialTurn == 1 ? 1 : 0); i++)
@@ -286,11 +291,14 @@ namespace LogicCore
 				BattleElement element = stacks[1].RandomPop();
 				if (element != null)
 				{
-					list[1].Add(element);
+					presetHandicaps[1].Add(element);
 				}
 			}
-			handicaps[0].Fill(list[0], initialTurn);
-			handicaps[1].Fill(list[1], initialTurn);
+			handicaps[0].Fill(presetHandicaps[0], initialTurn);
+			handicaps[1].Fill(presetHandicaps[1], initialTurn);
+
+			eventTable[0].RaiseEvent("HandicapPushed", null, this);
+			eventTable[1].RaiseEvent("HandicapPushed", null, this);
 		}
 
 		internal void FieldPreset(UnitElement playerBase, List<BattleNode.FieldPreset> fieldPresets)
@@ -337,12 +345,15 @@ namespace LogicCore
 				element.dynAttackWriter = fieldPreset.cardPreset.attackPreset;
 				element.dynAttackCounter = fieldPreset.cardPreset.attackCounterPreset;
 				//TODO
-				element.InitialDeploy(battleLines[lineIdx], 0);
+				element.PresetDeploy(battleLines[lineIdx], 0);
 
 				UpdateFrontLine();
 				UpdateAttackRange();
 			}
 			controller.InitBases(bases[0].controller, null);
+
+			eventTable[0].RaiseEvent("BattleStart", null, this);
+			eventTable[1].RaiseEvent("BattleStart", null, this);
 		}
 
 
@@ -558,6 +569,8 @@ namespace LogicCore
 			{
 				BattleElement element = stacks[TURN].RandomPop();
 				handicaps[TURN].Push(element, "append", 0);
+
+				eventTable[TURN].RaiseEvent("HandicapPushed", null, this);
 			}
 
 			//TODO config

@@ -75,6 +75,8 @@ public class BaseBuildingButton : MonoBehaviour,
 		aura.DOFade(0.5f, 0);
 		canvasGroup.alpha = 0.5f;
 
+		nameContent.text = nameText;
+
 		originScale = transform.localScale;
 		inspectScale = transform.localScale * inspectFactor;
 	}

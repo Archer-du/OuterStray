@@ -328,6 +328,55 @@ namespace EventEffectModels
 
 
 
+		internal void GetExtraEnergy(BattleElement element, BattleSystem system)
+		{
+			int energy = ((List<int>)argsTable["GetExtraEnergy"])[0];
+
+			system.energy[this.source.ownership] += energy;
+		}
+		internal void DrawExtraHandicaps(BattleElement element, BattleSystem system)
+		{
+			int extras = ((List<int>)argsTable["DrawExtraHandicaps"])[0];
+
+			for(int i = 0; i < extras; i++)
+			{
+				BattleElement e = system.stacks[this.source.ownership].RandomPop();
+				if (element != null)
+				{
+					system.presetHandicaps[this.source.ownership].Add(e);
+				}
+			}
+		}
+		internal void DecreaseHandicapsCost(BattleElement element, BattleSystem system)
+		{
+			int decrease = ((List<int>)argsTable["DecreaseHandicapCost"])[0];
+
+			int num = system.handicaps[this.source.ownership].count;
+			for (int i = 0; i < num; i++)
+			{
+				BattleElement e = system.handicaps[this.source.ownership][i];
+				if(e.cost != e.oriCost - decrease)
+				{
+					e.cost = e.oriCost - decrease;
+					e.UpdateInfo();
+				}
+			}
+		}
+		internal void RecoverAdjacent(BattleElement element, BattleSystem system)
+		{
+			UnitElement publisher = this.source as UnitElement;
+
+			int recover = ((List<int>)argsTable["RecoverAdjacent"])[0];
+
+			if(publisher.inlineIdx + 1 < publisher.battleLine.count)
+			{
+				publisher.battleLine[publisher.inlineIdx + 1].Recover(recover, "immediate");
+			}
+			if(publisher.inlineIdx - 1 >= 0)
+			{
+				publisher.battleLine[publisher.inlineIdx - 1].Recover(recover, "immediate");
+			}
+		}
 
 
 
@@ -661,6 +710,11 @@ namespace EventEffectModels
 			}
 		}
 
+
+
+
+
+
 		internal void TargetDamage(BattleElement source, BattleSystem system)
 		{
 			UnitElement target = source as UnitElement;
@@ -673,7 +727,12 @@ namespace EventEffectModels
 		}
 		internal void TargetRecover(BattleElement source, BattleSystem system)
 		{
+			UnitElement target = source as UnitElement;
 
+
+			int recover = ((List<int>)argsTable["TargetRecover"])[0];
+
+			target.Recover(recover, "immediate");
 		}
 		internal void TargetRetreat(BattleElement source, BattleSystem system)
 		{
@@ -682,6 +741,43 @@ namespace EventEffectModels
 			system.stacks[target.ownership].Push(target);
 			target.Retreat("immediate");
 		}
+		internal void TargetTerminate(BattleElement source, BattleSystem system)
+		{
+			UnitElement target = source as UnitElement;
+
+			target.Terminate("immediate");
+		}
+		internal void TargetGain(BattleElement source, BattleSystem system)
+		{
+			int atkGain = ((List<int>)argsTable["TargetGain"])[0];
+			int mhpGain = ((List<int>)argsTable["TargetGain"])[1];
+
+			for (int i = 0; i < system.deployQueue.Count; i++)
+			{
+				//UnitElement element = system.deployQueue[i];
+				//if (element.ownership == publisher.ownership && element.state == ElementState.inBattleLine)
+				//{
+				//	element.attackGain.Add(publisher.battleID, atkGain);
+				//	element.maxHealthGain.Add(publisher.battleID, mhpGain);
+				//	element.dynHealth += mhpGain;
+				//}
+				//element.UpdateInfo();
+				//element.UpdateHealth();
+			}
+		}
+		internal void TargetSetParry(BattleElement source, BattleSystem system)
+		{
+			UnitElement target = source as UnitElement;
+
+			target.parry = true;
+			target.EffectsParse("<self:BeforeDamaged+ParryOnEnable-0>/<self:AfterDamaged+ParryUnload-0>");
+
+			target.UpdateInfo();
+		}
+
+
+
+
 
 
 
@@ -800,8 +896,22 @@ namespace EventEffectModels
 						unit.Stifle();
 					}
 					break;
+				case 3:
+					foreach (UnitElement unit in system.deployQueue)
+					{
+						if (unit.ownership != this.source.ownership && unit.state == ElementState.inBattleLine)
+						{
+							unit.Stifle();
+						}
+					}
+					break;
 			}
 		}
+
+
+
+
+
 
 
 

@@ -202,6 +202,10 @@ public class UnitElementController : BattleElementController,
 		}
 	}
 
+	public void UpdateBuff(bool parry)
+	{
+	}
+
 	public void UpdateHealth(int dynHealth)
 	{
 		battleSceneManager.rotateSequence.InsertCallback(battleSceneManager.sequenceTime,
@@ -580,10 +584,10 @@ public class UnitElementController : BattleElementController,
 		}
 		else
 		{
+			battleLine.ElementRemove(resIdx);
 			battleSceneManager.rotateSequence.InsertCallback(battleSceneManager.sequenceTime,
 				() =>
 				{
-					battleLine.ElementRemove(resIdx);
 					selfCanvas.DOFade(0, fadeTime).OnComplete(() => gameObject.SetActive(false));
 					battleLine.UpdateElementPosition();
 					input.UpdateManual();
@@ -705,4 +709,6 @@ public class UnitElementController : BattleElementController,
 		//	}
 		//}
 	}
+
+
 }

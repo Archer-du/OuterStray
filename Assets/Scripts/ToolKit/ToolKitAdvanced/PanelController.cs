@@ -14,7 +14,9 @@ using UnityEngine.UI;
 
 public enum PanelType
 {
-	Base,
+	Govern,
+	CloningLab,
+	WorkShop,
 	OutPost,
 	Supply,
 	Medical
@@ -29,14 +31,17 @@ public class PanelController : MonoBehaviour,
 	public static event Action PanelEnabled;
 	public static event Action PanelDisabled;
 
-	public GameObject packPrototype;
+	public GameObject cardPackPrototype;
+	public GameObject tagsPackPrototype;
 
+	public Button FinalConfirmButton;
 	public Button ExitButton;
 
 	public RectTransform mask;
 
 	public Transform GridGroup;
-	public List<PackController> packs;
+	public List<CardPackController> cardPacks;
+	public List<TagsPackController> tagsPacks;
 
 	public TextAsset randomDialog;
 
@@ -77,8 +82,32 @@ public class PanelController : MonoBehaviour,
 	public Image NPCImage;
 	public DialogController dialogger;
 
+	private int PackSelectionIndex;
+	public int packSelectionIndex
+	{
+		get => PackSelectionIndex;
+		set
+		{
+			PackSelectionIndex = value;
+			foreach(TagsPackController pack in tagsPacks)
+			{
+				if(pack.index != value)
+				{
+					pack.frameCanvas.DOFade(0, 0.2f);
+				}
+				else
+				{
+					pack.frameCanvas.DOFade(1, 0.2f);
+				}
+			}
+		}
+	}
+
 	public void Start()
 	{
+		packSelectionIndex = -1;
+		FinalConfirmButton.interactable = false;
+
 		gameObject.SetActive(false);
 		transform.position = new Vector3(300, 0, 0);
 
@@ -92,25 +121,62 @@ public class PanelController : MonoBehaviour,
 		});
 
 		ExitButton.onClick.AddListener(ClosePanel);
+
+		TagsPackController.TagClicked += ClearAllOtherInspector;
 	}
+	public void ClearAllOtherInspector(int index)
+	{
+		foreach (var tagsPack in tagsPacks)
+		{
+			if (tagsPack.index != index)
+			{
+				tagsPack.inspectorCanvas.DOFade(0, 0.2f);
+			}
+		}
+	}
+
+
+
+
+
 	public void BuildPanel(PanelType type)
 	{
-		packs = new List<PackController>();
 		this.type = type;
 		switch (type)
 		{
 			//TODO 拆分
-			case PanelType.Base:
+			case PanelType.Govern:
+				tagsPacks = new List<TagsPackController>();
 				BackGround.sprite = Resources.Load<Sprite>("Ilustrate/back/admin");
 				NPCImage.sprite = Resources.Load<Sprite>("Ilustrate/chara/admin");
 				scrollRect.enabled = true;
+				scrollBar.SetActive(false);
+				FinalConfirmButton.gameObject.SetActive(false);
+				break;
+			case PanelType.CloningLab:
+				tagsPacks = new List<TagsPackController>();
+				BackGround.sprite = Resources.Load<Sprite>("Ilustrate/back/clone");
+				NPCImage.sprite = Resources.Load<Sprite>("Ilustrate/chara/clone");
+				scrollRect.enabled = true;
+				scrollBar.SetActive(false);
+				FinalConfirmButton.gameObject.SetActive(true);
+				break;
+			case PanelType.WorkShop:
+				tagsPacks = new List<TagsPackController>();
+				BackGround.sprite = Resources.Load<Sprite>("Ilustrate/back/fac");
+				NPCImage.sprite = Resources.Load<Sprite>("Ilustrate/chara/fac");
+				scrollRect.enabled = true;
+				scrollBar.SetActive(false);
+				FinalConfirmButton.gameObject.SetActive(true);
 				break;
 			case PanelType.OutPost:
+				cardPacks = new List<CardPackController>();
 				BackGround.sprite = Resources.Load<Sprite>("Ilustrate/back/outpost");
 				NPCImage.sprite = Resources.Load<Sprite>("Ilustrate/chara/merchant");
 				scrollRect.enabled = true;
 				break;
 			case PanelType.Supply:
+				cardPacks = new List<CardPackController>();
 				BackGround.sprite = Resources.Load<Sprite>("Ilustrate/back/supply");
 				BackGround.color = Color.white;
 				NPCImage.enabled = false;
@@ -132,26 +198,42 @@ public class PanelController : MonoBehaviour,
 				break;
 		}
 	}
-	public void InitializePanel(List<string> IDs)
+	public void FillTagPack(List<List<string>> IDPacks)
+	{
+		for(int i = 0; i < IDPacks.Count; i++)
+		{
+			GameObject pack = Instantiate(tagsPackPrototype, GridGroup);
+			TagsPackController controller = pack.GetComponent<TagsPackController>();
+			controller.Init(this, i);
+			controller.FillPack(IDPacks[i]);
+			tagsPacks.Add(controller);
+		}
+		content.sizeDelta = new Vector2(670 * IDPacks.Count, content.sizeDelta.y);
+	}
+	public void FillCardPack(List<string> IDs)
 	{
 		for (int i = 0; i < IDs.Count; i++)
 		{
-			GameObject pack = Instantiate(packPrototype, GridGroup);
-			PackController controller = pack.GetComponent<PackController>();
+			GameObject pack = Instantiate(cardPackPrototype, GridGroup);
+			CardPackController controller = pack.GetComponent<CardPackController>();
 			controller.Init(this);
-			packs.Add(controller);
+			cardPacks.Add(controller);
 
 			controller.RenderInspector(IDs[i]);
+
+			if(type == PanelType.OutPost)
+			{
+				controller.DisplayGasMineCost();
+			}
 		}
-		for (int i = 0; i < packs.Count; i++)
+		for (int i = 0; i < cardPacks.Count; i++)
 		{
 			int temp = i;
-			packs[i].SelectButton.onClick.AddListener(() =>
+			cardPacks[i].SelectButton.onClick.AddListener(() =>
 			{
-				Debug.Log(temp);
 				PackChosen?.Invoke(temp);
 			});
-			packs[i].detailInfoButton.onClick.AddListener(() =>
+			cardPacks[i].detailInfoButton.onClick.AddListener(() =>
 			{
 				detailShowing = true;
 				EnableDetailedInfo(temp);
@@ -159,16 +241,27 @@ public class PanelController : MonoBehaviour,
 		}
 		content.sizeDelta = new Vector2(670 * IDs.Count, content.sizeDelta.y);
 	}
+
+
+
+
+
+
+
+
 	float textTime = 0.4f;
 
 	public void OpenPanel()
 	{
 		gameObject.SetActive(true);
+
+		FinalConfirmButton.interactable = false;
+
 		transform.position = new Vector3(300, 0, 0);
 		OperateBar.localPosition = new Vector3(0, -1300f, 0);
-		BackGround.DOFade(0, 0.01f);
-		NPCImage.DOFade(0, 0.01f);
-		dialogger.canvas.DOFade(0, 0.01f);
+		BackGround.DOFade(0, 0f);
+		NPCImage.DOFade(0, 0f);
+		dialogger.canvas.DOFade(0, 0f);
 		dialogger.text.gameObject.SetActive(false);
 
 		float moveUpTime = 0.4f;
@@ -179,7 +272,7 @@ public class PanelController : MonoBehaviour,
 		seq.Append(OperateBar.DOLocalMove(new Vector3(0, -466, 0), moveUpTime));
 		seq.Append(BackGround.DOFade(1f, fadeTime));
 		seq.Append(NPCImage.DOFade(1f, fadeTime));
-		seq.Append(dialogger.canvas.DOFade(1, fadeTime));
+		seq.Append(dialogger.canvas.DOFade(0.6f, fadeTime));
 		//TODO
 		if(type != PanelType.Supply)
 		{
@@ -228,7 +321,7 @@ public class PanelController : MonoBehaviour,
 	}
 	public void DisablePackButton(int index)
 	{
-		packs[index].SelectButton.interactable = false;
+		cardPacks[index].SelectButton.interactable = false;
 	}
 
 
@@ -259,6 +352,11 @@ public class PanelController : MonoBehaviour,
 		}
 	}
 
+
+
+
+
+
 	public void OnPointerClick(PointerEventData eventData)
 	{
 		if(detailShowing)
@@ -276,16 +374,17 @@ public class PanelController : MonoBehaviour,
 				textTime
 			).SetEase(Ease.Linear);
 		}
-		foreach(PackController pack in packs)
+		foreach(CardPackController pack in cardPacks)
 		{
 			pack.explainCanvas.DOFade(0, 0.2f);
 		}
+		ClearAllOtherInspector(-1);
 	}
 	public void EnableDetailedInfo(int index)
 	{
 		float duration = 0.3f;
 
-		foreach (PackController pack in packs)
+		foreach (CardPackController pack in cardPacks)
 		{
 			pack.explainCanvas.DOFade(0, 0.2f);
 		}
@@ -299,7 +398,7 @@ public class PanelController : MonoBehaviour,
 		detailedCard.alpha = 0f;
 		detailedInfo.alpha = 0f;
 
-		CardInspector card = packs[index].inspector;
+		CardInspector card = cardPacks[index].inspector;
 		detailedImage.sprite = card.cardImage.sprite;
 		attackText.enabled = card.category != "Command";
 		healthText.enabled = card.category != "Command";

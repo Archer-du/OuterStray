@@ -6,7 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PackController : MonoBehaviour
+public class CardPackController : MonoBehaviour
 {
 	public static event Action<int> CloseOtherExplanation;
 
@@ -21,7 +21,7 @@ public class PackController : MonoBehaviour
 	public GridLayoutGroup textGroup;
 
 	public Button SelectButton;
-	public TMP_Text text;
+	public TMP_Text buttonText;
 
 	public int index;
 
@@ -41,7 +41,7 @@ public class PackController : MonoBehaviour
 		set
 		{
 			Num = value;
-			if(Num >= 3)
+			if(Num >= 1)
 			{
 				SelectButton.interactable = false;
 			}
@@ -66,7 +66,7 @@ public class PackController : MonoBehaviour
 	public void ExplainButtonClick()
 	{
 		explainCanvas.DOFade(explainCanvas.alpha == 0 ? 1 : 0, duration);
-		foreach(PackController pack in panel.packs)
+		foreach(CardPackController pack in panel.cardPacks)
 		{
 			if(pack != this)
 			{
@@ -92,5 +92,6 @@ public class PackController : MonoBehaviour
 
 	public void DisplayGasMineCost()
 	{
+		buttonText.text = gasMineCost.ToString();
 	}
 }

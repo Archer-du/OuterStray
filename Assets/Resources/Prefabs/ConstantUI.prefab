@@ -32,11 +32,11 @@ RectTransform:
   m_Father: {fileID: 1650916451937781121}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -581.248}
-  m_SizeDelta: {x: 0, y: 1162.4958}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 799.38007}
+  m_SizeDelta: {x: 584, y: 130}
+  m_Pivot: {x: 0.5, y: 1}
 --- !u!1 &542653481098473855
 GameObject:
   m_ObjectHideFlags: 0
@@ -732,9 +732,9 @@ RectTransform:
   m_Father: {fileID: 1046830291859569142}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 16.5, y: 319.24}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 0, y: -1061.3842}
   m_SizeDelta: {x: 550, y: 2122.7683}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &7729009110646093623
@@ -775,6 +775,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tags: []
   deckTagPrototype: {fileID: 3442668585234461305, guid: 03c54fa688f2c3e40991abfb98cb6703, type: 3}
+  content: {fileID: 1046830291859569142}
   deckTagLock: 0
 --- !u!1 &2853172358088194845
 GameObject:
@@ -1453,8 +1454,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0.000054359, y: 434.8917}
-  m_SizeDelta: {x: 42.534, y: -849.7831}
+  m_AnchoredPosition: {x: 0.000054359, y: 4.9992065}
+  m_SizeDelta: {x: 42.534, y: 9.9985}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5630618283158418578
 CanvasRenderer:
@@ -1484,8 +1485,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: c92c6e34b11e1dd47bc1a5395031813e, type: 3}
-  m_Type: 0
+  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -1908,7 +1909,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_PresetInfoIsWorld: 0
 --- !u!1 &8174332654943353484
 GameObject:
   m_ObjectHideFlags: 0
@@ -2248,8 +2249,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 4209992404397112141}
   m_HandleRect: {fileID: 1442340174716089550}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 0.57899743
+  m_Value: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
