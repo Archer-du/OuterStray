@@ -164,6 +164,7 @@ public class PanelController : MonoBehaviour,
 	public void OpenPanel()
 	{
 		gameObject.SetActive(true);
+		transform.position = new Vector3(300, 0, 0);
 		OperateBar.localPosition = new Vector3(0, -1300f, 0);
 		BackGround.DOFade(0, 0.01f);
 		NPCImage.DOFade(0, 0.01f);

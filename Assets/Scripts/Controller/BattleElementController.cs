@@ -311,16 +311,16 @@ public class BattleElementController : MonoBehaviour
 		switch(category)
 		{
 			case "LightArmor":
-				explanations.Add("<b>兵种：轻装</b>\n无效果");
+				explanations.Add("<b>兵种：轻装</b>\n近战攻击敌人");
 				break;
 			case "Motorized":
-				explanations.Add("<b>兵种：轻装</b>\n移动时减少攻击计数器");
+				explanations.Add("<b>兵种：机动</b>\n移动时减少攻击计数器");
 				break;
 			case "Artillery":
-				explanations.Add("<b>兵种：轻装</b>\n随机攻击敌方目标");
+				explanations.Add("<b>兵种：轰击</b>\n随机攻击敌方目标");
 				break;
 			case "Guardian":
-				explanations.Add("<b>兵种：轻装</b>\n嘲讽攻击范围内的单位");
+				explanations.Add("<b>兵种：重装</b>\n嘲讽攻击范围内的单位");
 				break;
 			case "Construction":
 				explanations.Add("<b>兵种：建筑</b>\n无法移动");
@@ -344,6 +344,10 @@ public class BattleElementController : MonoBehaviour
 		if (description.Contains("越野"))
 		{
 			explanations.Add("<b>越野</b>\n可以移动至不相邻的战线");
+		}
+		if (description.Contains("顺劈"))
+		{
+			explanations.Add("<b>顺劈</b>\n同时攻击范围内的所有敌人");
 		}
 		if (description.Contains("反击"))
 		{

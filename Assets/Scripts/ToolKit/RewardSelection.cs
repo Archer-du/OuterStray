@@ -146,6 +146,8 @@ public class RewardSelection : MonoBehaviour,
 				break;
 			case "Command":
 				color = Color.gray;
+				cardImage.rectTransform.sizeDelta = new Vector2(18, 24);
+				categoryIcon.sprite = Resources.LoadAll<Sprite>("Map-icon")[6];
 				break;
 		}
 

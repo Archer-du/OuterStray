@@ -140,6 +140,7 @@ public class BattleSceneManager : MonoBehaviour,
 		SettleButton.onClick.AddListener(BattleOverChecked);
     }
 	public GameObject dialog;
+	public GameObject guide;
 	public void FieldInitialize(IBattleSystemInput handler, int fieldCapacity, int BTindex)
 	{
 		gameManager = GameManager.GetInstance();
@@ -150,6 +151,7 @@ public class BattleSceneManager : MonoBehaviour,
 		if (!gameManager.config.tutorial)
 		{
 			dialog.SetActive(false);
+			guide.SetActive(false);
 		}
 		switch (BTindex)
 		{
@@ -453,6 +455,8 @@ public class BattleSceneManager : MonoBehaviour,
 
 	public void Surrender()
 	{
+
+
 		StopAllCoroutines();
 		SettleText.text = "Failure";
 		SettleText.gameObject.SetActive(true);
@@ -467,6 +471,13 @@ public class BattleSceneManager : MonoBehaviour,
 	}
 	public void BattleFailed()
 	{
+		if (gameManager.config.tutorial)
+		{
+			gameManager.config.tutorial = false;
+			string modifiedConfig = JsonUtility.ToJson(gameManager.config, true);
+			//TODO
+		}
+
 		StopAllCoroutines();
 		SettleText.text = "Failure";
 		SettleText.gameObject.SetActive(true);
@@ -485,14 +496,8 @@ public class BattleSceneManager : MonoBehaviour,
 	{
 		StopAllCoroutines();
 
-		if (gameManager.config.tutorial)
-		{
-			gameManager.config.tutorial = false;
-			string modifiedConfig = JsonUtility.ToJson(gameManager.config, true);
-			//TODO
-		}
+		SettleText.text = "Victory";
 
-		SettleText.text = gameManager.config.tutorial ? "Failure" : "Victory";
 		SettleText.gameObject.SetActive(true);
 		float duration = 0.4f;
 		rotateSequence.Append(

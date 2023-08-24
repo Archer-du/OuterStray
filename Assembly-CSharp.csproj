@@ -91,6 +91,7 @@
     <Compile Include="Assets\Scripts\Controller\MedicalNodeController.cs" />
     <Compile Include="Assets\Scripts\ToolKit\Button\BaseBuildingButton.cs" />
     <Compile Include="Assets\Scripts\SceneManager\BattleSceneManager.cs" />
+    <Compile Include="Assets\CircleEffects.cs" />
     <Compile Include="Assets\Scripts\ToolKit\Input\ElementDragInput.cs" />
     <Compile Include="Assets\Scripts\ToolKit\EnergyDisplay.cs" />
     <Compile Include="Assets\Scripts\Controller\PromoteNodeController.cs" />

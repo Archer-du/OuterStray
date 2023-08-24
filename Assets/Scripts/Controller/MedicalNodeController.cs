@@ -57,8 +57,6 @@ public class MedicalNodeController : NodeController
 	{
 		panel.selection.healthText.text = health.ToString();
 	}
-
-
 	public override void SetBasicInfo(int legacy, int medicalPrice)
 	{
 		this.pricePerHealth = medicalPrice;

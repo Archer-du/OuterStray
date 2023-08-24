@@ -23,7 +23,7 @@ human_05,human,卡瓦兰焚化小组,LightArmor,2,2,3,2,85,顺劈,Cleave,顺劈,
 human_06,human,指挥中心,Construction,1,0,2,,55,所有友方单位获得+1攻击力。,<Aura:ally:UnitDeployed+AuraUnitGain-2-1-0>|<self:AfterDeploy+AuraConstantUnitGain-2-1-0>,,todo
 human_08,human,卡瓦兰消杀小队,Artillery,2,2,2,2,55,,,,
 human_10,human,卡瓦兰安保卫队,Guardian,3,2,6,2,55,,,,
-human_11,human,卡瓦兰探险家,LightArmor,3,2,4,1,55,越野。/该单位进入前线后，抽一张牌。,Raid|<self:AfterDeploy+DrawCardsRandom-1-1>,越野,
+human_11,human,卡瓦兰探险家,LightArmor,3,2,4,1,55,越野。/该单位进入前线后，抽一张牌。,Raid|<self:EnterFrontLine+DrawCardsRandom-1-1>,越野,
 human_12,human,修理车间,Construction,4,0,4,,55,你的回合结束时，为一个随机的受伤友方单位恢复2点耐久。,<self:EndOfTurn+RandomRecoverDamaged-1-1>,,
 human_15,human,“索姆努斯”维修单元,Guardian,6,5,6,3,200,护甲（1）/部署：为你的基地恢复8点耐久。,<self:Initialize+Armor-1-1>/<self:BeforeAttacked+ArmorOnEnable-0>|<self:AfterDeploy+RecoverBase-1-8>,护甲、部署,
 human_17,human,卡瓦兰医官,LightArmor,2,1,2,1,55,部署：为所有友方单位恢复1点耐久。,<self:AfterDeploy+AOERecover-2-3-1>,,todo
@@ -62,4 +62,4 @@ tutorial_05,human,卡瓦兰焚化组长,LightArmor,2,4,10,2,85,顺劈,Cleave,顺
 tutorial_10,human,卡瓦兰安保卫队长,Guardian,3,2,8,2,55,,,,
 tutorial_21,human,机械安保,Guardian,4,2,10,1,55,部署：获得格挡。,<self:AfterDeploy+Parry-0>/<self:BeforeDamaged+ParryOnEnable-0>/<self:AfterDamaged+ParryUnload-0>,部署,
 tutorial_24,human,“泰坦”矿业外甲,Guardian,16,12,12,4,200,顺劈，护甲（3）/该单位处于前线时，你的基地耐久不会低于1点。,Cleave|<self:Initialize+Armor-1-3>/<self:BeforeAttacked+ArmorOnEnable-0>|<Aura:ally:BaseAttacked+AuraBaseImmunity-0>,顺劈、护甲,
-tutorial_27,human,威尔海姆教官,Guardian,4,4,15,3,200,护甲（1）/相邻单位始终获得格挡。,<self:Initialize+Armor-1-1>/<self:BeforeAttacked+ArmorOnEnable-0>|,格挡,
+tutorial_27,human,威尔海姆教官,Guardian,4,4,10,3,200,护甲（1）,<self:Initialize+Armor-1-1>/<self:BeforeAttacked+ArmorOnEnable-0>,格挡,

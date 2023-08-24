@@ -92,11 +92,7 @@ namespace DataCore.CultivateItems
 					line = reader.ReadLine();
 					continue;
 				}
-				if (data[0].Contains("tutorial"))
-				{
-					line = reader.ReadLine();
-					continue;
-				}
+
 
 				DeserializeMethods.CardDeserialize(out Card card, data);
 
@@ -129,7 +125,7 @@ namespace DataCore.CultivateItems
 							humanCommandSet.Add(card);
 							break;
 					}
-					if (!card.backendID.Contains("base"))
+					if (!card.backendID.Contains("base") && !card.backendID.Contains("tutorial"))
 					{
 						humanCardPool.Add(card);
 					}

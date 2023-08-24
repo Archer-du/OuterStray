@@ -825,7 +825,11 @@ namespace DataCore.BattleElements
 
             if (this.dynHealth <= 0)
             {
-                if (this == battleSystem.bases[0])
+				if (battleSystem.tutorial && backendID == "tutorial_27")
+				{
+					battleSystem.result = BattleResult.fail;
+				}
+				if (this == battleSystem.bases[0])
                 {
                     battleSystem.result = BattleResult.fail;
                 }
@@ -867,7 +871,7 @@ namespace DataCore.BattleElements
 			{
 				if (battleSystem.tutorial && backendID == "tutorial_27")
 				{
-					battleSystem.result = BattleResult.win;
+					battleSystem.result = BattleResult.fail;
 				}
 				if (this == battleSystem.bases[0])
 				{
@@ -899,7 +903,7 @@ namespace DataCore.BattleElements
 			{
                 if (battleSystem.tutorial && backendID == "tutorial_27")
                 {
-                    battleSystem.result = BattleResult.win;
+                    battleSystem.result = BattleResult.fail;
                 }
                 if (this == battleSystem.bases[0])
 				{
