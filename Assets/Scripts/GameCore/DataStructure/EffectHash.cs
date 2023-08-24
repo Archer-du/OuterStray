@@ -1629,31 +1629,53 @@ namespace EventEffectModels
 				{"Parry", (BattleEventHandler)Parry },
 				{"ParryOnEnable", (BattleEventHandler)ParryOnEnable },
 				{"ParryUnload", (BattleEventHandler)ParryUnload },
+
 				{"AttackCounterDecrease", (BattleEventHandler)AttackCounterDecrease },
 				{"DrawCardsRandom", (BattleEventHandler)DrawCardsRandom },
 				{"RandomDamage", (BattleEventHandler)RandomDamage },
 				{"RandomRecoverDamaged", (BattleEventHandler)RandomRecoverDamaged },
+				{"RecoverAdjacent", (BattleEventHandler)RecoverAdjacent },
 				{"DamageAdjacent", (BattleEventHandler)DamageAdjacent },
 				{"RecruitByID", (BattleEventHandler)RecruitByID },
 				{"RecruitByCategory", (BattleEventHandler)RecruitByCategory },
+				{"RecruitByCost", (BattleEventHandler)RecruitByCost },
 				{"SummonToken", (BattleEventHandler)SummonToken },
+
 				{"TokenGain", (BattleEventHandler)TokenGain },
 				{"TargetDamage", (BattleEventHandler)TargetDamage },
 				{"TargetRetreat", (BattleEventHandler)TargetRetreat },
+				{"TargetRecover", (BattleEventHandler)TargetRecover },
+				{"TargetGain", (BattleEventHandler)TargetGain },
+				{"TargetSetParry", (BattleEventHandler)TargetSetParry },
+				{"TargetTerminateAlly", (BattleEventHandler)TargetTerminateAlly },
+
 				{"AOEDamage", (BattleEventHandler)AOEDamage },
 				{"AOERetreat", (BattleEventHandler)AOERetreat },
 				{"AOERecover", (BattleEventHandler)AOERecover },
 				{"AOEStifle", (BattleEventHandler)AOEStifle },
+				{"AOEAttackCounterDecrease", (BattleEventHandler)AOEAttackCounterDecrease },
+				{"AOEResetAttackCounter", (BattleEventHandler)AOEResetAttackCounter },
+
 				{"RecoverBase", (BattleEventHandler)RecoverBase },
+
+				{"DamageAll", (BattleEventHandler)DamageAll },
 				{"RecoverAll", (BattleEventHandler)RecoverAll },
 				{"DrawCommandCardsRandomAndRecover", (BattleEventHandler)DrawCommandCardsRandomAndRecover },
-				{"StrangeGrowth", (BattleEventHandler)StrangeGrowth },
-				{"StrangeGrowthTutorial", (BattleEventHandler)StrangeGrowthTutorial },
 				{"AuraConstantUnitGain", (BattleEventHandler)AuraConstantUnitGain },
-				{"AOEResetAttackCounter", (BattleEventHandler)AOEResetAttackCounter },
 				{"AuraConstantSelfAttackGainByID", (BattleEventHandler)AuraConstantSelfAttackGainByID },
 				{"AuraSelfGainByID", (BattleEventHandler)AuraSelfGainByID },
 				{"SummonTokenAndGain", (BattleEventHandler)SummonTokenAndGain },
+
+				{"StrangeGrowth", (BattleEventHandler)StrangeGrowth },
+				{"StrangeGrowthTutorial", (BattleEventHandler)StrangeGrowthTutorial },
+
+				{"GetExtraEnergy", (BattleEventHandler)GetExtraEnergy },
+				{"DrawExtraHandicaps", (BattleEventHandler)DrawExtraHandicaps },
+				{"DecreaseHandicapsCost", (BattleEventHandler)DecreaseHandicapsCost },
+
+				{"CheckOutRemoteTarget", (BattleEventHandler)CheckOutRemoteTarget },
+
+				{"AttackAndStifle", (BattleEventHandler)AttackAndStifle },
 
 				//aura
 				{"Aura", (BattleEventHandler)Aura },
@@ -1666,6 +1688,7 @@ namespace EventEffectModels
 				{"AuraDoubleRecover", (BattleEventHandler)AuraDoubleRecover },
 				{"AuraBaseImmunity", (BattleEventHandler)AuraBaseImmunity },
 				{"AuraSelfAttackGainByID", (BattleEventHandler)AuraSelfAttackGainByID },
+				{"AuraDamageDeployed", (BattleEventHandler)AuraDamageDeployed },
 
 				//command
 				{"Comm_Mush_07", (BattleEventHandler)Comm_Mush_07 },
@@ -1677,12 +1700,13 @@ namespace EventEffectModels
 			//如果需要参数，请在这里注册
 			argsTable = new Hashtable()
 			{
+				//basic
 				{"Assault", null },
 				{"AssaultOnEnable", null },
 				{"Raid", null },
 				{"RaidOnEnable", null },
 				{"Cleave", null },
-				{"CleaveOnEnable",	null },
+				{"CleaveOnEnable", null },
 				{"Armor", null },
 				{"ArmorOnEnable", null },
 				{"Thorn", null },
@@ -1690,44 +1714,69 @@ namespace EventEffectModels
 				{"Parry", null },
 				{"ParryOnEnable", null },
 				{"ParryUnload", null },
+
 				{"AttackCounterDecrease", null },
 				{"DrawCardsRandom", null },
 				{"RandomDamage", null },
 				{"RandomRecoverDamaged", null },
+				{"RecoverAdjacent", null },
 				{"DamageAdjacent", null },
 				{"RecruitByID", null },
 				{"RecruitByCategory", null },
+				{"RecruitByCost", null },
 				{"SummonToken", null },
+
 				{"TokenGain", null },
 				{"TargetDamage", null },
 				{"TargetRetreat", null },
+				{"TargetRecover", null },
+				{"TargetGain", null },
+				{"TargetSetParry", null },
+				{"TargetTerminateAlly", null },
+
 				{"AOEDamage", null },
 				{"AOERetreat", null },
 				{"AOERecover", null },
 				{"AOEStifle", null },
-				{"DrawCommandCardsRandomAndRecover", null },
-				{"RecoverBase", null },
-				{"RecoverAll", null },
-				{"StrangeGrowth", null },
-				{"StrangeGrowthTutorial", null },
-				{"AuraConstantUnitGain", null },
+				{"AOEAttackCounterDecrease", null },
 				{"AOEResetAttackCounter", null },
+
+				{"RecoverBase", null },
+
+				{"DamageAll", null },
+				{"RecoverAll", null },
+				{"DrawCommandCardsRandomAndRecover", null },
+				{"AuraConstantUnitGain", null },
 				{"AuraConstantSelfAttackGainByID", null },
+				{"AuraSelfGainByID", null },
 				{"SummonTokenAndGain", null },
 
+				{"StrangeGrowth", null },
+				{"StrangeGrowthTutorial", null },
+
+				{"GetExtraEnergy", null },
+				{"DrawExtraHandicaps", null },
+				{"DecreaseHandicapsCost", null },
+
+				{"CheckOutRemoteTarget", null },
+
+				{"AttackAndStifle", null },
+
+				//aura
 				{"Aura", null },
 				{"AuraUnload", null },
 				{"AuraDisable", null },
+
 				{"AuraRandomDamage", null },
 				{"AuraAttackCounterDecrease", null },
 				{"AuraUnitGain", null },
 				{"AuraDoubleRecover", null },
 				{"AuraBaseImmunity", null },
 				{"AuraSelfAttackGainByID", null },
-                {"AuraSelfGainByID", null },
+				{"AuraDamageDeployed", null },
 
-
-                {"Comm_Mush_07", null },
+				//command
+				{"Comm_Mush_07", null },
 				{"Comm_Mush_08", null },
 				{"Comm_Mush_13", null },
 				{"Comm_Mush_18", null },

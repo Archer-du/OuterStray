@@ -984,6 +984,8 @@ namespace DataCore.BattleElements
 			this.targetIdx = -1;
 			this.target = null;
 
+			cost = oriCost;
+
 			//寄存器初始化
 			attackGain.Clear();
 			maxHealthGain.Clear();
