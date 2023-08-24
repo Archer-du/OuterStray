@@ -1,0 +1,13 @@
+comm_human_06,human,根除,Target,4,5,,,85,抽一张牌，对一个单位造成等同于其费用的伤害。,,,todo
+comm_mush_04,plant,回收养分,NonTarget,2,2,,,,使你的所有单位获得“阵亡：抽一张牌。”,,,todo
+comm_mush_05,plant,暗中生长,Target,1,5,,,,使一个单位获得+1/+1，然后为母体恢复等同于其攻击力的生命值。,,,todo
+comm_mush_09,plant,突然变异,NonTarget,5,2,,,,使你的所有处于前线的单位获得+1攻击力，且-1攻击计时。,<self:Cast+AOEAttackCounterDecrease-2-2-1>,,todo
+comm_mush_11,plant,同类相食,Target,0,3,,,,消灭一个亮顶孢子，为母体恢复5点生命值。,,,todo
+comm_mush_12,plant,栽培,NonTarget,4,2,,,,使母体恢复4点生命值。招募一个单位。,,,todo
+comm_mush_14,plant,枯萎,NonTarget,8,1,,,,触发所有友方单位的阵亡效果。,,,todo
+human_27,human,威尔海姆教官,Guardian,4,4,7,2,200,护甲（1）/相邻单位始终获得格挡。,,,todo
+human_29,human,卡瓦兰生化小组,Artillery,4,3,4,2,165,消灭一个处于支援战线的随机敌方单位。,,,todo
+human_31,human,卡瓦兰通信工程师,LightArmor,3,2,3,2,85,所有指令牌的费用降低（1）点。,<self:AfterDeploy,,todo
+human_32,human,卡瓦兰教官,LightArmor,1,1,1,3,85,部署：使一个随机友方单位获得+1/+1。,,,todo
+human_33,human,卡瓦兰技工,LightArmor,3,2,4,1,55,部署：召唤不结实的无人机,,,todo
+human_36,human,卡瓦兰建筑工,LightArmor,4,3,5,2,55,部署：招募建筑至当前战线,,,todo
