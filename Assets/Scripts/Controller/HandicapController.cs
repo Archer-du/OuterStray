@@ -142,6 +142,8 @@ public class HandicapController : MonoBehaviour,
 	/// 解锁
 	/// </summary>
 	/// <param name="element"></param>
+	/// 
+	public Sequence DrawSequence;
 	public void PushAnimation(BattleElementController element, string method, int position)
 	{
 		float popTime = 0.3f;
@@ -150,28 +152,28 @@ public class HandicapController : MonoBehaviour,
 
 		element.inspectPanel.active = false;
 
-		Sequence seq = DOTween.Sequence();
+		DrawSequence = DOTween.Sequence();
 
-		seq.AppendInterval(battleSceneManager.sequenceTime);
-		seq.AppendInterval(method == "append" ? 1.8f : 0);
+		DrawSequence.AppendInterval(battleSceneManager.sequenceTime);
+		DrawSequence.AppendInterval(method == "append" ? 1.8f : 0);
 
-		seq.AppendCallback(() => ResetElementDisplay(element));
+		DrawSequence.AppendCallback(() => ResetElementDisplay(element));
 		//移动到屏幕中心
 		if (element.ownership == 0)
 		{
             pushLock = true;
             element.inspectLock = true;
 
-            seq.Append(element.transform.DOMove(Vector3.zero + position * 800f * Vector3.right, popTime));
-			seq.Join(element.transform.DOScale(element.showScale, popTime));
-			seq.Join(element.transform.DORotate(new Vector3(0, 0, ownership * 180), popTime));
+            DrawSequence.Append(element.transform.DOMove(Vector3.zero + position * 800f * Vector3.right, popTime));
+			DrawSequence.Join(element.transform.DOScale(element.showScale, popTime));
+			DrawSequence.Join(element.transform.DORotate(new Vector3(0, 0, ownership * 180), popTime));
 	
 			//展示等待
-			seq.AppendInterval(waitTime);
+			DrawSequence.AppendInterval(waitTime);
 			//加入手牌
 			Vector3 dstPos = GetLogicPosition(count);
-			seq.Append(element.transform.DOScale(element.handicapScale, popTime));
-			seq.Join(element.transform.DOMove(dstPos, popTime)
+			DrawSequence.Append(element.transform.DOScale(element.handicapScale, popTime));
+			DrawSequence.Join(element.transform.DOMove(dstPos, popTime)
 				.OnComplete(() =>
 				{
 					element.inspectLock = false;
@@ -184,16 +186,16 @@ public class HandicapController : MonoBehaviour,
 		{
 			//加入手牌
 			Vector3 dstPos = GetLogicPosition(count);
-			seq.Append(element.transform.DOMove(dstPos, popTime));
-			seq.Join(element.transform.DOScale(element.handicapScale, popTime));
-			seq.Join(element.transform.DORotate(new Vector3(0, 0, ownership * 180), popTime)
+			DrawSequence.Append(element.transform.DOMove(dstPos, popTime));
+			DrawSequence.Join(element.transform.DOScale(element.handicapScale, popTime));
+			DrawSequence.Join(element.transform.DORotate(new Vector3(0, 0, ownership * 180), popTime)
 				.OnComplete(() =>
 				{
 					element.inspectLock = false;
 					UpdateHandicapPosition();
 				}));
 		}
-		seq.Play();
+		DrawSequence.Play();
 	}
 
 

@@ -1109,7 +1109,7 @@ namespace DataCore.BattleElements
 	}
 	internal sealed class ArtilleryElement : UnitElement
 	{
-		internal UnitElement tmpTarget;
+		internal UnitElement remoteTarget;
 		internal ArtilleryElement(UnitCard __card, BattleSystem system, IUnitElementController controller) 
 			: base(__card, system, controller) { }
 		internal override void SetAttackRange(UnitElement t1, UnitElement t2, UnitElement t3)
@@ -1124,7 +1124,7 @@ namespace DataCore.BattleElements
 
 			if (this.dynAttackCounter <= 0)
 			{
-				tmpTarget = battleSystem.RandomTarget(this.ownership);
+				remoteTarget = battleSystem.RandomTarget(this.ownership);
 				int result = -1;
 				result = Attack();
 				if (result > 0)
@@ -1135,13 +1135,15 @@ namespace DataCore.BattleElements
 		}
 		internal override int Attack()
 		{
-			if (tmpTarget == null) return -1;
+			if (remoteTarget == null) return -1;
 
 			eventTable.RaiseEvent("BeforeAttack", this, battleSystem);
+			if (remoteTarget == null) return -1;
 
 
-			controller.RandomAttackAnimationEvent(tmpTarget.controller);
-			tmpTarget.Attacked(this);
+
+			controller.RandomAttackAnimationEvent(remoteTarget.controller);
+			remoteTarget.Attacked(this);
 
 
 			eventTable.RaiseEvent("AfterAttack", this, battleSystem);
@@ -1224,6 +1226,7 @@ namespace DataCore.BattleElements
 		{
 			EffectsReParse();
 			eventTable.RaiseEvent("Cast", target, battleSystem);
+			battleSystem.eventTable[ownership].RaiseEvent("CommandCasted", this, battleSystem);
 			UnloadEffects();
 
 

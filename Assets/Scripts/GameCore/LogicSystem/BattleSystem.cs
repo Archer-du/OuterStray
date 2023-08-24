@@ -881,6 +881,40 @@ namespace LogicCore
 				}
 			}
 		}
+		internal UnitElement LowestHealthTarget(int ownership)
+		{
+			int maxHealth = 100;
+			UnitElement maxPointer = null;
+			foreach(var item in deployQueue)
+			{
+				if(item.ownership != ownership && item.state == ElementState.inBattleLine)
+				{
+					if(item.dynHealth < maxHealth)
+					{
+						maxHealth = item.dynHealth;
+						maxPointer = item;
+					}
+				}
+			}
+			return maxPointer;
+		}
+		internal UnitElement HighestHealthTarget(int ownership)
+		{
+			int minHealth = 0;
+			UnitElement minPointer = null;
+			foreach (var item in deployQueue)
+			{
+				if (item.ownership != ownership && item.state == ElementState.inBattleLine)
+				{
+					if (item.dynHealth > minHealth)
+					{
+						minHealth = item.dynHealth;
+						minPointer = item;
+					}
+				}
+			}
+			return minPointer;
+		}
 		/// <summary>
 		/// 查询敌方随机目标
 		/// </summary>

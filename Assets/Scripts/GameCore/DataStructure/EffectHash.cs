@@ -249,42 +249,7 @@ namespace EventEffectModels
 
 			element.UpdateInfo();
 		}
-		internal void AOEResetAttackCounter(BattleElement source, BattleSystem system)
-		{
-			int position = ((List<int>)argsTable["AOEResetAttackCounter"])[0];
 
-			BattleLine line;
-			switch (position)
-			{
-				//0：支援战线
-				case 0:
-					line = system.battleLines[system.supportLines[this.source.ownership]];
-					for (int i = 0; i < line.count; i++)
-					{
-						line[i].dynAttackCounter = line[i].oriAttackCounter;
-						line[i].UpdateInfo();
-					}
-					break;
-				//1：当前战线
-				case 1:
-					UnitElement element = this.source as UnitElement;
-
-					for (int i = 0; i < element.battleLine.count; i++)
-					{
-						element.battleLine[i].dynAttackCounter = element.battleLine[i].oriAttackCounter;
-						element.battleLine[i].UpdateInfo();
-					}
-					break;
-				case 2:
-					line = system.battleLines[system.frontLines[this.source.ownership]];
-					for (int i = 0; i < line.count; i++)
-					{
-						line[i].dynAttackCounter = line[i].oriAttackCounter;
-						line[i].UpdateInfo();
-					}
-					break;
-			}
-		}
 		internal void DrawCardsRandom(BattleElement source, BattleSystem system)
 		{
 			int argsNum = 1;
@@ -324,6 +289,33 @@ namespace EventEffectModels
 
 			target?.Damaged(damage, "append");
 		}
+		internal void RandomTerminate(BattleElement element, BattleSystem system)
+		{
+			int argsNum = 2;
+
+
+
+			int range = ((List<int>)argsTable["RandomDamage"])[0];
+			int damage = ((List<int>)argsTable["RandomDamage"])[1];
+
+			UnitElement target = null;
+			switch (range)
+			{
+				case 0:
+					target = system.RandomTarget(this.source.ownership);
+					break;
+				case 1:
+					target = system.RandomEnemyAtFrontLine(this.source.ownership);
+					break;
+			}
+
+			target?.Terminate("append");
+		}
+
+
+
+
+
 
 
 
@@ -571,6 +563,52 @@ namespace EventEffectModels
 				RecruitToPosition(system, position, unit);
 			}
 		}
+		internal void RecruitByCost(BattleElement source, BattleSystem system)
+		{
+			UnitElement element = this.source as UnitElement;
+
+			int argsNum = 3;
+			if (!argsTable.ContainsKey("RecruitByCost"))
+			{
+				throw new InvalidOperationException("argsTable fault");
+			}
+			if (((List<int>)argsTable["RecruitByCost"]).Count != argsNum)
+			{
+				throw new InvalidOperationException("argsTable list length invalid");
+			}
+			int costValve = ((List<int>)argsTable["RecruitByCost"])[0];
+			int position = ((List<int>)argsTable["RecruitByCost"])[1];
+			int num = ((List<int>)argsTable["RecruitByCost"])[2];
+
+			List<UnitElement> targets = new List<UnitElement>();
+			int count = system.stacks[element.ownership].count;
+			for (int i = 0; i < count; i++)
+			{
+				BattleElement e = system.stacks[element.ownership][i];
+				if (e.cost < costValve && e is UnitElement)
+				{
+					targets.Add(e as UnitElement);
+				}
+			}
+			if (targets.Count == 0) return;
+			int n = num > targets.Count ? targets.Count : num;
+			for (int i = 0; i < n; i++)
+			{
+				UnitElement unit;
+				Random random = new Random();
+
+				int index = random.Next(0, targets.Count);
+
+				unit = targets[index];
+				targets.RemoveAt(index);
+
+				RecruitToPosition(system, position, unit);
+			}
+		}
+
+
+
+
 
 
 
@@ -741,9 +779,14 @@ namespace EventEffectModels
 			system.stacks[target.ownership].Push(target);
 			target.Retreat("immediate");
 		}
-		internal void TargetTerminate(BattleElement source, BattleSystem system)
+		internal void TargetTerminateAlly(BattleElement source, BattleSystem system)
 		{
 			UnitElement target = source as UnitElement;
+
+			if(target.ownership != this.source.ownership)
+			{
+				return;
+			}
 
 			target.Terminate("immediate");
 		}
@@ -824,7 +867,6 @@ namespace EventEffectModels
 						}
 					}
 					break;
-
 			}
 		}
 		internal void AOERetreat(BattleElement source, BattleSystem system)
@@ -864,6 +906,13 @@ namespace EventEffectModels
 				case 1:
 					break;
 				case 2:
+					foreach (UnitElement unit in system.deployQueue)
+					{
+						if (unit.ownership == this.source.ownership && unit.state == ElementState.inBattleLine && unit.battleLine.index == system.frontLines[this.source.ownership])
+						{
+							unit.Recover(heal, "immediate");
+						}
+					}
 					break;
 				//全图
 				case 3:
@@ -907,6 +956,76 @@ namespace EventEffectModels
 					break;
 			}
 		}
+		internal void AOEAttackCounterDecrease(BattleElement source, BattleSystem system)
+		{
+			int argsNum = 2;
+
+
+
+			int position = ((List<int>)argsTable["AOEAttackCounterDecrease"])[0];
+			int decrease = ((List<int>)argsTable["AOEAttackCounterDecrease"])[1];
+
+
+			switch (position)
+			{
+				//0：支援战线
+				case 0:
+					break;
+				//1：当前战线
+				case 1:
+					break;
+				//2: 前线
+				case 2:
+					foreach (UnitElement unit in system.deployQueue)
+					{
+						if (unit.ownership == this.source.ownership && unit.state == ElementState.inBattleLine && unit.battleLine.index == system.frontLines[this.source.ownership])
+						{
+							unit.dynAttackCounter -= decrease;
+							unit.UpdateInfo();
+						}
+					}
+					break;
+				//3：全图
+				case 3:
+					break;
+			}
+		}
+		internal void AOEResetAttackCounter(BattleElement source, BattleSystem system)
+		{
+			int position = ((List<int>)argsTable["AOEResetAttackCounter"])[0];
+
+			BattleLine line;
+			switch (position)
+			{
+				//0：支援战线
+				case 0:
+					line = system.battleLines[system.supportLines[this.source.ownership]];
+					for (int i = 0; i < line.count; i++)
+					{
+						line[i].dynAttackCounter = line[i].oriAttackCounter;
+						line[i].UpdateInfo();
+					}
+					break;
+				//1：当前战线
+				case 1:
+					UnitElement element = this.source as UnitElement;
+
+					for (int i = 0; i < element.battleLine.count; i++)
+					{
+						element.battleLine[i].dynAttackCounter = element.battleLine[i].oriAttackCounter;
+						element.battleLine[i].UpdateInfo();
+					}
+					break;
+				case 2:
+					line = system.battleLines[system.frontLines[this.source.ownership]];
+					for (int i = 0; i < line.count; i++)
+					{
+						line[i].dynAttackCounter = line[i].oriAttackCounter;
+						line[i].UpdateInfo();
+					}
+					break;
+			}
+		}
 
 
 
@@ -917,12 +1036,26 @@ namespace EventEffectModels
 
 
 
+		internal void DamageAll(BattleElement source, BattleSystem system)
+		{
+			int damage = ((List<int>)argsTable["DamageAll"])[0];
+			foreach (UnitElement unit in system.deployQueue)
+			{
+				if(unit.state == ElementState.inBattleLine)
+				{
+					unit.Damaged(damage, "immediate");
+				}
+			}
+		}
 		internal void RecoverAll(BattleElement source, BattleSystem system)
 		{
 			int heal = ((List<int>)argsTable["RecoverAll"])[0];
 			foreach (UnitElement unit in system.deployQueue)
 			{
-				unit.Recover(heal, "immediate");
+				if(unit.state == ElementState.inBattleLine)
+				{
+					unit.Recover(heal, "immediate");
+				}
 			}
 		}
 		internal void RecoverBase(BattleElement source, BattleSystem system)
@@ -933,6 +1066,8 @@ namespace EventEffectModels
 
 			system.bases[BattleSystem.TURN].Recover(value, "append");
 		}
+
+
 
 
 
@@ -1120,6 +1255,23 @@ namespace EventEffectModels
 				element.UpdateHealth();
 			}
 		}
+		internal void AuraDamageDeployed(BattleElement target, BattleSystem system)
+		{
+			UnitElement publisher = this.source as UnitElement;
+			if (!publisher.aura)
+			{
+				return;
+			}
+
+
+			int damage = ((List<int>)argsTable["AuraDamageDeployed"])[0];
+
+			if (target.ownership != publisher.ownership)
+			{
+				UnitElement unit = target as UnitElement;
+				unit.Damaged(damage, "append");
+			}
+		}
 		internal void AuraSelfAttackGainByID(BattleElement target, BattleSystem system)
 		{
 			UnitElement publisher = this.source as UnitElement;
@@ -1241,8 +1393,43 @@ namespace EventEffectModels
 
 
 
+		internal void CheckOutRemoteTarget(BattleElement source, BattleSystem system)
+		{
+			ArtilleryElement publisher = this.source as ArtilleryElement;
+			if (!publisher.aura)
+			{
+				return;
+			}
 
 
+			int method = ((List<int>)argsTable["CheckOutRemoteTarget"])[0];
+
+			switch (method)
+			{
+				//生命值最高的单位
+				case 0:
+					publisher.remoteTarget = system.HighestHealthTarget(publisher.ownership);
+					break;
+				//生命值最低的单位
+				case 1:
+					publisher.remoteTarget = system.LowestHealthTarget(publisher.ownership);
+					break;
+			}
+		}
+
+
+
+
+
+		internal void AttackAndStifle(BattleElement source, BattleSystem system)
+		{
+			UnitElement publisher = this.source as UnitElement;
+
+			if(publisher.target != null)
+			{
+				publisher.target.Stifle();
+			}
+		}
 
 
 
