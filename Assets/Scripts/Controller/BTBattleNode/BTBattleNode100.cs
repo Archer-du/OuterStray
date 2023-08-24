@@ -62,18 +62,18 @@ public class BTBattleNode100 : BTBattleNode
             {
                 // 第一回合空过
                 case 1:
-                    yield return new WaitForSeconds(3f);
+                    yield return new WaitForSeconds(6f);
                     break;
                 // 第三回合空过，让两个孢子丛射击
                 case 3:
-                    yield return new WaitForSeconds(6f);
+                    yield return new WaitForSeconds(8f);
                     break;
                 // 第五回合部署菇母
                 case 5:
                     yield return new WaitForSeconds(3f);
                     BTDeploy(GetHandicapIndexByCardID("mush_02"));
 
-                    yield return new WaitForSeconds(1.5f);
+                    yield return new WaitForSeconds(2f);
                     break;
                 // 第七回合移动菇母和亮顶孢子
                 case 7:

@@ -234,7 +234,7 @@ public class PanelController : MonoBehaviour,
 				PackChosen?.Invoke(temp);
 				if(type == PanelType.Govern)
 				{
-					cardPacks[temp].SelectButton.interactable = false;
+					DisablePackButton(temp);
                 }
 			});
 			cardPacks[i].detailInfoButton.onClick.AddListener(() =>
@@ -326,6 +326,17 @@ public class PanelController : MonoBehaviour,
 	public void DisablePackButton(int index)
 	{
 		cardPacks[index].SelectButton.interactable = false;
+	}
+	public void DisableAllPackButtons()
+	{
+		foreach(var cardPack in cardPacks)
+		{
+			if (cardPack.SelectButton.interactable)
+			{
+				cardPack.SelectButton.image.color = Color.gray;
+				cardPack.SelectButton.enabled = false;
+			}
+		}
 	}
 
 

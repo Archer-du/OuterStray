@@ -36,14 +36,6 @@ public class TurnMappedDialogger : MonoBehaviour
 		get => manager.turnNum;
 	}
 
-    // private int lastTurnNum = -1;
-
-/*    Queue<Action> guideEventQueue = new Queue<Action>();
-    void EnqueueGuideEvent()
-    {
-        guideEventQueue.Enqueue(() => OnRetreat("human_02"));
-    }*/
-
     public void StartTutorial()
     {
         running = true;
@@ -125,7 +117,7 @@ public class TurnMappedDialogger : MonoBehaviour
             yield break;
         }
 
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(2f);
         dialogFrame.SetActive(true);
 
         PlayDialogAudio(tutorialAudioClips[audioIdx]);
@@ -140,8 +132,9 @@ public class TurnMappedDialogger : MonoBehaviour
                 time
             ).SetEase(Ease.Linear);
             yield return currentTween.WaitForCompletion();
-            yield return new WaitForSeconds(3f);
+            yield return new WaitForSeconds(1f);
         }
+        yield return new WaitForSeconds(1f);
         dialogFrame.SetActive(false);
     }
 
