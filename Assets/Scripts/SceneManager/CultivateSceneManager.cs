@@ -165,7 +165,8 @@ public class CultivateSceneManager : MonoBehaviour,
 		Panels[1].FillTagPack(IDPacks);
 		Panels[1].FinalConfirmButton.onClick.AddListener(() =>
 		{
-			Panels[1].FinalConfirmButton.interactable = false;
+			Panels[1].FinalConfirmButton.enabled = false;
+			Panels[1].FinalConfirmButton.image.color = Color.gray;
 			AddDeckPack(Panels[1].packSelectionIndex);
 		});
 
@@ -195,7 +196,8 @@ public class CultivateSceneManager : MonoBehaviour,
 		Panels[2].FillTagPack(IDPacks);
 		Panels[2].FinalConfirmButton.onClick.AddListener(() =>
 		{
-			Panels[2].FinalConfirmButton.interactable = false;
+			Panels[2].FinalConfirmButton.enabled = false;
+			Panels[2].FinalConfirmButton.image.color = Color.gray;
 			AddDeckPack(Panels[2].packSelectionIndex);
 		});
 	}
@@ -204,11 +206,11 @@ public class CultivateSceneManager : MonoBehaviour,
 	public void CountGovernChoice(int n)
 	{
 		governCounter++;
-		if(governCounter > 4)
+		if(governCounter > 10)
 		{
 			governCounter = 0;
-			Panels[0].DisableAllPackButtons();
-			LogWarning("在行政中心最多只能选择三张卡牌");
+			Panels[0].DisableAllCardPackButtons();
+			LogWarning("在行政中心最多只能选择10张卡牌");
 		}
 	}
 

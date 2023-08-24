@@ -341,7 +341,7 @@ namespace EventEffectModels
 		}
 		internal void DecreaseHandicapsCost(BattleElement element, BattleSystem system)
 		{
-			int decrease = ((List<int>)argsTable["DecreaseHandicapCost"])[0];
+			int decrease = ((List<int>)argsTable["DecreaseHandicapsCost"])[0];
 
 			int num = system.handicaps[this.source.ownership].count;
 			for (int i = 0; i < num; i++)
