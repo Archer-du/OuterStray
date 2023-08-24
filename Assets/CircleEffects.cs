@@ -6,20 +6,20 @@ using UnityEngine.UI;
 
 public class CircleEffects : MonoBehaviour
 {
-	public float duration;
+	public Image circle;
 
 	public void OnEnable()
 	{
 		// 创建一个 Tweener 对象
 		Tweener tweener = DOTween.To(
 			// 获取初始值
-			() => new Vector3(100, 100, 100),
+			() => new Vector3(20, 20, 1),
 			// 设置当前值
-			y => transform.localScale = y,
+			y => circle.transform.localScale = y,
 			// 指定最终值
 			new Vector3(1, 1, 1),
 			// 指定持续时间
-			duration
-		);
+			0.4f
+		).SetEase(Ease.Linear);
 	}
 }
