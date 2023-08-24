@@ -58,6 +58,7 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\2022.3.4f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\ArrowEffects.cs" />
     <Compile Include="Assets\Scripts\ToolKit\TurnMappedDialogger.cs" />
     <Compile Include="Assets\Scripts\Controller\UnitElementController.cs" />
     <Compile Include="Assets\Scripts\ToolKit\TargetSelection.cs" />
@@ -86,6 +87,7 @@
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\ExplanationController.cs" />
     <Compile Include="Assets\Scripts\Controller\BehaviorTree.cs" />
+    <Compile Include="Assets\TargetFrame.cs" />
     <Compile Include="Assets\Scripts\ToolKit\BaseInfoDisplay.cs" />
     <Compile Include="Assets\Scripts\Controller\SourceNodeController.cs" />
     <Compile Include="Assets\Scripts\Controller\MedicalNodeController.cs" />
