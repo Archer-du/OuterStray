@@ -813,7 +813,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8579635728430393848}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e91c75042349f684e89a54210af5b870, type: 3}
+  m_Script: {fileID: 11500000, guid: 9f6e4bb7fc8dec14da87644b6103167a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   panel: {fileID: 0}
@@ -823,9 +823,10 @@ MonoBehaviour:
   explainButton: {fileID: 0}
   textGroup: {fileID: 9098585149938774474}
   SelectButton: {fileID: 4230849245098933615}
-  text: {fileID: 4084812122366623956}
+  buttonText: {fileID: 4084812122366623956}
+  index: 0
   detailInfoButton: {fileID: 0}
-  duration: 0.2
+  duration: 0.3
 --- !u!1001 &3167124032010513385
 PrefabInstance:
   m_ObjectHideFlags: 0

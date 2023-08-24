@@ -179,7 +179,10 @@ namespace DisplayInterface
 			ElementState state, int moveRange, bool aura, int attackBuff, int maxHealthBuff);
 
 		public void UpdateState(ElementState state);
+
 		public void UpdateHealth(int dynHealth);
+
+		public void UpdateBuff(bool parry);
 
 		public void UpdateTarget(int t1, int t2, int t3, IUnitElementController target, int targetIdx, bool mocking, bool cleave);
 

@@ -93,7 +93,6 @@ namespace DataCore.CultivateItems
 					continue;
 				}
 
-
 				DeserializeMethods.CardDeserialize(out Card card, data);
 
 				//TODO

@@ -307,6 +307,9 @@ public class GameManager : MonoBehaviour, IGameManagement,
 	}
 
 
+
+
+
 	public StreamReader OpenText(string path)
 	{
 		TextAsset text = Resources.Load<TextAsset>(path);

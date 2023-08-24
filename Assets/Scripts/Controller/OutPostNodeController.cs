@@ -33,7 +33,7 @@ public class OutPostNodeController : NodeController
 
 	public void OutPostPurchase(int index)
 	{
-		if (tacticalManager.gasMineToken < panel.packs[index].gasMineCost)
+		if (tacticalManager.gasMineToken < panel.cardPacks[index].gasMineCost)
 		{
 			//TODO shake
 			return;
@@ -42,13 +42,13 @@ public class OutPostNodeController : NodeController
 
 		tacticalManager.OutPostNodePurchase(index);
 
-		CardInspector card = panel.packs[index].inspector;
+		CardInspector card = panel.cardPacks[index].inspector;
 		tacticalManager.playerDeck.AddNewTag(card.ID);
 	}
 
 	public override void DisplayPacks(List<string> IDs)
 	{
-		panel.InitializePanel(IDs);
+		panel.FillCardPack(IDs);
 	}
 
 }

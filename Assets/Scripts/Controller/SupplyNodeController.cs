@@ -51,31 +51,31 @@ public class SupplyNodeController : NodeController
 	public void SupplyChoose(int index)
 	{
 		Debug.Log(index);
-		for (int i = 0; i < panel.packs.Count; i++)
+		for (int i = 0; i < panel.cardPacks.Count; i++)
 		{
 			if (i == index)
 			{
-				panel.packs[i].SelectButton.enabled = false;
-				panel.packs[i].SelectButton.image.color = Color.gray;
+				panel.cardPacks[i].SelectButton.enabled = false;
+				panel.cardPacks[i].SelectButton.image.color = Color.gray;
 			}
 			else
 			{
-				panel.packs[i].SelectButton.interactable = false;
+				panel.cardPacks[i].SelectButton.interactable = false;
 			}
 		}
 
 		tacticalManager.SupplyNodeChoose(index);
 
-		CardInspector card = panel.packs[index].inspector;
+		CardInspector card = panel.cardPacks[index].inspector;
 		tacticalManager.playerDeck.AddNewTag(card.ID);
 	}
 
 
 	public override void DisplayPacks(List<string> IDs)
 	{
-		panel.InitializePanel(IDs);
+		panel.FillCardPack(IDs);
 
-		category = panel.packs[0].inspector.category;
+		category = panel.cardPacks[0].inspector.category;
 		LoadResource();
 	}
 }
