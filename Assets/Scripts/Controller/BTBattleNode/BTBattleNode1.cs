@@ -18,7 +18,7 @@ public class BTBattleNode1 : BTBattleNode
             new SequenceNode(new List<BTNode>()
             {
                 new ConditionNode(() => !GetIsLineAvailable(AISupportLineIdx)),
-                new ActionNode(() => TryRetreatSomeUnits(AISupportLineIdx)),
+                new ActionNode(() => TryRetreatUnits(AISupportLineIdx)),
             }),
             new ActionNode(() => TryAdjustForward(frontLineIdx)),
             new ActionNode(() => TryDeployLowCostUnit(AISupportLineIdx)),

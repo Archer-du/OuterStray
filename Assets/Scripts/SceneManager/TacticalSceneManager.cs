@@ -33,10 +33,10 @@ public class TacticalSceneManager : MonoBehaviour,
     public bool panelEnabled;
     public NodeController currentNode;
 
-    public int gasMineToken;
-    public int cardNum;
-    public int baseHealth;
-    public int baseMaxHealth;
+    public int gasMineToken
+    {
+        get => gameManager.cultivateSceneManager.gasMineToken;
+    }
 
     public List<TerrainController> terrains;
     public TerrainController currentTerrain
@@ -225,7 +225,7 @@ public class TacticalSceneManager : MonoBehaviour,
         DOTween.Clear();
         //yield return new WaitForSeconds(1f);
         gameManager.cultivateSceneManager.UpdateGasMineToken(gasMineToken + gasMineGain);
-		gameManager.cultivateSceneManager.UpdateBaseHealth(baseHealth, baseMaxHealth);
+		gameManager.cultivateSceneManager.UpdateBaseHealth(baseHealth, gameManager.cultivateSceneManager.baseMaxHealth);
         UpdateCurrentNode(currentNode);
         EnterNextTerrain();
     }

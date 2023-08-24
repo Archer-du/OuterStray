@@ -232,6 +232,10 @@ public class PanelController : MonoBehaviour,
 			cardPacks[i].SelectButton.onClick.AddListener(() =>
 			{
 				PackChosen?.Invoke(temp);
+				if(type == PanelType.Govern)
+				{
+					cardPacks[temp].SelectButton.interactable = false;
+                }
 			});
 			cardPacks[i].detailInfoButton.onClick.AddListener(() =>
 			{

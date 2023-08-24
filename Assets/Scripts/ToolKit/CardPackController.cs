@@ -34,28 +34,24 @@ public class CardPackController : MonoBehaviour
 	{
 		get => inspector.gasMineCost;
 	}
-	private int Num;
-	public int num
-	{
-		get => Num;
-		set
-		{
-			Num = value;
-			if(Num >= 1)
-			{
-				SelectButton.interactable = false;
-			}
-		}
-	}
+	//private int Num;
+	//public int num
+	//{
+	//	get => Num;
+	//	set
+	//	{
+	//		Num = value;
+	//		if(Num >= 1)
+	//		{
+	//			SelectButton.interactable = false;
+	//		}
+	//	}
+	//}
 
 	public float duration;
 	public void Init(PanelController controller)
 	{
 		panel = controller;
-
-		num = 0;
-		SelectButton.onClick.AddListener(() => num++);
-
 
 		explainButton = inspector.nameTag.gameObject.AddComponent<Button>();
 		explainButton.onClick.AddListener(ExplainButtonClick);

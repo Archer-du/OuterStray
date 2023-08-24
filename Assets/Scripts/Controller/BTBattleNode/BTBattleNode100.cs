@@ -31,28 +31,28 @@ public class BTBattleNode100 : BTBattleNode
             Info = GetInfoByCardID("tutorial_27");
             if (Info.Item1 > -1 && Info.Item2 > -1)
             {
-                BTTargetCast(GetHandicapIdx("comm_mush_15"), Info.Item1, Info.Item2);
+                BTTargetCast(GetHandicapIndexByCardID("comm_mush_15"), Info.Item1, Info.Item2);
             }
             yield return new WaitForSeconds(3f);
 
             Info = GetInfoByCardID("tutorial_27");
             if (Info.Item1 > -1 && Info.Item2 > -1)
             {
-                BTTargetCast(GetHandicapIdx("comm_mush_15"), Info.Item1, Info.Item2);
+                BTTargetCast(GetHandicapIndexByCardID("comm_mush_15"), Info.Item1, Info.Item2);
             }
             yield return new WaitForSeconds(1f);
 
             Info = GetInfoByCardID("tutorial_27");
             if (Info.Item1 > -1 && Info.Item2 > -1)
             {
-                BTTargetCast(GetHandicapIdx("comm_mush_15"), Info.Item1, Info.Item2);
+                BTTargetCast(GetHandicapIndexByCardID("comm_mush_15"), Info.Item1, Info.Item2);
             }
             yield return new WaitForSeconds(1f);
 
             Info = GetInfoByCardID("tutorial_27");
             if (Info.Item1 > -1 && Info.Item2 > -1)
             {
-                BTTargetCast(GetHandicapIdx("comm_mush_15"), Info.Item1, Info.Item2);
+                BTTargetCast(GetHandicapIndexByCardID("comm_mush_15"), Info.Item1, Info.Item2);
             }
             yield return new WaitForSeconds(5f);
         }
@@ -71,7 +71,7 @@ public class BTBattleNode100 : BTBattleNode
                 // 第五回合部署菇母
                 case 5:
                     yield return new WaitForSeconds(3f);
-                    BTDeploy(GetHandicapIdx("mush_02"));
+                    BTDeploy(GetHandicapIndexByCardID("mush_02"));
 
                     yield return new WaitForSeconds(1.5f);
                     break;
@@ -96,10 +96,10 @@ public class BTBattleNode100 : BTBattleNode
                 // 部署两个菇母
                 case 13:
                     yield return new WaitForSeconds(3f);
-                    BTDeploy(GetHandicapIdx("mush_02"));
+                    BTDeploy(GetHandicapIndexByCardID("mush_02"));
 
                     yield return new WaitForSeconds(1f);
-                    BTDeploy(GetHandicapIdx("mush_02"));
+                    BTDeploy(GetHandicapIndexByCardID("mush_02"));
 
                     yield return new WaitForSeconds(1.5f);
                     break;
