@@ -45,9 +45,9 @@ namespace LogicCore
 
 			bases = new UnitElement[3];
 
-			bases[0] = new ConstructionElement(pool.GetCardByID("base_00") as UnitCard, battleSystem, null);
-			bases[1] = new ConstructionElement(pool.GetCardByID("base_00") as UnitCard, battleSystem, null);
-			bases[2] = new ConstructionElement(pool.GetCardByID("base_00") as UnitCard, battleSystem, null);
+			bases[0] = new ConstructionElement(pool.GetCardByID("base_01") as UnitCard, battleSystem, null);
+			bases[1] = new ConstructionElement(pool.GetCardByID("base_02") as UnitCard, battleSystem, null);
+			bases[2] = new ConstructionElement(pool.GetCardByID("base_03") as UnitCard, battleSystem, null);
 		}
 		public void SetSceneController(ICultivateSceneController ctdspl)
 		{
