@@ -1,4 +1,5 @@
 using BehaviorTree;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -82,29 +83,30 @@ public class BTBattleNode100 : BTBattleNode
                 BTSkip();
                 break;
             case 21:
+                Tuple<int, int> Info;
                 yield return new WaitForSeconds(1f);
-                BTTargetCast(GetHandicapIdx("comm_mush_15"), 1, 0);
+
+                Info = GetInfoByCardID("tutorial_27");
+                if (Info.Item1 > -1 && Info.Item2 > -1)
+                {
+                    BTTargetCast(GetHandicapIdx("comm_mush_15"), Info.Item1, Info.Item2);
+                }
                 yield return new WaitForSeconds(3f);
-                BTTargetCast(GetHandicapIdx("comm_mush_15"), 1, 0);
+
+                Info = GetInfoByCardID("tutorial_27");
+                if (Info.Item1 > -1 && Info.Item2 > -1)
+                {
+                    BTTargetCast(GetHandicapIdx("comm_mush_15"), Info.Item1, Info.Item2);
+                }
                 yield return new WaitForSeconds(1f);
-                BTTargetCast(GetHandicapIdx("comm_mush_15"), 1, 0);
+
+                Info = GetInfoByCardID("tutorial_27");
+                if (Info.Item1 > -1 && Info.Item2 > -1)
+                {
+                    BTTargetCast(GetHandicapIdx("comm_mush_15"), Info.Item1, Info.Item2);
+                }
                 yield return new WaitForSeconds(5f);
-                BTSkip();
-                break;
-            case 23:
-                yield return new WaitForSeconds(3f);
-                BTSkip();
-                break;
-            case 25:
-                yield return new WaitForSeconds(3f);
-                BTSkip();
-                break;
-            case 27:
-                yield return new WaitForSeconds(3f);
-                BTSkip();
-                break;
-            case 29:
-                yield return new WaitForSeconds(3f);
+
                 BTSkip();
                 break;
             default:
@@ -115,6 +117,24 @@ public class BTBattleNode100 : BTBattleNode
         yield return new WaitForSeconds(3f);
     }
 
-
+    public Tuple<int, int> GetInfoByCardID(string CardID)
+    {
+        int dstLineIdx = -1;
+        int dstPos = -1;
+        BattleLineController battleLine;
+        for (int i = 0; i < FieldCapacity; i++)
+        {
+            battleLine = BattleLines[i];
+            for (int j = 0; j < battleLine.count; j++)
+            {
+                if (battleLine[j].ID == CardID)
+                {
+                    dstLineIdx = i;
+                    dstPos = j;
+                }
+            }
+        }
+        return Tuple.Create(dstLineIdx, dstPos);
+    }
 }
 

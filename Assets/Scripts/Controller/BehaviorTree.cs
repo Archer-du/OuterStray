@@ -121,19 +121,28 @@ namespace BehaviorTree
         }
         protected void BTNoneTargetCast(int handicapIdx)
         {
-            SceneManager.AINoneTargetCast(handicapIdx);
+            if (AIHandicap[handicapIdx] is CommandElementController && AIHandicap[handicapIdx].cost <= Energy)
+            {
+                SceneManager.AINoneTargetCast(handicapIdx);
+            }
         }
         protected void BTSkip()
         {
             SceneManager.AISkip();
         }
-        protected void BTMove(int resLineIdx, int resIdx, int dstLineIdx, int dstPos)
+        protected void BTMove(int resLineIdx, int resPos, int dstLineIdx, int dstPos)
         {
-            SceneManager.AIMove(resLineIdx, resIdx, dstLineIdx, dstPos);
+            if (BattleLines[resLineIdx][resPos].operateCounter == 1 && BattleLines[resLineIdx][resPos].category != "Construction" && BattleLines[dstLineIdx].count < BattleLines[dstLineIdx].capacity)
+            {
+                SceneManager.AIMove(resLineIdx, resPos, dstLineIdx, dstPos);
+            }
         }
         protected void BTRetreat(int resLineIdx, int resPos)
         {
-            SceneManager.AIRetreat(resLineIdx, resPos);
+            if (resLineIdx == FieldCapacity - 1 && BattleLines[resLineIdx][resPos].operateCounter == 1)
+            {
+                SceneManager.AIRetreat(resLineIdx, resPos);
+            }
         }
 
 
