@@ -13,7 +13,7 @@ comm_human_09,human,撤离,Target,3,3,,,55,撤退一个单位。,<self:Cast+Targ
 comm_human_10,human,播撒农药,NonTarget,6,3,,,85,对敌方所有单位造成2点伤害与压制。,<self:Cast+AOEDamage-2-3-2>|<self:Cast+AOEStifle-1-3>,,new
 comm_human_11,human,抢修,Target,1,3,,,55,为一个单位恢复5点耐久。,<self:Cast+TargetRecover-1-5>,,ok
 comm_human_12,human,西线无战事,NonTarget,7,3,,,55,撤退所有处于前线的单位。,<self:Cast+AOERetreat-1-2>,,ok
-comm_human_13,human,机械化部队,NonTarget,6,2,,,165,压制所有处于前线的敌方单位，将1个重装单位招募至前线。,<self:Cast+AOEStifle-1-2>|<self:Cast+RecruitByCategory-3-3-2-1>,,ok
+comm_human_13,human,巨械登场,NonTarget,6,2,,,165,压制所有处于前线的敌方单位，将1个重装单位招募至前线。,<self:Cast+AOEStifle-1-2>|<self:Cast+RecruitByCategory-3-3-2-1>,,ok
 comm_human_14,human,势不可挡,NonTarget,4,3,,,165,为前线的友方单位恢复3点生命值，并使其攻击计数器减为0。,<self:Cast+AOERecover-2-2-3>|<self:Cast+AOEAttackCounterDecrease-2-2-100>,,new
 comm_human_15,human,运输补给,NonTarget,3,4,,,55,抽两张牌。,<self:Cast+DrawCardsRandom-1-2>,,ok
 comm_mush_01,plant,菇军奋战,NonTarget,4,1,,,,将两个亮顶孢子添加至支援战线。使所有亮顶孢子获得+1/+2。,<self:Cast+SummonToken-3-0-0-2>|<self:Cast+TokenGain-3-0-1-2>,,ok
