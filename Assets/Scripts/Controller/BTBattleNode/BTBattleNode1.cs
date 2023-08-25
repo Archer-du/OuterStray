@@ -21,11 +21,11 @@ public class BTBattleNode1 : BTBattleNode
                 new ActionNode(() => TryRetreatUnits(AISupportLineIdx)),
             }),
             new ActionNode(() => TryAdjustForward(frontLineIdx)),
-            new SequenceNode(new List<BTNode>()
+/*            new SequenceNode(new List<BTNode>()
             {
                 new ConditionNode(() => Energy > 8),
                 new ActionNode(() => TryDeployHighCostUnit(AISupportLineIdx)),
-            }),
+            }),*/
             new ActionNode(() => TryDeployLowCostUnit(AISupportLineIdx)),
             new SequenceNode(new List<BTNode>
             {
@@ -42,4 +42,5 @@ public class BTBattleNode1 : BTBattleNode
         });
     }
 }
+
 

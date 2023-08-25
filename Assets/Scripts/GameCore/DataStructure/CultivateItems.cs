@@ -99,30 +99,33 @@ namespace DataCore.CultivateItems
 				cardPool.Add(card);
 				if (card.ownership == 0)
 				{
-					switch (card.category)
+					if (!card.backendID.Contains("tutorial"))
 					{
-						case "LightArmor":
-							humanLightArmorSet.Add(card);
-							break;
-						case "Motorized":
-							humanMotorizedSet.Add(card);
-							break;
-						case "Artillery":
-							humanArtillerySet.Add(card);
-							break;
-						case "Guardian":
-							humanGuardianSet.Add(card);
-							break;
-						case "Construction":
-							//TODO
-							if (!card.category.Contains("base"))
-							{
-								humanConstructionSet.Add(card);
-							}
-							break;
-						case "Command":
-							humanCommandSet.Add(card);
-							break;
+						switch (card.category)
+						{
+							case "LightArmor":
+								humanLightArmorSet.Add(card);
+								break;
+							case "Motorized":
+								humanMotorizedSet.Add(card);
+								break;
+							case "Artillery":
+								humanArtillerySet.Add(card);
+								break;
+							case "Guardian":
+								humanGuardianSet.Add(card);
+								break;
+							case "Construction":
+								//TODO
+								if (!card.category.Contains("base"))
+								{
+									humanConstructionSet.Add(card);
+								}
+								break;
+							case "Command":
+								humanCommandSet.Add(card);
+								break;
+						}
 					}
 					if (!card.backendID.Contains("base") && !card.backendID.Contains("tutorial"))
 					{
@@ -142,7 +145,7 @@ namespace DataCore.CultivateItems
 					IDhashPool.Add(card.backendID, card);
 				}
 
-
+	
 				line = reader.ReadLine();
 				num++;
 				index++;

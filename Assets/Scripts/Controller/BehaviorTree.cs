@@ -79,7 +79,7 @@ namespace BehaviorTree
             AIAdjacentLineIdx = frontLineIdx + 1;
             AIAdjacentLine = BattleLines[AIAdjacentLineIdx];
 
-            loopTimes = 15;
+            loopTimes = 7;
 
             BuildBT();
         }
