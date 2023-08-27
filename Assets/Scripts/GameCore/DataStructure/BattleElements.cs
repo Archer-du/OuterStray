@@ -707,14 +707,9 @@ namespace DataCore.BattleElements
 			}
 			battleSystem.UnitIDDic[this.backendID].Add(this);
 
-			UpdateHealth();
-			UpdateTarget();
-			controller.DeployAnimationEvent();
 			//战线接收
 			dstLine.Receive(this, dstPos);
 			this.operateCounter = 0;
-
-
 
 			eventTable.RaiseEvent("AfterDeploy", this, battleSystem);
 			battleSystem.eventTable[ownership].RaiseEvent("UnitDeployed", this, battleSystem);
@@ -723,7 +718,12 @@ namespace DataCore.BattleElements
 				battleSystem.eventTable[ownership].RaiseEvent("EnterFrontLine", this, battleSystem);
 				eventTable.RaiseEvent("EnterFrontLine", this, battleSystem);
 			}
+
+
+			UpdateHealth();
+			UpdateTarget();
 			UpdateInfo();
+			controller.DeployAnimationEvent();
 		}
 		/// <summary>
 		/// 主动移动，消耗行动次数
@@ -1239,11 +1239,11 @@ namespace DataCore.BattleElements
 			}
 
 
+			UpdateInfo();
 			if(type == "NonTarget" || ownership == 1)
 			{
 				controller.NonTargetCastAnimationEvent("append");
 			}
-			UpdateInfo();
 		}
 		internal void Recover(int heal)
 		{

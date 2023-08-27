@@ -333,7 +333,7 @@ namespace EventEffectModels
 			for(int i = 0; i < extras; i++)
 			{
 				BattleElement e = system.stacks[this.source.ownership].RandomPop();
-				if (element != null)
+				if (e != null)
 				{
 					system.presetHandicaps[this.source.ownership].Add(e);
 				}
@@ -565,8 +565,6 @@ namespace EventEffectModels
 		}
 		internal void RecruitByCost(BattleElement source, BattleSystem system)
 		{
-			UnitElement element = this.source as UnitElement;
-
 			int argsNum = 3;
 			if (!argsTable.ContainsKey("RecruitByCost"))
 			{
@@ -581,10 +579,10 @@ namespace EventEffectModels
 			int num = ((List<int>)argsTable["RecruitByCost"])[2];
 
 			List<UnitElement> targets = new List<UnitElement>();
-			int count = system.stacks[element.ownership].count;
+			int count = system.stacks[this.source.ownership].count;
 			for (int i = 0; i < count; i++)
 			{
-				BattleElement e = system.stacks[element.ownership][i];
+				BattleElement e = system.stacks[this.source.ownership][i];
 				if (e.cost < costValve && e is UnitElement)
 				{
 					targets.Add(e as UnitElement);

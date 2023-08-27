@@ -2,7 +2,7 @@ base_00,human,基地车,Construction,0,0,30,NA,0,,none,,ok
 base_01,human,“旅者”,Construction,0,0,20,,,战斗开始时获得三点额外费用。/战斗开始时额外抽三张牌。,<self:AfterDeploy+GetExtraEnergy-1-3>|<Aura:ally:BattleStart+DrawExtraHandicaps-1-3>,,new
 base_02,human,“决意”,Construction,0,0,15,,,所有手牌的费用减少1点。,<Aura:ally:HandicapPushed+DecreaseHandicapsCost-1-1>,,new
 base_03,human,“城塞”,Construction,0,0,30,,,在你的回合结束时，为基地相邻的单位恢复2点耐久。,<self:EndOfTurn+RecoverAdjacent-1-2>,,new
-comm_human_01,human,炮击,Target,2,3,,,55,对一个单位造成2点伤害，抽一张牌。,<self:Cast+RandomDamage-2-1-3>|<self:Cast+DrawCardsRandom-1-1>,,ok
+comm_human_01,human,炮击,Target,2,3,,,55,对一个单位造成2点伤害，抽一张牌。,<self:Cast+TargetDamage-1-2>|<self:Cast+DrawCardsRandom-1-1>,,ok
 comm_human_02,human,遏制生长,NonTarget,3,4,,,55,压制所有敌人。,<self:Cast+AOEStifle-1-3>,,ok
 comm_human_03,human,清理植被,NonTarget,2,3,,,55,对所有处于前线的敌人造成2点伤害。,<self:Cast+AOEDamage-2-2-2>,,ok
 comm_human_04,human,整装待发,NonTarget,4,3,,,85,为你的所有单位与基地恢复3点耐久。,<self:Cast+AOERecover-2-3-3>,,ok
@@ -54,7 +54,6 @@ human_25,human,碘化银发射平台,Construction,3,0,4,2,85,你的回合结束�
 human_26,human,“珀伽索斯”机动武装,Motorized,6,4,3,1,200,突击，越野/当该单位进入前线时，将另一张“珀伽索斯”机动武装招募至支援战线。,Assault|Raid|<self:EnterFrontLine+RecruitByID-3-26-0-1>,,ok
 human_28,human,哨塔,Construction,2,4,5,0,55,反击,Thorn,,ok
 human_30,human,展开式情报中心,Construction,5,0,5,1,85,每当你使用一张指令牌，抽一张牌。,<Aura:ally:CommandCasted+DrawCardsRandom-1-1>,,ok
-human_33_1,human,不结实的无人机,Motorized,0,1,1,1,55,突击,Assault,,ok
 human_34,human,护甲整备师,LightArmor,2,1,4,1,85,你的回合结束时，使一个随机友方单位获得+1耐久。,<self:EndOfTurn+RandomRecoverDamaged-1-1>,1,ok
 human_35,human,临时工厂,Construction,4,0,6,,85,你的回合结束时，抽一张牌。,<self:EndOfTurn+DrawCardsRandom-1-1>,,ok
 human_37,human,植株萃取机器人,Motorized,4,4,5,3,55,,,,ok

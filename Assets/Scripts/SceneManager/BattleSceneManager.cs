@@ -598,12 +598,12 @@ public class BattleSceneManager : MonoBehaviour,
 		rotateSequence = DOTween.Sequence();
 		//不允许新申请队列
 		inputLock = true;
-		skipButton.enabled = false;
+		skipButton.interactable = false;
 		rotateSequence.OnComplete(() =>
 		{
 			//允许新申请队列
 			inputLock = false;
-			skipButton.enabled = Turn == 0;
+			skipButton.interactable = Turn == 0;
 		});
 	}
 

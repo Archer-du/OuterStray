@@ -374,6 +374,9 @@ public class UnitElementController : BattleElementController,
 		costTag.gameObject.SetActive(false);
 		costText.gameObject.SetActive(false);
 
+		battleSceneManager.rotateSequence.AppendInterval(BattleLineController.updateTime + 0.2f);
+		battleSceneManager.sequenceTime += BattleLineController.updateTime + 0.2f;
+
 		if (transform.eulerAngles != Vector3.zero)
 		{
 			Vector3 rotateBy = -transform.eulerAngles;
@@ -387,6 +390,7 @@ public class UnitElementController : BattleElementController,
 		//attackText.fontSize = normalFontSizeEnlarge;
 		attackCounterText.fontSize = counterfontSizeEnlarge;
 		transform.DOScale(battleFieldScale, componentMoveTime);
+
 	}
 	public void MoveAnimationEvent()
 	{

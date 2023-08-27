@@ -206,7 +206,7 @@ public class CultivateSceneManager : MonoBehaviour,
 	public void CountGovernChoice(int n)
 	{
 		governCounter++;
-		if(governCounter > 10)
+		if(governCounter > 9)
 		{
 			governCounter = 0;
 			Panels[0].DisableAllCardPackButtons();
