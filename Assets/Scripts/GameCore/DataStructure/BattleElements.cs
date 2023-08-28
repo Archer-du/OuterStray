@@ -10,6 +10,15 @@ using EventEffectModels;
 using InputHandler;
 using WeightUpdaterHash;
 
+namespace AnimationType
+{
+	public enum AnimationType
+	{
+		Append,
+		Immediate
+	}
+}
+
 namespace DataCore.BattleElements
 {
 	/// <summary>

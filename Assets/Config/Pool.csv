@@ -73,7 +73,6 @@ mush_09,plant,摇曳菇,Artillery,4,3,2,3,,部署：攻击计时-2。,<self:Afte
 mush_10,plant,臭臭菇,Artillery,3,3,2,2,,部署：对一个处于前线的随机敌方单位造成2点伤害。,<self:AfterDeploy+RandomDamage-2-1-2>,,ok
 mush_100,plant,9号实验体,Guardian,0,6,15,2,,顺劈，护甲（2）,Cleave|<self:Initialize+Armor-1-2>/<self:BeforeAttacked+ArmorOnEnable-0>,,ok
 mush_100_01,plant,奇怪的蘑菇,Construction,0,4,4,NA,,似乎在茁壮成长......,<self:EndOfTurn+StrangeGrowth-3-2-2-20>,,ok
-mush_101,plant,克隆蘑人,LightArmor,0,1,2,1,,todo,,,ok
 mush_101,plant,克隆蘑人,LightArmor,0,3,3,2,,在自己的回合结束时，召唤一个新的克隆蘑人。每控制一个克隆蘑人，便+1+1,<self:EndOfTurn+SummonToken-3-2-1-1>|<Aura:ally:UnitDeployed+AuraSelfGainByID-3-103-1-1>|<Aura:ally:UnitTerminated+AuraSelfGainByID-3-103-1-1>|<Aura:ally:UnitRetreat+AuraSelfGainByID-3-103-1-1>|<self:AfterDeploy+AuraSelfGainByID-3-103-1-1>,,ok
 mush_102,plant,白菇,Artillery,0,2,20,2,,,,,ok
 mush_103,plant,克隆蘑人,LightArmor,0,3,3,2,,在自己的回合结束时，召唤一个新的克隆蘑人。,<self:EndOfTurn+SummonToken-3-2-1-1>,,ok
