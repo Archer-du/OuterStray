@@ -79,7 +79,7 @@ namespace BehaviorTree
             AIAdjacentLineIdx = frontLineIdx + 1;
             AIAdjacentLine = BattleLines[AIAdjacentLineIdx];
 
-            loopTimes = 7;
+            loopTimes = 10;
 
             BuildBT();
         }
@@ -113,45 +113,54 @@ namespace BehaviorTree
 
 
         // 行为树可执行的基本操作
-        protected void BTDeploy(int handicapIdx, int dstLineIdx = 3, int dstPos = 0)
+        protected bool BTDeploy(int handicapIdx, int dstLineIdx = 3, int dstPos = 0)
         {
             if (AIHandicap[handicapIdx] is UnitElementController && AIHandicap[handicapIdx].cost <= Energy && BattleLines[dstLineIdx].count < BattleLines[dstLineIdx].capacity)
             {
                 SceneManager.AIDeploy(handicapIdx, dstLineIdx, dstPos);
+                return true;
             }
+            return false;
         }
-        // TODO
-        protected void BTTargetCast(int handicapIdx, int dstLineIdx, int dstPos)
+        protected bool BTTargetCast(int handicapIdx, int dstLineIdx, int dstPos)
         {
             if (AIHandicap[handicapIdx] is CommandElementController && AIHandicap[handicapIdx].cost <= Energy && BattleLines[dstLineIdx][dstPos] != null)
             {
                 SceneManager.AITargetCast(handicapIdx, dstLineIdx, dstPos);
+                return true;
             }
+            return false;
         }
-        protected void BTNoneTargetCast(int handicapIdx)
+        protected bool BTNoneTargetCast(int handicapIdx)
         {
             if (AIHandicap[handicapIdx] is CommandElementController && AIHandicap[handicapIdx].cost <= Energy)
             {
                 SceneManager.AINoneTargetCast(handicapIdx);
+                return true;
             }
+            return false;
         }
-        protected void BTSkip()
-        {
-            SceneManager.AISkip();
-        }
-        protected void BTMove(int resLineIdx, int resPos, int dstLineIdx, int dstPos)
+        protected bool BTMove(int resLineIdx, int resPos, int dstLineIdx, int dstPos)
         {
             if (BattleLines[resLineIdx][resPos].ownership == 1 && BattleLines[resLineIdx][resPos].operateCounter == 1 && BattleLines[resLineIdx][resPos].category != "Construction" && BattleLines[dstLineIdx].count < BattleLines[dstLineIdx].capacity)
             {
                 SceneManager.AIMove(resLineIdx, resPos, dstLineIdx, dstPos);
+                return true;
             }
+            return false;
         }
-        protected void BTRetreat(int resLineIdx, int resPos)
+        protected bool BTRetreat(int resLineIdx, int resPos)
         {
             if (resLineIdx == FieldCapacity - 1 && BattleLines[resLineIdx][resPos].operateCounter == 1)
             {
                 SceneManager.AIRetreat(resLineIdx, resPos);
+                return true;
             }
+            return false;
+        }
+        protected void BTSkip()
+        {
+            SceneManager.AISkip();
         }
 
 
@@ -290,7 +299,7 @@ namespace BehaviorTree
                     maxCostCommandIndex = i;
                 }
             }
-            return maxCost;
+            return maxCostCommandIndex;
         }
 
         /// <summary>
@@ -310,7 +319,7 @@ namespace BehaviorTree
                     maxCostUnitIndex = i;
                 }
             }
-            return maxCost;
+            return maxCostUnitIndex;
         }
 
         protected int GetMaxCostUnitPointer()
@@ -469,8 +478,7 @@ namespace BehaviorTree
                     int dstPos;
 					(_, dstLineIdx, dstPos) = GetFieldMaxHealth(frontLineIdx);
 
-                    BTTargetCast(i, dstLineIdx, dstPos);
-                    return true;
+                    return BTTargetCast(i, dstLineIdx, dstPos);
                 }
             }
             return false;
@@ -555,8 +563,7 @@ namespace BehaviorTree
             // 有优先级大于0的才移动
             if (highestPriority > 0)
             {
-                BTMove(battleLineIdx, highestPriorityPos, battleLineIdx - 1, 0);
-                return true;
+                return BTMove(battleLineIdx, highestPriorityPos, battleLineIdx - 1, 0);
             }
             else
             {
@@ -602,8 +609,7 @@ namespace BehaviorTree
 
             if (highestPriority > 0)
             {
-                BTRetreat(AISupportLineIdx, highestPriorityPos);
-                return true;
+                return BTRetreat(AISupportLineIdx, highestPriorityPos);
             }
             else
             {
@@ -617,10 +623,9 @@ namespace BehaviorTree
             int idx = GetMaxCostUnitIndex(Energy);
             if (battleLine.count < battleLine.capacity)
             {
-                if (GetMaxCostUnitIndex() > 0)
+                if (idx > 0)
                 {
-                    BTDeploy(idx);
-                    return true;
+                    return BTDeploy(idx);
                 }
             }
             return false;
@@ -636,8 +641,7 @@ namespace BehaviorTree
                     int idx = GetMinCostUnitPointer();
                     if (idx >= 0)
                     {
-                        BTDeploy(idx);
-                        return true;
+                        return BTDeploy(idx);
                     }
                 }
                 // 若支援战线的建筑数大于等于战线容量减二，则不部署建筑
@@ -646,8 +650,7 @@ namespace BehaviorTree
                     int idx = GetMinCostUnitPointerExcConstr();
                     if (idx >= 0)
                     {
-                        BTDeploy(idx);
-                        return true;
+                        return BTDeploy(idx);
                     }
                 }
             }
@@ -655,7 +658,7 @@ namespace BehaviorTree
         }
 
         /// <summary>
-        /// 按卡名来释放手牌中的指令卡
+        /// 按卡名来释放手牌中的指令卡,无目标
         /// </summary>
         /// <param name="cardID"></param>
         /// <returns></returns>
@@ -665,8 +668,7 @@ namespace BehaviorTree
             {
                 if (AIHandicap[i].ID == cardID && Energy >= AIHandicap[i].cost)
                 {
-                    BTNoneTargetCast(i);
-                    return true;
+                    return BTNoneTargetCast(i);
                 }
             }
             return false;

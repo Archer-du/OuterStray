@@ -1,100 +1,46 @@
 using BehaviorTree;
-using System;
 using System.Collections.Generic;
 
 /// <summary>
-/// boss¿ËÂ¡Ä¢ÈË£¬²ßÂÔÎªµ÷ÕûÕ½ÏßÊ¹µÃÃ¿´Î¿ËÂ¡µÄ¿ËÂ¡Ä¢ÈËÊıÁ¿×î¶à
+/// bossä¹å·å®éªŒä½“ï¼Œç­–ç•¥è·Ÿç™½è‡ç±»ä¼¼
 /// </summary>
 public class BTBattleNode2 : BTBattleNode
 {
-	protected override void Init()
-	{
-		base.Init();
-	}
-
-	protected override void BuildBT()
-	{
-		rootNode = new SelectorNode(new List<BTNode>()
-		{
-			new ActionNode(() => TryAdjustHalf()),
-            // new ActionNode(() => TryAdjustForward(frontLineIdx)),
+    protected override void BuildBT()
+    {
+        rootNode = new SelectorNode(new List<BTNode>()
+        {
+            new SequenceNode(new List<BTNode>()
+            {
+                new ConditionNode(() => AIHandicap.count < AIHandicap.capacity - 2),
+                new ActionNode(() => TryCast("comm_mush_07")),
+            }),
+            new SequenceNode(new List<BTNode>()
+            {
+                new ConditionNode(() => !GetIsLineAvailable(AISupportLineIdx) || frontLineIdx == AISupportLineIdx - 1),
+                new ActionNode(() => TryRetreatUnits(AISupportLineIdx)),
+            }),
+            new ActionNode(() => TryAdjustForward(frontLineIdx)),
+            new SequenceNode(new List<BTNode>()
+            {
+                new ConditionNode(() => Energy > 8),
+                new ActionNode(() => TryDeployHighCostUnit(AISupportLineIdx)),
+            }),
+            new ActionNode(() => TryDeployLowCostUnit(AISupportLineIdx)),
+            new SequenceNode(new List<BTNode>
+            {
+                new ConditionNode(() => AISupportLine.count < AISupportLine.capacity - 1),
+                new ActionNode(() => TryCast("comm_mush_01")),
+            }),
             new ActionNode(() => TryCastComm15(frontLineIdx)),
-		});
-	}
-
-	/// <summary>
-	/// Õ½Ïßµ¥Î»Êı´óÓÚÕ½ÏßÈİÁ¿Ò»°ëÔò·µ»Øtrue
-	/// </summary>
-	/// <param name="battleLineIdx"></param>
-	/// <returns></returns>
-	private bool GetIsMoreThanHalf(int battleLineIdx)
-	{
-		return BattleLines[battleLineIdx].count > BattleLines[battleLineIdx].capacity / 2;
-	}
-
-	/// <summary>
-	/// Õ½Ïßµ¥Î»Êı´óÓÚÕ½ÏßÈİÁ¿Ò»°ë¼õÒ»Ôò·µ»Øtrue
-	/// </summary>
-	/// <param name="battleLineIdx"></param>
-	/// <returns></returns>
-	private bool GetIsMoreThanHalfMinusOne(int battleLineIdx)
-	{
-		return BattleLines[battleLineIdx].count > (BattleLines[battleLineIdx].capacity / 2 - 1);
-	}
-
-	/// <summary>
-	/// ½«Ã¿ÌõÕ½Ïßµ÷ÕûÖÁµ¥Î»Êı²»´óÓÚÕ½ÏßÈİÁ¿Ò»°ë
-	/// </summary>
-	private bool TryAdjustHalf()
-	{
-		for (int i = FieldCapacity - 1; i > frontLineIdx + 1; i--)
-		{
-			// µ¥Î»Êı´óÓÚÈİÁ¿µÄÒ»°ëÊ±£¬½«±¾Õ½ÏßÑªÁ¿µÍµÄµ¥Î»ÍùÇ°ÍÆ
-			if (GetIsMoreThanHalf(i) && GetIsLineAvailable(i - 1))
-			{
-				Tuple<int, int> minHealthInfo = GetAvailableMinHealth(i);
-				int minHealthPos = minHealthInfo.Item2;
-
-				// Èô´æÔÚ¿É²Ù×÷¶ÔÏó£¬ÔòÖ´ĞĞ²Ù×÷
-				if (minHealthPos > -1)
-				{
-					BTMove(i, minHealthPos, i - 1, 0);
-					return true;
-				}
-			}
-
-			// µ±µ¥Î»ÊıĞ¡ÓÚ»òµÈÓÚÈİÁ¿µÄÒ»°ë¼õÒ»£¬ÇÒÇ°Ò»ÌõÕ½Ïßµ¥Î»Êı´óÓÚÈİÁ¿Ò»°ëÊ±£¬½«Ç°Ò»ÌõÕ½ÏßÑªÁ¿¸ßµÄÍùºó³·
-			if (!GetIsMoreThanHalfMinusOne(i) && GetIsMoreThanHalf(i - 1))
-			{
-				Tuple<int, int> maxHealthInfo = GetAvailableMaxHealth(i - 1);
-				int maxHealthPos = maxHealthInfo.Item2;
-
-				if (maxHealthPos > -1)
-				{
-					BTMove(i - 1, maxHealthPos, i, 0);
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	/// <summary>
-	/// ½«ÊÖÅÆÖĞ×îµÍ·ÑµÄÖ¸Áî´ò³ö
-	/// </summary>
-	/// <returns></returns>
-	private bool TryCastLowCost()
-	{
-		int minCostPointer = GetMinCostCommPointer();
-		if (minCostPointer < 0)
-		{
-			return false;
-		}
-		else
-		{
-			BTNoneTargetCast(minCostPointer);
-			return true;
-		}
-	}
+            new SequenceNode(new List<BTNode>()
+            {
+                new ConditionNode(() => GetIsLineAvailable(AIAdjacentLineIdx)),
+                new ActionNode(() => TryCast("comm_mush_13")),
+            }),
+            new ActionNode(() => TryCast("comm_mush_08")),
+        });
+    }
 }
+
 
