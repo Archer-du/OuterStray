@@ -32,7 +32,6 @@ human_03,human,卡瓦兰伐木工,LightArmor,1,2,2,1,55,,,,ok
 human_04,human,“铁颚”开垦车辆,Motorized,6,3,6,3,200,突击/进入前线时，对所有敌人造成2点伤害。,Assault|<self:EnterFrontLine+AOEDamage-2-3-2>,,ok
 human_05,human,卡瓦兰焚化小组,LightArmor,2,2,3,2,85,顺劈,Cleave,,ok
 human_06,human,指挥中心,Construction,1,0,2,,55,所有友方单位获得+1攻击力。,<Aura:ally:UnitDeployed+AuraUnitGain-2-1-0>|<self:AfterDeploy+AuraConstantUnitGain-2-1-0>,,ok
-human_07,human,农药喷洒机器人,Artillery,1,1,1,1,165,每当一个敌方单位被部署时，对其造成一点伤害。,<Aura:enemy:UnitDeployed+AuraDamageDeployed-1-1>,,ok
 human_08,human,卡瓦兰消杀小队,Artillery,2,2,2,2,55,,,,ok
 human_09,human,“寂静”强酸加农炮,Artillery,6,6,4,4,200,总是攻击生命值最高的敌人。,<self:BeforeAttack+CheckOutRemoteTarget-1-0>,,ok
 human_10,human,卡瓦兰安保卫队,Guardian,3,2,6,2,55,,,,ok
@@ -72,7 +71,6 @@ mush_09,plant,摇曳菇,Artillery,4,3,2,3,,部署：攻击计时-2。,<self:Afte
 mush_10,plant,臭臭菇,Artillery,3,3,2,2,,部署：对一个处于前线的随机敌方单位造成2点伤害。,<self:AfterDeploy+RandomDamage-2-1-2>,,ok
 mush_100,plant,9号实验体,Guardian,0,6,15,2,,顺劈，护甲（2）,Cleave|<self:Initialize+Armor-1-2>/<self:BeforeAttacked+ArmorOnEnable-0>,,ok
 mush_100_01,plant,奇怪的蘑菇,Construction,0,4,4,NA,,似乎在茁壮成长......,<self:EndOfTurn+StrangeGrowth-3-2-2-20>,,ok
-mush_101,plant,克隆蘑人,LightArmor,0,1,2,1,,todo,,,ok
 mush_101,plant,克隆蘑人,LightArmor,0,3,3,2,,在自己的回合结束时，召唤一个新的克隆蘑人。每控制一个克隆蘑人，便+1+1,<self:EndOfTurn+SummonToken-3-2-1-1>|<Aura:ally:UnitDeployed+AuraSelfGainByID-3-103-1-1>|<Aura:ally:UnitTerminated+AuraSelfGainByID-3-103-1-1>|<Aura:ally:UnitRetreat+AuraSelfGainByID-3-103-1-1>|<self:AfterDeploy+AuraSelfGainByID-3-103-1-1>,,ok
 mush_102,plant,白菇,Artillery,0,2,20,2,,,,,ok
 mush_103,plant,克隆蘑人,LightArmor,0,3,3,2,,在自己的回合结束时，召唤一个新的克隆蘑人。,<self:EndOfTurn+SummonToken-3-2-1-1>,,ok

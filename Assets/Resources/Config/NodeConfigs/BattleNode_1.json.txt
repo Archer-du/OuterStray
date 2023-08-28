@@ -1,11 +1,11 @@
 {
-    "BTIndex": 2,
+    "BTIndex": 1,
     "initialTurn": 0,
     "fieldCapacity": 4,
     "battleLinesCapacity":[
         5, 6, 6, 5
     ],
-    "plantDeckPath": "Config\\DeckConfigs\\BattleNode_2.csv",
+    "plantDeckPath": "Config\\DeckConfigs\\BattleNode_1.csv",
     "initialHumanEnergy": 0,
     "initialPlantEnergy": 0,
     "initialHumanHandicaps": 3,

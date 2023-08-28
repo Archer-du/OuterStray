@@ -1421,11 +1421,11 @@ namespace EventEffectModels
 
 		internal void AttackAndStifle(BattleElement source, BattleSystem system)
 		{
-			UnitElement publisher = this.source as UnitElement;
+			ArtilleryElement publisher = this.source as ArtilleryElement;
 
-			if(publisher.target != null)
+			if(publisher.remoteTarget != null)
 			{
-				publisher.target.Stifle();
+				publisher.remoteTarget.Stifle();
 			}
 		}
 

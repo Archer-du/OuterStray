@@ -36,6 +36,7 @@ human_07,human,农药喷洒机器人,Artillery,1,1,1,1,165,每当一个敌方单
 human_08,human,卡瓦兰消杀小队,Artillery,2,2,2,2,55,,,,ok
 human_09,human,“寂静”强酸加农炮,Artillery,6,6,4,4,200,总是攻击生命值最高的敌人。,<self:BeforeAttack+CheckOutRemoteTarget-1-0>,,ok
 human_10,human,卡瓦兰安保卫队,Guardian,3,2,6,2,55,,,,ok
+#,human_07,human,农药喷洒机器人,Artillery,1,1,1,1,165,每当一个敌方单位被部署时，对其造成一点伤害。,<Aura:enemy:UnitDeployed+AuraDamageDeployed-1-1>,,ok
 human_11,human,卡瓦兰探险家,LightArmor,3,2,4,1,55,越野。/该单位进入前线后，抽一张牌。,Raid|<self:EnterFrontLine+DrawCardsRandom-1-1>,,ok
 human_12,human,修理车间,Construction,4,0,4,,55,你的回合结束时，为一个随机的受伤友方单位恢复2点耐久。,<self:EndOfTurn+RandomRecoverDamaged-1-2>,,ok
 human_13,human,卡瓦兰斥候,Motorized,2,3,2,1,85,,,,ok
