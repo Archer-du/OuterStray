@@ -523,7 +523,7 @@ public class PanelController : MonoBehaviour,
 		DOTween.To(
 			() => "",
 			value => backGroundStoryText.text = value,
-			"背景故事：\n",
+			card.story,
 			duration
 		).SetEase(Ease.Linear);
 	}
@@ -535,7 +535,6 @@ public class PanelController : MonoBehaviour,
 
 		seq.Append(detailedCard.DOFade(0, duration));
 		seq.Join(detailedMask.DOFade(0, duration));
-		seq.Join(backGroundStoryText.DOFade(0, duration));
 		seq.Join(detailedInfo.DOFade(0, duration))
 			.OnComplete(() =>
 			{

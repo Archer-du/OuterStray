@@ -15,6 +15,7 @@ using UnityEngine.EventSystems;
 using System;
 using System.IO;
 using UnityEngine.Rendering.VirtualTexturing;
+using DG.Tweening.Core.Easing;
 
 public class GameManager : MonoBehaviour, IGameManagement,
 	IResourceLoader
@@ -75,6 +76,13 @@ public class GameManager : MonoBehaviour, IGameManagement,
 		switch (state)
 		{
 			case GameState.Start:
+				if (config.tutorial)
+				{
+					//Destroy(cultivateSceneManager.gameObject);
+					//Destroy(tacticalSceneManager.gameObject);
+				}
+
+				BattleBGM.Stop();
 				async = SceneManager.LoadSceneAsync("StartScene");
 				StandaloneInputModule[] inputModules = FindObjectsOfType<StandaloneInputModule>();
 
@@ -127,23 +135,19 @@ public class GameManager : MonoBehaviour, IGameManagement,
 			yield return null;
 		}
 		SceneLoader.blocksRaycasts = false;
-		if(scene != "StartScene")
-		{
-			SceneLoader.DOFade(0f, 0.3f)
-				.OnComplete(() =>
-				{
-					progressText.gameObject.SetActive(false);
-				});
-		}
+		SceneLoader.DOFade(0f, 0.3f)
+			.OnComplete(() =>
+			{
+				progressText.gameObject.SetActive(false);
+			});
 		switch (scene)
 		{
 			case "StartScene":
 				OnGameStateChanged = null;
-				//Destroy(gameObject);
-				//Destroy(cultivateSceneManager);
-				//Destroy(tacticalSceneManager);
-
 				DestroyOtherInstancesOfType();
+
+
+				Destroy(gameObject);
 				break;
 			case "CultivateScene":
 				if (cultivateSceneManager != null)
@@ -185,6 +189,8 @@ public class GameManager : MonoBehaviour, IGameManagement,
 
 	public Button start;
 
+	public bool tutorialLock;
+
 	public GlobalConfig config;
 	public string configPath;
 	private void Start()
@@ -220,7 +226,8 @@ public class GameManager : MonoBehaviour, IGameManagement,
 		{
 			if (instance != this)
 			{
-				Destroy(instance.gameObject);
+				//Destroy(instance.gameObject);
+				instance.config.tutorial = false;
 			}
 		}
 	}

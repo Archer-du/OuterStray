@@ -33,7 +33,7 @@ namespace DataCore.Cards
 
 		public string story;
 
-		protected Card(string __id, string __name, string __description, int __cost, int ownership, int department, int pack, string effects)
+		protected Card(string __id, string __name, string __description, int __cost, int ownership, int department, int pack, string effects, string story)
 		{
 			this.backendID = __id;
 			this.name = __name;
@@ -43,6 +43,7 @@ namespace DataCore.Cards
 			this.department = department;
 			this.pack = pack;
 			this.effects = effects;
+			this.story = story;
 		}
 		//TODO
 		protected Card(Card __card)
@@ -92,8 +93,8 @@ namespace DataCore.Cards
 		internal string[] componentsHash;
 
 
-		internal UnitCard(string id, int ownership, string name, string category, int cost, int attack, int maxhealth, int attackCounter, string description, int department, int pack, string effects)
-			: base(id, name, description, cost, ownership, department, pack, effects)
+		internal UnitCard(string id, int ownership, string name, string category, int cost, int attack, int maxhealth, int attackCounter, string description, int department, int pack, string effects, string story)
+			: base(id, name, description, cost, ownership, department, pack, effects, story)
 		{
 			this.category = category;
 			this.attackPoint = attack;
@@ -149,8 +150,8 @@ namespace DataCore.Cards
 		public int maxDurability { get; set; }
 
 		//TODO
-		internal CommandCard(string __id, int ownership, string __name, string type, string __description, int __cost, int __maxDurability, int department, int pack, string effects)
-			: base(__id, __name, __description, __cost, ownership, department, pack, effects)
+		internal CommandCard(string __id, int ownership, string __name, string type, string __description, int __cost, int __maxDurability, int department, int pack, string effects, string story)
+			: base(__id, __name, __description, __cost, ownership, department, pack, effects, story)
 		{
 			this.category = "Command";
 			this.type = type;

@@ -66,6 +66,8 @@ public class CardInspector : MonoBehaviour
 		this.nameContent = card.name;
 		this.description = card.description;
 
+		this.story = card.story;
+
 		LoadCardResources(ID);
 		nameText.text = card.name;
 		costText.text = card.cost.ToString();

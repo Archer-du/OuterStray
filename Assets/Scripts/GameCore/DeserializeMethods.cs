@@ -27,9 +27,11 @@ internal class DeserializeMethods
 
 			string effects = cardObject[10];
 
+			string story = cardObject[11];
+
 			string description = cardObject[9];
 
-			card = new CommandCard(id, ownership, name, type, description, cost, durability, -1, -1, effects);
+			card = new CommandCard(id, ownership, name, type, description, cost, durability, -1, -1, effects, story);
 		}
 		else
 		{
@@ -43,9 +45,11 @@ internal class DeserializeMethods
 
 			string effects = cardObject[10];
 
+			string story = cardObject[11];
+
 			string description = cardObject[9];
 
-			card = new UnitCard(id, ownership, name, category, cost, atk, hp, atkc, description, -1, -1, effects);
+			card = new UnitCard(id, ownership, name, category, cost, atk, hp, atkc, description, -1, -1, effects, story);
 		}
 		if(!id.Contains("base") && card.ownership == 0)
 		{
