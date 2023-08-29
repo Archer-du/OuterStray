@@ -1,1 +1,1 @@
-{"tutorial":false}
+{"tutorial":true}
