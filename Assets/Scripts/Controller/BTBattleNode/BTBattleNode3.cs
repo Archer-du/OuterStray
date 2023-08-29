@@ -46,7 +46,7 @@ public class BTBattleNode3 : BTBattleNode
     /// </summary>
     private bool TryAdjustHalf()
     {
-        for (int i = FieldCapacity - 1; i > frontLineIdx + 1; i--)
+        for (int i = FieldCapacity - 1; i > FrontLineIdx + 1; i--)
         {
             // 单位数大于容量的一半时，将本战线血量低的单位往前推
             if (GetIsMoreThanHalf(i))

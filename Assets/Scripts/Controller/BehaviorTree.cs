@@ -45,7 +45,10 @@ namespace BehaviorTree
 
         // 战线索引 & 战线
         protected int AISupportLineIdx;
-        protected int frontLineIdx;
+        protected int FrontLineIdx
+        {
+            get => GetFrontLineIdx();
+        }
         protected int AIAdjacentLineIdx;
         protected BattleLineController AISupportLine;
         protected BattleLineController AIAdjacentLine;
@@ -75,8 +78,7 @@ namespace BehaviorTree
             AISupportLineIdx = FieldCapacity - 1;
             AISupportLine = BattleLines[AISupportLineIdx];
 
-            frontLineIdx = GetFrontLineIdx();
-            AIAdjacentLineIdx = frontLineIdx + 1;
+            AIAdjacentLineIdx = FrontLineIdx + 1;
             AIAdjacentLine = BattleLines[AIAdjacentLineIdx];
 
             loopTimes = 10;
@@ -256,6 +258,27 @@ namespace BehaviorTree
                 }
             }
             return Tuple.Create(lineMaxHealth, maxHealthPos);
+        }
+
+        /// <summary>
+        /// 获取战线上最低生命值的单位信息
+        /// </summary>
+        /// <param name="battleLineIdx"></param>
+        /// <returns></returns>
+        protected Tuple<int, int> GetLineMinHealth(int battleLineIdx)
+        {
+            BattleLineController battleLine = BattleLines[battleLineIdx];
+            int lineMinHealth = 99;
+            int minHealthPos = -1;
+            for (int i = 0; i < battleLine.count; i++)
+            {
+                if (battleLine[i].healthPoint < lineMinHealth)
+                {
+                    lineMinHealth = battleLine[i].healthPoint;
+                    minHealthPos = i;
+                }
+            }
+            return Tuple.Create(lineMinHealth, minHealthPos);
         }
 
         /// <summary>
@@ -468,20 +491,115 @@ namespace BehaviorTree
             return -1;
         }
 
-        protected bool TryCastComm15(int frontLineIdx)
+        protected bool TryCastComm15()
         {
+            int dstLineIdx = 0;
+            int dstPos = 0;
+            int handicapIdx = -1;
+
             for (int i = 0; i < AIHandicap.count; i++)
             {
                 if (AIHandicap[i].ID == "comm_mush_15" && Energy >= AIHandicap[i].cost)
                 {
-                    int dstLineIdx;
-                    int dstPos;
-					(_, dstLineIdx, dstPos) = GetFieldMaxHealth(frontLineIdx);
-
-                    return BTTargetCast(i, dstLineIdx, dstPos);
+                    handicapIdx = i;
+                    break;
                 }
             }
-            return false;
+
+            if (handicapIdx < 0)
+            {
+                return false;
+            }
+
+		    (_, dstLineIdx, dstPos) = GetFieldMaxHealth(FrontLineIdx);
+
+            return BTTargetCast(handicapIdx, dstLineIdx, dstPos);
+        }
+
+        protected bool TryCastComm2()
+        {
+            int fieldMinHealth = 99;
+            int lineMinHealth;
+            int lineMinHealthPos;
+            int dstLineIdx = FrontLineIdx + 1;
+            int dstPos = 0;
+            int handicapIdx = -1;
+
+            for (int i = 0; i < AIHandicap.count; i++)
+            {
+                if (AIHandicap[i].ID == "comm_mush_02" && Energy >= AIHandicap[i].cost)
+                {
+                    handicapIdx = i;
+                    break;
+                }
+            }
+
+            if (handicapIdx < 0)
+            {
+                return false;
+            }
+
+            for (int i = 0; i > FrontLineIdx && i < AISupportLineIdx; i--)
+            {
+                (lineMinHealth, lineMinHealthPos) = GetLineMinHealth(i);
+                if (lineMinHealth < fieldMinHealth)
+                {
+                    dstLineIdx = i;
+                    dstPos = lineMinHealthPos;
+                    fieldMinHealth = lineMinHealth;
+                }
+            }
+            return BTTargetCast(handicapIdx, dstLineIdx, dstPos);
+        }
+
+        protected bool TryCastComm3()
+        {
+            int handicapIdx = -1;
+            int dstLineIdx = FrontLineIdx + 1;
+            int dstPos = 0;
+
+            for (int i = 0; i < AIHandicap.count; i++)
+            {
+                if (AIHandicap[i].ID == "comm_mush_03" && Energy >= AIHandicap[i].cost)
+                {
+                    handicapIdx = i;
+                    break;
+                }
+            }
+
+            if (handicapIdx < 0)
+            {
+                return false;
+            }
+
+            (_, dstPos) = GetLineMaxHealth(dstLineIdx);
+
+            return BTTargetCast(handicapIdx, dstLineIdx, dstPos);
+        }
+
+        protected bool TryCastComm6()
+        {
+            int handicapIdx = -1;
+            int dstLineIdx = FrontLineIdx + 1;
+            int dstPos = 0;
+
+            for (int i = 0; i < AIHandicap.count; i++)
+            {
+                if (AIHandicap[i].ID == "comm_mush_06" && Energy >= AIHandicap[i].cost)
+                {
+                    handicapIdx = i;
+                    break;
+                }
+            }
+
+            if (handicapIdx < 0)
+            {
+                return false;
+            }
+
+            (_, dstPos) = GetLineMaxHealth(dstLineIdx);
+
+            return BTTargetCast(handicapIdx, dstLineIdx, dstPos);
         }
 
         /// <summary>
@@ -590,7 +708,7 @@ namespace BehaviorTree
                 {
                     priority = 2;
                 }
-                else if (battleLine[i].ID == "mush_04" && frontLineIdx == AISupportLineIdx - 1)
+                else if (battleLine[i].ID == "mush_04" && FrontLineIdx == AISupportLineIdx - 1)
                 {
                     priority = 5;
                 }
