@@ -210,6 +210,7 @@ public class BattleSceneManager : MonoBehaviour,
 		bases[1] = plantBase as UnitElementController;
 
 		baseDisplay.BaseInfoInitialize(bases[0].color, bases[0].CardImage, bases[0].categoryIcon, bases[0].description);
+		baseDisplay.UpdateBaseHealth(bases[0].healthPoint, bases[0].maxHealthPoint);
 	}
 	public void UpdateBaseHealth(int health)
 	{
