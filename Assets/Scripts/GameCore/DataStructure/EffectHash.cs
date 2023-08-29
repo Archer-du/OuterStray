@@ -362,11 +362,11 @@ namespace EventEffectModels
 
 			if(publisher.inlineIdx + 1 < publisher.battleLine.count)
 			{
-				publisher.battleLine[publisher.inlineIdx + 1].Recover(recover, "immediate");
+				publisher.battleLine[publisher.inlineIdx + 1].Recover(recover, "append");
 			}
 			if(publisher.inlineIdx - 1 >= 0)
 			{
-				publisher.battleLine[publisher.inlineIdx - 1].Recover(recover, "immediate");
+				publisher.battleLine[publisher.inlineIdx - 1].Recover(recover, "append");
 			}
 		}
 
@@ -1037,11 +1037,13 @@ namespace EventEffectModels
 		internal void DamageAll(BattleElement source, BattleSystem system)
 		{
 			int damage = ((List<int>)argsTable["DamageAll"])[0];
+			bool first = true;
 			foreach (UnitElement unit in system.deployQueue)
 			{
 				if(unit.state == ElementState.inBattleLine)
 				{
-					unit.Damaged(damage, "immediate");
+					unit.Damaged(damage, first ? "append" : "immediate");
+					first = false;
 				}
 			}
 		}

@@ -479,7 +479,7 @@ public class BattleSceneManager : MonoBehaviour,
 			gameManager.config.tutorial = false;
 			string modifiedConfig = JsonUtility.ToJson(gameManager.config);
 			//TODO
-			File.WriteAllText("Assets\\Resources\\Config\\GlobalConfig.json.txt", modifiedConfig);
+			//File.WriteAllText("Assets\\Resources\\Config\\GlobalConfig.json.txt", modifiedConfig);
 		}
 
 		StopAllCoroutines();

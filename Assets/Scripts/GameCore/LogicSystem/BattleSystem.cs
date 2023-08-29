@@ -350,6 +350,8 @@ namespace LogicCore
 				element.dynHealth = fieldPreset.cardPreset.healthPreset;
 				element.dynAttackWriter = fieldPreset.cardPreset.attackPreset;
 				element.dynAttackCounter = fieldPreset.cardPreset.attackCounterPreset;
+				element.UpdateInfo();
+				element.UpdateHealth();
 
 				UpdateFrontLine();
 				UpdateAttackRange();
