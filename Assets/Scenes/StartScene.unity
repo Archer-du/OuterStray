@@ -3111,7 +3111,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: World
+  m_text: Stray
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: afcc5cc520f12334980de9a824a45293, type: 2}
   m_sharedMaterial: {fileID: -8328883905887426020, guid: afcc5cc520f12334980de9a824a45293, type: 2}
@@ -3246,7 +3246,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Hello
+  m_text: Outer
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: afcc5cc520f12334980de9a824a45293, type: 2}
   m_sharedMaterial: {fileID: -8328883905887426020, guid: afcc5cc520f12334980de9a824a45293, type: 2}
