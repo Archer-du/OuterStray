@@ -17,10 +17,10 @@ public class BTBattleNode0 : BTBattleNode
             }),
             new SequenceNode(new List<BTNode>()
             {
-                new ConditionNode(() => !GetIsLineAvailable(AISupportLineIdx) || frontLineIdx == AISupportLineIdx - 1),
+                new ConditionNode(() => !GetIsLineAvailable(AISupportLineIdx) || FrontLineIdx == AISupportLineIdx - 1),
                 new ActionNode(() => TryRetreatUnits(AISupportLineIdx)),
             }),
-            new ActionNode(() => TryAdjustForward(frontLineIdx)),
+            new ActionNode(() => TryAdjustForward(FrontLineIdx)),
             new SequenceNode(new List<BTNode>()
             {
                 new ConditionNode(() => Energy > 8),
@@ -32,12 +32,13 @@ public class BTBattleNode0 : BTBattleNode
                 new ConditionNode(() => AISupportLine.count < AISupportLine.capacity - 1),
                 new ActionNode(() => TryCast("comm_mush_01")),
             }),
-            new ActionNode(() => TryCastComm15(frontLineIdx)),
+            new ActionNode(() => TryCastComm15()),
             new SequenceNode(new List<BTNode>()
             {
                 new ConditionNode(() => GetIsLineAvailable(AIAdjacentLineIdx)),
                 new ActionNode(() => TryCast("comm_mush_13")),
             }),
+            new ActionNode(() => TryCast("comm_mush_10")),
             new ActionNode(() => TryCast("comm_mush_08")),
         });
     }

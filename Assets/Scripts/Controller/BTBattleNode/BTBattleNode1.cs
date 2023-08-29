@@ -17,8 +17,10 @@ public class BTBattleNode1 : BTBattleNode
 		rootNode = new SelectorNode(new List<BTNode>()
 		{
 			new ActionNode(() => TryAdjustHalf()),
-            // new ActionNode(() => TryAdjustForward(frontLineIdx)),
-            new ActionNode(() => TryCastComm15(frontLineIdx)),
+			// new ActionNode(() => TryCastComm2()),
+			new ActionNode(() => TryCastComm3()),
+			new ActionNode(() => TryCastComm6()),
+            new ActionNode(() => TryCastComm15()),
 		});
 	}
 
@@ -47,7 +49,7 @@ public class BTBattleNode1 : BTBattleNode
 	/// </summary>
 	private bool TryAdjustHalf()
 	{
-		for (int i = FieldCapacity - 1; i > frontLineIdx + 1; i--)
+		for (int i = FieldCapacity - 1; i > FrontLineIdx + 1; i--)
 		{
 			// 单位数大于容量的一半时，将本战线血量低的单位往前推
 			if (GetIsMoreThanHalf(i) && GetIsLineAvailable(i - 1))
