@@ -15,6 +15,8 @@ using JetBrains.Annotations;
 using System.Linq;
 using BehaviorTree;
 using UnityEngine.SceneManagement;
+using static GameManager;
+using Unity.VisualScripting.FullSerializer;
 
 public enum Result
 {
@@ -210,7 +212,7 @@ public class BattleSceneManager : MonoBehaviour,
 		bases[1] = plantBase as UnitElementController;
 
 		baseDisplay.BaseInfoInitialize(bases[0].color, bases[0].CardImage, bases[0].categoryIcon, bases[0].description);
-		baseDisplay.UpdateBaseHealth(bases[0].healthPoint, bases[0].maxHealthPoint);
+		UpdateBaseHealth(bases[0].maxHealthPoint);
 	}
 	public void UpdateBaseHealth(int health)
 	{
@@ -475,8 +477,9 @@ public class BattleSceneManager : MonoBehaviour,
 		if (gameManager.config.tutorial)
 		{
 			gameManager.config.tutorial = false;
-			string modifiedConfig = JsonUtility.ToJson(gameManager.config, true);
+			string modifiedConfig = JsonUtility.ToJson(gameManager.config);
 			//TODO
+			File.WriteAllText("Assets\\Resources\\Config\\GlobalConfig.json.txt", modifiedConfig);
 		}
 
 		StopAllCoroutines();

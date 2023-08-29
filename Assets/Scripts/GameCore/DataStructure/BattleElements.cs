@@ -846,7 +846,7 @@ namespace DataCore.BattleElements
                 {
                     battleSystem.result = BattleResult.win;
                 }
-                Terminate("append");
+                Terminate(method);
                 return -1;
             }
 
@@ -890,7 +890,7 @@ namespace DataCore.BattleElements
 				{
 					battleSystem.result = BattleResult.win;
 				}
-				Terminate("append");
+				Terminate(method);
 				return -1;
 			}
 

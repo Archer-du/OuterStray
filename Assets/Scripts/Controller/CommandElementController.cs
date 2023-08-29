@@ -119,6 +119,7 @@ public class CommandElementController : BattleElementController,
 
 		targetSelectionLock = true;
 		battleSceneManager.castingCommand = this;
+		battleSceneManager.skipButton.interactable = false;
 
 		seq.Append(transform.DOMove(inputOffset / 2 + 500 * Vector2.down, castTime));
 		seq.Join(transform.DOScale(castScale, castTime));
@@ -134,6 +135,7 @@ public class CommandElementController : BattleElementController,
 
 		targetSelectionLock = false;
 		battleSceneManager.castingCommand = null;
+		battleSceneManager.skipButton.interactable = true;
 
 		//消耗
 		if (durability == 0)

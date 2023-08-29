@@ -340,12 +340,16 @@ namespace LogicCore
 				if (fieldPreset.cardPreset.boss)
 				{
 					bases[1] = element;
+					element.Deploy(battleLines[lineIdx], 0);
+				}
+				else
+				{
+					//TODO
+					element.PresetDeploy(battleLines[lineIdx], 0);
 				}
 				element.dynHealth = fieldPreset.cardPreset.healthPreset;
 				element.dynAttackWriter = fieldPreset.cardPreset.attackPreset;
 				element.dynAttackCounter = fieldPreset.cardPreset.attackCounterPreset;
-				//TODO
-				element.PresetDeploy(battleLines[lineIdx], 0);
 
 				UpdateFrontLine();
 				UpdateAttackRange();

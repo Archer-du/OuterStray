@@ -1394,10 +1394,6 @@ namespace EventEffectModels
 		internal void CheckOutRemoteTarget(BattleElement source, BattleSystem system)
 		{
 			ArtilleryElement publisher = this.source as ArtilleryElement;
-			if (!publisher.aura)
-			{
-				return;
-			}
 
 
 			int method = ((List<int>)argsTable["CheckOutRemoteTarget"])[0];

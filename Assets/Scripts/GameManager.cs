@@ -139,11 +139,11 @@ public class GameManager : MonoBehaviour, IGameManagement,
 		{
 			case "StartScene":
 				OnGameStateChanged = null;
-				Destroy(gameObject);
+				//Destroy(gameObject);
 				//Destroy(cultivateSceneManager);
 				//Destroy(tacticalSceneManager);
 
-				//DestroyOtherInstancesOfType();
+				DestroyOtherInstancesOfType();
 				break;
 			case "CultivateScene":
 				if (cultivateSceneManager != null)
