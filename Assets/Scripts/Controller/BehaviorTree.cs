@@ -117,7 +117,7 @@ namespace BehaviorTree
         // 行为树可执行的基本操作
         protected bool BTDeploy(int handicapIdx, int dstLineIdx = 3, int dstPos = 0)
         {
-            if (AIHandicap[handicapIdx] is UnitElementController && AIHandicap[handicapIdx].cost <= Energy && BattleLines[dstLineIdx].count < BattleLines[dstLineIdx].capacity)
+            if (AIHandicap.count > handicapIdx && AIHandicap[handicapIdx] is UnitElementController && AIHandicap[handicapIdx].cost <= Energy && BattleLines[dstLineIdx].count < BattleLines[dstLineIdx].capacity)
             {
                 SceneManager.AIDeploy(handicapIdx, dstLineIdx, dstPos);
                 return true;
@@ -126,7 +126,7 @@ namespace BehaviorTree
         }
         protected bool BTTargetCast(int handicapIdx, int dstLineIdx, int dstPos)
         {
-            if (AIHandicap[handicapIdx] is CommandElementController && AIHandicap[handicapIdx].cost <= Energy && BattleLines[dstLineIdx][dstPos] != null)
+            if (AIHandicap.count > handicapIdx && AIHandicap[handicapIdx] is CommandElementController && AIHandicap[handicapIdx].cost <= Energy && dstLineIdx < FieldCapacity && BattleLines[dstLineIdx].count > dstPos)
             {
                 SceneManager.AITargetCast(handicapIdx, dstLineIdx, dstPos);
                 return true;
@@ -135,7 +135,7 @@ namespace BehaviorTree
         }
         protected bool BTNoneTargetCast(int handicapIdx)
         {
-            if (AIHandicap[handicapIdx] is CommandElementController && AIHandicap[handicapIdx].cost <= Energy)
+            if (AIHandicap.count > handicapIdx && AIHandicap[handicapIdx] is CommandElementController && AIHandicap[handicapIdx].cost <= Energy)
             {
                 SceneManager.AINoneTargetCast(handicapIdx);
                 return true;
@@ -144,7 +144,7 @@ namespace BehaviorTree
         }
         protected bool BTMove(int resLineIdx, int resPos, int dstLineIdx, int dstPos)
         {
-            if (BattleLines[resLineIdx][resPos].ownership == 1 && BattleLines[resLineIdx][resPos].operateCounter == 1 && BattleLines[resLineIdx][resPos].category != "Construction" && BattleLines[dstLineIdx].count < BattleLines[dstLineIdx].capacity)
+            if (resLineIdx < FieldCapacity && BattleLines[resLineIdx].count > resPos && BattleLines[resLineIdx][resPos].ownership == 1 && BattleLines[resLineIdx][resPos].operateCounter == 1 && BattleLines[resLineIdx][resPos].category != "Construction" && dstLineIdx < FieldCapacity && BattleLines[dstLineIdx].count < BattleLines[dstLineIdx].capacity)
             {
                 SceneManager.AIMove(resLineIdx, resPos, dstLineIdx, dstPos);
                 return true;
@@ -153,7 +153,7 @@ namespace BehaviorTree
         }
         protected bool BTRetreat(int resLineIdx, int resPos)
         {
-            if (resLineIdx == FieldCapacity - 1 && BattleLines[resLineIdx][resPos].operateCounter == 1)
+            if (resLineIdx == FieldCapacity - 1 && BattleLines[resLineIdx].count >= resPos && BattleLines[resLineIdx][resPos].operateCounter == 1)
             {
                 SceneManager.AIRetreat(resLineIdx, resPos);
                 return true;
@@ -534,12 +534,12 @@ namespace BehaviorTree
                 }
             }
 
-            if (handicapIdx < 0)
+            if (handicapIdx < 0 || FrontLineIdx + 1 == AISupportLineIdx)
             {
                 return false;
             }
 
-            for (int i = 0; i > FrontLineIdx && i < AISupportLineIdx; i--)
+            for (int i = AISupportLineIdx - 1; i > FrontLineIdx; i--)
             {
                 (lineMinHealth, lineMinHealthPos) = GetLineMinHealth(i);
                 if (lineMinHealth < fieldMinHealth)

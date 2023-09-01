@@ -18,8 +18,8 @@ public class BTBattleNode1 : BTBattleNode
 		{
 			new ActionNode(() => TryAdjustHalf()),
 			// new ActionNode(() => TryCastComm2()),
-			new ActionNode(() => TryCastComm3()),
-			new ActionNode(() => TryCastComm6()),
+			// new ActionNode(() => TryCastComm3()),
+			// new ActionNode(() => TryCastComm6()),
             new ActionNode(() => TryCastComm15()),
 		});
 	}
