@@ -59,4 +59,12 @@
 左下角圆框中的数字即为能源，其下侧的+x为下回合将获得的能源
 
 ## 演示
-![cat](https://media.giphy.com/media/vFKqnCdLPNOKc/giphy.gif)
+![cat](https://github.com/Archer-du/OuterStray/blob/master/Assets/demo/main_menu.gif)
+![cat](https://github.com/Archer-du/OuterStray/blob/master/Assets/demo/base_select.gif)
+![cat](https://github.com/Archer-du/OuterStray/blob/master/Assets/demo/battle_start.gif)
+![cat](https://github.com/Archer-du/OuterStray/blob/master/Assets/demo/battle_turnstart.gif)
+![cat](https://github.com/Archer-du/OuterStray/blob/master/Assets/demo/battle_deploy.gif)
+![cat](https://github.com/Archer-du/OuterStray/blob/master/Assets/demo/battle_move.gif)
+![cat](https://github.com/Archer-du/OuterStray/blob/master/Assets/demo/battle_inspect.gif)
+![cat](https://github.com/Archer-du/OuterStray/blob/master/Assets/demo/battle_attacked.gif)
+![cat](https://github.com/Archer-du/OuterStray/blob/master/Assets/demo/battle_win.gif)
