@@ -1,6 +1,18 @@
 # OuterStray
 ---
-## OuterStray新手小教程
+## 演示
+> 可能由于网络问题短时间内无法加载
+![cat](https://github.com/Archer-du/OuterStray/blob/master/Assets/demo/main_menu.gif)
+![cat](https://github.com/Archer-du/OuterStray/blob/master/Assets/demo/base_select.gif)
+![cat](https://github.com/Archer-du/OuterStray/blob/master/Assets/demo/battle_start.gif)
+![cat](https://github.com/Archer-du/OuterStray/blob/master/Assets/demo/battle_turnstart.gif)
+![cat](https://github.com/Archer-du/OuterStray/blob/master/Assets/demo/battle_deploy.gif)
+![cat](https://github.com/Archer-du/OuterStray/blob/master/Assets/demo/battle_move.gif)
+![cat](https://github.com/Archer-du/OuterStray/blob/master/Assets/demo/battle_inspect.gif)
+![cat](https://github.com/Archer-du/OuterStray/blob/master/Assets/demo/battle_attacked.gif)
+![cat](https://github.com/Archer-du/OuterStray/blob/master/Assets/demo/battle_win.gif)
+
+## 教程
 ### 0. 开局准备
 1. 点击中间的建筑，进入构建初始卡组的界面，目前的测试版本将全卡库开放给测试玩家，
 每张卡牌限选三张进入自己的初始卡组，目前卡组卡牌张数没有限制
@@ -57,14 +69,3 @@
 己方占据的最前方战线即为前线（用透明矩形框来表示）
 ##### 3.2.2. 能源
 左下角圆框中的数字即为能源，其下侧的+x为下回合将获得的能源
-
-## 演示
-![cat](https://github.com/Archer-du/OuterStray/blob/master/Assets/demo/main_menu.gif)
-![cat](https://github.com/Archer-du/OuterStray/blob/master/Assets/demo/base_select.gif)
-![cat](https://github.com/Archer-du/OuterStray/blob/master/Assets/demo/battle_start.gif)
-![cat](https://github.com/Archer-du/OuterStray/blob/master/Assets/demo/battle_turnstart.gif)
-![cat](https://github.com/Archer-du/OuterStray/blob/master/Assets/demo/battle_deploy.gif)
-![cat](https://github.com/Archer-du/OuterStray/blob/master/Assets/demo/battle_move.gif)
-![cat](https://github.com/Archer-du/OuterStray/blob/master/Assets/demo/battle_inspect.gif)
-![cat](https://github.com/Archer-du/OuterStray/blob/master/Assets/demo/battle_attacked.gif)
-![cat](https://github.com/Archer-du/OuterStray/blob/master/Assets/demo/battle_win.gif)
